@@ -1,0 +1,57 @@
+#include <stdio.h>
+
+char INTRODUCTION[] =
+    "Step 1: Customize Your Profile"
+    "Navigate to the Account section in the navigation bar to change your name "
+    "and personalize your experience."
+    "Step 2: Choose Your First Course"
+    "Focus on one of the course cards (like \"Build an HTTP Server in C\") and "
+    "press Enter to begin your learning journey."
+    "Step-by-Step Learning"
+    "Each course is designed to guide you through small, manageable steps. "
+    "You'll learn by:"
+    "Short instructions to get you started."
+    "Reading material and links to deepen your understanding."
+    "Hands-on tasks to practice and apply what you've learned in the built-in "
+    "editor."
+    "Testing and Feedback"
+    "Once you've completed a task, you'll be prompted to test your solution. "
+    "Submit it for evaluation to receive feedback and gain points. Use these "
+    "points to unlock the next level and continue your learning adventure!"
+    "Once you're ready, choose a course and dive in! The app is here to help "
+    "guide you, and you'll learn while having fun.";
+
+char *wrap_text_by_words(char *text, int width);
+
+int main(int argc, char **argv)
+{
+    char *text = wrap_text_by_words(INTRODUCTION, 20);
+    printf("%s", text);
+    return 0;
+}
+
+char *wrap_text_by_words(char text[], int width)
+{
+    int i, line, last_space;
+    i = line = last_space = 0;
+    while (text[line * width + i])
+    {
+        printf("i: %i\n", i);
+        printf("line: %i\n", line);
+        printf("last_space: %i\n", last_space);
+        printf("text at %i: %c\n", i, text[line * width + i]);
+        if (i > width)
+        {
+            text[last_space] = '\n';
+            i = 0;
+            line++;
+        }
+        else if (text[line * width + i] == ' ')
+        {
+            last_space = line * width + i;
+        }
+        i++;
+    }
+
+    return text;
+}

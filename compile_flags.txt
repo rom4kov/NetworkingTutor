@@ -1,0 +1,3 @@
+-Wall
+-std=c17
+-I/src/

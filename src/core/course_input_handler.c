@@ -5,6 +5,7 @@
 #include <ncurses.h>
 
 #define WINDOW_COUNT 3
+#define WU COLS / 12 // WU for WIDTH_UNIT
 
 void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu, sqlite3 *db)
 {
@@ -15,6 +16,8 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu, s
     int y, x;
     y = 0;
     x = 0;
+
+    WINDOW *edit_window = derwin(windows[1], LINES - 5, WU * 7 + 2, 1, 1);
     // FIELD *fields[3];
 
     while (in_course_view)
@@ -75,46 +78,52 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu, s
         {
             switch (ch) {
                 case KEY_RIGHT:
-                    getyx(windows[1], y, x);
-                    wmove(windows[1], y, x + 1);
-                    wrefresh(windows[1]);
+                    getyx(edit_window, y, x);
+                    wmove(edit_window, y, x + 1);
+                    wrefresh(edit_window);
                     break;
                 case KEY_LEFT:
-                    getyx(windows[1], y, x);
-                    wmove(windows[1], y, x - 1);
-                    wrefresh(windows[1]);
+                    getyx(edit_window, y, x);
+                    wmove(edit_window, y, x - 1);
+                    wrefresh(edit_window);
                     break;
                 case KEY_DOWN:
-                    getyx(windows[1], y, x);
-                    wmove(windows[1], y + 1, x);
-                    wrefresh(windows[1]);
+                    getyx(edit_window, y, x);
+                    wmove(edit_window, y + 1, x);
+                    wrefresh(edit_window);
                     break;
                 case KEY_UP:
-                    getyx(windows[1], y, x);
-                    wmove(windows[1], y - 1, x);
-                    wrefresh(windows[1]);
+                    getyx(edit_window, y, x);
+                    wmove(edit_window, y - 1, x);
+                    wrefresh(edit_window);
                     break;
                 case KEY_BACKSPACE:
-                    getyx(windows[1], y, x);
-                    mvwprintw(windows[1], y, x - 1, " ");
-                    wmove(windows[1], y, x - 1);
-                    wrefresh(windows[1]);
+                    getyx(edit_window, y, x);
+                    if (x == 0)
+                    {
+                        wmove(edit_window, y - 1, x);
+                        wrefresh(edit_window);
+                        break;
+                    }
+                    mvwprintw(edit_window, y, x - 1, " ");
+                    wmove(edit_window, y, x - 1);
+                    wrefresh(edit_window);
                     break;
                 case 10:
-                    getyx(windows[1], y, x);
-                    wprintw(windows[1], "%c", '\n');
-                    wmove(windows[1], y + 1, 1);
-                    wrefresh(windows[1]);
+                    getyx(edit_window, y, x);
+                    wprintw(edit_window, "%c", '\n');
+                    wmove(edit_window, y + 1, 0);
+                    wrefresh(edit_window);
                     break;
                 case KEY_F(1):
                     curs_set(0);
-                    wrefresh(windows[1]);
+                    wrefresh(edit_window);
                     editor_mode = false;
                     break;
                 default:
-                    wprintw(windows[1], "%c", ch);
-                    // wmove(windows[1], y, x + 1);
-                    wrefresh(windows[1]);
+                    wprintw(edit_window, "%c", ch);
+                    // wmove(edit_window, y, x + 1);
+                    wrefresh(edit_window);
                     break;
             }
         }

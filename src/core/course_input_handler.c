@@ -3,11 +3,13 @@
 #include <curses.h>
 #include <menu.h>
 #include <ncurses.h>
+#include <stdio.h>
 
 #define WINDOW_COUNT 3
 #define WU COLS / 12 // WU for WIDTH_UNIT
 
-void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu, sqlite3 *db)
+void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
+                         sqlite3 *db)
 {
     bool in_course_view = true;
     bool editor_mode = false;
@@ -19,6 +21,45 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu, s
 
     WINDOW *edit_window = derwin(windows[1], LINES - 5, WU * 7 + 2, 1, 1);
     // FIELD *fields[3];
+
+    // char buffer[10][80];
+
+    char *filename = "../hello.c";
+    FILE *file = fopen(filename, "r");
+    // mvwprintw(edit_window, 1, 1, "%p", file);
+    if (file != NULL)
+    {
+
+        int i, j;
+        i = j = 0;
+        char c;
+        while (fread(&c, sizeof(char), 1, file))
+        {
+            if (c == 10)
+            {
+                // buffer[i][j] = c;
+                // buffer[i][j + 1] = '\0';
+                i++;
+                j = 0;
+                continue;
+            }
+            mvwprintw(edit_window, i, j, "%c", c);
+            wrefresh(edit_window);
+            // buffer[i][j] = c;
+            j++;
+        }
+        // for (i = 0; i < 10; i++)
+        // {
+        // mvwprintw(edit_window, 1, 1, "%s", buffer[i]);
+    }
+    else
+    {
+        mvwprintw(edit_window, 1, 1, "%p", file);
+    }
+
+    fclose(file);
+
+    wrefresh(edit_window);
 
     while (in_course_view)
     {
@@ -76,56 +117,7 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu, s
         }
         else if (*active_win == 1 && editor_mode)
         {
-            switch (ch) {
-                case KEY_RIGHT:
-                    getyx(edit_window, y, x);
-                    wmove(edit_window, y, x + 1);
-                    wrefresh(edit_window);
-                    break;
-                case KEY_LEFT:
-                    getyx(edit_window, y, x);
-                    wmove(edit_window, y, x - 1);
-                    wrefresh(edit_window);
-                    break;
-                case KEY_DOWN:
-                    getyx(edit_window, y, x);
-                    wmove(edit_window, y + 1, x);
-                    wrefresh(edit_window);
-                    break;
-                case KEY_UP:
-                    getyx(edit_window, y, x);
-                    wmove(edit_window, y - 1, x);
-                    wrefresh(edit_window);
-                    break;
-                case KEY_BACKSPACE:
-                    getyx(edit_window, y, x);
-                    if (x == 0)
-                    {
-                        wmove(edit_window, y - 1, x);
-                        wrefresh(edit_window);
-                        break;
-                    }
-                    mvwprintw(edit_window, y, x - 1, " ");
-                    wmove(edit_window, y, x - 1);
-                    wrefresh(edit_window);
-                    break;
-                case 10:
-                    getyx(edit_window, y, x);
-                    wprintw(edit_window, "%c", '\n');
-                    wmove(edit_window, y + 1, 0);
-                    wrefresh(edit_window);
-                    break;
-                case KEY_F(1):
-                    curs_set(0);
-                    wrefresh(edit_window);
-                    editor_mode = false;
-                    break;
-                default:
-                    wprintw(edit_window, "%c", ch);
-                    // wmove(edit_window, y, x + 1);
-                    wrefresh(edit_window);
-                    break;
-            }
+            handle_editor_input(ch, &edit_window, y, x, &editor_mode);
         }
         else if (*active_win == 1)
         {
@@ -135,7 +127,8 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu, s
                 case KEY_RIGHT:
                     *active_win = 2;
                     focus_window(windows, 1, 2, active_win, "Editor");
-                    focus_window(windows, 2, 3, active_win, "Course Instructions");
+                    focus_window(windows, 2, 3, active_win,
+                                 "Course Instructions");
                     break;
                 case KEY_UP:
                     *active_win = 0;
@@ -158,9 +151,66 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu, s
                 case KEY_LEFT:
                     *active_win = 1;
                     focus_window(windows, 1, 3, active_win, "Editor");
-                    focus_window(windows, 2, 2, active_win, "Course Instructions");
+                    focus_window(windows, 2, 2, active_win,
+                                 "Course Instructions");
                     break;
             }
         }
+    }
+}
+
+void handle_editor_input(int ch, WINDOW **edit_window, int y, int x,
+                         bool *editor_mode)
+{
+    switch (ch)
+    {
+        case KEY_RIGHT:
+            getyx(*edit_window, y, x);
+            wmove(*edit_window, y, x + 1);
+            wrefresh(*edit_window);
+            break;
+        case KEY_LEFT:
+            getyx(*edit_window, y, x);
+            wmove(*edit_window, y, x - 1);
+            wrefresh(*edit_window);
+            break;
+        case KEY_DOWN:
+            getyx(*edit_window, y, x);
+            wmove(*edit_window, y + 1, x);
+            wrefresh(*edit_window);
+            break;
+        case KEY_UP:
+            getyx(*edit_window, y, x);
+            wmove(*edit_window, y - 1, x);
+            wrefresh(*edit_window);
+            break;
+        case KEY_BACKSPACE:
+            getyx(*edit_window, y, x);
+            if (x == 0)
+            {
+                wmove(*edit_window, y - 1, x);
+                wrefresh(*edit_window);
+                break;
+            }
+            mvwprintw(*edit_window, y, x - 1, " ");
+            wmove(*edit_window, y, x - 1);
+            wrefresh(*edit_window);
+            break;
+        case 10:
+            getyx(*edit_window, y, x);
+            wprintw(*edit_window, "%c", '\n');
+            wmove(*edit_window, y + 1, 0);
+            wrefresh(*edit_window);
+            break;
+        case KEY_F(1):
+            curs_set(0);
+            wrefresh(*edit_window);
+            *editor_mode = false;
+            break;
+        default:
+            wprintw(*edit_window, "%c", ch);
+            // wmove(*edit_window, y, x + 1);
+            wrefresh(*edit_window);
+            break;
     }
 }

@@ -1,4 +1,5 @@
 #include "src/views/views.h"
+#include "src/core/core.h"
 #include <locale.h>
 #include <ncurses.h>
 #include <sqlite3.h>

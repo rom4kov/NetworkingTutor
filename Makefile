@@ -5,7 +5,7 @@ INC=-Isrc/
 
 TARGET = main
 
-SRC = main.c src/views/start_screen.c src/views/user_form.c src/views/course_view.c src/data/data_access_layer.c src/core/input_handler.c src/core/helpers.c 
+SRC = $(wildcard *.c) $(wildcard src/**/*.c)
 
 $(TARGET): $(SRC)
 		$(CC) $(CFLAGS) $(SRC) -o $(TARGET) $(LDFLAGS)

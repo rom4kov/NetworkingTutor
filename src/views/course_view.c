@@ -2,7 +2,7 @@
 
 #include "../core/core.h"
 #include "start_menu.h"
-#include "user_form.h"
+#include "views.h"
 #include "views.h"
 #include <curses.h>
 #include <form.h>
@@ -26,7 +26,7 @@ void create_course_view(sqlite3 *db)
 
     wrefresh(windows[2]);
 
-    getch();
+    handle_course_input(windows, &active_window, &start_menu, db);
 }
 
 WINDOW *create_editor_window(int *active_window)

@@ -16,16 +16,16 @@ typedef struct _course_data
 typedef struct _char_buffer
 {
     char *buf_;
-    char *ccur_;
-    char *cend_;
+    int *ccur_;
+    int *cend_;
     int size_;
 } CHAR_BUFFER;
 
 typedef struct _line_buffer
 {
     int *line_size_;
-    int *ccur_;
-    int *cend_;
+    int ccur_;
+    int cend_;
     int size_;
 } LINE_BUFFER;
 

@@ -1,12 +1,15 @@
 #include "../core/core.h"
 #include "../views/views.h"
+#include "../models/models.h"
 #include <curses.h>
 #include <menu.h>
 #include <ncurses.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #define WINDOW_COUNT 3
 #define WU COLS / 12 // WU for WIDTH_UNIT
+#define INITIAL_GAP_SIZE 64
 
 void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
                          sqlite3 *db)
@@ -15,51 +18,99 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
     bool editor_mode = false;
     int ch;
     ITEM *curr_item;
-    int y, x;
-    y = 0;
-    x = 0;
+    int y, x, num_lines, prev_chars;
+    y = x = num_lines = prev_chars = 0;
+    char c;
 
-    WINDOW *edit_window = derwin(windows[1], LINES - 5, WU * 7 + 2, 1, 1);
+    WINDOW *line_num_win = derwin(windows[1], LINES - 5, 3, 1, 1);
+    WINDOW *edit_window = derwin(windows[1], LINES - 6, WU * 7 - 2, 2, 4);
     // FIELD *fields[3];
 
-    // char buffer[10][80];
+    CHAR_BUFFER char_buf;
+    LINE_BUFFER line_buf;
+    // TEXT_EDITOR editor;
 
     char *filename = "../hello.c";
     FILE *file = fopen(filename, "r");
-    // mvwprintw(edit_window, 1, 1, "%p", file);
+
+    if (file == NULL)
+    {
+        printf("Could not open %s.\n", filename);
+    }
+
+    fseek(file, 0, SEEK_END);
+    int file_size = ftell(file);
+    rewind(file);
+
+    do {
+        c = fgetc(file);
+        if (c == '\n') num_lines++;
+    } while (c != EOF);
+    rewind(file);
+
+    // mvwprintw(edit_window, 20, 2, "File size: %i", file_size);
+    // mvwprintw(edit_window, 21, 2, "Lines:     %i", num_lines);
+
     if (file != NULL)
     {
+        int i, j, k;
+        i = j = k = 0;
 
-        int i, j;
-        i = j = 0;
-        char c;
+        char_buf.buf_ = calloc(file_size, sizeof(char));
+        char_buf.ccur_ = char_buf.buf_;
+        char_buf.cend_ = char_buf.ccur_ + INITIAL_GAP_SIZE;
+        char_buf.size_ = 0;
+
+        line_buf.line_size_ = calloc(num_lines, sizeof(int));
+        line_buf.ccur_ = 0;
+        line_buf.cend_ = 0;
+        line_buf.size_ = 0;
+
         while (fread(&c, sizeof(char), 1, file))
         {
-            if (c == 10)
+            if (c == '\n')
             {
-                // buffer[i][j] = c;
-                // buffer[i][j + 1] = '\0';
-                i++;
-                j = 0;
+                char_buf.buf_[char_buf.size_] = c;
+                char_buf.size_++;
+                if (line_buf.size_ == 0)
+                {
+                    line_buf.line_size_[line_buf.size_] = char_buf.size_;
+                }
+                else
+                {
+                    prev_chars = 0;
+                    for (j = 0; j < line_buf.size_; j++)
+                        prev_chars += line_buf.line_size_[j];
+                    line_buf.line_size_[line_buf.size_] = char_buf.size_ - prev_chars;
+                }
+                line_buf.size_++;
                 continue;
             }
-            mvwprintw(edit_window, i, j, "%c", c);
-            wrefresh(edit_window);
-            // buffer[i][j] = c;
-            j++;
+            char_buf.buf_[char_buf.size_] = c;
+            char_buf.size_++;
+            i++;
         }
-        // for (i = 0; i < 10; i++)
-        // {
-        // mvwprintw(edit_window, 1, 1, "%s", buffer[i]);
-    }
-    else
-    {
-        mvwprintw(edit_window, 1, 1, "%p", file);
+
+        wattron(windows[1], A_BOLD);
+        mvwprintw(windows[1], 1, 1, "%s", filename);
+        wattroff(windows[1], A_BOLD);
+        for (i = 0; i < line_buf.size_; i++)
+        {
+            if (i < 10) mvwprintw(line_num_win, i + 1, 1, "%i", i + 1);
+            else mvwprintw(line_num_win, i + 1, 0, "%i", i + 1);
+            for (j = 0; j < line_buf.line_size_[i]; j++)
+            {
+                mvwprintw(edit_window, i, j, "%c", char_buf.buf_[k]);
+                k++;
+            }
+        }
     }
 
     fclose(file);
 
+    wrefresh(line_num_win);
     wrefresh(edit_window);
+    wrefresh(windows[1]);
 
     while (in_course_view)
     {
@@ -138,8 +189,8 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
                 case 10:
                     editor_mode = true;
                     curs_set(1);
-                    wmove(windows[1], 1, 1);
-                    wrefresh(windows[1]);
+                    wmove(edit_window, 0, 0);
+                    wrefresh(edit_window);
                     break;
             }
         }

@@ -22,7 +22,7 @@ void create_course_view(sqlite3 *db)
 
     windows[0] = create_navigation_window(&active_window, &start_menu);
     windows[1] = create_editor_window(&active_window);
-    windows[2] = create_right_side_panel(&active_window, &db);
+    windows[2] = create_right_side_panel(&active_window, &db, "Course instructions");
 
     wrefresh(windows[2]);
 

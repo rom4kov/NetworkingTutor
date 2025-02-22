@@ -90,7 +90,7 @@ void create_start_screen(sqlite3 *db)
         create_course_preview_card(CARD_WIDTH, &active_window, 3, &courses[1]);
     windows[4] = create_course_preview_card(CARD_WIDTH * 2, &active_window, 4,
                                             &courses[2]);
-    windows[5] = create_right_side_panel(&active_window, &db);
+    windows[5] = create_right_side_panel(&active_window, &db, "Details");
 
     wrefresh(windows[5]);
 
@@ -195,7 +195,7 @@ WINDOW *create_course_preview_card(int x_position, int *active_win,
     return course_preview_card_outer;
 }
 
-WINDOW *create_right_side_panel(int *active_win, sqlite3 **db)
+WINDOW *create_right_side_panel(int *active_win, sqlite3 **db, char *label)
 {
     USER_DATA user_data = get_user_data(*db);
     int window_width = COLS - (WU * 7 + 4);
@@ -211,7 +211,7 @@ WINDOW *create_right_side_panel(int *active_win, sqlite3 **db)
         draw_border(right_panel, 2, 0);
     }
     wattron(right_panel, COLOR_PAIR(1));
-    mvwprintw(right_panel, 0, 2, "Details");
+    mvwprintw(right_panel, 0, 2, "%s", label);
     wattroff(right_panel, COLOR_PAIR(1));
 
     mvwprintw(right_panel, 2, 3, "Your name: %s", user_data.name);

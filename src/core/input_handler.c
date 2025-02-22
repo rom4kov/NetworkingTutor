@@ -192,7 +192,7 @@ void input_handler(WINDOW **windows, int *active_win, MENU **start_menu,
                     mvwprintw(windows[5], 39, 2, "Buffer: %s", buf2);
                     update_user(*db, 1, buf1, buf2);
                     curs_set(0);
-                    windows[5] = create_right_side_panel(active_win, db);
+                    windows[5] = create_right_side_panel(active_win, db, "Details");
                     wrefresh(windows[5]);
                     input_handler(windows, active_win, start_menu, courses, db);
                     unpost_form(user_form);

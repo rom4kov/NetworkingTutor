@@ -16,9 +16,10 @@ typedef struct _course_data
 typedef struct _char_buffer
 {
     char *buf_;
-    int *ccur_;
-    int *cend_;
+    char *ccur_;
+    char *cend_;
     int size_;
+    char *last_mod_;
 } CHAR_BUFFER;
 
 typedef struct _line_buffer

@@ -19,7 +19,7 @@ typedef struct _char_buffer
     char *ccur_;
     char *cend_;
     int size_;
-    char *last_mod_;
+    int mod_size_;
 } CHAR_BUFFER;
 
 typedef struct _line_buffer

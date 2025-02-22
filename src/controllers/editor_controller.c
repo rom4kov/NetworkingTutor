@@ -3,35 +3,55 @@
 #include <stdio.h>
 #include <string.h>
 
-void write_buffer_to_file(CHAR_BUFFER *cbuf, FILE *file, int file_size, WINDOW *edit_window)
+void write_buffer_to_file(CHAR_BUFFER *cbuf, FILE *file, int file_size,
+                          WINDOW *edit_window, char *ccur, char *cend,
+                          LINE_BUFFER *lbuf)
 {
-    mvwprintw(edit_window, LINES - 10, 22, "test2");
-    // int i;
-    // for (i = 0; i < lbuf->size_; i++)
-    // {
-        // int chars_printed = 0;
-    fwrite(cbuf->buf_, sizeof(char), file_size, file);
-    //     chars_printed += lbuf->line_size_[i];
-    // }
+    for (int i = 0; i < lbuf->size_; i++)
+    {
+        mvwprintw(edit_window, LINES - 28 + i, 6, "%i", lbuf->line_size_[i]);
+    }
+
+    mvwprintw(edit_window, LINES - 16, 52, "After:");
+    mvwprintw(edit_window, LINES - 15, 52, "Mod size: %i", cbuf->mod_size_);
+    mvwprintw(edit_window, LINES - 14, 52, "File pointer: %li", ftell(file));
+    mvwprintw(edit_window, LINES - 13, 52, "First byte of buffer: %p",
+              cbuf->buf_);
+    mvwprintw(edit_window, LINES - 12, 52, "ccur: %p", ccur);
+    mvwprintw(edit_window, LINES - 11, 52, "cend: %p", cend);
+
+    int first_buf_len = ccur - cbuf->buf_;
+    mvwprintw(edit_window, LINES - 10, 52, "First buffer length: %i",
+              first_buf_len);
+    int second_buf_len = &cbuf->buf_[file_size] - cend;
+    mvwprintw(edit_window, LINES - 9, 52, "Second buffer length: %i",
+              second_buf_len);
+
+    fwrite(cbuf->buf_, sizeof(char), first_buf_len, file);
+    fwrite(cend, sizeof(char), second_buf_len, file);
+
+    wrefresh(edit_window);
 }
 
 void handle_editor_input(int ch, WINDOW *edit_window, int y, int x,
                          CHAR_BUFFER *char_buf, LINE_BUFFER *line_buf,
-                         int gap_size, bool *editor_mode, FILE *file, int file_size)
+                         int gap_size, bool *editor_mode, FILE *file,
+                         int file_size)
 {
     switch (ch)
     {
         case KEY_RIGHT:
             char_buf->ccur_++;
             char_buf->cend_++;
+            char_buf->mod_size_++;
             getyx(edit_window, y, x);
             wmove(edit_window, y, x + 1);
             wrefresh(edit_window);
             break;
         case KEY_LEFT:
-            char_buf->last_mod_ = char_buf->ccur_;
             char_buf->ccur_--;
             char_buf->cend_--;
+            char_buf->mod_size_--;
             getyx(edit_window, y, x);
             wmove(edit_window, y, x - 1);
             wrefresh(edit_window);
@@ -39,6 +59,7 @@ void handle_editor_input(int ch, WINDOW *edit_window, int y, int x,
         case KEY_DOWN:
             char_buf->ccur_ += line_buf->line_size_[line_buf->ccur_];
             char_buf->cend_ += line_buf->line_size_[line_buf->ccur_];
+            char_buf->mod_size_ += line_buf->line_size_[line_buf->ccur_];
             line_buf->ccur_++;
             getyx(edit_window, y, x);
             wmove(edit_window, y + 1, x);
@@ -47,15 +68,24 @@ void handle_editor_input(int ch, WINDOW *edit_window, int y, int x,
         case KEY_UP:
             char_buf->ccur_ -= line_buf->line_size_[line_buf->ccur_ - 1];
             char_buf->cend_ -= line_buf->line_size_[line_buf->ccur_ - 1];
+            char_buf->mod_size_ -= line_buf->line_size_[line_buf->ccur_];
             line_buf->ccur_--;
             getyx(edit_window, y, x);
             wmove(edit_window, y - 1, x);
             wrefresh(edit_window);
             break;
         case KEY_BACKSPACE:
+            if (char_buf->mod_size_ > 0)
+                memcpy(char_buf->ccur_ - char_buf->mod_size_,
+                       char_buf->cend_ - char_buf->mod_size_,
+                       char_buf->mod_size_);
+            else if (char_buf->mod_size_ < 0)
+                memcpy(char_buf->cend_, char_buf->ccur_, char_buf->mod_size_);
+            char_buf->mod_size_ = 0;
             char_buf->ccur_--;
-            gap_size++;
-            line_buf->line_size_[line_buf->ccur_]--;
+            // gap_size++;
+            line_buf->line_size_[line_buf->ccur_] =
+                line_buf->line_size_[line_buf->ccur_] + 1;
             getyx(edit_window, y, x);
             if (x == 0)
             {
@@ -82,22 +112,25 @@ void handle_editor_input(int ch, WINDOW *edit_window, int y, int x,
             break;
         case KEY_F(10):
             mvwprintw(edit_window, LINES - 9, 22, "test");
-            write_buffer_to_file(char_buf, file, file_size, edit_window);
+            write_buffer_to_file(char_buf, file, file_size, edit_window,
+                                 char_buf->ccur_, char_buf->cend_, line_buf);
             break;
         default:
-            if (char_buf->ccur_ > char_buf->last_mod_)
-                memcpy(char_buf->ccur_, char_buf->cend_,
-                       char_buf->ccur_ - char_buf->last_mod_);
-            else
-                memcpy(char_buf->ccur_, char_buf->cend_,
-                       char_buf->last_mod_ - char_buf->ccur_);
-            char_buf->last_mod_ = char_buf->ccur_;
+            if (char_buf->mod_size_ > 0)
+                memcpy(char_buf->ccur_ - char_buf->mod_size_,
+                       char_buf->cend_ - char_buf->mod_size_,
+                       char_buf->mod_size_);
+            else if (char_buf->mod_size_ < 0)
+                memcpy(char_buf->cend_, char_buf->ccur_, char_buf->mod_size_);
             *char_buf->ccur_ = ch;
             char_buf->ccur_++;
             gap_size--;
-            line_buf->line_size_[line_buf->ccur_]++;
+            line_buf->line_size_[line_buf->ccur_] =
+                line_buf->line_size_[line_buf->ccur_] + 1;
             wprintw(edit_window, "%c", ch);
             // wmove(edit_window, y, x + 1);
+            // mvwprintw(edit_window, LINES - 15, 2, "Mod size: %i", char_buf->mod_size_);
+            char_buf->mod_size_ = 0;
             wrefresh(edit_window);
             break;
     }

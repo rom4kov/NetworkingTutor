@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -ggdb -Wall -Wextra -std=c17
+CFLAGS = -g -Wall -Wextra -std=c17
 LDFLAGS = -lpanel -lmenu -lform -lsqlite3 -lncurses 
 INC=-Isrc/
 

@@ -6,11 +6,11 @@ void input_handler(WINDOW **windows, int *active_win, MENU **start_menu,
                    COURSE courses[], sqlite3 **db);
 void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
                          sqlite3 *db);
-void handle_editor_input(int ch, WINDOW *edit_window, int y, int x,
+void handle_editor_input(int ch, int *chars, WINDOW *edit_window, int y, int x,
                          CHAR_BUFFER *char_buf, LINE_BUFFER *line_buf,
                          int gap_size, bool *editor_mode, FILE *file,
-                         int file_size);
-void write_buffer_to_file(CHAR_BUFFER *cbuf, FILE *file, int file_size,
+                         int file_size, int *new_file_size);
+void write_buffer_to_file(CHAR_BUFFER *cbuf, FILE *file, int file_size, int new_file_size,
                           WINDOW *edit_window, char *ccur, char *cend, LINE_BUFFER *lbuf);
 void update_edit_window(CHAR_BUFFER *cbuf, LINE_BUFFER *lbuf,
                         WINDOW **line_num_win, WINDOW **edit_window,

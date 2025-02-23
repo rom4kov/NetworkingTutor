@@ -22,6 +22,7 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
     y = x = num_lines = prev_chars = 0;
     char c;
     int gap_size = 64;
+    int chars = 0;
 
     WINDOW *line_num_win = derwin(windows[1], LINES - 5, 3, 1, 1);
     WINDOW *edit_window = derwin(windows[1], LINES - 6, WU * 7 - 2, 2, 4);
@@ -41,6 +42,7 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
 
     fseek(file, 0, SEEK_END);
     int file_size = ftell(file);
+    int new_file_size = file_size + gap_size;
     rewind(file);
 
     do
@@ -202,9 +204,9 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
         }
         else if (*active_win == 1 && editor_mode)
         {
-            handle_editor_input(ch, edit_window, y, x, &char_buf, &line_buf,
+            handle_editor_input(ch, &chars, edit_window, y, x, &char_buf, &line_buf,
                                 gap_size, &editor_mode, file,
-                                file_size + gap_size);
+                                file_size + gap_size, &new_file_size);
             // fclose(file);
         }
         else if (*active_win == 1)

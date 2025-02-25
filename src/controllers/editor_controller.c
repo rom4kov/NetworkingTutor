@@ -215,36 +215,11 @@ void handle_editor_input(int ch, WINDOW *line_num_win, WINDOW *edit_window,
                                     (next_line_len < 2 ? 0 : 1); // 1
                 }
 
-                // if (next_line_len > x && next_line_len > 2)
-                // {
-                //     ccur_change_kdown = curr_line_len;
-                // }
-                // else if (next_line_len > x && next_line_len <= 2)
-                // {
-                //     ccur_change_kdown = curr_line_len - 1;
-                // }
-                // else if (next_line_len == x && next_line_len > 1)
-                // {
-                //     ccur_change_kdown = curr_line_len - x;
-                // }
-                // else if (next_line_len < x && next_line_len > 2)
-                // {
-                //     ccur_change_kdown = curr_line_len - x + next_line_len -
-                //     1;
-                // }
-                // else
-                // {
-                //     ccur_change_kdown = curr_line_len - x - 1;
-                // }
-                //        19                1        0         16          1   1
-                //        1
-                // ccur_change_kdown = (curr_line_len - x) + (next_line_len < 3
-                // ? 0 : next_line_len - 1); ccur_change_kdown = curr_line_len -
-                // x;
                 char_buf->ccur_ += ccur_change_kdown;
                 char_buf->cend_ += ccur_change_kdown;
                 char_buf->mod_size_ += ccur_change_kdown;
                 line_buf->ccur_++;
+                line_buf->cend_++;
                 mvwprintw(edit_window, LINES - 7, 70, "             ");
                 mvwprintw(edit_window, LINES - 7, 70, "Curr line: %i",
                           next_line_len);
@@ -281,29 +256,11 @@ void handle_editor_input(int ch, WINDOW *line_num_win, WINDOW *edit_window,
                                 line_buf->new_lines_[line_buf->ccur_ - 1] +
                                 (prev_line_len < 2 ? 0 : 1);
                 }
-                //     19                1         0          19         1   1 1
-                // if (prev_line_len > x && prev_line_len > 1)
-                // {
-                //     ccur_change_kup = prev_line_len;
-                // }
-                // else if (prev_line_len <= x && prev_line_len > 1)
-                // {
-                //     ccur_change_kup = x + 2;
-                //     // } else if (prev_line_len == x && prev_line_len == 1) {
-                //     //     ccur_change_kup = 1;
-                //     // } else if (prev_line_len < x) {
-                //     //     ccur_change_kup = x + 2;
-                // }
-                // else
-                // {
-                //     ccur_change_kup = x + 1;
-                // }
-                // ccur_change_kup = x + (prev_line_len < 3 ? 1 : prev_line_len
-                // - 1);
                 char_buf->ccur_ -= ccur_change_kup;
                 char_buf->cend_ -= ccur_change_kup;
                 char_buf->mod_size_ -= ccur_change_kup;
                 line_buf->ccur_--;
+                line_buf->cend_++;
                 mvwprintw(edit_window, LINES - 7, 70, "             ");
                 mvwprintw(edit_window, LINES - 7, 70, "Curr line: %i",
                           prev_line_len);
@@ -410,19 +367,7 @@ void handle_editor_input(int ch, WINDOW *line_num_win, WINDOW *edit_window,
             getyx(edit_window, y, x);
             update_edit_window(char_buf, line_buf, gap_size, line_num_win,
                                edit_window);
-            // *chars = line_buf->line_size_[line_buf->ccur_] - x;
-            // char *insert_str = malloc(*chars * sizeof(char));
-            // memcpy(insert_str, char_buf->cend_,
-            //        line_buf->line_size_[line_buf->ccur_] - x + 2);
-            // wprintw(edit_window, "%c%s", ch, insert_str);
-            // wprintw(edit_window, "%c", ch);
-            // mvwprintw(edit_window, y, 40, "%c%i", ch, *chars);
-            // mvwprintw(edit_window, y + 1, 40, "%i",
-            //           line_buf->line_size_[line_buf->ccur_]);
-            // free(insert_str);
             wmove(edit_window, y, x + 1);
-            // mvwprintw(edit_window, LINES - 15, 2, "Mod size: %i",
-            // char_buf->mod_size_);
             char_buf->mod_size_ = 0;
             wrefresh(edit_window);
             break;

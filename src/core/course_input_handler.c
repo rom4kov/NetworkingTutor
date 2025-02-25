@@ -53,9 +53,8 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
     } while (c != EOF);
     rewind(file);
 
-    mvwprintw(edit_window, LINES - 7, 2, "File size: %ib", file_size);
-    mvwprintw(edit_window, LINES - 7, 22, "Lines: %i", num_lines);
-    wrefresh(edit_window);
+    // mvwprintw(edit_window, LINES - 18, 2, "File size: %ib", file_size);
+    // mvwprintw(edit_window, LINES - 18, 22, "Lines: %i", num_lines);
 
     if (file != NULL)
     {
@@ -108,6 +107,7 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
         wattron(windows[1], A_BOLD);
         mvwprintw(windows[1], 1, 1, "%s", filename);
         wattroff(windows[1], A_BOLD);
+        wrefresh(edit_window);
         update_edit_window(&char_buf, &line_buf, &gap_size, line_num_win, edit_window);
         // for (i = 0; i < line_buf.size_; i++)
         // {

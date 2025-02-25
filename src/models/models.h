@@ -25,6 +25,7 @@ typedef struct _char_buffer
 typedef struct _line_buffer
 {
     int *line_size_;
+    int *new_lines_;
     int ccur_;
     int cend_;
     int size_;

@@ -30,6 +30,7 @@ typedef struct _line_buffer
     int cend_;
     int gap_size_;
     int size_;
+    int mod_size_;
 } LINE_BUFFER;
 
 typedef struct _text_editor

@@ -72,6 +72,7 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
         line_buf.new_lines_ = calloc(num_lines + line_buf.gap_size_, sizeof(int));
         line_buf.ccur_ = 0;
         line_buf.cend_ = line_buf.gap_size_;
+        line_buf.mod_size_ = 0;
         line_buf.size_ = 0;
 
         while (fread(&c, sizeof(char), 1, file))

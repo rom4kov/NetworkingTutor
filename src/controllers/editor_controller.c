@@ -1,6 +1,7 @@
 #define _XOPEN_SOURCE 500
 
 #include "../models/models.h"
+#include "../core/core.h"
 #include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -61,8 +62,8 @@ void update_edit_window(CHAR_BUFFER *cbuf, LINE_BUFFER *lbuf, int *gap_size,
                         WINDOW *line_num_win, WINDOW *edit_window)
 {
     wclear(edit_window);
-    int i, j, k, l;
-    k = 0;
+    int i, c, y, x;
+    i = c = y = x = 0;
     int file_size = 144;
 
     int first_buf_len = cbuf->ccur_ - cbuf->buf_;
@@ -87,58 +88,83 @@ void update_edit_window(CHAR_BUFFER *cbuf, LINE_BUFFER *lbuf, int *gap_size,
     mvwprintw(edit_window, LINES - 16, 50, "%s", "  ");
     mvwprintw(edit_window, LINES - 16, 50, "%i", first_buf_len);
     mvwprintw(edit_window, LINES - 15, 50, "%s", "  ");
-    mvwprintw(edit_window, LINES - 15, 50, "%i", *gap_size);
+    mvwprintw(edit_window, LINES - 15, 50, "gap_size: %i", *gap_size);
     mvwprintw(edit_window, LINES - 14, 50, "%s", "  ");
     mvwprintw(edit_window, LINES - 14, 50, "%i", start_second_buf);
     mvwprintw(edit_window, LINES - 13, 50, "%s", "  ");
     mvwprintw(edit_window, LINES - 13, 50, "%i", second_buf_len);
     mvwprintw(edit_window, LINES - 13, 50, "%s", "  ");
-    mvwprintw(edit_window, LINES - 13, 50, "%i", lbuf->size_);
-    for (i = 0; i < lbuf->size_; i++)
+    // mvwprintw(edit_window, LINES - 13, 50, "%i", lbuf->size_);
+    mvwprintw(edit_window, 20, 20, "%c", cbuf->buf_[65]);
+    mvwprintw(edit_window, 21, 20, "%i", (file_size + *gap_size));
+
+    for (i = 0; i < file_size; i++)
     {
-        // mvwprintw(edit_window, i + 14, k + 35 - i * 2, "%i", i);
-        l = 0;
-        mvwprintw(edit_window, LINES - 20 + i, 105, "%i", lbuf->new_lines_[i]);
-        if (i < 9)
+        mvwprintw(edit_window, LINES - 20 + y, 75, "%i", lbuf->new_lines_[y + lbuf->gap_size_]);
+        if (y < lbuf->size_ && y < 9)
         {
             wattron(line_num_win, COLOR_PAIR(4));
-            mvwprintw(line_num_win, i + 1, 1, "%i", i + 1);
+            mvwprintw(line_num_win, y + 1, 1, "%i", y + 1);
             wattron(line_num_win, COLOR_PAIR(4));
-            mvwprintw(edit_window, LINES - 29 + i, 2, "%i",
-                      lbuf->line_size_[i]);
+            mvwprintw(edit_window, LINES - 29 + y, 2, "%i",
+                      lbuf->line_size_[y]);
         }
-        else
+        else if (y < lbuf->size_ && y >= 9)
         {
             wattron(line_num_win, COLOR_PAIR(4));
-            mvwprintw(line_num_win, i + 1, 0, "%i", i + 1);
+            mvwprintw(line_num_win, y + 1, 0, "%i", y + 1);
             wattron(line_num_win, COLOR_PAIR(4));
-            mvwprintw(edit_window, LINES - 29 + i, 2, "%i",
-                      lbuf->line_size_[i]);
+            mvwprintw(edit_window, LINES - 29 + y, 2, "%i",
+                      lbuf->line_size_[y]);
         }
-        for (j = 0; j < lbuf->line_size_[i]; j++)
+        // mvwprintw(edit_window, i, l + 42, "%i", k);
+
+        if (c == first_buf_len)
         {
-            if (k == first_buf_len)
-            {
-                k = first_buf_len + *gap_size;
-                mvwprintw(edit_window, i, j, "%c", cbuf->buf_[k]);
-            }
-            else
-                mvwprintw(edit_window, i, j, "%c", cbuf->buf_[k]);
-            mvwprintw(edit_window, i + 15, l + 10, "%i", k);
-            k++;
-            l += 4;
+            c = start_second_buf;
         }
+        if (cbuf->buf_[c] == '\n') {
+            x = 0;
+            y++;
+            mvwprintw(edit_window, y, x, "%c", cbuf->buf_[c]);
+        } else {
+            mvwprintw(edit_window, y, x, "%c", cbuf->buf_[c]);
+            x++;
+        }
+        c++;
     }
     // for (i = 0; i < lbuf->size_; i++)
     // {
+    //     l = 0;
+    //     mvwprintw(edit_window, LINES - 20 + i, 75, "%i", lbuf->new_lines_[i + lbuf->gap_size_]);
     //     if (i < 9)
-    //         mvwprintw(*line_num_win, i + 1, 1, "%i", i + 1);
+    //     {
+    //         wattron(line_num_win, COLOR_PAIR(4));
+    //         mvwprintw(line_num_win, i + 1, 1, "%i", i + 1);
+    //         wattron(line_num_win, COLOR_PAIR(4));
+    //         mvwprintw(edit_window, LINES - 29 + i, 2, "%i",
+    //                   lbuf->line_size_[i]);
+    //     }
     //     else
-    //         mvwprintw(*line_num_win, i + 1, 0, "%i", i + 1);
+    //     {
+    //         wattron(line_num_win, COLOR_PAIR(4));
+    //         mvwprintw(line_num_win, i + 1, 0, "%i", i + 1);
+    //         wattron(line_num_win, COLOR_PAIR(4));
+    //         mvwprintw(edit_window, LINES - 29 + i, 2, "%i",
+    //                   lbuf->line_size_[i]);
+    //     }
     //     for (j = 0; j < lbuf->line_size_[i]; j++)
     //     {
-    //         mvwprintw(*edit_window, i, j, "%c", cbuf->buf_[k + *gap_size]);
+    //         mvwprintw(edit_window, i, l + 42, "%i", k);
+    //         if (k == first_buf_len)
+    //         {
+    //             k = first_buf_len + *gap_size;
+    //             mvwprintw(edit_window, i, j, "%c", cbuf->buf_[k]);
+    //         }
+    //         else
+    //             mvwprintw(edit_window, i, j, "%c", cbuf->buf_[k]);
     //         k++;
+    //         l += 2;
     //     }
     // }
 }
@@ -210,9 +236,11 @@ void handle_editor_input(int ch, WINDOW *line_num_win, WINDOW *edit_window,
                 else
                 {
                     ccur_change_kdown =
-                        line_buf->new_lines_[line_buf->ccur_ + 1] - // 21
-                                    (char_buf->ccur_ - char_buf->buf_) - // 0
-                                    (next_line_len < 2 ? 0 : 1); // 1
+                        // line_buf->new_lines_[line_buf->ccur_ + 1] - // 21
+                        line_buf->new_lines_[line_buf->ccur_ + 1 +
+                                             line_buf->gap_size_] - // 21
+                        (char_buf->ccur_ - char_buf->buf_) -        // 0
+                        (next_line_len < 2 ? 0 : 1);                // 1
                 }
 
                 char_buf->ccur_ += ccur_change_kdown;
@@ -220,6 +248,10 @@ void handle_editor_input(int ch, WINDOW *line_num_win, WINDOW *edit_window,
                 char_buf->mod_size_ += ccur_change_kdown;
                 line_buf->ccur_++;
                 line_buf->cend_++;
+                line_buf->mod_size_++;
+                mvwprintw(edit_window, LINES - 7, 50, "             ");
+                mvwprintw(edit_window, LINES - 7, 50, "Pr lb: %i",
+                          ++line_buf->new_lines_[line_buf->ccur_ - 1]);
                 mvwprintw(edit_window, LINES - 7, 70, "             ");
                 mvwprintw(edit_window, LINES - 7, 70, "Curr line: %i",
                           next_line_len);
@@ -230,9 +262,12 @@ void handle_editor_input(int ch, WINDOW *line_num_win, WINDOW *edit_window,
                 mvwprintw(edit_window, LINES - 7, 102, "          ");
                 mvwprintw(edit_window, LINES - 7, 102, "c mov: %i",
                           ccur_change_kdown);
-                mvwprintw(edit_window, LINES - 8, 90, "                         ");
+                mvwprintw(edit_window, LINES - 8, 90,
+                          "                         ");
+                mvwprintw(edit_window, LINES - 9, 102, "pl idx: %i",
+                          line_buf->new_lines_[line_buf->ccur_ - 1]);
                 mvwprintw(edit_window, LINES - 8, 102, "nl idx: %i",
-                          line_buf->new_lines_[line_buf->ccur_ + 1]);
+                          line_buf->new_lines_[line_buf->ccur_ + 1 + line_buf->gap_size_]);
                 mvwprintw(edit_window, LINES - 8, 90, "curs: %li",
                           char_buf->ccur_ - char_buf->buf_);
                 wmove(edit_window, y, x);
@@ -249,18 +284,21 @@ void handle_editor_input(int ch, WINDOW *line_num_win, WINDOW *edit_window,
             if (line_buf->ccur_ > 0)
             {
                 getyx(edit_window, y, x);
-                if (prev_line_len - 1 > x) ccur_change_kup = prev_line_len;
+                if (prev_line_len - 1 > x)
+                    ccur_change_kup = prev_line_len;
                 else
                 {
-                    ccur_change_kup = (char_buf->ccur_ - char_buf->buf_) -
-                                line_buf->new_lines_[line_buf->ccur_ - 1] +
-                                (prev_line_len < 2 ? 0 : 1);
+                    ccur_change_kup =
+                        (char_buf->ccur_ - char_buf->buf_) -
+                        line_buf->new_lines_[line_buf->ccur_ - 1 + line_buf->gap_size_] +
+                        (prev_line_len < 2 ? 0 : 1);
                 }
                 char_buf->ccur_ -= ccur_change_kup;
                 char_buf->cend_ -= ccur_change_kup;
                 char_buf->mod_size_ -= ccur_change_kup;
                 line_buf->ccur_--;
-                line_buf->cend_++;
+                line_buf->cend_--;
+                line_buf->mod_size_++;
                 mvwprintw(edit_window, LINES - 7, 70, "             ");
                 mvwprintw(edit_window, LINES - 7, 70, "Curr line: %i",
                           prev_line_len);
@@ -271,9 +309,12 @@ void handle_editor_input(int ch, WINDOW *line_num_win, WINDOW *edit_window,
                 mvwprintw(edit_window, LINES - 7, 102, "          ");
                 mvwprintw(edit_window, LINES - 7, 102, "c mov: %i",
                           ccur_change_kup);
-                mvwprintw(edit_window, LINES - 8, 90, "                         ");
+                mvwprintw(edit_window, LINES - 8, 90,
+                          "                         ");
+                mvwprintw(edit_window, LINES - 9, 102, "pl nl idx: %i",
+                          line_buf->new_lines_[line_buf->ccur_ - 1]);
                 mvwprintw(edit_window, LINES - 8, 102, "nl idx: %i",
-                          line_buf->new_lines_[line_buf->ccur_ + 1]);
+                          line_buf->new_lines_[line_buf->ccur_ + 1 + line_buf->gap_size_]);
                 mvwprintw(edit_window, LINES - 8, 90, "curs: %li",
                           char_buf->ccur_ - char_buf->buf_);
                 wmove(edit_window, y, x);
@@ -294,19 +335,28 @@ void handle_editor_input(int ch, WINDOW *line_num_win, WINDOW *edit_window,
             else if (char_buf->mod_size_ < 0)
                 memcpy(char_buf->cend_, char_buf->ccur_,
                        abs(char_buf->mod_size_));
+            if (x == 0)
+            {
+                if (line_buf->mod_size_ > 0)
+                    memcpy(&line_buf->ccur_ - line_buf->mod_size_,
+                           &line_buf->cend_ - line_buf->mod_size_,
+                           line_buf->mod_size_);
+                else if (line_buf->mod_size_ < 0)
+                    memcpy(&line_buf->cend_, &line_buf->ccur_,
+                           abs(line_buf->mod_size_));
+                line_buf->line_size_[line_buf->ccur_] =
+                    line_buf->line_size_[line_buf->ccur_] - 1;
+                update_lines(line_buf, -1);
+            }
             char_buf->mod_size_ = 0;
             char_buf->ccur_--;
             *char_buf->ccur_ = ' ';
             *gap_size += 1;
-            line_buf->line_size_[line_buf->ccur_] =
-                line_buf->line_size_[line_buf->ccur_] - 1;
-            for (int i = line_buf->ccur_; i < line_buf->size_; i++)
-            {
-                line_buf->new_lines_[i] -= 1;
-            }
+            // for (int i = line_buf->ccur_; i < line_buf->size_; i++)
+            // {
+            //     line_buf->new_lines_[i] -= 1;
+            // }
             *new_file_size -= 1;
-            // mvwprintw(edit_window, LINES - 28, 52, "nfs after change: %i",
-            // new_file_size);
             getyx(edit_window, y, x);
             if (x == 0)
             {
@@ -314,11 +364,6 @@ void handle_editor_input(int ch, WINDOW *line_num_win, WINDOW *edit_window,
                 wrefresh(edit_window);
                 break;
             }
-            // *chars = line_buf->line_size_[line_buf->ccur_] - x;
-            // char *shift_str = malloc(*chars * sizeof(char));
-            // memcpy(shift_str, char_buf->cend_,
-            //        line_buf->line_size_[line_buf->ccur_] - x);
-            // mvwprintw(edit_window, y, x - 1, "%s ", shift_str);
             update_edit_window(char_buf, line_buf, gap_size, line_num_win,
                                edit_window);
             wmove(edit_window, y, x - 1);
@@ -326,11 +371,26 @@ void handle_editor_input(int ch, WINDOW *line_num_win, WINDOW *edit_window,
             // free(shift_str);
             break;
         case 10:
+            // if (line_buf->mod_size_ > 0)
+            //     memcpy(&line_buf->ccur_ - line_buf->mod_size_,
+            //            &line_buf->cend_ - line_buf->mod_size_,
+            //            line_buf->mod_size_);
+            // else if (line_buf->mod_size_ < 0)
+            //     memcpy(&line_buf->cend_, &line_buf->ccur_,
+            //            abs(line_buf->mod_size_));
             *char_buf->ccur_ = '\n';
+            char_buf->ccur_++;
+            line_buf->gap_size_--;
+            // line_buf->size_++;
+            line_buf->ccur_++;
+            // line_buf->new_lines_[line_buf->ccur_] =
+            //     line_buf->new_lines_[line_buf->ccur_ - 1] + 1;
+            update_lines(line_buf, 1);
             gap_size--;
             new_file_size++;
             getyx(edit_window, y, x);
-            wprintw(edit_window, "%c", '\n');
+            update_edit_window(char_buf, line_buf, gap_size, line_num_win,
+                               edit_window);
             wmove(edit_window, y + 1, 0);
             wrefresh(edit_window);
             break;
@@ -371,5 +431,17 @@ void handle_editor_input(int ch, WINDOW *line_num_win, WINDOW *edit_window,
             char_buf->mod_size_ = 0;
             wrefresh(edit_window);
             break;
+    }
+}
+
+void update_lines(LINE_BUFFER *lbuf, int mode)
+{
+    int i, j;
+    j = 0;
+
+    for (i = lbuf->cend_; i < lbuf->size_ + lbuf->gap_size_; i++)
+    {
+        lbuf->new_lines_[j] += mode;
+        j++;
     }
 }

@@ -26,8 +26,8 @@ typedef struct _line_buffer
 {
     int *line_size_;
     int *new_lines_;
-    int ccur_;
-    int cend_;
+    int *ccur_;
+    int *cend_;
     int gap_size_;
     int size_;
     int mod_size_;

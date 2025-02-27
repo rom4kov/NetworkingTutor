@@ -58,8 +58,8 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
 
     if (file != NULL)
     {
-        int j, k;
-        j = k = 0;
+        int j;
+        j = 0;
 
         char_buf.buf_ = calloc(file_size + gap_size, sizeof(char));
         char_buf.ccur_ = char_buf.buf_;
@@ -70,8 +70,8 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
         line_buf.gap_size_ = 64;
         line_buf.line_size_ = calloc(num_lines, sizeof(int));
         line_buf.new_lines_ = calloc(num_lines + line_buf.gap_size_, sizeof(int));
-        line_buf.ccur_ = 0;
-        line_buf.cend_ = line_buf.gap_size_;
+        line_buf.ccur_ = line_buf.new_lines_;
+        line_buf.cend_ = line_buf.ccur_ + line_buf.gap_size_;
         line_buf.mod_size_ = 0;
         line_buf.size_ = 0;
 

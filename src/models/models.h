@@ -18,6 +18,7 @@ typedef struct _char_buffer
     char *buf_;
     char *ccur_;
     char *cend_;
+    int gap_size_;
     int size_;
     int mod_size_;
 } CHAR_BUFFER;

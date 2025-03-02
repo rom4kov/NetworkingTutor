@@ -38,12 +38,13 @@ void write_buffer_to_file(CHAR_BUFFER *cbuf, FILE *file, int file_size,
 
     rewind(file);
 
-    int first_lbuf_len = lbuf->ccur_ - lbuf->new_lines_;
-    int second_lbuf_len =
-        &lbuf->new_lines_[lbuf->size_ + lbuf->gap_size_] - lbuf->cend_;
+    // int first_lbuf_len = lbuf->ccur_ - lbuf->new_lines_;
+    // int second_lbuf_len =
+    //     &lbuf->new_lines_[lbuf->size_ + lbuf->gap_size_] - lbuf->cend_;
     FILE *lines_file = fopen("../lines.txt", "r+");
-    fwrite(lbuf->new_lines_, sizeof(int), first_lbuf_len, lines_file);
-    fwrite(lbuf->cend_, sizeof(int), second_lbuf_len, lines_file);
+    fwrite(lbuf->new_lines_, sizeof(int), lbuf->size_ + lbuf->gap_size_,
+           lines_file);
+    // fwrite(lbuf->cend_, sizeof(int), second_lbuf_len, lines_file);
 
     // int chars_diff = *new_file_size - file_size;
     mvwprintw(edit_window, LINES - 20, 52, "file_size: %i", file_size);
@@ -81,8 +82,8 @@ void update_edit_window(CHAR_BUFFER *cbuf, LINE_BUFFER *lbuf,
 
     mvwprintw(edit_window, LINES - 14, 2, "Before");
     mvwprintw(edit_window, LINES - 13, 23, "%s", "  ");
-    mvwprintw(edit_window, LINES - 13, 2, "First byte of buffer: %p",
-              cbuf->buf_);
+    mvwprintw(edit_window, LINES - 13, 2, "cursor at: %li",
+              cbuf->ccur_ - cbuf->buf_);
     mvwprintw(edit_window, LINES - 12, 8, "%s", "  ");
     mvwprintw(edit_window, LINES - 12, 2, "ccur: %p", cbuf->ccur_);
     mvwprintw(edit_window, LINES - 11, 8, "%s", "  ");
@@ -107,7 +108,7 @@ void update_edit_window(CHAR_BUFFER *cbuf, LINE_BUFFER *lbuf,
     mvwprintw(edit_window, 20, 20, "%c", cbuf->buf_[65]);
     mvwprintw(edit_window, 21, 20, "%i", (file_size + cbuf->gap_size_));
     int lcur = lbuf->ccur_ - lbuf->new_lines_;
-    mvwprintw(edit_window, 22, 20, "%i", lcur);
+    mvwprintw(edit_window, 22, 20, "line cursor: %i", lcur);
 
     for (i = 0; i < *new_file_size; i++)
     {
@@ -136,7 +137,7 @@ void update_edit_window(CHAR_BUFFER *cbuf, LINE_BUFFER *lbuf,
         if (cbuf->buf_[c] == '\n')
         {
             x = 0;
-            mvwprintw(edit_window, LINES - 32 + y, 75, "%i",
+            mvwprintw(edit_window, LINES - 32 + y, 75, "line: %i",
                       lbuf->new_lines_[y + (y < lcur ? 0 : lbuf->gap_size_)]);
             y++;
             mvwprintw(edit_window, y, x, "%c", cbuf->buf_[c]);
@@ -156,7 +157,8 @@ void handle_editor_input(int ch, WINDOW **line_num_win, WINDOW **edit_window,
                          LINE_BUFFER *line_buf, bool *editor_mode, FILE *file,
                          int file_size, int *new_file_size)
 {
-    int curr_line = line_buf->ccur_ - line_buf->new_lines_;
+    getyx(*edit_window, y, x);
+    int curr_line = y;
     // int curr_line_len =
     //     line_buf->new_lines_[line_buf->cend_ - line_buf->new_lines_] -
     //     line_buf->new_lines_[line_buf->cend_ - line_buf->new_lines_ - 1] + 1;
@@ -189,7 +191,6 @@ void handle_editor_input(int ch, WINDOW **line_num_win, WINDOW **edit_window,
     switch (ch)
     {
         case KEY_RIGHT:
-            getyx(*edit_window, y, x);
             if (x + 1 < curr_line_len - 1)
             {
                 char_buf->ccur_++;
@@ -211,7 +212,6 @@ void handle_editor_input(int ch, WINDOW **line_num_win, WINDOW **edit_window,
             }
             break;
         case KEY_LEFT:
-            getyx(*edit_window, y, x);
             if (x > 0)
             {
                 char_buf->ccur_--;
@@ -233,9 +233,8 @@ void handle_editor_input(int ch, WINDOW **line_num_win, WINDOW **edit_window,
             }
             break;
         case KEY_DOWN:
-            if (line_buf->ccur_ - line_buf->new_lines_ + 1 < line_buf->size_)
+            if (y + 1 < line_buf->size_)
             {
-                getyx(*edit_window, y, x);
                 if (next_line_len - 1 > x)
                     ccur_change_kdown = curr_line_len;
                 else
@@ -251,9 +250,9 @@ void handle_editor_input(int ch, WINDOW **line_num_win, WINDOW **edit_window,
                 char_buf->ccur_ += ccur_change_kdown;
                 char_buf->cend_ += ccur_change_kdown;
                 char_buf->mod_size_ += ccur_change_kdown;
-                line_buf->ccur_++;
-                line_buf->cend_++;
-                line_buf->mod_size_++;
+                // line_buf->ccur_++;
+                // line_buf->cend_++;
+                // line_buf->mod_size_++;
                 mvwprintw(*edit_window, LINES - 9, 50, "             ");
                 mvwprintw(*edit_window, LINES - 9, 50, "nll: %i",
                           next_line_len);
@@ -277,6 +276,8 @@ void handle_editor_input(int ch, WINDOW **line_num_win, WINDOW **edit_window,
                 mvwprintw(
                     *edit_window, LINES - 8, 102, "nl idx: %i",
                     line_buf->new_lines_[curr_line + 1 + line_buf->gap_size_]);
+                mvwprintw(*edit_window, LINES - 9, 90, "currl: %i",
+                          curr_line + 1);
                 mvwprintw(*edit_window, LINES - 8, 90, "curs: %li",
                           char_buf->ccur_ - char_buf->buf_);
                 wmove(*edit_window, y, x);
@@ -292,7 +293,6 @@ void handle_editor_input(int ch, WINDOW **line_num_win, WINDOW **edit_window,
         case KEY_UP:
             if (curr_line > 0)
             {
-                getyx(*edit_window, y, x);
                 if (prev_line_len - 1 > x)
                     ccur_change_kup = prev_line_len;
                 else
@@ -306,9 +306,9 @@ void handle_editor_input(int ch, WINDOW **line_num_win, WINDOW **edit_window,
                 char_buf->ccur_ -= ccur_change_kup;
                 char_buf->cend_ -= ccur_change_kup;
                 char_buf->mod_size_ -= ccur_change_kup;
-                line_buf->ccur_--;
-                line_buf->cend_--;
-                line_buf->mod_size_++;
+                // line_buf->ccur_--;
+                // line_buf->cend_--;
+                // line_buf->mod_size_++;
                 mvwprintw(*edit_window, LINES - 9, 50, "             ");
                 mvwprintw(*edit_window, LINES - 9, 50, "nll: %i",
                           next_line_len);
@@ -329,6 +329,8 @@ void handle_editor_input(int ch, WINDOW **line_num_win, WINDOW **edit_window,
                 mvwprintw(
                     *edit_window, LINES - 8, 102, "nl idx: %i",
                     line_buf->new_lines_[curr_line + 1 + line_buf->gap_size_]);
+                mvwprintw(*edit_window, LINES - 9, 90, "currl: %i",
+                          curr_line - 1);
                 mvwprintw(*edit_window, LINES - 8, 90, "curs: %li",
                           char_buf->ccur_ - char_buf->buf_);
                 wmove(*edit_window, y, x);
@@ -371,7 +373,6 @@ void handle_editor_input(int ch, WINDOW **line_num_win, WINDOW **edit_window,
             *new_file_size -= 1;
 
             update_lines(line_buf, -1);
-            getyx(*edit_window, y, x);
             // if (x == 0)
             // {
             //     wmove(*edit_window, y - 1, x);
@@ -391,25 +392,14 @@ void handle_editor_input(int ch, WINDOW **line_num_win, WINDOW **edit_window,
             else if (char_buf->mod_size_ < 0)
                 memmove(char_buf->cend_, char_buf->ccur_,
                         abs(char_buf->mod_size_));
-            if (line_buf->mod_size_ > 0)
-                memmove(line_buf->ccur_ - line_buf->mod_size_,
-                        line_buf->cend_ - line_buf->mod_size_,
-                        line_buf->mod_size_ * sizeof(int));
-            else if (line_buf->mod_size_ < 0)
-                memmove(line_buf->cend_, line_buf->ccur_,
-                        abs(line_buf->mod_size_) * sizeof(int));
+
             *char_buf->ccur_ = '\n';
             char_buf->ccur_++;
-            getyx(*edit_window, y, x);
-
-            line_buf->new_lines_[curr_line] =
-                curr_line < 1 ? x
-                              : (line_buf->new_lines_[curr_line - 1] + x + 1);
-
-            line_buf->ccur_++;
-            line_buf->gap_size_--;
-            line_buf->size_++;
             char_buf->gap_size_ -= 1;
+
+            move_gap_to_line(line_buf, curr_line);
+            insert_new_line(line_buf, char_buf);
+
             *new_file_size += 1;
             update_lines(line_buf, 1);
             update_edit_window(char_buf, line_buf, new_file_size, *line_num_win,
@@ -438,7 +428,7 @@ void handle_editor_input(int ch, WINDOW **line_num_win, WINDOW **edit_window,
                 memmove(char_buf->cend_, char_buf->ccur_,
                         abs(char_buf->mod_size_));
             *char_buf->ccur_ = ch;
-            char_buf->ccur_++;
+            // char_buf->ccur_++;
             char_buf->gap_size_ -= 1;
             // line_buf->line_size_[curr_line] =
             //     line_buf->line_size_[curr_line] + 1;
@@ -448,7 +438,6 @@ void handle_editor_input(int ch, WINDOW **line_num_win, WINDOW **edit_window,
             // }
             *new_file_size += 1;
             update_lines(line_buf, 1);
-            getyx(*edit_window, y, x);
             update_edit_window(char_buf, line_buf, new_file_size, *line_num_win,
                                *edit_window);
             wmove(*edit_window, y, x + 1);
@@ -462,11 +451,14 @@ int get_line_length(LINE_BUFFER *lbuf, int line_index)
 {
     int actual_index;
 
-    // if (line_index < (lbuf->ccur_ - lbuf->new_lines_)) {
-    //     actual_index = line_index;
-    // } else {
-    actual_index = line_index + lbuf->gap_size_;
-    // }
+    if (line_index < (lbuf->ccur_ - lbuf->new_lines_))
+    {
+        actual_index = line_index;
+    }
+    else
+    {
+        actual_index = line_index + lbuf->gap_size_;
+    }
 
     if (line_index == 0)
     {
@@ -474,12 +466,14 @@ int get_line_length(LINE_BUFFER *lbuf, int line_index)
     }
 
     int prev_actual_index;
-    // if ((line_index - 1) < (lbuf->ccur_ - lbuf->new_lines_))
-    // {
-    //     prev_actual_index = line_index - 1;
-    // } else {
-    prev_actual_index = (line_index - 1) + lbuf->gap_size_;
-    // }
+    if ((line_index - 1) < (lbuf->ccur_ - lbuf->new_lines_))
+    {
+        prev_actual_index = line_index - 1;
+    }
+    else
+    {
+        prev_actual_index = (line_index - 1) + lbuf->gap_size_;
+    }
 
     return lbuf->new_lines_[actual_index] - lbuf->new_lines_[prev_actual_index];
 }
@@ -506,7 +500,20 @@ void move_gap_to_line(LINE_BUFFER *lbuf, int line_index)
     }
 
     lbuf->ccur_ = lbuf->new_lines_ + line_index;
-    lbuf->ccur_ = lbuf->ccur_ + lbuf->gap_size_;
+    lbuf->cend_ = lbuf->ccur_ + lbuf->gap_size_;
+}
+
+void insert_new_line(LINE_BUFFER *lbuf, CHAR_BUFFER *cbuf)
+{
+    if (lbuf->gap_size_ <= 0)
+    {
+    }
+
+    *(lbuf->ccur_) = cbuf->ccur_ - cbuf->buf_;
+
+    lbuf->ccur_++;
+    lbuf->gap_size_--;
+    lbuf->size_++;
 }
 
 void update_lines(LINE_BUFFER *lbuf, int mode)

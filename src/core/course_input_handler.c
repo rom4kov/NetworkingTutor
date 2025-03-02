@@ -42,7 +42,7 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
 
     fseek(file, 0, SEEK_END);
     int file_size = ftell(file);
-    int new_file_size = file_size + gap_size;
+    int new_file_size = file_size;
     rewind(file);
 
     do
@@ -52,9 +52,6 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
             num_lines++;
     } while (c != EOF);
     rewind(file);
-
-    // mvwprintw(edit_window, LINES - 18, 2, "File size: %ib", file_size);
-    // mvwprintw(edit_window, LINES - 18, 22, "Lines: %i", num_lines);
 
     if (file != NULL)
     {
@@ -69,7 +66,8 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
 
         line_buf.gap_size_ = 64;
         line_buf.line_size_ = calloc(num_lines, sizeof(int));
-        line_buf.new_lines_ = calloc(num_lines + line_buf.gap_size_, sizeof(int));
+        line_buf.new_lines_ =
+            calloc(num_lines + line_buf.gap_size_, sizeof(int));
         line_buf.ccur_ = line_buf.new_lines_;
         line_buf.cend_ = line_buf.ccur_ + line_buf.gap_size_;
         line_buf.mod_size_ = 0;
@@ -81,7 +79,8 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
             if (c == '\n')
             {
                 char_buf.buf_[char_buf.size_] = c;
-                line_buf.new_lines_[line_buf.size_ + line_buf.gap_size_] = char_buf.size_ - 64;
+                line_buf.new_lines_[line_buf.size_ + line_buf.gap_size_] =
+                    char_buf.size_ - gap_size;
                 char_buf.size_++;
                 if (line_buf.size_ == 0)
                 {
@@ -110,32 +109,8 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
         mvwprintw(windows[1], 1, 1, "%s", filename);
         wattroff(windows[1], A_BOLD);
         wrefresh(edit_window);
-        update_edit_window(&char_buf, &line_buf, &gap_size, line_num_win,
-                           edit_window);
-        // for (i = 0; i < line_buf.size_; i++)
-        // {
-        //     if (i < 9)
-        //     {
-        //         wattron(line_num_win, COLOR_PAIR(4));
-        //         mvwprintw(line_num_win, i + 1, 1, "%i", i + 1);
-        //         wattron(line_num_win, COLOR_PAIR(4));
-        //         mvwprintw(edit_window, LINES - 29 + i, 2, "%i",
-        //         line_buf.line_size_[i]);
-        //     }
-        //     else
-        //     {
-        //         wattron(line_num_win, COLOR_PAIR(4));
-        //         mvwprintw(line_num_win, i + 1, 0, "%i", i + 1);
-        //         wattron(line_num_win, COLOR_PAIR(4));
-        //         mvwprintw(edit_window, LINES - 29 + i, 2, "%i",
-        //         line_buf.line_size_[i]);
-        //     }
-        //     for (j = 0; j < line_buf.line_size_[i]; j++)
-        //     {
-        //         mvwprintw(edit_window, i, j, "%c", char_buf.buf_[k +
-        //         gap_size]); k++;
-        //     }
-        // }
+        update_edit_window(&char_buf, &line_buf, &new_file_size, &gap_size,
+                           line_num_win, edit_window);
         mvwprintw(edit_window, LINES - 14, 2, "Before");
         mvwprintw(edit_window, LINES - 13, 2, "First byte of buffer: %p",
                   char_buf.buf_);
@@ -211,7 +186,7 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
         }
         else if (*active_win == 1 && editor_mode)
         {
-            handle_editor_input(ch, line_num_win, edit_window, y, x, &char_buf,
+            handle_editor_input(ch, &line_num_win, &edit_window, y, x, &char_buf,
                                 &line_buf, &gap_size, &editor_mode, file,
                                 file_size + gap_size, &new_file_size);
             // fclose(file);

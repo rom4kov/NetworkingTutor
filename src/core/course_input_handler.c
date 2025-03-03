@@ -103,7 +103,6 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
 
         rewind(file);
 
-        // mvwprintw(edit_window, 1, 0, "%s", char_buf.buf_);
         wattron(windows[1], A_BOLD);
         mvwprintw(windows[1], 1, 1, "%s", filename);
         wattroff(windows[1], A_BOLD);

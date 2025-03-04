@@ -2,11 +2,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void initialize_buffer(TEXT_BUFFER *text_buf, unsigned short num_lines)
+TEXT_BUFFER *initialize_buffer()
 {
-    text_buf->num_of_lines = num_lines;
+    TEXT_BUFFER *text_buf = malloc(sizeof(TEXT_BUFFER));
+
+    text_buf->first_line = NULL;
+    text_buf->num_of_lines = 0;
     text_buf->current_line = 0;
     text_buf->current_col = 0;
+
+    return text_buf;
 }
 
 LINE *initialize_line()
@@ -47,9 +52,11 @@ void read_file_into_buffer(FILE *file, TEXT_BUFFER *text_buf)
                 curr_line = initialize_line();
                 text_buf->first_line->next = curr_line;
                 curr_line->prev = text_buf->first_line;
+                text_buf->num_of_lines++;
             }
             else
             {
+                text_buf->num_of_lines++;
                 prev_line->next = curr_line;
                 curr_line->prev = prev_line;
                 prev_line = curr_line;

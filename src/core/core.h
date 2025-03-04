@@ -16,6 +16,7 @@ void write_buffer_to_file(CHAR_BUFFER *cbuf, FILE *file, int file_size,
 void update_edit_window(CHAR_BUFFER *cbuf, LINE_BUFFER *lbuf,
                         int *new_file_size, WINDOW *line_num_win,
                         WINDOW *edit_window);
+void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window);
 int get_line_length(LINE_BUFFER *lbuf, int line_index);
 int calculate_cursor_offset(LINE_BUFFER *lbuf, CHAR_BUFFER *cbuf, int curr_line, int x, 
                             int pll, int cll, int nll, int direction);

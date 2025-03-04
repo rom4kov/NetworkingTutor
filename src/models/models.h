@@ -13,6 +13,22 @@ typedef struct _course_data
     char *short_desc;
 } COURSE;
 
+typedef struct line
+{
+  char *buf_;
+  unsigned short line_num;
+  struct line *prev;
+  struct line *next;
+} LINE;
+
+typedef struct text_buffer
+{
+  struct line *first_line;
+  unsigned short num_of_lines;
+  unsigned short current_line;
+  unsigned short current_col;
+} TEXT_BUFFER;
+
 typedef struct _char_buffer
 {
     char *buf_;

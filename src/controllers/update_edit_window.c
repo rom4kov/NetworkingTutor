@@ -89,3 +89,10 @@ void update_edit_window(CHAR_BUFFER *cbuf, LINE_BUFFER *lbuf,
     wrefresh(line_num_win);
 }
 
+void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window)
+{
+    wclear(*edit_window);
+
+    mvwprintw(*edit_window, 0, 0, "%s", tbuf->first_line->buf_);
+}
+

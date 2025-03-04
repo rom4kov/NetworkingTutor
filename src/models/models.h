@@ -17,13 +17,15 @@ typedef struct line
 {
   char *buf_;
   unsigned short line_num;
+  unsigned short length;
   struct line *prev;
   struct line *next;
 } LINE;
 
 typedef struct text_buffer
 {
-  struct line *first_line;
+  LINE *first_line;
+  LINE *trav;
   unsigned short num_of_lines;
   unsigned short current_line;
   unsigned short current_col;

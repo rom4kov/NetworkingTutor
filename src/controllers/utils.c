@@ -1,5 +1,15 @@
+#include "controllers.h"
 #include "../models/models.h"
 #include <string.h>
+
+LINE *insert_new_line(LINE *head)
+{
+    LINE *new_line = initialize_line();
+
+    head->next = new_line;
+
+    return new_line;
+}
 
 int get_line_length(LINE_BUFFER *lbuf, int line_index)
 {
@@ -97,18 +107,18 @@ void move_gap_to_line(LINE_BUFFER *lbuf, int line_index)
     lbuf->cend_ = lbuf->ccur_ + lbuf->gap_size_;
 }
 
-void insert_new_line(LINE_BUFFER *lbuf, CHAR_BUFFER *cbuf)
-{
-    if (lbuf->gap_size_ <= 0)
-    {
-    }
-
-    *(lbuf->ccur_) = cbuf->ccur_ - cbuf->buf_;
-
-    lbuf->ccur_++;
-    lbuf->gap_size_--;
-    lbuf->size_++;
-}
+// void insert_new_line(LINE_BUFFER *lbuf, CHAR_BUFFER *cbuf)
+// {
+//     if (lbuf->gap_size_ <= 0)
+//     {
+//     }
+//
+//     *(lbuf->ccur_) = cbuf->ccur_ - cbuf->buf_;
+//
+//     lbuf->ccur_++;
+//     lbuf->gap_size_--;
+//     lbuf->size_++;
+// }
 
 void update_lines(LINE_BUFFER *lbuf, int mode)
 {

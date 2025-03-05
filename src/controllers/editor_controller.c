@@ -1,8 +1,9 @@
 #define _XOPEN_SOURCE 500
 
-#include "controllers.h"
 #include "../core/core.h"
+#include "../data/data_access_layer.h"
 #include "../models/models.h"
+#include "controllers.h"
 #include "utils.h"
 #include <ncurses.h>
 #include <stdio.h>
@@ -56,9 +57,7 @@ void write_buffer_to_file(CHAR_BUFFER *cbuf, FILE *file, int file_size,
 
 void handle_editor_input(int ch, WINDOW **edit_window,
                          // int y, int x,
-                         TEXT_BUFFER *text_buf, bool *editor_mode
-                         // , FILE *file
-                         )
+                         TEXT_BUFFER *text_buf, bool *editor_mode)
 {
     int y, x;
     getyx(*edit_window, y, x);
@@ -78,6 +77,7 @@ void handle_editor_input(int ch, WINDOW **edit_window,
             move_up(text_buf, edit_window, y, x);
             break;
         case KEY_BACKSPACE:
+            delete_char(text_buf, edit_window, y, x);
             break;
         case 10:
             break;
@@ -90,10 +90,11 @@ void handle_editor_input(int ch, WINDOW **edit_window,
             // mvwprintw(*edit_window, LINES - 30, 52, "nfs before passing: %i",
             //           *new_file_size);
             // write_buffer_to_file(char_buf, file, file_size, new_file_size,
-            //                      *edit_window, char_buf->ccur_, char_buf->cend_,
-            //                      line_buf);
+            //                      *edit_window, char_buf->ccur_,
+            //                      char_buf->cend_, line_buf);
             break;
         default:
+            insert_char(text_buf, edit_window, y, x, ch);
             break;
     }
 }

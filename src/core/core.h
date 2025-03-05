@@ -10,7 +10,7 @@ void handle_editor_input(int ch, WINDOW **edit_window,
                          // int y, int x,
                          TEXT_BUFFER *text_buf, bool *editor_mode
                          // bool *editor_mode, FILE *file
-                         );
+);
 void write_buffer_to_file(CHAR_BUFFER *cbuf, FILE *file, int file_size,
                           int *new_file_size, WINDOW *edit_window, char *ccur,
                           char *cend, LINE_BUFFER *lbuf);
@@ -18,11 +18,15 @@ void write_buffer_to_file(CHAR_BUFFER *cbuf, FILE *file, int file_size,
 //                         int *new_file_size, WINDOW *line_num_win,
 //                         WINDOW *edit_window);
 //
-void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window, WINDOW **line_num_win);
+void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
+                  WINDOW **line_num_win);
 void move_down(TEXT_BUFFER *tbuf, WINDOW **edit_window, int y, int x);
 void move_up(TEXT_BUFFER *tbuf, WINDOW **edit_window, int y, int x);
 void move_right(TEXT_BUFFER *tbuf, WINDOW **edit_window, int y, int x);
 void move_left(TEXT_BUFFER *tbuf, WINDOW **edit_window, int y, int x);
+void insert_char(TEXT_BUFFER *tbuf, WINDOW **edit_window, int y, int x,
+                 char ch);
+void delete_char(TEXT_BUFFER *tbuf, WINDOW **edit_window, int y, int x);
 
 char *wrap_text(char *text, int width);
 void draw_border(WINDOW *win, int color_pair, int active_window);

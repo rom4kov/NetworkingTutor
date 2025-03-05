@@ -1,7 +1,7 @@
 tui-learning-app/
 │── src/                      # Source code
 │   ├── controllers/          # Handles user input and orchestrates logic
-│   │   ├── lesson_controller.c
+│   │   ├── editor_controller.c
 │   │   ├── user_controller.c
 │   │   ├── evaluation_controller.c
 │   │   ├── controllers.h

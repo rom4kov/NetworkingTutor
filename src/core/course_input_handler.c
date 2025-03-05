@@ -34,7 +34,6 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
     TEXT_BUFFER *t_buffer = initialize_buffer();
     if (file != NULL)
     {
-
         read_file_into_buffer(file, t_buffer);
 
         print_buffer(t_buffer, &edit_window, &line_num_win);

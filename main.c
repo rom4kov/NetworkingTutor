@@ -1,5 +1,5 @@
-#include "src/views/views.h"
 #include "src/core/core.h"
+#include "src/views/views.h"
 #include <locale.h>
 #include <ncurses.h>
 #include <sqlite3.h>
@@ -17,7 +17,7 @@ int main(void)
     init_pair(1, COLOR_RED, -1);
     init_pair(2, -1, -1);
     init_pair(3, COLOR_RED, -1);
-    // if (can_change_color()) 
+    // if (can_change_color())
     //     init_color(COLOR_WHITE, 195, 225, 225);
     init_pair(4, COLOR_GREEN, -1);
     cbreak();

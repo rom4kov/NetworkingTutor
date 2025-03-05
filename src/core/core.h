@@ -6,7 +6,7 @@ void input_handler(WINDOW **windows, int *active_win, MENU **start_menu,
                    COURSE courses[], sqlite3 **db);
 void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
                          sqlite3 *db);
-void handle_editor_input(int ch, WINDOW **edit_window,
+void handle_editor_input(int ch, WINDOW **line_num_win, WINDOW **edit_window,
                          // int y, int x,
                          TEXT_BUFFER *text_buf, bool *editor_mode
                          // bool *editor_mode, FILE *file
@@ -26,7 +26,12 @@ void move_right(TEXT_BUFFER *tbuf, WINDOW **edit_window, int y, int x);
 void move_left(TEXT_BUFFER *tbuf, WINDOW **edit_window, int y, int x);
 void insert_char(TEXT_BUFFER *tbuf, WINDOW **edit_window, int y, int x,
                  char ch);
-void delete_char(TEXT_BUFFER *tbuf, WINDOW **edit_window, int y, int x);
+void delete_line(TEXT_BUFFER *tbuf, WINDOW ***edit_window, WINDOW ***line_num_win,
+                 int y);
+void delete_char_or_line(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
+                         WINDOW **edit_window, int y, int x);
+void insert_line(TEXT_BUFFER *tbuf, WINDOW **edit_window, WINDOW **line_num_win,
+                 int y, int x);
 
 char *wrap_text(char *text, int width);
 void draw_border(WINDOW *win, int color_pair, int active_window);

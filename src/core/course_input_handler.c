@@ -105,7 +105,8 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
         }
         else if (*active_win == 1 && editor_mode)
         {
-            handle_editor_input(ch, &edit_window, t_buffer, &editor_mode);
+            handle_editor_input(ch, &line_num_win, &edit_window, t_buffer,
+                                &editor_mode);
         }
         else if (*active_win == 1)
         {

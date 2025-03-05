@@ -55,7 +55,7 @@ void write_buffer_to_file(CHAR_BUFFER *cbuf, FILE *file, int file_size,
     wrefresh(edit_window);
 }
 
-void handle_editor_input(int ch, WINDOW **edit_window,
+void handle_editor_input(int ch, WINDOW **line_num_win, WINDOW **edit_window,
                          // int y, int x,
                          TEXT_BUFFER *text_buf, bool *editor_mode)
 {
@@ -77,9 +77,12 @@ void handle_editor_input(int ch, WINDOW **edit_window,
             move_up(text_buf, edit_window, y, x);
             break;
         case KEY_BACKSPACE:
-            delete_char(text_buf, edit_window, y, x);
+            delete_char_or_line(text_buf, line_num_win, edit_window, y, x);
             break;
         case 10:
+            insert_line(text_buf, edit_window, line_num_win, y, x);
+            wrefresh(*line_num_win);
+            wrefresh(*edit_window);
             break;
         case KEY_F(1):
             curs_set(0);

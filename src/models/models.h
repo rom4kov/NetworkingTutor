@@ -26,9 +26,10 @@ typedef struct text_buffer
 {
   LINE *first_line;
   LINE *trav;
-  unsigned short num_of_lines;
-  unsigned short current_line;
+  LINE *current_line;
+  unsigned short curr_line_nr;
   unsigned short current_col;
+  unsigned short num_of_lines;
 } TEXT_BUFFER;
 
 typedef struct _char_buffer

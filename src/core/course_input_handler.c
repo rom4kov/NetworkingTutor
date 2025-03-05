@@ -19,18 +19,9 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
     bool editor_mode = false;
     int ch;
     ITEM *curr_item;
-    // int y, x;
-    // int prev_chars;
-    // num_lines = prev_chars = 0;
-    // char c;
 
-    WINDOW *line_num_win = derwin(windows[1], LINES - 5, 3, 1, 1);
+    WINDOW *line_num_win = derwin(windows[1], LINES - 6, 3, 2, 1);
     WINDOW *edit_window = derwin(windows[1], LINES - 6, WU * 7 - 2, 2, 4);
-    // FIELD *fields[3];
-
-    // CHAR_BUFFER char_buf;
-    // LINE_BUFFER line_buf;
-
 
     char *filename = "../hello.c";
     FILE *file = fopen(filename, "r+");
@@ -40,73 +31,13 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
         printf("Could not open %s.\n", filename);
     }
 
-    // fseek(file, 0, SEEK_END);
-    // int file_size = ftell(file);
-    // unsigned short new_file_size = file_size;
-    // rewind(file);
-
-    // do
-    // {
-    //     c = fgetc(file);
-    //     if (c == '\n')
-    //         num_lines++;
-    // } while (c != EOF);
-    // rewind(file);
-
+    TEXT_BUFFER *t_buffer = initialize_buffer();
     if (file != NULL)
     {
-        // int j;
-        // j = 0;
-
-        TEXT_BUFFER *t_buffer = initialize_buffer();
 
         read_file_into_buffer(file, t_buffer);
 
-        print_buffer(t_buffer, &edit_window);
-        // char_buf.gap_size_ = 64;
-        // char_buf.buf_ = calloc(file_size + char_buf.gap_size_, sizeof(char));
-        // char_buf.ccur_ = char_buf.buf_;
-        // char_buf.cend_ = char_buf.ccur_ + char_buf.gap_size_;
-        // char_buf.size_ = char_buf.gap_size_;
-        // char_buf.mod_size_ = 0;
-        //
-        // line_buf.gap_size_ = 64;
-        // line_buf.line_size_ = calloc(num_lines, sizeof(int));
-        // line_buf.new_lines_ =
-        //     calloc(num_lines + line_buf.gap_size_, sizeof(int));
-        // line_buf.ccur_ = line_buf.new_lines_;
-        // line_buf.cend_ = line_buf.ccur_ + line_buf.gap_size_;
-        // line_buf.mod_size_ = 0;
-        // line_buf.size_ = 0;
-        //
-        // while (fread(&c, sizeof(char), 1, file))
-        // {
-        //     // mvwprintw(edit_window, 1, i, "%c", c);
-        //     if (c == '\n')
-        //     {
-        //         char_buf.buf_[char_buf.size_] = c;
-        //         line_buf.new_lines_[line_buf.size_ + line_buf.gap_size_] =
-        //             char_buf.size_ - char_buf.gap_size_;
-        //         char_buf.size_++;
-        //         if (line_buf.size_ == 0)
-        //         {
-        //             line_buf.line_size_[line_buf.size_] =
-        //                 char_buf.size_ - char_buf.gap_size_;
-        //         }
-        //         else
-        //         {
-        //             prev_chars = 0;
-        //             for (j = 0; j < line_buf.size_; j++)
-        //                 prev_chars += line_buf.line_size_[j];
-        //             line_buf.line_size_[line_buf.size_] =
-        //                 char_buf.size_ - char_buf.gap_size_ - prev_chars;
-        //         }
-        //         line_buf.size_++;
-        //         continue;
-        //     }
-        //     char_buf.buf_[char_buf.size_] = c;
-        //     char_buf.size_++;
-        // }
+        print_buffer(t_buffer, &edit_window, &line_num_win);
 
         rewind(file);
 
@@ -114,25 +45,9 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
         mvwprintw(windows[1], 1, 1, "%s", filename);
         wattroff(windows[1], A_BOLD);
         wrefresh(edit_window);
-        // update_edit_window(&char_buf, &line_buf, &new_file_size, line_num_win,
-        //                    edit_window);
-        // mvwprintw(edit_window, LINES - 14, 2, "Before");
-        // mvwprintw(edit_window, LINES - 13, 2, "First byte of buffer: %p",
-        //           char_buf.buf_);
-        // mvwprintw(edit_window, LINES - 12, 2, "ccur: %p", char_buf.ccur_);
-        // mvwprintw(edit_window, LINES - 11, 2, "cend: %p", char_buf.cend_);
-        //
-        // int first_buf_len = char_buf.ccur_ - char_buf.buf_;
-        // mvwprintw(edit_window, LINES - 10, 2, "First buffer length: %i",
-        //           first_buf_len);
-        // int second_buf_len = &char_buf.buf_[file_size] - char_buf.cend_;
-        // mvwprintw(edit_window, LINES - 9, 2, "Second buffer length: %i",
-        //           second_buf_len);
-        // wrefresh(edit_window);
     }
 
     wrefresh(line_num_win);
-    // wrefresh(edit_window);
     wrefresh(windows[1]);
 
     while (in_course_view)
@@ -191,10 +106,7 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
         }
         else if (*active_win == 1 && editor_mode)
         {
-            // handle_editor_input(ch, &line_num_win, &edit_window, y, x,
-            //                     &char_buf, &line_buf, &editor_mode, file,
-            //                     file_size + char_buf.gap_size_, &new_file_size);
-            // fclose(file);
+            handle_editor_input(ch, &edit_window, t_buffer, &editor_mode);
         }
         else if (*active_win == 1)
         {
@@ -234,6 +146,7 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
             }
         }
     }
+    fclose(file);
 
     // free(char_buf.buf_);
     // free(line_buf.line_size_);

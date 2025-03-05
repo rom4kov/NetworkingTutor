@@ -51,6 +51,7 @@ int main(void)
     create_start_screen(db);
 
     sqlite3_close(db);
+    curs_set(1);
     endwin();
 
     return EXIT_SUCCESS;

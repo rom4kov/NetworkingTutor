@@ -1,7 +1,6 @@
 #include "../models/models.h"
 #include <ncurses.h>
 
-
 void update_edit_window(CHAR_BUFFER *cbuf, LINE_BUFFER *lbuf,
                         int *new_file_size, WINDOW *line_num_win,
                         WINDOW *edit_window)
@@ -29,8 +28,7 @@ void update_edit_window(CHAR_BUFFER *cbuf, LINE_BUFFER *lbuf,
               first_buf_len);
     mvwprintw(edit_window, LINES - 9, 2, "Second buffer length: %i",
               second_buf_len);
-    mvwprintw(edit_window, LINES - 8, 52, "Num of lines: %i",
-              lbuf->size_);
+    mvwprintw(edit_window, LINES - 8, 52, "Num of lines: %i", lbuf->size_);
 
     mvwprintw(edit_window, LINES - 16, 50, "%s", "  ");
     mvwprintw(edit_window, LINES - 16, 50, "%i", first_buf_len);
@@ -89,10 +87,88 @@ void update_edit_window(CHAR_BUFFER *cbuf, LINE_BUFFER *lbuf,
     wrefresh(line_num_win);
 }
 
-void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window)
+void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
+                  WINDOW **line_num_win)
 {
     wclear(*edit_window);
+    int i;
 
-    mvwprintw(*edit_window, 0, 0, "%s", tbuf->first_line->buf_);
+    LINE *next_line = tbuf->first_line;
+
+    wattron(*line_num_win, COLOR_PAIR(4));
+    for (i = 0; i < tbuf->num_of_lines; i++)
+    {
+        if (i < 9)
+        {
+            mvwprintw(*line_num_win, i, 1, "%i", i + 1);
+        }
+        else
+        {
+            mvwprintw(*line_num_win, i, 0, "%i", i + 1);
+        }
+        mvwprintw(*edit_window, i, 0, "%s", next_line->buf_);
+        next_line = next_line->next;
+    }
+    wattroff(*line_num_win, COLOR_PAIR(4));
 }
 
+void move_down(TEXT_BUFFER *tbuf, WINDOW **edit_window, int y, int x)
+{
+    if (tbuf->curr_line_nr + 1 >= tbuf->num_of_lines)
+        return;
+
+    if (x + 1 < tbuf->current_line->next->length)
+    {
+        mvwprintw(*edit_window, LINES - 9, 70, "   ");
+        mvwprintw(*edit_window, LINES - 9, 70, "%i",
+                  tbuf->current_line->next->length);
+        tbuf->current_line = tbuf->current_line->next;
+        tbuf->curr_line_nr++;
+        wmove(*edit_window, y + 1, x);
+    }
+    else
+    {
+        mvwprintw(*edit_window, LINES - 9, 70, "   ");
+        mvwprintw(*edit_window, LINES - 9, 70, "%i",
+                  tbuf->current_line->next->length);
+        tbuf->current_line = tbuf->current_line->next;
+        tbuf->curr_line_nr++;
+        tbuf->current_col = tbuf->current_line->length - 1;
+        wmove(*edit_window, y + 1, tbuf->current_line->length - 1);
+    }
+    wrefresh(*edit_window);
+}
+
+void move_up(TEXT_BUFFER *tbuf, WINDOW **edit_window, int y, int x)
+{
+    if (tbuf->curr_line_nr > 0)
+    {
+        mvwprintw(*edit_window, LINES - 9, 70, "   ");
+        mvwprintw(*edit_window, LINES - 9, 70, "%i",
+                  tbuf->current_line->prev->length);
+        tbuf->current_line = tbuf->current_line->prev;
+        tbuf->curr_line_nr--;
+        wmove(*edit_window, y - 1, x);
+        wrefresh(*edit_window);
+    }
+}
+
+void move_right(TEXT_BUFFER *tbuf, WINDOW **edit_window, int y, int x)
+{
+    if (x + 1 < tbuf->current_line->length)
+    {
+        tbuf->current_col++;
+        wmove(*edit_window, y, x + 1);
+        wrefresh(*edit_window);
+    }
+}
+
+void move_left(TEXT_BUFFER *tbuf, WINDOW **edit_window, int y, int x)
+{
+    if (x > 0)
+    {
+        tbuf->current_col--;
+        wmove(*edit_window, y, x - 1);
+        wrefresh(*edit_window);
+    }
+}

@@ -8,7 +8,7 @@ TEXT_BUFFER *initialize_buffer()
 
     text_buf->first_line = NULL;
     text_buf->num_of_lines = 0;
-    text_buf->current_line = 0;
+    text_buf->curr_line_nr = 0;
     text_buf->current_col = 0;
 
     return text_buf;
@@ -49,6 +49,7 @@ void read_file_into_buffer(FILE *file, TEXT_BUFFER *text_buf)
             {
                 prev_line = curr_line;
                 text_buf->first_line = prev_line;
+                text_buf->current_line = prev_line;
                 curr_line = initialize_line();
                 text_buf->first_line->next = curr_line;
                 curr_line->prev = text_buf->first_line;

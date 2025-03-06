@@ -44,29 +44,3 @@ WINDOW *create_editor_window(int *active_window)
 
     return editor_window;
 }
-
-void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
-                  WINDOW **line_num_win)
-{
-    wclear(*line_num_win);
-    wclear(*edit_window);
-    int i;
-
-    LINE *next_line = tbuf->first_line;
-
-    wattron(*line_num_win, COLOR_PAIR(4));
-    for (i = 0; i < tbuf->num_of_lines; i++)
-    {
-        if (i < 9)
-        {
-            mvwprintw(*line_num_win, i, 1, "%i", i + 1);
-        }
-        else
-        {
-            mvwprintw(*line_num_win, i, 0, "%i", i + 1);
-        }
-        mvwprintw(*edit_window, i, 0, "%s", next_line->buf_);
-        next_line = next_line->next;
-    }
-    wattroff(*line_num_win, COLOR_PAIR(4));
-}

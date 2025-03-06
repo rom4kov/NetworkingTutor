@@ -19,3 +19,6 @@ WINDOW *create_editor_window(int *active_window);
 void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
                   WINDOW **line_num_win);
 void create_user_form(WINDOW **window, FORM **user_form, FIELD **fields);
+void update_line_numbers(TEXT_BUFFER *tbuf, WINDOW **line_num_win);
+void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
+                  WINDOW **line_num_win);

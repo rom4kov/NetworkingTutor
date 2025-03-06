@@ -20,6 +20,7 @@ int main(void)
     // if (can_change_color())
     //     init_color(COLOR_WHITE, 195, 225, 225);
     init_pair(4, COLOR_GREEN, -1);
+    init_pair(5, COLOR_YELLOW, -1);
     cbreak();
     noecho();
     keypad(stdscr, TRUE);

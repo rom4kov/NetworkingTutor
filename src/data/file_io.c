@@ -1,4 +1,5 @@
 #include "../models/models.h"
+#include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -70,5 +71,22 @@ void read_file_into_buffer(FILE *file, TEXT_BUFFER *text_buf)
         curr_line->buf_[i] = c;
         curr_line->length++;
         i++;
+    }
+}
+
+void write_buffer_to_file(TEXT_BUFFER *tbuf, FILE *file, int y)
+{
+    tbuf->current_line = tbuf->first_line;
+    while (tbuf->current_line != NULL)
+    {
+        fwrite(tbuf->current_line->buf_, sizeof(char),
+               tbuf->current_line->length, file);
+        tbuf->current_line = tbuf->current_line->next;
+    }
+    rewind(file);
+    tbuf->current_line = tbuf->first_line;
+    for (int i = 0; i < y; i++)
+    {
+        tbuf->current_line = tbuf->current_line->next;
     }
 }

@@ -93,9 +93,6 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
                         focus_window(windows, 0, 2, active_win, "Navigation");
                         focus_window(windows, 5, 3, active_win, "Details");
                         *active_win = 5;
-                        // mvwprintw(windows[5], 30, 2, "active window: %i",
-                        //           *active_win);
-                        // create_user_form(&windows[5], &user_form, fields);
                         focus_window(windows, 5, 3, active_win, "Details");
                         wmove(windows[5], 4, 14);
                         wrefresh(windows[5]);
@@ -105,7 +102,7 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
         }
         else if (*active_win == 1 && editor_mode)
         {
-            handle_editor_input(ch, &line_num_win, &edit_window, t_buffer,
+            handle_editor_input(ch, &line_num_win, &edit_window, t_buffer, file,
                                 &editor_mode);
         }
         else if (*active_win == 1)
@@ -147,7 +144,4 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
         }
     }
     fclose(file);
-
-    // free(char_buf.buf_);
-    // free(line_buf.line_size_);
 }

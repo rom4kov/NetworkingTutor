@@ -31,7 +31,8 @@ LINE *initialize_line()
 void read_file_into_buffer(FILE *file, TEXT_BUFFER *text_buf)
 {
     char c;
-    int i = 0;
+    int i, j;
+    i = j = 0;
     unsigned short line_number = 0;
 
     LINE *prev_line = initialize_line();
@@ -39,39 +40,81 @@ void read_file_into_buffer(FILE *file, TEXT_BUFFER *text_buf)
 
     while (fread(&c, sizeof(char), 1, file))
     {
-        if (c == '\n')
+        while (c != ' ')
         {
-            curr_line->buf_[i] = c;
-            curr_line->line_num = line_number;
-            line_number++;
-            i = 0;
-
-            if (text_buf->num_of_lines == 0)
+            if (c == '\n')
             {
-                prev_line = curr_line;
-                text_buf->first_line = prev_line;
-                text_buf->current_line = prev_line;
-                curr_line = initialize_line();
-                text_buf->first_line->next = curr_line;
-                curr_line->prev = text_buf->first_line;
-                text_buf->num_of_lines++;
-            }
-            else
-            {
-                text_buf->num_of_lines++;
-                prev_line->next = curr_line;
-                curr_line->prev = prev_line;
-                prev_line = curr_line;
-                curr_line = initialize_line();
+                curr_line->buf_[i][j] = c;
+                curr_line->line_num = line_number;
+                line_number++;
+                i = 0;
+
+                if (text_buf->num_of_lines == 0)
+                {
+                    prev_line = curr_line;
+                    text_buf->first_line = prev_line;
+                    text_buf->current_line = prev_line;
+                    curr_line = initialize_line();
+                    text_buf->first_line->next = curr_line;
+                    curr_line->prev = text_buf->first_line;
+                    text_buf->num_of_lines++;
+                }
+                else
+                {
+                    text_buf->num_of_lines++;
+                    prev_line->next = curr_line;
+                    curr_line->prev = prev_line;
+                    prev_line = curr_line;
+                    curr_line = initialize_line();
+                }
+
+                continue;
             }
 
-            continue;
+            curr_line->buf_[i][j] = c;
+            curr_line->length++;
+            j++;
         }
 
-        curr_line->buf_[i] = c;
         curr_line->length++;
         i++;
     }
+
+    // while (fread(&c, sizeof(char), 1, file))
+    // {
+    //     if (c == '\n')
+    //     {
+    //         curr_line->buf_[i] = c;
+    //         curr_line->line_num = line_number;
+    //         line_number++;
+    //         i = 0;
+    //
+    //         if (text_buf->num_of_lines == 0)
+    //         {
+    //             prev_line = curr_line;
+    //             text_buf->first_line = prev_line;
+    //             text_buf->current_line = prev_line;
+    //             curr_line = initialize_line();
+    //             text_buf->first_line->next = curr_line;
+    //             curr_line->prev = text_buf->first_line;
+    //             text_buf->num_of_lines++;
+    //         }
+    //         else
+    //         {
+    //             text_buf->num_of_lines++;
+    //             prev_line->next = curr_line;
+    //             curr_line->prev = prev_line;
+    //             prev_line = curr_line;
+    //             curr_line = initialize_line();
+    //         }
+    //
+    //         continue;
+    //     }
+    //
+    //     curr_line->buf_[i] = c;
+    //     curr_line->length++;
+    //     i++;
+    // }
 }
 
 void write_buffer_to_file(TEXT_BUFFER *tbuf, FILE *file, int y)

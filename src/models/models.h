@@ -15,7 +15,7 @@ typedef struct _course_data
 
 typedef struct line
 {
-  char **buf_;
+  char *buf_;
   unsigned short line_num;
   unsigned short length;
   struct line *prev;

@@ -12,6 +12,7 @@ int main(void)
     setlocale(LC_ALL, "");
 
     initscr();
+
     start_color();
     use_default_colors();
     init_pair(1, COLOR_RED, -1);
@@ -21,6 +22,8 @@ int main(void)
     //     init_color(COLOR_WHITE, 195, 225, 225);
     init_pair(4, COLOR_GREEN, -1);
     init_pair(5, COLOR_YELLOW, -1);
+    init_pair(6, COLOR_CYAN, -1);
+
     cbreak();
     noecho();
     keypad(stdscr, TRUE);
@@ -38,11 +41,12 @@ int main(void)
     mvwprintw(welcome_screen, (rows / 2), (cols - strlen(msg2)) / 2, msg2, rows,
               cols);
     wattroff(welcome_screen, COLOR_PAIR(1) | A_BOLD);
+    wrefresh(welcome_screen);
+
     curs_set(0);
 
     sqlite3 *db = create_database(welcome_screen);
     // seed_courses_data(db, welcome_screen);
-    wrefresh(welcome_screen);
 
     wgetch(welcome_screen);
     delwin(welcome_screen);
@@ -52,7 +56,9 @@ int main(void)
     create_start_screen(db);
 
     sqlite3_close(db);
+
     curs_set(1);
+
     endwin();
 
     return EXIT_SUCCESS;

@@ -49,7 +49,6 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
     {
         for (int k = 0; k < current_line->length; k++)
         {
-            // mvwprintw(*edit_window, i, k, "%c", current_line->buf_[k]);
             if (current_line->buf_[k] == ' ' || current_line->buf_[k] == '\n')
             {
                 word_len++;
@@ -59,8 +58,6 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
 
                 mvwprintw(*edit_window, LINES + i - 25, line_len,
                           "%s", word);
-                mvwprintw(*edit_window, LINES + i - 25, line_len + 40,
-                          "%c", 'f');
                 if (strcmp(word, "#include") == 0)
                 {
                     wattron(*edit_window, COLOR_PAIR(6));
@@ -80,7 +77,6 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
             }
             else
             {
-                // word[word_len] = current_line->buf_[line_len + word_len];
                 word_len++;
             }
         }

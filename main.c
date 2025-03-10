@@ -24,6 +24,7 @@ int main(void)
     init_pair(5, COLOR_YELLOW, -1);
     init_pair(6, COLOR_CYAN, -1);
     init_pair(7, COLOR_BLUE, -1);
+    init_pair(8, COLOR_MAGENTA, -1);
 
     cbreak();
     noecho();

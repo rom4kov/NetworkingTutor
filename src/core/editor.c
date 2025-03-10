@@ -178,6 +178,7 @@ void delete_char_or_line(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
 void bs_delete_line(TEXT_BUFFER *tbuf, WINDOW **edit_window,
                     WINDOW **line_num_win, int y)
 {
+    curs_set(0);
     memmove(
         &tbuf->current_line->prev->buf_[tbuf->current_line->prev->length - 1],
         tbuf->current_line->buf_, tbuf->current_line->length);
@@ -193,7 +194,6 @@ void bs_delete_line(TEXT_BUFFER *tbuf, WINDOW **edit_window,
     tbuf->num_of_lines--;
     tbuf->curr_line_nr--;
     tbuf->current_col = tbuf->current_line->length;
-    curs_set(0);
     print_buffer(tbuf, edit_window, line_num_win);
     wmove(*edit_window, y - 1, prev_length < 2 ? 0 : prev_length - 1);
     curs_set(1);
@@ -268,7 +268,6 @@ void insert_line(TEXT_BUFFER *tbuf, WINDOW **edit_window, WINDOW **line_num_win,
         tbuf->num_of_lines++;
         tbuf->curr_line_nr++;
         tbuf->current_col = 0;
-        curs_set(0);
         print_buffer(tbuf, edit_window, line_num_win);
         wmove(*edit_window, y + 1, 0);
         curs_set(1);

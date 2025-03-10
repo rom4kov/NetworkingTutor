@@ -48,25 +48,48 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
     {
         for (int k = 0; k < current_line->length; k++)
         {
-            if (current_line->buf_[k] == ' ' || current_line->buf_[k] == '\n')
+            if (current_line->buf_[k] == ' ' || current_line->buf_[k] == '\n' ||
+                current_line->buf_[k] == '(' || current_line->buf_[k] == ')')
             {
                 word_len++;
                 word = malloc(sizeof(word_len));
-                strncpy(word, &current_line->buf_[line_len], word_len - 1);
-                word[word_len + 1] = '\0';
+                strncpy(word, &current_line->buf_[line_len], word_len);
+                word[word_len - 1] = '\0';
 
+                // mvwprintw(*edit_window, LINES + i - 25, line_len, "%s",
+                // word);
                 if (strcmp(word, "#include") == 0)
                 {
                     wattron(*edit_window, COLOR_PAIR(6));
                 }
+                if (strcmp(word, "<stdio.h>") == 0)
+                {
+                    wattron(*edit_window, COLOR_PAIR(4));
+                }
+                if (strcmp(word, "int") == 0 || strcmp(word, "void") == 0 ||
+                    strcmp(word, "return") == 0)
+                {
+                    wattron(*edit_window, COLOR_PAIR(8));
+                }
+
                 for (int j = 0; j < word_len; j++)
                 {
                     mvwprintw(*edit_window, i, line_len + j, "%c",
                               current_line->buf_[line_len + j]);
                 }
+
                 if (strcmp(word, "#include") == 0)
                 {
                     wattroff(*edit_window, COLOR_PAIR(6));
+                }
+                if (strcmp(word, "<stdio.h>") == 0)
+                {
+                    wattroff(*edit_window, COLOR_PAIR(4));
+                }
+                if (strcmp(word, "int") == 0 || strcmp(word, "void") == 0 ||
+                    strcmp(word, "return") == 0)
+                {
+                    wattroff(*edit_window, COLOR_PAIR(8));
                 }
                 line_len += word_len;
                 word_len = 0;

@@ -37,8 +37,6 @@ void handle_editor_input(int ch, WINDOW **line_num_win, WINDOW **edit_window,
             break;
         case 10:
             insert_line(text_buf, edit_window, line_num_win, y, x);
-            wrefresh(*line_num_win);
-            wrefresh(*edit_window);
             break;
         case KEY_HOME:
             move_to_start_of_line(text_buf, edit_window, y, x);

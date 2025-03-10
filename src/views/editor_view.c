@@ -36,11 +36,10 @@ void update_line_numbers(TEXT_BUFFER *tbuf, WINDOW **line_num_win)
 void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
                   WINDOW **line_num_win)
 {
-    wclear(*line_num_win);
-    wclear(*edit_window);
+    werase(*line_num_win);
+    werase(*edit_window);
     int word_len = 0;
     int line_len = 0;
-    // char word[30];
     char *word;
 
     LINE *current_line = tbuf->first_line;
@@ -56,8 +55,6 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
                 strncpy(word, &current_line->buf_[line_len], word_len - 1);
                 word[word_len + 1] = '\0';
 
-                mvwprintw(*edit_window, LINES + i - 25, line_len,
-                          "%s", word);
                 if (strcmp(word, "#include") == 0)
                 {
                     wattron(*edit_window, COLOR_PAIR(6));

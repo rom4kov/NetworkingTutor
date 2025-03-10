@@ -31,8 +31,9 @@ void move_down(TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **edit_window,
         wmove(*edit_window, y + 1, tbuf->current_line->length - 1);
     }
     update_line_numbers(tbuf, line_num_win);
-    wrefresh(*line_num_win);
-    wrefresh(*edit_window);
+    wnoutrefresh(*line_num_win);
+    wnoutrefresh(*edit_window);
+    doupdate();
 }
 
 void move_up(TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **edit_window,
@@ -61,8 +62,9 @@ void move_up(TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **edit_window,
         wmove(*edit_window, y - 1, tbuf->current_line->length - 1);
     }
     update_line_numbers(tbuf, line_num_win);
-    wrefresh(*line_num_win);
-    wrefresh(*edit_window);
+    wnoutrefresh(*line_num_win);
+    wnoutrefresh(*edit_window);
+    doupdate();
 }
 
 void move_right(TEXT_BUFFER *tbuf, WINDOW **edit_window, int y, int x)
@@ -139,10 +141,13 @@ void delete_line(TEXT_BUFFER *tbuf, WINDOW **edit_window, WINDOW **line_num_win,
         tbuf->num_of_lines--;
         // tbuf->curr_line_nr--;
         // tbuf->current_col = tbuf->current_line->length;
+        curs_set(0);
         print_buffer(tbuf, edit_window, line_num_win);
         wmove(*edit_window, y, x);
-        wrefresh(*line_num_win);
-        wrefresh(*edit_window);
+        curs_set(1);
+        wnoutrefresh(*line_num_win);
+        wnoutrefresh(*edit_window);
+        doupdate();
     }
 }
 
@@ -188,10 +193,13 @@ void bs_delete_line(TEXT_BUFFER *tbuf, WINDOW **edit_window,
     tbuf->num_of_lines--;
     tbuf->curr_line_nr--;
     tbuf->current_col = tbuf->current_line->length;
+    curs_set(0);
     print_buffer(tbuf, edit_window, line_num_win);
     wmove(*edit_window, y - 1, prev_length < 2 ? 0 : prev_length - 1);
-    wrefresh(*line_num_win);
-    wrefresh(*edit_window);
+    curs_set(1);
+    wnoutrefresh(*line_num_win);
+    wnoutrefresh(*edit_window);
+    doupdate();
 }
 
 void bs_delete_char_or_line(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
@@ -223,6 +231,7 @@ void insert_line(TEXT_BUFFER *tbuf, WINDOW **edit_window, WINDOW **line_num_win,
     LINE *new_line = initialize_line();
     if (x + 1 < tbuf->current_line->length)
     {
+        curs_set(0);
         memmove(new_line->buf_, &tbuf->current_line->buf_[x],
                 tbuf->current_line->length - x);
         strncpy(&tbuf->current_line->buf_[x], "\n\0", 2 * sizeof(char));
@@ -241,9 +250,11 @@ void insert_line(TEXT_BUFFER *tbuf, WINDOW **edit_window, WINDOW **line_num_win,
         tbuf->current_col = 0;
         print_buffer(tbuf, edit_window, line_num_win);
         wmove(*edit_window, y + 1, 0);
+        curs_set(1);
     }
     else
     {
+        curs_set(0);
         strncpy(new_line->buf_, "\n\0", 2 * sizeof(char));
         new_line->length = 1;
         new_line->prev = tbuf->current_line;
@@ -257,7 +268,12 @@ void insert_line(TEXT_BUFFER *tbuf, WINDOW **edit_window, WINDOW **line_num_win,
         tbuf->num_of_lines++;
         tbuf->curr_line_nr++;
         tbuf->current_col = 0;
+        curs_set(0);
         print_buffer(tbuf, edit_window, line_num_win);
         wmove(*edit_window, y + 1, 0);
+        curs_set(1);
     }
+    wnoutrefresh(*line_num_win);
+    wnoutrefresh(*edit_window);
+    doupdate();
 }

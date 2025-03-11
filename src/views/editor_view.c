@@ -62,12 +62,12 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
     PCRE2_SIZE erroffset;
 
     // Define the pattern and subject
-    PCRE2_SPTR pattern = (PCRE2_SPTR) "[a-z]{3}";
+    PCRE2_SPTR pattern = (PCRE2_SPTR) "\\b(void|int|return)\\b";
     // PCRE2_SPTR subject = (PCRE2_SPTR)current_line->buf_;
     // size_t subject_length = strlen(current_line->buf_);
 
     // Compile the regex pattern
-    re = pcre2_compile(pattern, PCRE2_ZERO_TERMINATED, 0, &errcode, &erroffset,
+    re = pcre2_compile(pattern, PCRE2_ZERO_TERMINATED, PCRE2_UCP, &errcode, &erroffset,
                        NULL);
     if (!re)
         return; // Compilation failed
@@ -111,7 +111,7 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
             PCRE2_SIZE start = ovector[0];
             PCRE2_SIZE end = ovector[1];
             //
-            for (PCRE2_SIZE k = line_len + start; k < line_len + end; k++)
+            for (PCRE2_SIZE k = start; k < end; k++)
                 mvwprintw(*edit_window, i, k, "%c", current_line->buf_[k]);
             //
             line_len += end;
@@ -197,7 +197,7 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
         //         word_len);
         //     }
         // }
-        line_len = 0;
+        // line_len = 0;
         // word_len = 0;
         current_line = current_line->next;
     }

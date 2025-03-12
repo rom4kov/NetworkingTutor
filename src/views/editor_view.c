@@ -5,10 +5,6 @@
 #include "../models/models.h"
 #include <ncurses.h>
 #include <string.h>
-// #include <stdio.h>
-// #include <stdlib.h>
-// #include <string.h>
-// #include <regex.h>
 #include <pcre2.h>
 
 void update_line_numbers(TEXT_BUFFER *tbuf, WINDOW **line_num_win)
@@ -16,11 +12,11 @@ void update_line_numbers(TEXT_BUFFER *tbuf, WINDOW **line_num_win)
     int i;
     for (i = 0; i < tbuf->num_of_lines; i++)
     {
-        wattron(*line_num_win, COLOR_PAIR(4));
+        wattron(*line_num_win, COLOR_PAIR(10));
         if (i == tbuf->curr_line_nr)
         {
-            wattroff(*line_num_win, COLOR_PAIR(4));
-            wattron(*line_num_win, COLOR_PAIR(5));
+            wattroff(*line_num_win, COLOR_PAIR(10));
+            wattron(*line_num_win, COLOR_PAIR(1));
         }
 
         if (i < 9)
@@ -34,11 +30,11 @@ void update_line_numbers(TEXT_BUFFER *tbuf, WINDOW **line_num_win)
 
         if (i == tbuf->curr_line_nr)
         {
-            wattroff(*line_num_win, COLOR_PAIR(5));
-            wattron(*line_num_win, COLOR_PAIR(4));
+            wattroff(*line_num_win, COLOR_PAIR(1));
+            wattron(*line_num_win, COLOR_PAIR(10));
         }
     }
-    wattroff(*line_num_win, COLOR_PAIR(4));
+    wattroff(*line_num_win, COLOR_PAIR(10));
 }
 
 void compile_patterns(pcre2_code **re, int p_codes_num, char **pattern_str)
@@ -52,7 +48,7 @@ void compile_patterns(pcre2_code **re, int p_codes_num, char **pattern_str)
         re[i] = pcre2_compile(pattern, PCRE2_ZERO_TERMINATED, PCRE2_UCP,
                               &errcode, &erroffset, NULL);
         if (!re[i])
-            return; // Compilation failed
+            return;
     }
 }
 
@@ -97,12 +93,12 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
     int pattern_num = 6;
     pcre2_code *re[pattern_num];
     char *patterns[] = {".",
-                        "\\b(void|int|char|return)\\b",
-                        "#(include|define)",
+                        "\\b(void|int|char|return|for|while|if|else|break|continue)\\b",
+                        "#(include|define)|=|\\+|\\-|\\*|\\&",
                         "(\".*\"|<.*\\.h>)",
                         "([a-z0-9_]*)\\(.*\\)",
                         "\\d"};
-    int colors[] = {2, 8, 6, 4, 7, 3};
+    int colors[] = {1, 8, 6, 4, 7, 9};
 
     compile_patterns(re, pattern_num, patterns);
 
@@ -130,12 +126,12 @@ void print_line(char *line_buf, int line_num, WINDOW **edit_window)
     int pattern_num = 6;
     pcre2_code *re[pattern_num];
     char *patterns[] = {".",
-                        "\\b(void|int|char|return)\\b",
-                        "#(include|define)",
+                        "\\b(void|int|char|return|for|while|if|else|break|continue)\\b",
+                        "#(include|define)|=|\\+|\\-|\\*|\\&",
                         "(\".*\"|<.*\\.h>)",
                         "([a-z0-9_]*)\\(.*\\)",
                         "\\d"};
-    int colors[] = {2, 8, 6, 4, 7, 3};
+    int colors[] = {1, 8, 6, 4, 7, 9};
     size_t subj_len = strlen(line_buf);
 
     compile_patterns(re, pattern_num, patterns);

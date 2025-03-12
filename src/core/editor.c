@@ -126,12 +126,12 @@ void delete_line(TEXT_BUFFER *tbuf, WINDOW **edit_window, WINDOW **line_num_win,
 {
     if (y + 1 < tbuf->num_of_lines)
     {
-        memmove(
-            &tbuf->current_line->buf_[tbuf->current_line->length - 1],
-            tbuf->current_line->next->buf_, tbuf->current_line->next->length);
+        memmove(&tbuf->current_line->buf_[tbuf->current_line->length - 1],
+                tbuf->current_line->next->buf_,
+                tbuf->current_line->next->length);
         // memmove(
-        //     &tbuf->current_line->prev->buf_[tbuf->current_line->prev->length - 1],
-        //     tbuf->current_line->buf_, tbuf->current_line->length);
+        //     &tbuf->current_line->prev->buf_[tbuf->current_line->prev->length
+        //     - 1], tbuf->current_line->buf_, tbuf->current_line->length);
         // tbuf->current_line->prev->next = tbuf->current_line->next;
         // int prev_length = tbuf->current_line->prev->length;
         free(tbuf->current_line->next->buf_);
@@ -165,8 +165,8 @@ void delete_char_or_line(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
         //         "\n", sizeof(char));
         tbuf->current_line->length--;
         mvwprintw(*edit_window, y, tbuf->current_line->length - 1, " ");
-        mvwprintw(*edit_window, y, x, "%s", &tbuf->current_line->buf_[x]);
-        mvwprintw(*edit_window, LINES - 20, 70, "char deleted");
+        print_line(tbuf->current_line->buf_, tbuf->curr_line_nr, edit_window);
+        // mvwprintw(*edit_window, y, x, "%s", &tbuf->current_line->buf_[x]);
         wmove(*edit_window, y, x);
         wrefresh(*edit_window);
     }
@@ -215,8 +215,9 @@ void bs_delete_char_or_line(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
         tbuf->current_line->length--;
         tbuf->current_col--;
         mvwprintw(*edit_window, y, tbuf->current_line->length - 1, " ");
-        mvwprintw(*edit_window, y, x - 1, "%s",
-                  &tbuf->current_line->buf_[x - 1]);
+        print_line(tbuf->current_line->buf_, tbuf->curr_line_nr, edit_window);
+        // mvwprintw(*edit_window, y, x - 1, "%s",
+        //           &tbuf->current_line->buf_[x - 1]);
         wmove(*edit_window, y, x - 1);
         wrefresh(*edit_window);
     }
@@ -235,7 +236,9 @@ void insert_line(TEXT_BUFFER *tbuf, WINDOW **edit_window, WINDOW **line_num_win,
         curs_set(0);
         memmove(new_line->buf_, &tbuf->current_line->buf_[x],
                 tbuf->current_line->length - x);
-        strncpy(&tbuf->current_line->buf_[x], "\n\0", 2 * sizeof(char));
+        strncpy(&tbuf->current_line->buf_[x], "\n", 2 * sizeof(char));
+        strncpy(&tbuf->current_line->buf_[x + 1], "\0",
+                (tbuf->current_line->length - x) * sizeof(char));
         new_line->length = tbuf->current_line->length - x;
         new_line->prev = tbuf->current_line;
         if (y + 1 < tbuf->num_of_lines)

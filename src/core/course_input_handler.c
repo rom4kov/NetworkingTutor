@@ -23,7 +23,7 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
     WINDOW *line_num_win = derwin(windows[1], LINES - 6, 3, 2, 1);
     WINDOW *edit_window = derwin(windows[1], LINES - 6, WU * 7 - 2, 2, 4);
 
-    char *filename = "../hello.c";
+    char *filename = "../read_lines.c";
     FILE *file = fopen(filename, "r+");
 
     if (file == NULL)

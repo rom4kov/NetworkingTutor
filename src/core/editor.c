@@ -115,7 +115,8 @@ void insert_char(TEXT_BUFFER *tbuf, WINDOW **edit_window, int y, int x, char ch)
     tbuf->current_line->length++;
     tbuf->current_line->buf_[x] = ch;
     tbuf->current_col++;
-    mvwprintw(*edit_window, y, x, "%s", &tbuf->current_line->buf_[x]);
+    print_line(tbuf->current_line->buf_, tbuf->curr_line_nr, edit_window);
+    // mvwprintw(*edit_window, y, x, "%s", &tbuf->current_line->buf_[x]);
     wmove(*edit_window, y, x + 1);
     wrefresh(*edit_window);
 }

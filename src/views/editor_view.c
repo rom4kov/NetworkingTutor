@@ -93,9 +93,6 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
     werase(*edit_window);
 
     LINE *current_line = tbuf->first_line;
-    //
-    // int errcode;
-    // PCRE2_SIZE erroffset;
 
     int pattern_num = 6;
     pcre2_code *re[pattern_num];
@@ -108,47 +105,6 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
     int colors[] = {2, 8, 6, 4, 7, 3};
 
     compile_patterns(re, pattern_num, patterns);
-    // pcre2_code *re5;
-    // PCRE2_SPTR pattern5 = (PCRE2_SPTR) ".";
-    // re5 = pcre2_compile(pattern5, PCRE2_ZERO_TERMINATED, PCRE2_UCP, &errcode,
-    //                     &erroffset, NULL);
-    // if (!re5)
-    //     return; // Compilation failed
-    //
-    // pcre2_code *re;
-    // PCRE2_SPTR pattern = (PCRE2_SPTR) "\\b(void|int|char|return)\\b";
-    // re = pcre2_compile(pattern, PCRE2_ZERO_TERMINATED, PCRE2_UCP, &errcode,
-    //                    &erroffset, NULL);
-    // if (!re)
-    //     return; // Compilation failed
-    //
-    // pcre2_code *re2;
-    // PCRE2_SPTR pattern2 = (PCRE2_SPTR) "#(include|define)";
-    // re2 = pcre2_compile(pattern2, PCRE2_ZERO_TERMINATED, PCRE2_UCP, &errcode,
-    //                     &erroffset, NULL);
-    // if (!re)
-    //     return; // Compilation failed
-    //
-    // pcre2_code *re3;
-    // PCRE2_SPTR pattern3 = (PCRE2_SPTR) "(\".*\"|<.*\\.h>)";
-    // re3 = pcre2_compile(pattern3, PCRE2_ZERO_TERMINATED, PCRE2_UCP, &errcode,
-    //                     &erroffset, NULL);
-    // if (!re3)
-    //     return; // Compilation failed
-    //
-    // pcre2_code *re4;
-    // PCRE2_SPTR pattern4 = (PCRE2_SPTR) "([a-z0-9_]*)\\(.*\\)";
-    // re4 = pcre2_compile(pattern4, PCRE2_ZERO_TERMINATED, PCRE2_UCP, &errcode,
-    //                     &erroffset, NULL);
-    // if (!re4)
-    //     return; // Compilation failed
-    //
-    // pcre2_code *re6;
-    // PCRE2_SPTR pattern6 = (PCRE2_SPTR) "\\d";
-    // re6 = pcre2_compile(pattern6, PCRE2_ZERO_TERMINATED, PCRE2_UCP, &errcode,
-    //                     &erroffset, NULL);
-    // if (!re6)
-    //     return; // Compilation failed
 
     for (int i = 0; i < tbuf->num_of_lines; i++)
     {
@@ -159,18 +115,37 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
             print_matches(re[j], i, subj_len, current_line->buf_,
                           j == 4 ? 2 : 0, edit_window, colors[j]);
         }
-        // print_matches(re[1], i, subj_len, current_line->buf_, 0, edit_window,
-        // 8); print_matches(re[2], i, subj_len, current_line->buf_, 0,
-        // edit_window, 6); print_matches(re[3], i, subj_len,
-        // current_line->buf_, 0, edit_window, 4); print_matches(re[4], i,
-        // subj_len, current_line->buf_, 2, edit_window, 7);
-        // print_matches(re[5], i, subj_len, current_line->buf_, 0, edit_window,
-        // 3);
 
         current_line = current_line->next;
     }
 
     for (int i = 0; i < pattern_num; i++)
         pcre2_code_free(re[i]);
+
     update_line_numbers(tbuf, line_num_win);
+}
+
+void print_line(char *line_buf, int line_num, WINDOW **edit_window)
+{
+    int pattern_num = 6;
+    pcre2_code *re[pattern_num];
+    char *patterns[] = {".",
+                        "\\b(void|int|char|return)\\b",
+                        "#(include|define)",
+                        "(\".*\"|<.*\\.h>)",
+                        "([a-z0-9_]*)\\(.*\\)",
+                        "\\d"};
+    int colors[] = {2, 8, 6, 4, 7, 3};
+    size_t subj_len = strlen(line_buf);
+
+    compile_patterns(re, pattern_num, patterns);
+
+    for (int i = 0; i < pattern_num; i++)
+    {
+        print_matches(re[i], line_num, subj_len, line_buf,
+                      i == 4 ? 2 : 0, edit_window, colors[i]);
+    }
+
+    for (int i = 0; i < pattern_num; i++)
+        pcre2_code_free(re[i]);
 }

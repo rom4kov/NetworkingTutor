@@ -35,6 +35,9 @@ void handle_editor_input(int ch, WINDOW **line_num_win, WINDOW **edit_window,
         case KEY_DC:
             delete_char_or_line(text_buf, line_num_win, edit_window, y, x);
             break;
+        case 9:
+            insert_tab(text_buf, edit_window, y, x);
+            break;
         case 10:
             insert_line(text_buf, edit_window, line_num_win, y, x);
             break;
@@ -48,6 +51,8 @@ void handle_editor_input(int ch, WINDOW **line_num_win, WINDOW **edit_window,
             curs_set(0);
             wrefresh(*edit_window);
             *editor_mode = false;
+            break;
+        case KEY_F(2):
             break;
         case KEY_F(10):
             write_buffer_to_file(text_buf, file, y);

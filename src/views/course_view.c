@@ -1,3 +1,4 @@
+#include <math.h>
 #define _XOPEN_SOURCE_EXTENDED 1
 
 #include "../core/core.h"
@@ -10,7 +11,7 @@
 #include <ncurses.h>
 #include <sqlite3.h>
 
-#define WINDOW_COUNT 3
+#define WINDOW_COUNT 4
 #define WU COLS / 12 // WU for WIDTH_UNIT
 #define WIDTH_REMAINDER COLS % WU
 
@@ -23,6 +24,7 @@ void create_course_view(sqlite3 *db)
     windows[0] = create_navigation_window(&active_window, &start_menu);
     windows[1] = create_editor_window(&active_window);
     windows[2] = create_right_side_panel(&active_window, &db, "Course instructions");
+    windows[3] = create_explorer_window(&active_window);
 
     wrefresh(windows[2]);
 
@@ -31,7 +33,7 @@ void create_course_view(sqlite3 *db)
 
 WINDOW *create_editor_window(int *active_window)
 {
-    WINDOW *editor_window = newwin(LINES - 3, WU * 7 + 4, 3, 0);
+    WINDOW *editor_window = newwin(LINES - 3, WU * 5 + 4, 3, WU * 2);
     draw_border(editor_window, 2, 0);
 
     mvwprintw(editor_window, 0, 2, "%i", *active_window);
@@ -43,4 +45,20 @@ WINDOW *create_editor_window(int *active_window)
     wrefresh(editor_window);
 
     return editor_window;
+}
+
+WINDOW *create_explorer_window(int *active_window)
+{
+    WINDOW *explorer_window = newwin(LINES - 3, WU * 2, 3, 0);
+    draw_border(explorer_window, 2, 0);
+
+    mvwprintw(explorer_window, 0, 2, "%i", *active_window);
+
+    wattron(explorer_window, COLOR_PAIR(3));
+    mvwprintw(explorer_window, 0, 2, "Explorer");
+    wattroff(explorer_window, COLOR_PAIR(3));
+
+    wrefresh(explorer_window);
+
+    return explorer_window;
 }

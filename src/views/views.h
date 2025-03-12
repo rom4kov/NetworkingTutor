@@ -16,6 +16,7 @@ void input_handler(WINDOW **windows, int *active_win, MENU **start_menu,
 
 void create_course_view(sqlite3 *db);
 WINDOW *create_editor_window(int *active_window);
+WINDOW *create_explorer_window(int *active_window);
 void create_user_form(WINDOW **window, FORM **user_form, FIELD **fields);
 void update_line_numbers(TEXT_BUFFER *tbuf, WINDOW **line_num_win);
 void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,

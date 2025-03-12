@@ -111,9 +111,9 @@ WINDOW *create_navigation_window(int *active_win, MENU **start_menu)
     {
         *start_menu = create_start_menu(navigation);
     }
-    wattron(navigation, COLOR_PAIR(1));
+    wattron(navigation, COLOR_PAIR(3));
     mvwprintw(navigation, 0, 2, "Navigation");
-    wattroff(navigation, COLOR_PAIR(1));
+    wattroff(navigation, COLOR_PAIR(3));
 
     wrefresh(navigation);
     return navigation;
@@ -121,8 +121,6 @@ WINDOW *create_navigation_window(int *active_win, MENU **start_menu)
 
 WINDOW *create_header_section(int *active_win)
 {
-    // WINDOW *header_outer = newwin(LINES / 2 + 1, (COLS / 6) * 3, 0, COLS /
-    // 6);
     WINDOW *header_outer = newwin(LINES / 2 + 1, WU * 7 + 4, 3, 0);
     WINDOW *header_inner =
         derwin(header_outer, LINES / 2 - 1, CARD_WIDTH * 3 - 4, 0, 3);
@@ -178,9 +176,9 @@ WINDOW *create_course_preview_card(int x_position, int *active_win,
     }
 
     mvwhline(course_preview_card_inner, 1, 0, ACS_HLINE, CARD_WIDTH);
-    wattron(course_preview_card_outer, COLOR_PAIR(1));
+    wattron(course_preview_card_outer, COLOR_PAIR(3));
     mvwprintw(course_preview_card_outer, 0, 2, "Lesson #%i", course->id);
-    wattroff(course_preview_card_outer, COLOR_PAIR(1));
+    wattroff(course_preview_card_outer, COLOR_PAIR(3));
     wrefresh(course_preview_card_outer);
     mvwprintw(course_preview_card_inner, 0,
               (CARD_WIDTH - strlen(course->name)) / 2 - 1, "%s", course->name);
@@ -210,9 +208,9 @@ WINDOW *create_right_side_panel(int *active_win, sqlite3 **db, char *label)
     {
         draw_border(right_panel, 2, 0);
     }
-    wattron(right_panel, COLOR_PAIR(1));
+    wattron(right_panel, COLOR_PAIR(3));
     mvwprintw(right_panel, 0, 2, "%s", label);
-    wattroff(right_panel, COLOR_PAIR(1));
+    wattroff(right_panel, COLOR_PAIR(3));
 
     mvwprintw(right_panel, 2, 3, "Your name: %s", user_data.name);
     mvwprintw(right_panel, 3, 3, "Language:  %s", user_data.language);

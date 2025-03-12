@@ -4,8 +4,8 @@
 
 #include "../models/models.h"
 #include <ncurses.h>
-#include <string.h>
 #include <pcre2.h>
+#include <string.h>
 
 void update_line_numbers(TEXT_BUFFER *tbuf, WINDOW **line_num_win)
 {
@@ -92,12 +92,13 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
 
     int pattern_num = 6;
     pcre2_code *re[pattern_num];
-    char *patterns[] = {".",
-                        "\\b(void|int|char|return|for|while|if|else|break|continue)\\b",
-                        "#(include|define)|=|\\+|\\-|\\*|\\&",
-                        "(\".*\"|<.*\\.h>)",
-                        "([a-z0-9_]*)\\(.*\\)",
-                        "\\d"};
+    char *patterns[] = {
+        ".",
+        "\\b(void|int|char|return|for|while|if|else|break|continue)\\b",
+        "#(include|define)|=|\\+|\\-|\\*|\\&",
+        "(\".*\"|<.*\\.h>)",
+        "([a-z0-9_]*)\\(.*\\)",
+        "\\d"};
     int colors[] = {1, 8, 6, 4, 7, 9};
 
     compile_patterns(re, pattern_num, patterns);
@@ -125,12 +126,13 @@ void print_line(char *line_buf, int line_num, WINDOW **edit_window)
 {
     int pattern_num = 6;
     pcre2_code *re[pattern_num];
-    char *patterns[] = {".",
-                        "\\b(void|int|char|return|for|while|if|else|break|continue)\\b",
-                        "#(include|define)|=|\\+|\\-|\\*|\\&",
-                        "(\".*\"|<.*\\.h>)",
-                        "([a-z0-9_]*)\\(.*\\)",
-                        "\\d"};
+    char *patterns[] = {
+        ".",
+        "\\b(void|int|char|return|for|while|if|else|break|continue)\\b",
+        "#(include|define)|=|\\+|\\-|\\*|\\&",
+        "(\".*\"|<.*\\.h>)",
+        "([a-z0-9_]*)\\(.*\\)",
+        "\\d"};
     int colors[] = {1, 8, 6, 4, 7, 9};
     size_t subj_len = strlen(line_buf);
 
@@ -138,8 +140,8 @@ void print_line(char *line_buf, int line_num, WINDOW **edit_window)
 
     for (int i = 0; i < pattern_num; i++)
     {
-        print_matches(re[i], line_num, subj_len, line_buf,
-                      i == 4 ? 2 : 0, edit_window, colors[i]);
+        print_matches(re[i], line_num, subj_len, line_buf, i == 4 ? 2 : 0,
+                      edit_window, colors[i]);
     }
 
     for (int i = 0; i < pattern_num; i++)

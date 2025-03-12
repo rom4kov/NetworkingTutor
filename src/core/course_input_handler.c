@@ -11,6 +11,7 @@
 
 #define WINDOW_COUNT 3
 #define WU COLS / 12 // WU for WIDTH_UNIT
+#define EDIT_MAX WU * 7 + 4
 
 void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
                          sqlite3 *db)
@@ -21,7 +22,7 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
     ITEM *curr_item;
 
     WINDOW *line_num_win = derwin(windows[1], LINES - 6, 3, 2, 1);
-    WINDOW *edit_window = derwin(windows[1], LINES - 6, WU * 7 - 2, 2, 4);
+    WINDOW *edit_window = derwin(windows[1], LINES - 6, WU * 5 - 2, 2, 4);
 
     char *filename = "../read_lines.c";
     FILE *file = fopen(filename, "r+");
@@ -37,12 +38,17 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
         read_file_into_buffer(file, t_buffer);
 
         print_buffer(t_buffer, &edit_window, &line_num_win);
+        mvwprintw(edit_window, LINES - 7, EDIT_MAX - 15, "     ");
+        mvwprintw(edit_window, LINES - 7, EDIT_MAX - 15, "0 : 0");
 
         rewind(file);
 
-        wattron(windows[1], A_BOLD);
-        mvwprintw(windows[1], 1, 1, "%s", filename);
-        wattroff(windows[1], A_BOLD);
+        wattron(windows[1], A_BOLD | COLOR_PAIR(7));
+        mvwprintw(windows[1], 1, 4, "");
+        wattroff(windows[1], A_BOLD | COLOR_PAIR(7));
+        wattron(windows[1], A_BOLD | COLOR_PAIR(1));
+        mvwprintw(windows[1], 1, 6, "%s", filename);
+        wattroff(windows[1], A_BOLD | COLOR_PAIR(1));
         wrefresh(edit_window);
     }
 

@@ -2,30 +2,8 @@
 #include <ctype.h>
 #include <ncurses.h>
 #include <string.h>
-// #include <stdio.h>
 
-// char *wrap_text2(char *text, int width);
-
-// char *INTRODUCTION2 = 
-//     "Step-by-Step Learning\n"
-//     "Each course is designed to guide you through small, manageable steps.\n"
-//     "You'll learn by:\n"
-//     "Short instructions to get you started.\n"
-//     "Reading material and links to deepen your understanding.\n"
-//     "Hands-on tasks to practice and apply what you've learned in the built-in "
-//     "editor.\n"
-//     "Testing and Feedback\n"
-//     "Once you've completed a task, you'll be prompted to test your solution. "
-//     "Submit it for evaluation to receive feedback and gain points. Use these "
-//     "points to unlock the next level and continue your learning adventure!\n\n";
-
-// int main(void)
-// {
-//     char *text = wrap_text2(INTRODUCTION2, 58);
-//     printf("%s", text);
-// }
-
-void draw_border(WINDOW *win, int color_pair, int active_window)
+void draw_border(WINDOW *win, int color_pair, char *label)
 {
     int max_y, max_x;
     getmaxyx(win, max_y, max_x);
@@ -50,7 +28,8 @@ void draw_border(WINDOW *win, int color_pair, int active_window)
     mvwprintw(win, 0, max_x - 1, "╮");
     mvwprintw(win, max_y - 1, 0, "╰");
     mvwprintw(win, max_y - 1, max_x - 1, "╯");
-    if (color_pair == 2 && active_window > 2 && active_window < 4)
+
+    if (NULL != label && strcmp(label, "Lesson") == 0)
     {
         mvwaddch(win, 2, 0, ACS_LTEE);
         mvwaddch(win, 2, max_x - 1, ACS_RTEE);
@@ -61,9 +40,9 @@ void draw_border(WINDOW *win, int color_pair, int active_window)
 }
 
 void focus_window(WINDOW **windows, int window, int color_pair,
-                  int *active_window, char *label)
+                  char *label)
 {
-    draw_border(windows[window], color_pair, *active_window);
+    draw_border(windows[window], color_pair, label);
     wattron(windows[window], COLOR_PAIR(3));
     mvwprintw(windows[window], 0, 2, "%s", label);
     wattroff(windows[window], COLOR_PAIR(3));
@@ -96,9 +75,6 @@ char *wrap_text(char *text, int width)
     i = col = last_space = 0;
     while (str[i])
     {
-        // printf("i: %i, col: %i\n", i, col);
-        // printf("last_space: %i\n", last_space);
-        // printf("text at %i: %c\n", i, text[i]);
         if (str[i] == '\n')
         {
             col = 0;

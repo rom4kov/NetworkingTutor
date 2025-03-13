@@ -104,7 +104,7 @@ WINDOW *create_navigation_window(int *active_win, MENU **start_menu)
     navigation = newwin(3, WU * 7 + 4, 0, 0);
     if (*active_win == 0)
     {
-        draw_border(navigation, 3, 0);
+        draw_border(navigation, 3, "Navigation");
         mvwprintw(navigation, 0, 2, "Navigation");
     }
     if (*active_win == 1 || *active_win == 0)
@@ -128,7 +128,7 @@ WINDOW *create_header_section(int *active_win)
     {
         wattron(header_outer, COLOR_PAIR(1) | A_BOLD);
     }
-    draw_border(header_outer, 2, 0);
+    draw_border(header_outer, 2, "Header");
     wattron(header_inner, A_BOLD);
     mvwprintw(header_inner, 1, 0, "%s", HEADER_TEXT);
     wattroff(header_inner, A_BOLD);
@@ -165,11 +165,11 @@ WINDOW *create_course_preview_card(int x_position, int *active_win,
     if ((*active_win == 2 || *active_win == 3 || *active_win == 4) &&
         curr_win_idx == *active_win)
     {
-        draw_border(course_preview_card_outer, 3, 0);
+        draw_border(course_preview_card_outer, 3, "Lesson");
     }
     else
     {
-        draw_border(course_preview_card_outer, 2, 0);
+        draw_border(course_preview_card_outer, 2, "Lesson");
         mvwaddch(course_preview_card_outer, 2, 0, ACS_LTEE);
         mvwaddch(course_preview_card_outer, 2, CARD_WIDTH - 1 + remainder,
                  ACS_RTEE);
@@ -202,11 +202,11 @@ WINDOW *create_right_side_panel(int *active_win, sqlite3 **db, char *label)
     // mvwprintw(right_panel, 1, 2, "Your progress: 🔥🔥🔥");
     if (*active_win == 5)
     {
-        draw_border(right_panel, 3, 0);
+        draw_border(right_panel, 3, "Right Panel");
     }
     else
     {
-        draw_border(right_panel, 2, 0);
+        draw_border(right_panel, 2, "Right Panel");
     }
     wattron(right_panel, COLOR_PAIR(3));
     mvwprintw(right_panel, 0, 2, "%s", label);

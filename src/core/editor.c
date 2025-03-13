@@ -6,7 +6,7 @@
 #include <string.h>
 
 #define WU COLS / 12 // WU for WIDTH_UNIT
-#define EDIT_MAX WU * 5 + 4
+#define EDIT_MAX WU * 5 + (WU / 2) + 4
 
 void move_down(TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **edit_window,
                int y, int x)

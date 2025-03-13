@@ -39,8 +39,8 @@ void insert_line(TEXT_BUFFER *tbuf, WINDOW **edit_window, WINDOW **line_num_win,
                  int y, int x);
 
 char *wrap_text(char *text, int width);
-void draw_border(WINDOW *win, int color_pair, int active_window);
+void draw_border(WINDOW *win, int color_pair, char *label);
 void focus_window(WINDOW **windows, int window, int color_pair,
-                  int *active_window, char *label);
+                  char *label);
 void trim(char *str);
 int get_length(char *str);

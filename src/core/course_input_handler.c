@@ -14,7 +14,7 @@
 #define EDIT_MAX WU * 7 + 4
 
 void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
-                         sqlite3 *db)
+                         MENU **explorer_menu, sqlite3 *db)
 {
     bool in_course_view = true;
     bool editor_mode = false;
@@ -105,6 +105,10 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
                     }
                     break;
             }
+        }
+        else if (*active_win == 1 && explorer_mode)
+        {
+            handle_explorer_input(ch, &windows[1], &editor_mode, explorer_menu);
         }
         else if (*active_win == 1)
         {

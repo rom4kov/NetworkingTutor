@@ -17,6 +17,38 @@ int main(void)
 
     initscr();
 
+    initialize_colors();
+
+    cbreak();
+    noecho();
+    keypad(stdscr, TRUE);
+
+    curs_set(0);
+
+    WINDOW *welcome_screen = create_welcome_screen();
+
+    sqlite3 *db = create_database(welcome_screen);
+    // seed_courses_data(db, welcome_screen);
+
+    wgetch(welcome_screen);
+
+    delwin(welcome_screen);
+    clear();
+    refresh();
+
+    create_start_screen(db);
+
+    sqlite3_close(db);
+
+    curs_set(1);
+
+    endwin();
+
+    return EXIT_SUCCESS;
+}
+
+void initialize_colors()
+{
     start_color();
     use_default_colors();
 
@@ -40,13 +72,13 @@ int main(void)
     init_color(COLOR_DARKGREY, 500, 500, 500);
 
     init_pair(10, COLOR_DARKGREY, -1);
+}
 
-    cbreak();
-    noecho();
-    keypad(stdscr, TRUE);
-
+WINDOW *create_welcome_screen()
+{
     int rows, cols;
     getmaxyx(stdscr, rows, cols);
+
     WINDOW *welcome_screen = newwin(rows, cols, 0, 0);
     draw_border(welcome_screen, 2, 0);
     wattron(welcome_screen, COLOR_PAIR(3) | A_BOLD);
@@ -60,23 +92,5 @@ int main(void)
     wattroff(welcome_screen, COLOR_PAIR(3) | A_BOLD);
     wrefresh(welcome_screen);
 
-    curs_set(0);
-
-    sqlite3 *db = create_database(welcome_screen);
-    // seed_courses_data(db, welcome_screen);
-
-    wgetch(welcome_screen);
-    delwin(welcome_screen);
-    clear();
-    refresh();
-
-    create_start_screen(db);
-
-    sqlite3_close(db);
-
-    curs_set(1);
-
-    endwin();
-
-    return EXIT_SUCCESS;
+    return welcome_screen;
 }

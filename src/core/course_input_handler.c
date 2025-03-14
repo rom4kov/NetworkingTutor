@@ -1,13 +1,12 @@
 #include "../controllers/controllers.h"
 #include "../core/core.h"
-#include "../models/models.h"
+#include "../data/data_access_layer.h"
 #include "../views/views.h"
 #include <curses.h>
 #include <menu.h>
 #include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #define WINDOW_COUNT 3
 #define WU COLS / 12 // WU for WIDTH_UNIT
@@ -23,35 +22,42 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
     ITEM *curr_item;
 
     WINDOW *line_num_win = derwin(windows[2], LINES - 6, 3, 2, 1);
-    WINDOW *edit_window = derwin(windows[2], LINES - 6, WU * 5 + (WU / 2) - 2, 2, 4);
+    WINDOW *edit_window =
+        derwin(windows[2], LINES - 6, WU * 5 + (WU / 2) - 2, 2, 4);
 
     char *filename = "../read_lines.c";
-    FILE *file = fopen(filename, "r+");
-
-    if (file == NULL)
-    {
-        printf("Could not open %s.\n", filename);
-    }
 
     TEXT_BUFFER *t_buffer = initialize_buffer();
-    if (file != NULL)
-    {
-        read_file_into_buffer(file, t_buffer);
 
-        print_buffer(t_buffer, &edit_window, &line_num_win);
-        mvwprintw(edit_window, LINES - 7, EDIT_MAX - 15, "     ");
-        mvwprintw(edit_window, LINES - 7, EDIT_MAX - 15, "0 : 0");
+    FILE *file =
+        open_file(filename, t_buffer, &line_num_win, &windows[2], &edit_window);
 
-        rewind(file);
-
-        wattron(windows[2], A_BOLD | COLOR_PAIR(7));
-        mvwprintw(windows[2], 1, 4, "");
-        wattroff(windows[2], A_BOLD | COLOR_PAIR(7));
-        wattron(windows[2], A_BOLD | COLOR_PAIR(1));
-        mvwprintw(windows[2], 1, 6, "%s", filename);
-        wattroff(windows[2], A_BOLD | COLOR_PAIR(1));
-        wrefresh(edit_window);
-    }
+    // FILE *file = fopen(filename, "r+");
+    //
+    // if (file == NULL)
+    // {
+    //     printf("Could not open %s.\n", filename);
+    // }
+    //
+    // TEXT_BUFFER *t_buffer = initialize_buffer();
+    // if (file != NULL)
+    // {
+    //     read_file_into_buffer(file, t_buffer);
+    //
+    //     print_buffer(t_buffer, &edit_window, &line_num_win);
+    //     mvwprintw(edit_window, LINES - 7, EDIT_MAX - 15, "     ");
+    //     mvwprintw(edit_window, LINES - 7, EDIT_MAX - 15, "0 : 0");
+    //
+    //     rewind(file);
+    //
+    //     wattron(windows[2], A_BOLD | COLOR_PAIR(7));
+    //     mvwprintw(windows[2], 1, 4, "");
+    //     wattroff(windows[2], A_BOLD | COLOR_PAIR(7));
+    //     wattron(windows[2], A_BOLD | COLOR_PAIR(1));
+    //     mvwprintw(windows[2], 1, 6, "%s", filename);
+    //     wattroff(windows[2], A_BOLD | COLOR_PAIR(1));
+    //     wrefresh(edit_window);
+    // }
 
     wrefresh(line_num_win);
     wrefresh(windows[2]);
@@ -108,7 +114,8 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
         }
         else if (*active_win == 1 && explorer_mode)
         {
-            handle_explorer_input(ch, &windows[1], &editor_mode, explorer_menu);
+            handle_explorer_input(ch, &windows[1], &explorer_mode,
+                                  explorer_menu);
         }
         else if (*active_win == 1)
         {
@@ -127,6 +134,7 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
                     break;
                 case 10:
                     explorer_mode = true;
+                    wrefresh(windows[1]);
                     break;
             }
         }

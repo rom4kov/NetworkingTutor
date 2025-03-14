@@ -11,5 +11,7 @@ void update_user(sqlite3 *db, int id, char *name, char *language);
 
 TEXT_BUFFER *initialize_buffer();
 LINE *initialize_line();
+FILE *open_file(char *filename, TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **editor_window,
+               WINDOW **edit_window);
 void read_file_into_buffer(FILE *file, TEXT_BUFFER *text_buf);
 void write_buffer_to_file(TEXT_BUFFER *tbuf, FILE *file, int y);

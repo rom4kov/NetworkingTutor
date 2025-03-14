@@ -33,7 +33,8 @@ void create_course_view(sqlite3 *db)
 
     wrefresh(windows[2]);
 
-    handle_course_input(windows, &active_window, &start_menu, &explorer_menu, db);
+    handle_course_input(windows, &active_window, &start_menu, &explorer_menu,
+                        db);
 }
 
 WINDOW *create_editor_window(int *active_window)
@@ -66,19 +67,6 @@ WINDOW *create_explorer_window(int *active_window, MENU **explorer_menu)
 
     create_explorer_menu(&explorer_window, explorer_menu);
 
-    // int i = 1;
-    // DIR *dir = opendir(".");
-    // struct dirent *next = readdir(dir);
-    //
-    // while (NULL != next)
-    // {
-    //     mvwprintw(explorer_window, i, 2, "%s", next->d_name);
-    //     next = readdir(dir);
-    //     i++;
-    // }
-
-    // wrefresh(explorer_window);
-
     return explorer_window;
 }
 
@@ -96,7 +84,7 @@ void create_explorer_menu(WINDOW **explorer_window, MENU **explorer_menu)
         next = readdir(dir);
     }
 
-    mvwprintw(*explorer_window, LINES - 20, 2, "%i", dir_size);
+    mvwprintw(*explorer_window, LINES - 5, 2, "Press ? for Keys");
 
     rewinddir(dir);
 
@@ -108,21 +96,18 @@ void create_explorer_menu(WINDOW **explorer_window, MENU **explorer_menu)
         menu_items[i] = new_item(next->d_name, "");
     }
 
-    // Create the menu
     *explorer_menu = new_menu(menu_items);
     set_menu_format(*explorer_menu, 20, 1);
     set_menu_spacing(*explorer_menu, 0, 1, 0);
 
-    // Set the window for the menu to be displayed inside left_inner_win
     set_menu_win(*explorer_menu, *explorer_window);
     set_menu_sub(*explorer_menu,
                  derwin(*explorer_window, LINES - 15, WU + (WU / 2) - 4, 1, 2));
-    set_menu_fore(*explorer_menu, A_BOLD | A_ITALIC);
-    set_menu_mark(*explorer_menu, ""); // Mark for the selected item
+    set_menu_fore(*explorer_menu, A_BOLD | A_ITALIC | COLOR_PAIR(2));
+    set_menu_back(*explorer_menu, COLOR_PAIR(1));
+    set_menu_mark(*explorer_menu, "");
 
-    // Post the menu (make it visible)
     post_menu(*explorer_menu);
 
-    // Refresh the left_inner_win window
     wrefresh(*explorer_window);
 }

@@ -1,7 +1,12 @@
+#include "../data/data_access_layer.h"
 #include "../models/models.h"
+#include "../views/views.h"
 #include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#define WU COLS / 12 // WU for WIDTH_UNIT
+#define EDIT_MAX WU * 7 + 4
 
 TEXT_BUFFER *initialize_buffer()
 {
@@ -26,6 +31,41 @@ LINE *initialize_line()
     line->next = NULL;
 
     return line;
+}
+
+FILE *open_file(char *filename, TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **editor_window,
+               WINDOW **edit_window)
+{
+    FILE *file = fopen(filename, "r+");
+
+    if (file == NULL)
+    {
+        printf("Could not open %s.\n", filename);
+    }
+
+    if (file != NULL)
+    {
+        read_file_into_buffer(file, tbuf);
+
+        print_buffer(tbuf, edit_window, line_num_win);
+        mvwprintw(*edit_window, LINES - 7, EDIT_MAX - 15, "     ");
+        mvwprintw(*edit_window, LINES - 7, EDIT_MAX - 15, "0 : 0");
+
+        rewind(file);
+
+        wattron(*editor_window, A_BOLD | COLOR_PAIR(7));
+        mvwprintw(*editor_window, 1, 4, "");
+        wattroff(*editor_window, A_BOLD | COLOR_PAIR(7));
+        wattron(*editor_window, A_BOLD | COLOR_PAIR(1));
+        mvwprintw(*editor_window, 1, 6, "%s", filename);
+        wattroff(*editor_window, A_BOLD | COLOR_PAIR(1));
+        wrefresh(*edit_window);
+    }
+
+    wrefresh(*line_num_win);
+    wrefresh(*editor_window);
+
+    return file;
 }
 
 void read_file_into_buffer(FILE *file, TEXT_BUFFER *text_buf)

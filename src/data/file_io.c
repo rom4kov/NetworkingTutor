@@ -1,6 +1,7 @@
 #include "../data/data_access_layer.h"
 #include "../models/models.h"
 #include "../views/views.h"
+#include <curses.h>
 #include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,6 +14,7 @@ TEXT_BUFFER *initialize_buffer()
     TEXT_BUFFER *text_buf = malloc(sizeof(TEXT_BUFFER));
 
     text_buf->first_line = NULL;
+    // text_buf->current_line = text_buf->first_line;
     text_buf->num_of_lines = 0;
     text_buf->curr_line_nr = 0;
     text_buf->current_col = 0;
@@ -33,9 +35,13 @@ LINE *initialize_line()
     return line;
 }
 
-FILE *open_file(char *filename, TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **editor_window,
-               WINDOW **edit_window)
+FILE *open_file(const char *filename, TEXT_BUFFER *tbuf, WINDOW **line_num_win,
+                WINDOW **editor_window, WINDOW **edit_window)
 {
+    // werase(*line_num_win);
+    // werase(*editor_window);
+    // werase(*edit_window);
+
     FILE *file = fopen(filename, "r+");
 
     if (file == NULL)
@@ -130,4 +136,16 @@ void write_buffer_to_file(TEXT_BUFFER *tbuf, FILE *file, int y)
     {
         tbuf->current_line = tbuf->current_line->next;
     }
+}
+
+void deallocate_buffer(TEXT_BUFFER *tbuf)
+{
+    LINE *current_line = tbuf->first_line;
+    while (NULL != current_line->next)
+    {
+        free(current_line->buf_);
+        current_line = current_line->next;
+        free(current_line->prev);
+    }
+    free(tbuf);
 }

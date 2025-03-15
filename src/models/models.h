@@ -25,7 +25,6 @@ typedef struct line
 typedef struct text_buffer
 {
   LINE *first_line;
-  LINE *trav;
   LINE *current_line;
   unsigned short curr_line_nr;
   unsigned short current_col;

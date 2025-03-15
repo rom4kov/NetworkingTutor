@@ -26,7 +26,7 @@ LINE *initialize_line()
 {
     LINE *line = malloc(sizeof(LINE));
 
-    line->buf_ = calloc(80, sizeof(char));
+    line->buf_ = calloc(100, sizeof(char));
     line->line_num = 0;
     line->length = 1;
     line->prev = NULL;
@@ -36,7 +36,7 @@ LINE *initialize_line()
 }
 
 FILE *open_file(const char *filename, TEXT_BUFFER *tbuf, WINDOW **line_num_win,
-                WINDOW **editor_window, WINDOW **edit_window)
+                WINDOW **editor_window, WINDOW **edit_window, int *scroll_offset)
 {
     // werase(*line_num_win);
     // werase(*editor_window);
@@ -53,7 +53,7 @@ FILE *open_file(const char *filename, TEXT_BUFFER *tbuf, WINDOW **line_num_win,
     {
         read_file_into_buffer(file, tbuf);
 
-        print_buffer(tbuf, edit_window, line_num_win);
+        print_buffer(tbuf, edit_window, line_num_win, scroll_offset);
         mvwprintw(*edit_window, LINES - 7, EDIT_MAX - 15, "     ");
         mvwprintw(*edit_window, LINES - 7, EDIT_MAX - 15, "0 : 0");
 

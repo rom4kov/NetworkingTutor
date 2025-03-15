@@ -10,7 +10,8 @@
 #include <unistd.h>
 
 void handle_editor_input(int ch, WINDOW **line_num_win, WINDOW **edit_window,
-                         TEXT_BUFFER *text_buf, FILE *file, bool *editor_mode)
+                         TEXT_BUFFER *text_buf, FILE *file, bool *editor_mode,
+                         int *scroll_offset)
 {
     int y, x;
     getyx(*edit_window, y, x);
@@ -24,10 +25,10 @@ void handle_editor_input(int ch, WINDOW **line_num_win, WINDOW **edit_window,
             move_left(text_buf, edit_window, y, x);
             break;
         case KEY_DOWN:
-            move_down(text_buf, line_num_win, edit_window, y, x);
+            move_down(text_buf, line_num_win, edit_window, y, x, scroll_offset);
             break;
         case KEY_UP:
-            move_up(text_buf, line_num_win, edit_window, y, x);
+            move_up(text_buf, line_num_win, edit_window, y, x, scroll_offset);
             break;
         case KEY_BACKSPACE:
             bs_delete_char_or_line(text_buf, line_num_win, edit_window, y, x);

@@ -38,4 +38,3 @@ tui-learning-app/
 │
 ├── Makefile                   # Build script
 ├── README.md                  # Project description
-

@@ -83,14 +83,18 @@ void print_matches(pcre2_code *re, int i, size_t subject_length, char *line_buf,
 }
 
 void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
-                  WINDOW **line_num_win)
+                  WINDOW **line_num_win, int *scroll_offset)
 {
     werase(*line_num_win);
     werase(*edit_window);
 
     LINE *current_line = tbuf->first_line;
+    for (int i = 0; i < *scroll_offset; i++)
+    {
+        current_line = current_line->next;
+    }
 
-    int pattern_num = 6;
+    int pattern_num = 7;
     pcre2_code *re[pattern_num];
     char *patterns[] = {
         ".",
@@ -98,12 +102,14 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
         "#(include|define)|=|\\+|\\-|\\*|\\&",
         "(\".*\"|<.*\\.h>)",
         "([a-z0-9_]*)\\(.*\\)",
-        "\\d"};
-    int colors[] = {1, 8, 6, 4, 7, 9};
+        "\\b\\d*\\b",
+        "//.*",
+    };
+    int colors[] = {1, 8, 6, 4, 7, 9, 10};
 
     compile_patterns(re, pattern_num, patterns);
 
-    for (int i = 0; i < tbuf->num_of_lines; i++)
+    for (int i = 0; i < LINES - 5; i++)
     {
         size_t subj_len = strlen(current_line->buf_);
 
@@ -124,7 +130,7 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
 
 void print_line(char *line_buf, int line_num, WINDOW **edit_window)
 {
-    int pattern_num = 6;
+    int pattern_num = 7;
     pcre2_code *re[pattern_num];
     char *patterns[] = {
         ".",
@@ -132,8 +138,10 @@ void print_line(char *line_buf, int line_num, WINDOW **edit_window)
         "#(include|define)|=|\\+|\\-|\\*|\\&",
         "(\".*\"|<.*\\.h>)",
         "([a-z0-9_]*)\\(.*\\)",
-        "\\d"};
-    int colors[] = {1, 8, 6, 4, 7, 9};
+        "\\d",
+        "//.*",
+    };
+    int colors[] = {1, 8, 6, 4, 7, 9, 10};
     size_t subj_len = strlen(line_buf);
 
     compile_patterns(re, pattern_num, patterns);

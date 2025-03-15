@@ -7,10 +7,11 @@
 #include <pcre2.h>
 #include <string.h>
 
-void update_line_numbers(TEXT_BUFFER *tbuf, WINDOW **line_num_win)
+void update_line_numbers(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
+                         int *scroll_offset, int lines_to_print)
 {
     int i;
-    for (i = 0; i < tbuf->num_of_lines; i++)
+    for (i = 0; i < lines_to_print; i++)
     {
         wattron(*line_num_win, COLOR_PAIR(10));
         if (i == tbuf->curr_line_nr)
@@ -83,7 +84,7 @@ void print_matches(pcre2_code *re, int i, size_t subject_length, char *line_buf,
 }
 
 void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
-                  WINDOW **line_num_win, int *scroll_offset)
+                  WINDOW **line_num_win, int *scroll_offset, int lines_to_print)
 {
     werase(*line_num_win);
     werase(*edit_window);
@@ -109,7 +110,7 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
 
     compile_patterns(re, pattern_num, patterns);
 
-    for (int i = 0; i < LINES - 5; i++)
+    for (int i = 0; i < lines_to_print; i++)
     {
         size_t subj_len = strlen(current_line->buf_);
 
@@ -125,7 +126,7 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
     for (int i = 0; i < pattern_num; i++)
         pcre2_code_free(re[i]);
 
-    update_line_numbers(tbuf, line_num_win);
+    update_line_numbers(tbuf, line_num_win, scroll_offset, lines_to_print);
 }
 
 void print_line(char *line_buf, int line_num, WINDOW **edit_window)

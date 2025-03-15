@@ -38,10 +38,6 @@ LINE *initialize_line()
 FILE *open_file(const char *filename, TEXT_BUFFER *tbuf, WINDOW **line_num_win,
                 WINDOW **editor_window, WINDOW **edit_window, int *scroll_offset)
 {
-    // werase(*line_num_win);
-    // werase(*editor_window);
-    // werase(*edit_window);
-
     FILE *file = fopen(filename, "r+");
 
     if (file == NULL)
@@ -63,6 +59,7 @@ FILE *open_file(const char *filename, TEXT_BUFFER *tbuf, WINDOW **line_num_win,
         mvwprintw(*editor_window, 1, 4, "");
         wattroff(*editor_window, A_BOLD | COLOR_PAIR(7));
         wattron(*editor_window, A_BOLD | COLOR_PAIR(1));
+        mvwprintw(*editor_window, 1, 6, "                                ");
         mvwprintw(*editor_window, 1, 6, "%s", filename);
         wattroff(*editor_window, A_BOLD | COLOR_PAIR(1));
         wrefresh(*edit_window);

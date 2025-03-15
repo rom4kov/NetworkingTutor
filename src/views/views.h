@@ -21,7 +21,8 @@ WINDOW *create_editor_window(int *active_window);
 WINDOW *create_explorer_window(int *active_window, MENU **explorer_menu);
 void create_explorer_menu(WINDOW **explorer_window, MENU **explorer_menu);
 void create_user_form(WINDOW **window, FORM **user_form, FIELD **fields);
-void update_line_numbers(TEXT_BUFFER *tbuf, WINDOW **line_num_win);
+void update_line_numbers(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
+                         int *scroll_offset, int lines_to_print);
 void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
-                  WINDOW **line_num_win, int *scroll_offset);
+                  WINDOW **line_num_win, int *scroll_offset, int lines_to_print);
 void print_line(char *line_buf, int line_num, WINDOW **edit_window);

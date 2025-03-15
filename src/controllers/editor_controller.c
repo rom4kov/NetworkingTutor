@@ -16,6 +16,9 @@ void handle_editor_input(int ch, WINDOW **line_num_win, WINDOW **edit_window,
     int y, x;
     getyx(*edit_window, y, x);
 
+    int lines_to_print =
+        text_buf->num_of_lines > LINES - 7 ? LINES - 7 : text_buf->num_of_lines;
+
     switch (ch)
     {
         case KEY_RIGHT:
@@ -25,22 +28,25 @@ void handle_editor_input(int ch, WINDOW **line_num_win, WINDOW **edit_window,
             move_left(text_buf, edit_window, y, x);
             break;
         case KEY_DOWN:
-            move_down(text_buf, line_num_win, edit_window, y, x, scroll_offset);
+            move_down(text_buf, line_num_win, edit_window, y, x, scroll_offset, lines_to_print);
             break;
         case KEY_UP:
-            move_up(text_buf, line_num_win, edit_window, y, x, scroll_offset);
+            move_up(text_buf, line_num_win, edit_window, y, x, scroll_offset, lines_to_print);
             break;
         case KEY_BACKSPACE:
-            bs_delete_char_or_line(text_buf, line_num_win, edit_window, y, x);
+            bs_delete_char_or_line(text_buf, line_num_win, edit_window, y, x,
+                                   scroll_offset, lines_to_print);
             break;
         case KEY_DC:
-            delete_char_or_line(text_buf, line_num_win, edit_window, y, x);
+            delete_char_or_line(text_buf, line_num_win, edit_window, y, x,
+                                scroll_offset, lines_to_print);
             break;
         case 9:
             insert_tab(text_buf, edit_window, y, x);
             break;
         case 10:
-            insert_line(text_buf, edit_window, line_num_win, y, x);
+            insert_line(text_buf, edit_window, line_num_win, y, x,
+                        scroll_offset, lines_to_print);
             break;
         case KEY_HOME:
             move_to_start_of_line(text_buf, edit_window, y, x);

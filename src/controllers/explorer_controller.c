@@ -7,7 +7,8 @@
 void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE *file,
                            WINDOW **explorer_win, WINDOW **line_num_win,
                            WINDOW **editor_window, WINDOW **edit_window,
-                           bool *explorer_mode, MENU **explorer_menu)
+                           bool *explorer_mode, MENU **explorer_menu,
+                           int *scroll_offset)
 {
     ITEM *curr_item;
 
@@ -26,11 +27,10 @@ void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE *file,
             const char *name = item_name(curr_item);
             deallocate_buffer(tbuf);
             tbuf = initialize_buffer();
-            file =
-                open_file(name, tbuf, line_num_win, editor_window, edit_window);
+            file = open_file(name, tbuf, line_num_win, editor_window,
+                             edit_window, scroll_offset);
             rewind(file);
-            // mvwprintw(*explorer_win, LINES - 23, 2, "                  ");
-            // mvwprintw(*explorer_win, LINES - 23, 2, "%s", name);
+
             wnoutrefresh(*explorer_win);
             wnoutrefresh(*line_num_win);
             wnoutrefresh(*editor_window);

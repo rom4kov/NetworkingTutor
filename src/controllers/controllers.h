@@ -10,5 +10,6 @@ void handle_editor_input(int ch, WINDOW **line_num_win, WINDOW **edit_window,
 void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE *file,
                            WINDOW **explorer_win, WINDOW **line_num_win,
                            WINDOW **editor_window, WINDOW **edit_window,
-                           bool *explorer_mode, MENU **explorer_menu);
+                           bool *explorer_mode, MENU **explorer_menu,
+                           int *scroll_offset);
 

@@ -8,9 +8,12 @@ void seed_courses_data(sqlite3 *db, WINDOW *win);
 COURSE *get_course_data(sqlite3 *db);
 int callback(void *NotUsed, int argc, char **argv, char **azColName);
 void update_user(sqlite3 *db, int id, char *name, char *language);
-
 TEXT_BUFFER *initialize_buffer();
 LINE *initialize_line();
+void prepare_empty_file(TEXT_BUFFER **tbuf);
+FILE *open_new_file(char *filename, TEXT_BUFFER *tbuf, WINDOW **line_num_win,
+                WINDOW **editor_window, WINDOW **edit_window,
+                int *scroll_offset, int *lines_to_print);
 FILE *open_file(const char *filename, TEXT_BUFFER *tbuf, WINDOW **line_num_win,
                 WINDOW **editor_window, WINDOW **edit_window, int *scroll_offset,
                 int *lines_to_print);

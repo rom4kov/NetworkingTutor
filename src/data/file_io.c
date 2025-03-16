@@ -2,10 +2,10 @@
 #include "../models/models.h"
 #include "../views/views.h"
 #include <curses.h>
+#include <dirent.h>
 #include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <dirent.h>
 #include <string.h>
 
 #define WU COLS / 12 // WU for WIDTH_UNIT
@@ -15,8 +15,8 @@ TEXT_BUFFER *initialize_buffer()
 {
     TEXT_BUFFER *text_buf = malloc(sizeof(TEXT_BUFFER));
 
-    text_buf->first_line = NULL;
-    // text_buf->current_line = text_buf->first_line;
+    text_buf->first_line = calloc(100, sizeof(char));
+    text_buf->current_line = text_buf->first_line;
     text_buf->num_of_lines = 0;
     text_buf->curr_line_nr = 0;
     text_buf->current_col = 0;
@@ -37,7 +37,20 @@ LINE *initialize_line()
     return line;
 }
 
-void open_new_file(char *filename)
+void prepare_empty_file(TEXT_BUFFER **tbuf)
+{
+    (*tbuf)->first_line = initialize_line();
+    (*tbuf)->first_line->buf_[0] = ' ';
+    (*tbuf)->first_line->buf_[1] = '\n';
+    (*tbuf)->first_line->length = 1;
+    (*tbuf)->current_line = (*tbuf)->first_line;
+    (*tbuf)->current_line->length = 1;
+    (*tbuf)->num_of_lines = 1;
+}
+
+FILE *open_new_file(char *filename, TEXT_BUFFER *tbuf, WINDOW **line_num_win,
+                    WINDOW **editor_window, WINDOW **edit_window,
+                    int *scroll_offset, int *lines_to_print)
 {
     FILE *file = fopen(filename, "w+");
 
@@ -45,29 +58,41 @@ void open_new_file(char *filename)
     {
         printf("Could not open %s.\n", filename);
     }
+
+    if (file != NULL)
+    {
+        prepare_empty_file(&tbuf);
+
+        *lines_to_print = 1;
+
+        print_buffer(tbuf, edit_window, line_num_win, scroll_offset,
+                     *lines_to_print);
+        mvwprintw(*edit_window, LINES - 7, EDIT_MAX - 15, "     ");
+        mvwprintw(*edit_window, LINES - 7, EDIT_MAX - 15, "0 : 0");
+
+        rewind(file);
+
+        wattron(*editor_window, A_BOLD | COLOR_PAIR(7));
+        mvwprintw(*editor_window, 1, 4, "");
+        wattroff(*editor_window, A_BOLD | COLOR_PAIR(7));
+        wattron(*editor_window, A_BOLD | COLOR_PAIR(1));
+        mvwprintw(*editor_window, 1, 6, "                                ");
+        mvwprintw(*editor_window, 1, 6, "%s", filename);
+        wattroff(*editor_window, A_BOLD | COLOR_PAIR(1));
+        wrefresh(*edit_window);
+    }
+
+    wrefresh(*line_num_win);
+    wrefresh(*editor_window);
+
+    return file;
 }
 
 FILE *open_file(const char *filename, TEXT_BUFFER *tbuf, WINDOW **line_num_win,
                 WINDOW **editor_window, WINDOW **edit_window,
                 int *scroll_offset, int *lines_to_print)
 {
-    // DIR *dir = opendir(".");
-    //
-    // struct dirent *next = readdir(dir);
-    //
-    // bool file_exists = false;
-    //
-    // while ((next = readdir(dir)) != NULL)
-    // {
-    //     if (strcmp(next->d_name, filename) == 0)
-    //     {
-    //         file_exists = true;
-    //         break;
-    //     }
-    // }
-    //
-    // closedir(dir);
-
+    int file_size = 0;
     FILE *file = fopen(filename, "r+");
 
     if (file == NULL)
@@ -77,10 +102,22 @@ FILE *open_file(const char *filename, TEXT_BUFFER *tbuf, WINDOW **line_num_win,
 
     if (file != NULL)
     {
-        read_file_into_buffer(file, tbuf);
+
+        fseek(file, 0, SEEK_END);
+        file_size = ftell(file);
+        rewind(file);
+
+        if (file_size == 0)
+        {
+            prepare_empty_file(&tbuf);
+        }
+        else
+        {
+            read_file_into_buffer(file, tbuf);
+        }
 
         *lines_to_print =
-            tbuf->num_of_lines > LINES - 7 ? LINES - 7 : tbuf->num_of_lines;
+            tbuf->num_of_lines > (LINES - 7) ? (LINES - 7) : tbuf->num_of_lines;
 
         print_buffer(tbuf, edit_window, line_num_win, scroll_offset,
                      *lines_to_print);

@@ -11,6 +11,7 @@ void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE *file,
                            int *scroll_offset, int *lines_to_print)
 {
     ITEM *curr_item;
+    char *new_file_name = "new_file.c";
 
     switch (ch)
     {
@@ -38,6 +39,16 @@ void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE *file,
             doupdate();
             break;
         case 'a':
+            deallocate_buffer(tbuf);
+            file = open_new_file(new_file_name, tbuf, line_num_win, editor_window,
+                             edit_window, scroll_offset, lines_to_print);
+            rewind(file);
+
+            wnoutrefresh(*explorer_win);
+            wnoutrefresh(*line_num_win);
+            wnoutrefresh(*editor_window);
+            wnoutrefresh(*edit_window);
+            doupdate();
             break;
         case KEY_F(1):
             wrefresh(*explorer_win);

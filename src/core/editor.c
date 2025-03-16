@@ -201,6 +201,7 @@ void delete_line(TEXT_BUFFER *tbuf, WINDOW **edit_window, WINDOW **line_num_win,
         tbuf->current_line->next->next->prev = tbuf->current_line;
         tbuf->current_line->next = tbuf->current_line->next->next;
         tbuf->num_of_lines--;
+        *lines_to_print -= 1;
         curs_set(0);
         print_buffer(tbuf, edit_window, line_num_win, scroll_offset, *lines_to_print);
         wmove(*edit_window, y, x);
@@ -249,6 +250,7 @@ void bs_delete_line(TEXT_BUFFER *tbuf, WINDOW **edit_window,
     tbuf->num_of_lines--;
     tbuf->curr_line_nr--;
     tbuf->current_col = tbuf->current_line->length;
+    *lines_to_print -= 1;
     print_buffer(tbuf, edit_window, line_num_win, scroll_offset,
                  *lines_to_print);
     wmove(*edit_window, y - 1, prev_length < 2 ? 0 : prev_length - 1);
@@ -306,6 +308,7 @@ void insert_line(TEXT_BUFFER *tbuf, WINDOW **edit_window, WINDOW **line_num_win,
         tbuf->num_of_lines++;
         tbuf->curr_line_nr++;
         tbuf->current_col = 0;
+        *lines_to_print += 1;
         print_buffer(tbuf, edit_window, line_num_win, scroll_offset,
                      *lines_to_print);
         wmove(*edit_window, y + 1, 0);
@@ -327,6 +330,7 @@ void insert_line(TEXT_BUFFER *tbuf, WINDOW **edit_window, WINDOW **line_num_win,
         tbuf->num_of_lines++;
         tbuf->curr_line_nr++;
         tbuf->current_col = 0;
+        *lines_to_print += 1;
         print_buffer(tbuf, edit_window, line_num_win, scroll_offset,
                      *lines_to_print);
         wmove(*edit_window, y + 1, 0);

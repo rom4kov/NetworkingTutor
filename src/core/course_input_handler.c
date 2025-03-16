@@ -19,6 +19,7 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
     bool explorer_mode = false;
     int ch;
     int scroll_offset = 0;
+    int lines_to_print;
     ITEM *curr_item;
 
     WINDOW *line_num_win = derwin(windows[2], LINES - 6, 3, 2, 1);
@@ -30,7 +31,7 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
     TEXT_BUFFER *t_buffer = initialize_buffer();
 
     FILE *file = open_file(filename, t_buffer, &line_num_win, &windows[2],
-                           &edit_window, &scroll_offset);
+                           &edit_window, &scroll_offset, &lines_to_print);
 
     wrefresh(line_num_win);
     wrefresh(windows[2]);
@@ -89,7 +90,8 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
         {
             handle_explorer_input(ch, t_buffer, file, &windows[1],
                                   &line_num_win, &windows[2], &edit_window,
-                                  &explorer_mode, explorer_menu, &scroll_offset);
+                                  &explorer_mode, explorer_menu, &scroll_offset,
+                                  &lines_to_print);
         }
         else if (*active_win == 1)
         {
@@ -115,7 +117,7 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
         else if (*active_win == 2 && editor_mode)
         {
             handle_editor_input(ch, &line_num_win, &edit_window, t_buffer, file,
-                                &editor_mode, &scroll_offset);
+                                &editor_mode, &scroll_offset, &lines_to_print);
         }
         else if (*active_win == 2)
         {

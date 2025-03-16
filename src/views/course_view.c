@@ -110,4 +110,6 @@ void create_explorer_menu(WINDOW **explorer_window, MENU **explorer_menu)
     post_menu(*explorer_menu);
 
     wrefresh(*explorer_window);
+
+    closedir(dir);
 }

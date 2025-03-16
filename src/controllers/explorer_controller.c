@@ -8,7 +8,7 @@ void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE *file,
                            WINDOW **explorer_win, WINDOW **line_num_win,
                            WINDOW **editor_window, WINDOW **edit_window,
                            bool *explorer_mode, MENU **explorer_menu,
-                           int *scroll_offset)
+                           int *scroll_offset, int *lines_to_print)
 {
     ITEM *curr_item;
 
@@ -28,7 +28,7 @@ void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE *file,
             deallocate_buffer(tbuf);
             tbuf = initialize_buffer();
             file = open_file(name, tbuf, line_num_win, editor_window,
-                             edit_window, scroll_offset);
+                             edit_window, scroll_offset, lines_to_print);
             rewind(file);
 
             wnoutrefresh(*explorer_win);
@@ -36,6 +36,8 @@ void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE *file,
             wnoutrefresh(*editor_window);
             wnoutrefresh(*edit_window);
             doupdate();
+            break;
+        case 'a':
             break;
         case KEY_F(1):
             wrefresh(*explorer_win);

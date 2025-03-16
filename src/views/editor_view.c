@@ -10,26 +10,25 @@
 void update_line_numbers(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
                          int *scroll_offset, int lines_to_print)
 {
-    int i;
-    for (i = 0; i < lines_to_print; i++)
+    for (int i = 0; i < lines_to_print; i++)
     {
         wattron(*line_num_win, COLOR_PAIR(10));
-        if (i == tbuf->curr_line_nr)
+        if (i + *scroll_offset == tbuf->curr_line_nr)
         {
             wattroff(*line_num_win, COLOR_PAIR(10));
             wattron(*line_num_win, COLOR_PAIR(1));
         }
 
-        if (i < 9)
+        if (i + *scroll_offset < 9)
         {
-            mvwprintw(*line_num_win, i, 1, "%i", i + 1);
+            mvwprintw(*line_num_win, i, 1, "%i", i + *scroll_offset + 1);
         }
         else
         {
-            mvwprintw(*line_num_win, i, 0, "%i", i + 1);
+            mvwprintw(*line_num_win, i, 0, "%i", i + *scroll_offset + 1);
         }
 
-        if (i == tbuf->curr_line_nr)
+        if (i + *scroll_offset == tbuf->curr_line_nr)
         {
             wattroff(*line_num_win, COLOR_PAIR(1));
             wattron(*line_num_win, COLOR_PAIR(10));

@@ -5,6 +5,8 @@
 #include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <dirent.h>
+#include <string.h>
 
 #define WU COLS / 12 // WU for WIDTH_UNIT
 #define EDIT_MAX WU * 7 + 4
@@ -35,9 +37,37 @@ LINE *initialize_line()
     return line;
 }
 
-FILE *open_file(const char *filename, TEXT_BUFFER *tbuf, WINDOW **line_num_win,
-                WINDOW **editor_window, WINDOW **edit_window, int *scroll_offset)
+void open_new_file(char *filename)
 {
+    FILE *file = fopen(filename, "w+");
+
+    if (file == NULL)
+    {
+        printf("Could not open %s.\n", filename);
+    }
+}
+
+FILE *open_file(const char *filename, TEXT_BUFFER *tbuf, WINDOW **line_num_win,
+                WINDOW **editor_window, WINDOW **edit_window,
+                int *scroll_offset, int *lines_to_print)
+{
+    // DIR *dir = opendir(".");
+    //
+    // struct dirent *next = readdir(dir);
+    //
+    // bool file_exists = false;
+    //
+    // while ((next = readdir(dir)) != NULL)
+    // {
+    //     if (strcmp(next->d_name, filename) == 0)
+    //     {
+    //         file_exists = true;
+    //         break;
+    //     }
+    // }
+    //
+    // closedir(dir);
+
     FILE *file = fopen(filename, "r+");
 
     if (file == NULL)
@@ -49,7 +79,11 @@ FILE *open_file(const char *filename, TEXT_BUFFER *tbuf, WINDOW **line_num_win,
     {
         read_file_into_buffer(file, tbuf);
 
-        print_buffer(tbuf, edit_window, line_num_win, scroll_offset);
+        *lines_to_print =
+            tbuf->num_of_lines > LINES - 7 ? LINES - 7 : tbuf->num_of_lines;
+
+        print_buffer(tbuf, edit_window, line_num_win, scroll_offset,
+                     *lines_to_print);
         mvwprintw(*edit_window, LINES - 7, EDIT_MAX - 15, "     ");
         mvwprintw(*edit_window, LINES - 7, EDIT_MAX - 15, "0 : 0");
 

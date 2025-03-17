@@ -3,6 +3,7 @@
 #include <curses.h>
 #include <menu.h>
 #include <ncurses.h>
+#include <stdio.h>
 
 void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE *file,
                            WINDOW **explorer_win, WINDOW **line_num_win,
@@ -28,6 +29,7 @@ void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE *file,
             const char *name = item_name(curr_item);
             deallocate_buffer(tbuf);
             tbuf = initialize_buffer();
+            fclose(file);
             file = open_file(name, tbuf, line_num_win, editor_window,
                              edit_window, scroll_offset, lines_to_print);
             rewind(file);
@@ -40,6 +42,7 @@ void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE *file,
             break;
         case 'a':
             deallocate_buffer(tbuf);
+            fclose(file);
             file = open_new_file(new_file_name, tbuf, line_num_win, editor_window,
                              edit_window, scroll_offset, lines_to_print);
             rewind(file);

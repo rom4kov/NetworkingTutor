@@ -1,3 +1,5 @@
+#define _DEFAULT_SOURCE
+
 #include "../data/data_access_layer.h"
 #include "../models/models.h"
 #include "../views/views.h"
@@ -7,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #define WU COLS / 12 // WU for WIDTH_UNIT
 #define EDIT_MAX WU * 7 + 4
@@ -102,7 +105,6 @@ FILE *open_file(const char *filename, TEXT_BUFFER *tbuf, WINDOW **line_num_win,
 
     if (file != NULL)
     {
-
         fseek(file, 0, SEEK_END);
         file_size = ftell(file);
         rewind(file);
@@ -191,14 +193,20 @@ void read_file_into_buffer(FILE *file, TEXT_BUFFER *text_buf)
 
 void write_buffer_to_file(TEXT_BUFFER *tbuf, FILE *file, int y)
 {
+    int file_size = 0;
     tbuf->current_line = tbuf->first_line;
     while (tbuf->current_line != NULL)
     {
         fwrite(tbuf->current_line->buf_, sizeof(char),
                tbuf->current_line->length, file);
+        file_size += tbuf->current_line->length;
         tbuf->current_line = tbuf->current_line->next;
     }
     rewind(file);
+
+    int fd = fileno(file);
+    ftruncate(fd, file_size);
+
     tbuf->current_line = tbuf->first_line;
     for (int i = 0; i < y; i++)
     {

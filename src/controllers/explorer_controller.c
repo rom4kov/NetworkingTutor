@@ -43,6 +43,14 @@ void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE *file,
                              edit_window, scroll_offset, lines_to_print);
             rewind(file);
 
+            new_file_form_active = false;
+            *explorer_mode = false;
+            *editor_mode = true;
+            *active_window = 2;
+            focus_window(explorer_win, 2, "Explorer");
+            focus_window(editor_window, 3, "Editor");
+            curs_set(2);
+            wmove(*edit_window, 0, 0);
             wnoutrefresh(*explorer_win);
             wnoutrefresh(*line_num_win);
             wnoutrefresh(*editor_window);
@@ -50,8 +58,6 @@ void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE *file,
             doupdate();
             break;
         case 'a':
-            // deallocate_buffer(tbuf);
-            // fclose(file);
             create_new_file_input(&inner_win, &form_window, &new_file_form,
                                   field);
 
@@ -73,16 +79,18 @@ void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE *file,
                             wrefresh(form_window);
                         }
                         break;
-                    case '\n':
+                    case 10:
                         form_driver(new_file_form, REQ_VALIDATION);
                         char *new_file_name = field_buffer(field[0], 0);
+                        trim(new_file_name);
                         new_file_form_active = false;
                         *explorer_mode = false;
                         *editor_mode = true;
                         *active_window = 2;
                         focus_window(editor_window, 3, "Editor");
-                        trim(new_file_name);
 
+                        deallocate_buffer(tbuf);
+                        tbuf = initialize_buffer();
                         if (file)
                             fclose(file);
                         file = open_new_file(new_file_name, tbuf, line_num_win,

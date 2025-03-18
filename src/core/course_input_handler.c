@@ -12,7 +12,7 @@
 #define EDIT_MAX WU * 7 + 4
 
 void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
-                         MENU **explorer_menu, sqlite3 *db)
+                         MENU **explorer_menu, ITEM ***menu_items, sqlite3 *db)
 {
     bool in_course_view = true;
     bool editor_mode = false;
@@ -59,8 +59,8 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
                 case 9:
                 case KEY_DOWN:
                     *active_win = 2;
-                    focus_window(windows, 0, 2, "Navigation");
-                    focus_window(windows, 2, 3, "Editor");
+                    focus_window(&windows[0], 2, "Navigation");
+                    focus_window(&windows[2], 3, "Editor");
                     break;
                 case '\n':
                     curr_item = current_item(*start_menu);
@@ -76,10 +76,10 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
                     }
                     else if (item_index(curr_item) == 2)
                     {
-                        focus_window(windows, 0, 2, "Navigation");
-                        focus_window(windows, 5, 3, "Details");
+                        focus_window(&windows[0], 2, "Navigation");
+                        focus_window(&windows[5], 3, "Details");
                         *active_win = 5;
-                        focus_window(windows, 5, 3, "Details");
+                        focus_window(&windows[5], 3, "Details");
                         wmove(windows[5], 4, 14);
                         wrefresh(windows[5]);
                     }
@@ -88,10 +88,10 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
         }
         else if (*active_win == 1 && explorer_mode)
         {
-            handle_explorer_input(ch, t_buffer, file, &windows[1],
-                                  &line_num_win, &windows[2], &edit_window,
-                                  &explorer_mode, explorer_menu, &scroll_offset,
-                                  &lines_to_print);
+            handle_explorer_input(
+                ch, t_buffer, file, &windows[1], &line_num_win, &windows[2],
+                &edit_window, &editor_mode, &explorer_mode, explorer_menu,
+                menu_items, &scroll_offset, &lines_to_print, active_win);
         }
         else if (*active_win == 1)
         {
@@ -100,13 +100,13 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
                 case 9:
                 case KEY_RIGHT:
                     *active_win = 2;
-                    focus_window(windows, 1, 2, "Explorer");
-                    focus_window(windows, 2, 3, "Editor");
+                    focus_window(&windows[1], 2, "Explorer");
+                    focus_window(&windows[2], 3, "Editor");
                     break;
                 case KEY_UP:
                     *active_win = 0;
-                    focus_window(windows, 1, 2, "Explorer");
-                    focus_window(windows, 0, 3, "Navigation");
+                    focus_window(&windows[1], 2, "Explorer");
+                    focus_window(&windows[0], 3, "Navigation");
                     break;
                 case 10:
                     explorer_mode = true;
@@ -126,22 +126,22 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
                 case 9:
                 case KEY_LEFT:
                     *active_win = 1;
-                    focus_window(windows, 2, 2, "Editor");
-                    focus_window(windows, 1, 3, "Explorer");
+                    focus_window(&windows[2], 2, "Editor");
+                    focus_window(&windows[1], 3, "Explorer");
                     break;
                 case KEY_RIGHT:
                     *active_win = 3;
-                    focus_window(windows, 2, 2, "Editor");
-                    focus_window(windows, 3, 3, "Course Instructions");
+                    focus_window(&windows[2], 2, "Editor");
+                    focus_window(&windows[3], 3, "Course Instructions");
                     break;
                 case KEY_UP:
                     *active_win = 0;
-                    focus_window(windows, 0, 3, "Navigation");
-                    focus_window(windows, 2, 2, "Editor");
+                    focus_window(&windows[0], 3, "Navigation");
+                    focus_window(&windows[2], 2, "Editor");
                     break;
                 case 10:
                     editor_mode = true;
-                    curs_set(1);
+                    curs_set(2);
                     wmove(edit_window, 0, 0);
                     wrefresh(edit_window);
                     break;
@@ -154,8 +154,8 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
                 case 9:
                 case KEY_LEFT:
                     *active_win = 2;
-                    focus_window(windows, 2, 3, "Editor");
-                    focus_window(windows, 3, 2, "Course Instructions");
+                    focus_window(&windows[2], 3, "Editor");
+                    focus_window(&windows[3], 2, "Course Instructions");
                     break;
             }
         }

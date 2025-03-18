@@ -6,7 +6,6 @@
 
 void create_user_form(WINDOW **window, FORM **user_form, FIELD **fields)
 {
-    // FIELD *fields[3];
     int rows, cols;
     WINDOW *inner_win = derwin(*window, LINES - 2, COLS - (WU * 7 + 4) - 2, 1, 1);
     wclear(*window);
@@ -34,8 +33,8 @@ void create_user_form(WINDOW **window, FORM **user_form, FIELD **fields)
     wattroff(inner_win, A_BOLD);
     mvwprintw(inner_win, 3, 2, "Your name: ");
     mvwprintw(inner_win, 5, 2, "Language:  ");
-    mvwprintw(inner_win, 27, 2, "LINES: %i", LINES);
-    mvwprintw(inner_win, 28, 2, "COLS: %i", COLS);
+    // mvwprintw(inner_win, 27, 2, "LINES: %i", LINES);
+    // mvwprintw(inner_win, 28, 2, "COLS: %i", COLS);
 
     set_form_win(*user_form, inner_win);
     set_form_sub(*user_form, form_win);

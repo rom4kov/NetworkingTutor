@@ -1,10 +1,11 @@
 #define _DEFAULT_SOURCE
 
+#include "../core/core.h"
 #include "../data/data_access_layer.h"
 #include "../models/models.h"
 #include "../views/views.h"
-#include <curses.h>
 #include <dirent.h>
+#include <form.h>
 #include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -224,4 +225,40 @@ void deallocate_buffer(TEXT_BUFFER *tbuf)
         free(current_line->prev);
     }
     free(tbuf);
+}
+
+void create_new_file_input(WINDOW **inner_win, WINDOW **form_window,
+                           FORM **new_file_form, FIELD **field)
+{
+    int rows, cols;
+
+    field[0] = new_field(1, 14, 0, 0, 0, 0);
+    field[1] = NULL;
+
+    // set_field_back(field[0], A_UNDERLINE);
+    field_opts_off(field[0], O_AUTOSKIP);
+
+    *new_file_form = new_form(field);
+
+    scale_form(*new_file_form, &rows, &cols);
+
+    set_form_win(*new_file_form, *inner_win);
+    set_form_sub(*new_file_form, *form_window);
+
+    draw_border(*inner_win, 1, "");
+    mvwprintw(*inner_win, 0, 1, "Create file");
+    wrefresh(*inner_win);
+
+    wclear(*form_window);
+    wmove(*form_window, 0, 0);
+    wrefresh(*form_window);
+    curs_set(1);
+    set_current_field(*new_file_form, field[0]);
+    post_form(*new_file_form);
+
+    // wmove(*form_window, 0, 0);
+    // wnoutrefresh(*inner_win);
+    // wrefresh(*form_window);
+    // wnoutrefresh(form_win);
+    // doupdate();
 }

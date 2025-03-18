@@ -15,6 +15,7 @@ void handle_editor_input(int ch, WINDOW **line_num_win, WINDOW **edit_window,
 {
     int y, x;
     getyx(*edit_window, y, x);
+    curs_set(2);
 
     switch (ch)
     {

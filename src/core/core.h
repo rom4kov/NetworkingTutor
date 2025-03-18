@@ -5,7 +5,7 @@
 void input_handler(WINDOW **windows, int *active_win, MENU **start_menu,
                    COURSE courses[], sqlite3 **db);
 void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
-                         MENU **explorer_menu, sqlite3 *db);
+                         MENU **explorer_menu, ITEM ***menu_items, sqlite3 *db);
 void move_down(TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **edit_window,
                int y, int x, int *scroll_offset, int lines_to_print);
 void move_up(TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **edit_window,
@@ -32,6 +32,6 @@ void insert_line(TEXT_BUFFER *tbuf, WINDOW **edit_window, WINDOW **line_num_win,
 
 char *wrap_text(char *text, int width);
 void draw_border(WINDOW *win, int color_pair, char *label);
-void focus_window(WINDOW **windows, int window, int color_pair, char *label);
+void focus_window(WINDOW **window, int color_pair, char *label);
 void trim(char *str);
 int get_length(char *str);

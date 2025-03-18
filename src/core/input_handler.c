@@ -42,18 +42,18 @@ void input_handler(WINDOW **windows, int *active_win, MENU **start_menu,
                 case 9:
                 case KEY_DOWN:
                     *active_win = 1;
-                    focus_window(windows, 0, 2, "Navigation");
-                    focus_window(windows, 1, 3, "");
+                    focus_window(&windows[0], 2, "Navigation");
+                    focus_window(&windows[1], 3, "");
                     break;
                 case '\n':
                     curr_item = current_item(*start_menu);
                     if (item_index(curr_item) == 2)
                     {
-                        focus_window(windows, 0, 2, "Navigation");
-                        focus_window(windows, 5, 3, "Details");
+                        focus_window(&windows[0], 2, "Navigation");
+                        focus_window(&windows[5], 3, "Details");
                         *active_win = 5;
                         create_user_form(&windows[5], &user_form, fields);
-                        focus_window(windows, 5, 3, "Details");
+                        focus_window(&windows[5], 3, "Details");
                         wmove(windows[5], 4, 14);
                         wrefresh(windows[5]);
                     }
@@ -74,13 +74,13 @@ void input_handler(WINDOW **windows, int *active_win, MENU **start_menu,
                     break;
                 case KEY_UP:
                     *active_win = 0;
-                    focus_window(windows, 0, 3, "Navigation");
-                    focus_window(windows, 1, 2, "");
+                    focus_window(&windows[0], 3, "Navigation");
+                    focus_window(&windows[1], 2, "");
                     break;
                 case KEY_RIGHT:
                     *active_win = 5;
-                    focus_window(windows, 1, 2, "");
-                    focus_window(windows, 5, 3, "Details");
+                    focus_window(&windows[1], 2, "");
+                    focus_window(&windows[5], 3, "Details");
                     break;
             }
         }
@@ -111,7 +111,7 @@ void input_handler(WINDOW **windows, int *active_win, MENU **start_menu,
                 case KEY_UP:
                     this_win = *active_win;
                     *active_win = 1;
-                    focus_window(windows, 1, 3, "");
+                    focus_window(&windows[1], 3, "");
                     windows[this_win] = create_course_preview_card(
                         CARD_WIDTH * (this_win - 2), active_win, this_win,
                         &courses[this_win - 2]);
@@ -137,7 +137,7 @@ void input_handler(WINDOW **windows, int *active_win, MENU **start_menu,
                     windows[*active_win - 1] = create_course_preview_card(
                         CARD_WIDTH * (*active_win - 3), active_win, *active_win - 1,
                         &courses[2]);
-                    focus_window(windows, 5, 3, "Details");
+                    focus_window(&windows[5], 3, "Details");
                     break;
                 case KEY_LEFT:
                     *active_win = 3;
@@ -149,7 +149,7 @@ void input_handler(WINDOW **windows, int *active_win, MENU **start_menu,
                 case KEY_UP:
                     this_win = *active_win;
                     *active_win = 1;
-                    focus_window(windows, 1, 3, "");
+                    focus_window(&windows[1], 3, "");
                     windows[this_win] = create_course_preview_card(
                         CARD_WIDTH * 2, active_win, this_win, &courses[2]);
                     break;
@@ -188,8 +188,8 @@ void input_handler(WINDOW **windows, int *active_win, MENU **start_menu,
                     form_driver(user_form, REQ_VALIDATION);
                     char *buf1 = field_buffer(fields[0], 0);
                     char *buf2 = field_buffer(fields[1], 0);
-                    mvwprintw(windows[5], 38, 2, "Buffer: %s", buf1);
-                    mvwprintw(windows[5], 39, 2, "Buffer: %s", buf2);
+                    // mvwprintw(windows[5], 38, 2, "Buffer: %s", buf1);
+                    // mvwprintw(windows[5], 39, 2, "Buffer: %s", buf2);
                     update_user(*db, 1, buf1, buf2);
                     curs_set(0);
                     windows[5] = create_right_side_panel(active_win, db, "Details");
@@ -213,8 +213,8 @@ void input_handler(WINDOW **windows, int *active_win, MENU **start_menu,
                 case 9:
                 case KEY_LEFT:
                     *active_win = 0;
-                    focus_window(windows, 5, 2, "Details");
-                    focus_window(windows, 0, 3, "Navigation");
+                    focus_window(&windows[5], 2, "Details");
+                    focus_window(&windows[0], 3, "Navigation");
                     break;
             }
         }

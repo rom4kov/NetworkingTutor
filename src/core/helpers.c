@@ -39,14 +39,13 @@ void draw_border(WINDOW *win, int color_pair, char *label)
     wrefresh(win);
 }
 
-void focus_window(WINDOW **windows, int window, int color_pair,
-                  char *label)
+void focus_window(WINDOW **window, int color_pair, char *label)
 {
-    draw_border(windows[window], color_pair, label);
-    wattron(windows[window], COLOR_PAIR(3));
-    mvwprintw(windows[window], 0, 2, "%s", label);
-    wattroff(windows[window], COLOR_PAIR(3));
-    wrefresh(windows[window]);
+    draw_border(*window, color_pair, label);
+    wattron(*window, COLOR_PAIR(3));
+    mvwprintw(*window, 0, 2, "%s", label);
+    wattroff(*window, COLOR_PAIR(3));
+    wrefresh(*window);
 }
 
 void trim(char *str)

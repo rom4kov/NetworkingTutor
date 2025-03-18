@@ -1,6 +1,9 @@
+#include "../core/core.h"
 #include "../data/data_access_layer.h"
 #include "../models/models.h"
+#include "../views/views.h"
 #include <curses.h>
+#include <form.h>
 #include <menu.h>
 #include <ncurses.h>
 #include <stdio.h>
@@ -8,11 +11,17 @@
 void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE *file,
                            WINDOW **explorer_win, WINDOW **line_num_win,
                            WINDOW **editor_window, WINDOW **edit_window,
-                           bool *explorer_mode, MENU **explorer_menu,
-                           int *scroll_offset, int *lines_to_print)
+                           bool *editor_mode, bool *explorer_mode,
+                           MENU **explorer_menu, ITEM ***menu_items,
+                           int *scroll_offset, int *lines_to_print,
+                           int *active_window)
 {
     ITEM *curr_item;
-    char *new_file_name = "new_file.c";
+    bool new_file_form_active = false;
+    WINDOW *inner_win = derwin(*explorer_win, 3, 18, 2, 2);
+    WINDOW *form_window = derwin(inner_win, 1, 16, 1, 1);
+    FORM *new_file_form = NULL;
+    FIELD *field[2];
 
     switch (ch)
     {
@@ -41,17 +50,65 @@ void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE *file,
             doupdate();
             break;
         case 'a':
-            deallocate_buffer(tbuf);
-            fclose(file);
-            file = open_new_file(new_file_name, tbuf, line_num_win, editor_window,
-                             edit_window, scroll_offset, lines_to_print);
-            rewind(file);
+            // deallocate_buffer(tbuf);
+            // fclose(file);
+            create_new_file_input(&inner_win, &form_window, &new_file_form,
+                                  field);
 
-            wnoutrefresh(*explorer_win);
-            wnoutrefresh(*line_num_win);
-            wnoutrefresh(*editor_window);
-            wnoutrefresh(*edit_window);
-            doupdate();
+            new_file_form_active = true;
+
+            while (new_file_form_active && (ch = getch()) != 'q')
+            {
+                switch (ch)
+                {
+                    case 263: // Backspace
+                        form_driver(new_file_form, REQ_VALIDATION);
+                        FIELD *current = current_field(new_file_form);
+                        char *buf = field_buffer(current, 0);
+                        trim(buf);
+                        if (buf && get_length(buf) > 0)
+                        {
+                            // form_driver(new_file_form, REQ_LEFT_CHAR);
+                            form_driver(new_file_form, REQ_DEL_PREV);
+                            wrefresh(form_window);
+                        }
+                        break;
+                    case '\n':
+                        form_driver(new_file_form, REQ_VALIDATION);
+                        char *new_file_name = field_buffer(field[0], 0);
+                        new_file_form_active = false;
+                        *explorer_mode = false;
+                        *editor_mode = true;
+                        *active_window = 2;
+                        focus_window(editor_window, 3, "Editor");
+                        trim(new_file_name);
+
+                        if (file)
+                            fclose(file);
+                        file = open_new_file(new_file_name, tbuf, line_num_win,
+                                             editor_window, edit_window,
+                                             scroll_offset, lines_to_print);
+
+                        *explorer_win =
+                            create_explorer_window(explorer_menu, menu_items);
+                        curs_set(2);
+                        wmove(*edit_window, 0, 0);
+                        wrefresh(*explorer_win);
+                        wrefresh(*edit_window);
+                        break;
+                    default:
+                        form_driver(new_file_form, ch);
+                        wrefresh(form_window);
+                        break;
+                }
+            }
+
+            // curs_set(0);
+
+            unpost_form(new_file_form);
+            free_form(new_file_form);
+            free_field(field[0]);
+            menu_driver(*explorer_menu, REQ_NEXT_ITEM);
             break;
         case KEY_F(1):
             wrefresh(*explorer_win);

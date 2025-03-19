@@ -1,9 +1,10 @@
 // #include <pcre.h>
+#include "../models/models.h"
+
+#include <curses.h>
+#include <ncurses.h>
 #include <pcre.h>
 #define PCRE2_CODE_UNIT_WIDTH 8
-
-#include "../models/models.h"
-#include <ncurses.h>
 #include <pcre2.h>
 #include <string.h>
 
@@ -99,7 +100,7 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
     char *patterns[] = {
         ".",
         "\\b(void|int|char|return|for|while|if|else|break|continue)\\b",
-        "#(include|define)|=|\\+|\\-|\\*|\\&",
+        "#(include|define)|=|\\+|\\-|\\*|\\&|<|>",
         "(\".*\"|<.*\\.h>)",
         "([a-z0-9_]*)\\(.*\\)",
         "\\b\\d*\\b",
@@ -154,4 +155,56 @@ void print_line(char *line_buf, int line_num, WINDOW **edit_window)
 
     for (int i = 0; i < pattern_num; i++)
         pcre2_code_free(re[i]);
+}
+
+char *get_file_icon(pcre2_code *re, int subj_len, char *filename, char **icon)
+{
+    PCRE2_SPTR subject = (PCRE2_SPTR)filename;
+    pcre2_match_data *md = pcre2_match_data_create_from_pattern(re, NULL);
+    if (!md)
+        return NULL;
+
+    int rc = pcre2_match(re, subject, subj_len, 0, 0, md, NULL);
+
+    if (rc > 0)
+    {
+        return *icon;
+    }
+
+    pcre2_match_data_free(md);
+
+    return NULL;
+}
+
+ICON print_file_icon(char *filename)
+{
+    int pattern_num = 9;
+    pcre2_code *re[pattern_num];
+
+    char *patterns[] = {
+        ".*\\.c\\b", ".*\\.h",  ".*\\.txt", ".*\\.py",  ".*\\.js",
+        ".*\\.ts",   ".*\\.rs", ".*\\.db",  ".*\\.git",
+    };
+    char *icons[] = {
+        " ", " ", " ", " ", " ", " ", " ", " ", " ",
+    };
+
+    ICON matched_icon = {.icon = NULL, .color = 2};
+
+    int colors[] = {7, 8, 4, 5, 5, 7, 9, 2, 9};
+    size_t subj_len = strlen(filename);
+
+    compile_patterns(re, pattern_num, patterns);
+
+    for (int i = 0; i < pattern_num; i++)
+    {
+        matched_icon.icon = get_file_icon(re[i], subj_len, filename, &icons[i]);
+
+        if (matched_icon.icon != NULL)
+        {
+            matched_icon.color = colors[i];
+            return matched_icon;
+        }
+    }
+    return matched_icon;
 }

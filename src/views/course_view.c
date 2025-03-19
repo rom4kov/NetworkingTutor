@@ -2,6 +2,7 @@
 #define _GNU_SOURCE
 
 #include "../core/core.h"
+#include "../models/models.h"
 #include "start_menu.h"
 #include "views.h"
 #include <curses.h>
@@ -102,10 +103,50 @@ void create_explorer_menu(WINDOW **explorer_window, MENU **explorer_menu,
     *menu_items = (ITEM **)calloc(dir_size, sizeof(ITEM *));
     (*menu_items)[dir_size - 1] = NULL;
 
+    int item = 0;
     for (int i = 0; i < dir_size - 1; i++)
     {
         next = readdir(dir);
-        (*menu_items)[i] = new_item(next->d_name, "");
+        if (strcmp(next->d_name, "..") != 0 && strcmp(next->d_name, ".") != 0)
+        {
+            if (next->d_type == 4)
+            {
+                wattron(*explorer_window, COLOR_PAIR(1));
+                mvwprintw(*explorer_window, item + 1, 2, " ");
+                wattroff(*explorer_window, COLOR_PAIR(1));
+                (*menu_items)[item] = new_item(next->d_name, "");
+                ICON icon = print_file_icon((char *)next->d_name);
+                if (icon.icon != NULL)
+                {
+                    wattron(*explorer_window, COLOR_PAIR(icon.color));
+                    mvwprintw(*explorer_window, item + 1, 2, "%s", icon.icon);
+                    wattroff(*explorer_window, COLOR_PAIR(icon.color));
+                }
+                item++;
+            }
+        }
+    }
+
+    rewinddir(dir);
+
+    for (int i = 0; i < dir_size - 1; i++)
+    {
+        next = readdir(dir);
+        if (strcmp(next->d_name, "..") != 0 && strcmp(next->d_name, ".") != 0)
+        {
+            if (next->d_type != 4)
+            {
+                (*menu_items)[item] = new_item(next->d_name, "");
+                ICON icon = print_file_icon((char *)next->d_name);
+                if (icon.icon != NULL)
+                {
+                    wattron(*explorer_window, COLOR_PAIR(icon.color));
+                    mvwprintw(*explorer_window, item + 1, 2, "%s", icon.icon);
+                    wattroff(*explorer_window, COLOR_PAIR(icon.color));
+                }
+                item++;
+            }
+        }
     }
 
     *explorer_menu = new_menu(*menu_items);
@@ -114,7 +155,7 @@ void create_explorer_menu(WINDOW **explorer_window, MENU **explorer_menu,
 
     set_menu_win(*explorer_menu, *explorer_window);
     set_menu_sub(*explorer_menu,
-                 derwin(*explorer_window, LINES - 7, WU + (WU / 2) - 4, 1, 2));
+                 derwin(*explorer_window, LINES - 7, WU + (WU / 2) - 6, 1, 4));
     set_menu_fore(*explorer_menu, A_BOLD | A_ITALIC | COLOR_PAIR(2));
     set_menu_back(*explorer_menu, COLOR_PAIR(1));
     set_menu_mark(*explorer_menu, "");

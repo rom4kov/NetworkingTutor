@@ -1,8 +1,12 @@
 #include "../data/data_access_layer.h"
 #include "form.h"
+
+#include <pcre.h>
+#define PCRE2_CODE_UNIT_WIDTH 8
 #include <curses.h>
 #include <menu.h>
 #include <ncurses.h>
+#include <pcre2.h>
 #include <sqlite3.h>
 
 void initialize_colors();
@@ -19,10 +23,15 @@ void input_handler(WINDOW **windows, int *active_win, MENU **start_menu,
 void create_course_view(sqlite3 *db);
 WINDOW *create_editor_window(int *active_window);
 WINDOW *create_explorer_window(MENU **explorer_menu, ITEM ***menu_items);
-void create_explorer_menu(WINDOW **explorer_window, MENU **explorer_menu, ITEM ***menu_items);
+void create_explorer_menu(WINDOW **explorer_window, MENU **explorer_menu,
+                          ITEM ***menu_items);
 void create_user_form(WINDOW **window, FORM **user_form, FIELD **fields);
 void update_line_numbers(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
                          int *scroll_offset, int lines_to_print);
 void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
-                  WINDOW **line_num_win, int *scroll_offset, int lines_to_print);
+                  WINDOW **line_num_win, int *scroll_offset,
+                  int lines_to_print);
 void print_line(char *line_buf, int line_num, WINDOW **edit_window);
+char *get_file_icon(pcre2_code *re, int subj_len, char *filename, char *icon,
+                    int color);
+ICON print_file_icon(char *filename);

@@ -76,11 +76,14 @@ FILE *open_new_file(char *filename, TEXT_BUFFER *tbuf, WINDOW **line_num_win,
 
         rewind(file);
 
-        wattron(*editor_window, A_BOLD | COLOR_PAIR(7));
-        mvwprintw(*editor_window, 1, 4, "");
-        wattroff(*editor_window, A_BOLD | COLOR_PAIR(7));
+        mvwprintw(*editor_window, 1, 4, "                                ");
+        ICON icon = print_file_icon((char *)filename);
+
+        wattron(*editor_window, COLOR_PAIR(icon.color));
+        mvwprintw(*editor_window, 1, 4, "%s", icon.icon);
+        wattroff(*editor_window, COLOR_PAIR(icon.color));
+
         wattron(*editor_window, A_BOLD | COLOR_PAIR(1));
-        mvwprintw(*editor_window, 1, 6, "                                ");
         mvwprintw(*editor_window, 1, 6, "%s", filename);
         wattroff(*editor_window, A_BOLD | COLOR_PAIR(1));
         wrefresh(*edit_window);
@@ -129,11 +132,14 @@ FILE *open_file(const char *filename, TEXT_BUFFER *tbuf, WINDOW **line_num_win,
 
         rewind(file);
 
-        wattron(*editor_window, A_BOLD | COLOR_PAIR(7));
-        mvwprintw(*editor_window, 1, 4, "");
-        wattroff(*editor_window, A_BOLD | COLOR_PAIR(7));
+        mvwprintw(*editor_window, 1, 4, "                                ");
+        ICON icon = print_file_icon((char *)filename);
+
+        wattron(*editor_window, COLOR_PAIR(icon.color));
+        mvwprintw(*editor_window, 1, 4, "%s", icon.icon);
+        wattroff(*editor_window, COLOR_PAIR(icon.color));
+
         wattron(*editor_window, A_BOLD | COLOR_PAIR(1));
-        mvwprintw(*editor_window, 1, 6, "                                ");
         mvwprintw(*editor_window, 1, 6, "%s", filename);
         wattroff(*editor_window, A_BOLD | COLOR_PAIR(1));
         wrefresh(*edit_window);
@@ -255,10 +261,4 @@ void create_new_file_input(WINDOW **inner_win, WINDOW **form_window,
     curs_set(1);
     set_current_field(*new_file_form, field[0]);
     post_form(*new_file_form);
-
-    // wmove(*form_window, 0, 0);
-    // wnoutrefresh(*inner_win);
-    // wrefresh(*form_window);
-    // wnoutrefresh(form_win);
-    // doupdate();
 }

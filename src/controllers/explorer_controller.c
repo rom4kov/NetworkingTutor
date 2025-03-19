@@ -63,8 +63,10 @@ void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE *file,
 
             new_file_form_active = true;
 
-            while (new_file_form_active && (ch = getch()) != 'q')
+            while (new_file_form_active)
             {
+                ch = getch();
+
                 switch (ch)
                 {
                     case 263: // Backspace
@@ -99,10 +101,19 @@ void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE *file,
 
                         *explorer_win =
                             create_explorer_window(explorer_menu, menu_items);
-                        curs_set(2);
                         wmove(*edit_window, 0, 0);
                         wrefresh(*explorer_win);
                         wrefresh(*edit_window);
+                        break;
+                    case 'q':
+                        new_file_form_active = false;
+                        curs_set(0);
+                        unpost_form(new_file_form);
+                        free_form(new_file_form);
+                        free_field(field[0]);
+                        menu_driver(*explorer_menu, REQ_NEXT_ITEM);
+                        *explorer_win =
+                            create_explorer_window(explorer_menu, menu_items);
                         break;
                     default:
                         form_driver(new_file_form, ch);
@@ -111,12 +122,6 @@ void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE *file,
                 }
             }
 
-            // curs_set(0);
-
-            unpost_form(new_file_form);
-            free_form(new_file_form);
-            free_field(field[0]);
-            menu_driver(*explorer_menu, REQ_NEXT_ITEM);
             break;
         case KEY_F(1):
             wrefresh(*explorer_win);

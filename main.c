@@ -9,8 +9,6 @@
 #define COLOR_ORANGE 17
 #define COLOR_DARKGREY 18
 
-int EXIT_SUCCESS = 0;
-
 int main(void)
 {
     setlocale(LC_ALL, "");
@@ -57,7 +55,7 @@ void initialize_colors()
     init_pair(1, COLOR_GREY, -1);
     init_pair(2, -1, -1);
     init_pair(3, COLOR_RED, -1);
-    // if (can_change_color())
+    //if (can_change_color())
     //     init_color(COLOR_WHITE, 195, 225, 225);
     init_pair(4, COLOR_GREEN, -1);
     init_pair(5, COLOR_YELLOW, -1);

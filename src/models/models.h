@@ -30,3 +30,9 @@ typedef struct text_buffer
   unsigned short current_col;
   unsigned short num_of_lines;
 } TEXT_BUFFER;
+
+typedef struct _icon
+{
+  char *icon;
+  int color;
+} ICON;

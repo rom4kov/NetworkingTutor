@@ -110,7 +110,6 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
                     break;
                 case 10:
                     explorer_mode = true;
-                    // wrefresh(windows[1]);
                     break;
             }
         }

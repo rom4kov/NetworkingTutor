@@ -111,9 +111,9 @@ void create_explorer_menu(WINDOW **explorer_window, MENU **explorer_menu,
         {
             if (next->d_type == 4)
             {
-                wattron(*explorer_window, COLOR_PAIR(1));
+                wattron(*explorer_window, COLOR_PAIR(10));
                 mvwprintw(*explorer_window, item + 1, 2, " ");
-                wattroff(*explorer_window, COLOR_PAIR(1));
+                wattroff(*explorer_window, COLOR_PAIR(10));
                 (*menu_items)[item] = new_item(next->d_name, "");
                 ICON icon = print_file_icon((char *)next->d_name);
                 if (icon.icon != NULL)

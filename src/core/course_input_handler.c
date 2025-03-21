@@ -24,7 +24,7 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
 
     WINDOW *line_num_win = derwin(windows[2], LINES - 6, 3, 2, 1);
     WINDOW *edit_window =
-        derwin(windows[2], LINES - 6, WU * 5 + (WU / 2) - 2, 2, 4);
+        derwin(windows[2], LINES - 6, WU * 5 + (WU / 2) - 1, 2, 4);
 
     const char *filename = "../read_lines.c";
 

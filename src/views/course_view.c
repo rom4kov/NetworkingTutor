@@ -28,6 +28,8 @@ void create_course_view(sqlite3 *db)
     MENU *explorer_menu = NULL;
     ITEM **menu_items = NULL;
 
+    char *filename = (char *)calloc(30, sizeof(char));
+
     windows[0] = create_navigation_window(&active_window, &start_menu);
     windows[1] = create_explorer_window(&explorer_menu, &menu_items);
     windows[2] = create_editor_window(&active_window);
@@ -37,7 +39,7 @@ void create_course_view(sqlite3 *db)
     wrefresh(windows[2]);
 
     handle_course_input(windows, &active_window, &start_menu, &explorer_menu,
-                        &menu_items, db);
+                        &menu_items, db, &filename);
 }
 
 WINDOW *create_editor_window(int *active_window)

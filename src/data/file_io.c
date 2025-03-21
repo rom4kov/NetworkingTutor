@@ -52,11 +52,12 @@ void prepare_empty_file(TEXT_BUFFER **tbuf)
     (*tbuf)->num_of_lines = 1;
 }
 
-FILE *open_new_file(char *filename, TEXT_BUFFER *tbuf, WINDOW **line_num_win,
-                    WINDOW **editor_window, WINDOW **edit_window,
-                    int *scroll_offset, int *lines_to_print)
+void open_new_file(char *filename, FILE *file, TEXT_BUFFER *tbuf,
+                    WINDOW **line_num_win, WINDOW **editor_window,
+                    WINDOW **edit_window, int *scroll_offset,
+                    int *lines_to_print)
 {
-    FILE *file = fopen(filename, "w+");
+    file = fopen(filename, "w+");
 
     if (file == NULL)
     {
@@ -91,16 +92,14 @@ FILE *open_new_file(char *filename, TEXT_BUFFER *tbuf, WINDOW **line_num_win,
 
     wrefresh(*line_num_win);
     wrefresh(*editor_window);
-
-    return file;
 }
 
-FILE *open_file(const char *filename, TEXT_BUFFER *tbuf, WINDOW **line_num_win,
-                WINDOW **editor_window, WINDOW **edit_window,
-                int *scroll_offset, int *lines_to_print)
+void open_file(char *filename, FILE *file, TEXT_BUFFER *tbuf,
+               WINDOW **line_num_win, WINDOW **editor_window,
+               WINDOW **edit_window, int *scroll_offset, int *lines_to_print)
 {
     int file_size = 0;
-    FILE *file = fopen(filename, "r+");
+    file = fopen(filename, "r+");
 
     if (file == NULL)
     {
@@ -147,8 +146,6 @@ FILE *open_file(const char *filename, TEXT_BUFFER *tbuf, WINDOW **line_num_win,
 
     wrefresh(*line_num_win);
     wrefresh(*editor_window);
-
-    return file;
 }
 
 void read_file_into_buffer(FILE *file, TEXT_BUFFER *text_buf)

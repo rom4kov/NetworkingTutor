@@ -12,7 +12,8 @@
 #define EDIT_MAX WU * 7 + 4
 
 void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
-                         MENU **explorer_menu, ITEM ***menu_items, sqlite3 *db)
+                         MENU **explorer_menu, ITEM ***menu_items, sqlite3 *db,
+                         char **filename)
 {
     bool in_course_view = true;
     bool editor_mode = false;
@@ -26,12 +27,11 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
     WINDOW *edit_window =
         derwin(windows[2], LINES - 6, WU * 5 + (WU / 2) - 1, 2, 4);
 
-    const char *filename = "../read_lines.c";
-
     TEXT_BUFFER *t_buffer = initialize_buffer();
 
-    FILE *file = open_file(filename, t_buffer, &line_num_win, &windows[2],
-                           &edit_window, &scroll_offset, &lines_to_print);
+    FILE *file = NULL;
+    // file = open_file(filename, t_buffer, &line_num_win, &windows[2],
+    //                        &edit_window, &scroll_offset, &lines_to_print);
 
     wrefresh(line_num_win);
     wrefresh(windows[2]);
@@ -88,10 +88,11 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
         }
         else if (*active_win == 1 && explorer_mode)
         {
-            handle_explorer_input(
-                ch, t_buffer, file, &windows[1], &line_num_win, &windows[2],
-                &edit_window, &editor_mode, &explorer_mode, explorer_menu,
-                menu_items, &scroll_offset, &lines_to_print, active_win);
+            handle_explorer_input(ch, t_buffer, file, filename, &windows[1],
+                                  &line_num_win, &windows[2], &edit_window,
+                                  &editor_mode, &explorer_mode, explorer_menu,
+                                  menu_items, &scroll_offset, &lines_to_print,
+                                  active_win);
         }
         else if (*active_win == 1)
         {
@@ -115,6 +116,7 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
         }
         else if (*active_win == 2 && editor_mode)
         {
+            curs_set(2);
             handle_editor_input(ch, &line_num_win, &edit_window, t_buffer, file,
                                 &editor_mode, &scroll_offset, &lines_to_print);
         }
@@ -140,7 +142,6 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
                     break;
                 case 10:
                     editor_mode = true;
-                    curs_set(2);
                     wmove(edit_window, 0, 0);
                     wrefresh(edit_window);
                     break;

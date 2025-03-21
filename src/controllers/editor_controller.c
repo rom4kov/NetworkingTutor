@@ -29,7 +29,7 @@ void handle_editor_input(int ch, WINDOW **line_num_win, WINDOW **edit_window,
             move_down(text_buf, line_num_win, edit_window, y, x, scroll_offset, *lines_to_print);
             break;
         case KEY_UP:
-            move_up(text_buf, line_num_win, edit_window, y, x, scroll_offset, *lines_to_print);
+            move_up(text_buf, line_num_win, edit_window, y, x, scroll_offset, lines_to_print);
             break;
         case KEY_BACKSPACE:
             bs_delete_char_or_line(text_buf, line_num_win, edit_window, y, x,

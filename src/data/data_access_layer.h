@@ -21,5 +21,5 @@ FILE *open_file(const char *filename, TEXT_BUFFER *tbuf, WINDOW **line_num_win,
 void read_file_into_buffer(FILE *file, TEXT_BUFFER *text_buf);
 void write_buffer_to_file(TEXT_BUFFER *tbuf, FILE *file, int y);
 void deallocate_buffer(TEXT_BUFFER *tbuf);
-void create_new_file_input(WINDOW **inner_win, WINDOW **form_win,
-                           FORM **new_file_form, FIELD **field);
+void create_new_file_input(WINDOW **inner_win, WINDOW **form_window,
+                           FORM **new_file_form, FIELD **field, char *label);

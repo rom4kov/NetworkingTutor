@@ -234,14 +234,13 @@ void deallocate_buffer(TEXT_BUFFER *tbuf)
 }
 
 void create_new_file_input(WINDOW **inner_win, WINDOW **form_window,
-                           FORM **new_file_form, FIELD **field)
+                           FORM **new_file_form, FIELD **field, char *label)
 {
     int rows, cols;
 
     field[0] = new_field(1, 14, 0, 0, 0, 0);
     field[1] = NULL;
 
-    // set_field_back(field[0], A_UNDERLINE);
     field_opts_off(field[0], O_AUTOSKIP);
 
     *new_file_form = new_form(field);
@@ -252,7 +251,7 @@ void create_new_file_input(WINDOW **inner_win, WINDOW **form_window,
     set_form_sub(*new_file_form, *form_window);
 
     draw_border(*inner_win, 1, "");
-    mvwprintw(*inner_win, 0, 1, "Create file");
+    mvwprintw(*inner_win, 0, 1, "%s", label);
     wrefresh(*inner_win);
 
     wclear(*form_window);

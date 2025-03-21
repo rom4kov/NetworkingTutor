@@ -6,6 +6,7 @@
 #include <form.h>
 #include <menu.h>
 #include <ncurses.h>
+#include <stdbool.h>
 #include <stdio.h>
 
 void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE *file,
@@ -18,6 +19,7 @@ void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE *file,
 {
     ITEM *curr_item;
     bool new_file_form_active = false;
+    bool del_file_form_active = false;
     WINDOW *inner_win = derwin(*explorer_win, 3, 18, 2, 2);
     WINDOW *form_window = derwin(inner_win, 1, 16, 1, 1);
     FORM *new_file_form = NULL;
@@ -59,7 +61,7 @@ void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE *file,
             break;
         case 'a':
             create_new_file_input(&inner_win, &form_window, &new_file_form,
-                                  field);
+                                  field, "Create file");
 
             new_file_form_active = true;
 
@@ -122,6 +124,69 @@ void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE *file,
                 }
             }
 
+            break;
+        case 'r':
+            break;
+        case 'd':
+            create_new_file_input(&inner_win, &form_window, &new_file_form,
+                                  field, "Delete file");
+            del_file_form_active = true; 
+
+            while (del_file_form_active)
+            {
+                switch (ch) {
+                    case 263: // Backspace
+                        form_driver(new_file_form, REQ_VALIDATION);
+                        FIELD *current = current_field(new_file_form);
+                        char *buf = field_buffer(current, 0);
+                        trim(buf);
+                        if (buf && get_length(buf) > 0)
+                        {
+                            // form_driver(new_file_form, REQ_LEFT_CHAR);
+                            form_driver(new_file_form, REQ_DEL_PREV);
+                            wrefresh(form_window);
+                        }
+                        break;
+                    case 10:
+                        form_driver(new_file_form, REQ_VALIDATION);
+                        char *new_file_name = field_buffer(field[0], 0);
+                        trim(new_file_name);
+                        new_file_form_active = false;
+                        *explorer_mode = false;
+                        *editor_mode = true;
+                        *active_window = 2;
+                        focus_window(editor_window, 3, "Editor");
+
+                        deallocate_buffer(tbuf);
+                        tbuf = initialize_buffer();
+                        if (file)
+                            fclose(file);
+                        file = open_new_file(new_file_name, tbuf, line_num_win,
+                                             editor_window, edit_window,
+                                             scroll_offset, lines_to_print);
+
+                        *explorer_win =
+                            create_explorer_window(explorer_menu, menu_items);
+                        wmove(*edit_window, 0, 0);
+                        wrefresh(*explorer_win);
+                        wrefresh(*edit_window);
+                        break;
+                    case 'q':
+                        new_file_form_active = false;
+                        curs_set(0);
+                        unpost_form(new_file_form);
+                        free_form(new_file_form);
+                        free_field(field[0]);
+                        menu_driver(*explorer_menu, REQ_NEXT_ITEM);
+                        *explorer_win =
+                            create_explorer_window(explorer_menu, menu_items);
+                        break;
+                    default:
+                        form_driver(new_file_form, ch);
+                        wrefresh(form_window);
+                        break;
+                }
+            }
             break;
         case KEY_F(1):
             wrefresh(*explorer_win);

@@ -11,6 +11,7 @@
 void update_line_numbers(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
                          int *scroll_offset, int lines_to_print)
 {
+    // if (lines_to_print < tbuf->num_of_lines && tbuf->num_of_lines)
     for (int i = 0; i < lines_to_print; i++)
     {
         wattron(*line_num_win, COLOR_PAIR(10));
@@ -112,15 +113,18 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
 
     for (int i = 0; i < lines_to_print; i++)
     {
-        size_t subj_len = strlen(current_line->buf_);
-
-        for (int j = 0; j < pattern_num; j++)
+        if (current_line != NULL)
         {
-            print_matches(re[j], i, subj_len, current_line->buf_,
-                          j == 4 ? 2 : 0, edit_window, colors[j]);
-        }
+            size_t subj_len = strlen(current_line->buf_);
 
-        current_line = current_line->next;
+            for (int j = 0; j < pattern_num; j++)
+            {
+                print_matches(re[j], i, subj_len, current_line->buf_,
+                              j == 4 ? 2 : 0, edit_window, colors[j]);
+            }
+
+            current_line = current_line->next;
+        }
     }
 
     for (int i = 0; i < pattern_num; i++)

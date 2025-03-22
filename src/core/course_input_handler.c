@@ -7,7 +7,7 @@
 #include <ncurses.h>
 #include <stdio.h>
 
-#define WINDOW_COUNT 3
+#define WINDOW_COUNT 4
 #define WU COLS / 12 // WU for WIDTH_UNIT
 #define EDIT_MAX WU * 7 + 4
 
@@ -32,6 +32,10 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
     FILE *file = NULL;
     // file = open_file(filename, t_buffer, &line_num_win, &windows[2],
     //                        &edit_window, &scroll_offset, &lines_to_print);
+    wattron(windows[2], COLOR_PAIR(10));
+    mvwprintw(windows[2], LINES - (LINES / 2) - 4, 7,
+              "No file has been opened yet. Open or create a file in the file explorer");
+    wattroff(windows[2], COLOR_PAIR(10));
 
     wrefresh(line_num_win);
     wrefresh(windows[2]);
@@ -43,6 +47,20 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
 
         if (ch == 27)
             return;
+
+        if (ch == KEY_RESIZE)
+        {
+            endwin();
+            refresh();
+            for (int i = 0; i < WINDOW_COUNT; i++)
+            {
+                if (windows[i] != NULL)
+                {
+                    delwin(windows[i]);
+                }
+            }
+            create_course_view(db);
+        }
 
         if (*active_win == 0)
         {
@@ -88,7 +106,7 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
         }
         else if (*active_win == 1 && explorer_mode)
         {
-            handle_explorer_input(ch, t_buffer, file, filename, &windows[1],
+            handle_explorer_input(ch, t_buffer, &file, filename, &windows[1],
                                   &line_num_win, &windows[2], &edit_window,
                                   &editor_mode, &explorer_mode, explorer_menu,
                                   menu_items, &scroll_offset, &lines_to_print,
@@ -114,9 +132,8 @@ void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
                     break;
             }
         }
-        else if (*active_win == 2 && editor_mode)
+        else if (*active_win == 2 && editor_mode && file)
         {
-            curs_set(2);
             handle_editor_input(ch, &line_num_win, &edit_window, t_buffer, file,
                                 &editor_mode, &scroll_offset, &lines_to_print);
         }

@@ -23,6 +23,20 @@ void input_handler(WINDOW **windows, int *active_win, MENU **start_menu,
     while (on_main_menu)
     {
         ch = getch();
+        if (ch == KEY_RESIZE)
+        {
+            endwin();
+            refresh();
+            for (int i = 0; i < WINDOW_COUNT; i++)
+            {
+                if (windows[i] != NULL)
+                {
+                    delwin(windows[i]);
+                }
+            }
+            create_start_screen(*db);
+        }
+
         ESCDELAY = 100;
 
         if (ch == 27) return;

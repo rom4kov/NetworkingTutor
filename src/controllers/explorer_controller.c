@@ -16,7 +16,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE *file,
+void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE **file,
                            char **filename, WINDOW **explorer_win,
                            WINDOW **line_num_win, WINDOW **editor_window,
                            WINDOW **edit_window, bool *editor_mode,
@@ -47,7 +47,7 @@ void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE *file,
             *filename = (char *)item_name(curr_item);
             deallocate_buffer(tbuf);
             tbuf = initialize_buffer();
-            if (file) fclose(file);
+            if (*file) fclose(*file);
             open_file(*filename, file, tbuf, line_num_win, editor_window,
                              edit_window, scroll_offset, lines_to_print);
 
@@ -101,8 +101,8 @@ void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE *file,
 
                         deallocate_buffer(tbuf);
                         tbuf = initialize_buffer();
-                        if (file)
-                            fclose(file);
+                        if (*file)
+                            fclose(*file);
                         open_new_file(*filename, file, tbuf, line_num_win,
                                              editor_window, edit_window,
                                              scroll_offset, lines_to_print);
@@ -166,7 +166,6 @@ void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE *file,
                         *explorer_mode = true;
                         *editor_mode = false;
                         *active_window = 1;
-                        // focus_window(editor_window, 3, "Editor");
 
                         if (strcmp(new_file_name, *filename) == 0)
                         {
@@ -174,15 +173,17 @@ void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE *file,
                             wclear(*editor_window);
                             wclear(*edit_window);
                             deallocate_buffer(tbuf);
-                            if (file) fclose(file);
+                            if (*file) fclose(*file);
                         }
+
                         remove(new_file_name);
+
                         *explorer_win =
                             create_explorer_window(explorer_menu, menu_items);
+
                         curs_set(0);
-                        // wmove(*edit_window, 0, 0);
-                        mvwprintw(*explorer_win, 30, 2, "old: %s", *filename);
-                        mvwprintw(*explorer_win, 31, 2, "new: %s", new_file_name);
+                        // mvwprintw(*explorer_win, 30, 2, "old: %s", *filename);
+                        // mvwprintw(*explorer_win, 31, 2, "new: %s", new_file_name);
                         focus_window(editor_window, 2, "Editor");
                         focus_window(explorer_win, 3, "Explorer");
                         wnoutrefresh(*explorer_win);

@@ -52,19 +52,19 @@ void prepare_empty_file(TEXT_BUFFER **tbuf)
     (*tbuf)->num_of_lines = 1;
 }
 
-void open_new_file(char *filename, FILE *file, TEXT_BUFFER *tbuf,
-                    WINDOW **line_num_win, WINDOW **editor_window,
-                    WINDOW **edit_window, int *scroll_offset,
-                    int *lines_to_print)
+void open_new_file(char *filename, FILE **file, TEXT_BUFFER *tbuf,
+                   WINDOW **line_num_win, WINDOW **editor_window,
+                   WINDOW **edit_window, int *scroll_offset,
+                   int *lines_to_print)
 {
-    file = fopen(filename, "w+");
+    *file = fopen(filename, "w+");
 
-    if (file == NULL)
+    if (*file == NULL)
     {
         printf("Could not open %s.\n", filename);
     }
 
-    if (file != NULL)
+    if (*file != NULL)
     {
         prepare_empty_file(&tbuf);
 
@@ -75,7 +75,7 @@ void open_new_file(char *filename, FILE *file, TEXT_BUFFER *tbuf,
         mvwprintw(*edit_window, LINES - 7, EDIT_MAX - 15, "     ");
         mvwprintw(*edit_window, LINES - 7, EDIT_MAX - 15, "0 : 0");
 
-        rewind(file);
+        rewind(*file);
 
         mvwprintw(*editor_window, 1, 4, "                                ");
         ICON icon = print_file_icon((char *)filename);
@@ -94,23 +94,23 @@ void open_new_file(char *filename, FILE *file, TEXT_BUFFER *tbuf,
     wrefresh(*editor_window);
 }
 
-void open_file(char *filename, FILE *file, TEXT_BUFFER *tbuf,
+void open_file(char *filename, FILE **file, TEXT_BUFFER *tbuf,
                WINDOW **line_num_win, WINDOW **editor_window,
                WINDOW **edit_window, int *scroll_offset, int *lines_to_print)
 {
     int file_size = 0;
-    file = fopen(filename, "r+");
+    *file = fopen(filename, "r+");
 
-    if (file == NULL)
+    if (*file == NULL)
     {
         printf("Could not open %s.\n", filename);
     }
 
-    if (file != NULL)
+    if (*file != NULL)
     {
-        fseek(file, 0, SEEK_END);
-        file_size = ftell(file);
-        rewind(file);
+        fseek(*file, 0, SEEK_END);
+        file_size = ftell(*file);
+        rewind(*file);
 
         if (file_size == 0)
         {
@@ -118,7 +118,7 @@ void open_file(char *filename, FILE *file, TEXT_BUFFER *tbuf,
         }
         else
         {
-            read_file_into_buffer(file, tbuf);
+            read_file_into_buffer(*file, tbuf);
         }
 
         *lines_to_print =
@@ -129,7 +129,7 @@ void open_file(char *filename, FILE *file, TEXT_BUFFER *tbuf,
         mvwprintw(*edit_window, LINES - 7, EDIT_MAX - 15, "     ");
         mvwprintw(*edit_window, LINES - 7, EDIT_MAX - 15, "0 : 0");
 
-        rewind(file);
+        rewind(*file);
 
         mvwprintw(*editor_window, 1, 4, "                                ");
         ICON icon = print_file_icon((char *)filename);

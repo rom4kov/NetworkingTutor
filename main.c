@@ -1,5 +1,6 @@
 #include "src/core/core.h"
 #include "src/views/views.h"
+#include <curses.h>
 #include <locale.h>
 #include <ncurses.h>
 #include <sqlite3.h>
@@ -28,7 +29,13 @@ int main(void)
     sqlite3 *db = create_database(welcome_screen);
     // seed_courses_data(db, welcome_screen);
 
-    wgetch(welcome_screen);
+    int rc = wgetch(welcome_screen);
+    if (rc == KEY_RESIZE)
+    {
+        // wresize(welcome_screen, LINES, COLS);
+        wclear(welcome_screen);
+        wrefresh(welcome_screen);
+    }
 
     delwin(welcome_screen);
     clear();

@@ -20,26 +20,38 @@
 #define WU COLS / 12 // WU for WIDTH_UNIT
 #define WIDTH_REMAINDER COLS % WU
 
-void create_course_view(sqlite3 *db)
+void create_course_view(WINDOW **windows, WINDOW **line_num_win,
+                        WINDOW **edit_window, int *active_window,
+                        MENU **start_menu, MENU **explorer_menu,
+                        ITEM ***menu_items, sqlite3 *db)
 {
-    WINDOW *windows[WINDOW_COUNT];
-    int active_window = 0;
-    MENU *start_menu;
-    MENU *explorer_menu = NULL;
-    ITEM **menu_items = NULL;
+    // WINDOW *windows[WINDOW_COUNT];
+    *active_window = 0;
+    // MENU *start_menu;
+    // MENU *explorer_menu = NULL;
+    // ITEM **menu_items = NULL;
 
-    char *filename = (char *)calloc(30, sizeof(char));
+    // char *filename = (char *)calloc(30, sizeof(char));
 
-    windows[0] = create_navigation_window(&active_window, &start_menu);
-    windows[1] = create_explorer_window(&explorer_menu, &menu_items);
-    windows[2] = create_editor_window(&active_window);
+    windows[0] = create_navigation_window(active_window, start_menu);
+    windows[1] = create_explorer_window(explorer_menu, menu_items);
+    windows[2] = create_editor_window(active_window);
     windows[3] =
-        create_right_side_panel(&active_window, &db, "Course instructions");
+        create_right_side_panel(active_window, &db, "Course instructions");
 
+    *line_num_win = derwin(windows[2], LINES - 6, 3, 2, 1);
+    *edit_window =
+        derwin(windows[2], LINES - 6, WU * 5 + (WU / 2) - 1, 2, 4);
+
+    wattron(windows[2], COLOR_PAIR(10));
+    mvwprintw(windows[2], LINES - (LINES / 2) - 4, 7,
+              "No file has been opened yet. Open or create a file in the file "
+              "explorer");
+    wattroff(windows[2], COLOR_PAIR(10));
     wrefresh(windows[2]);
 
-    handle_course_input(windows, &active_window, &start_menu, &explorer_menu,
-                        &menu_items, db, &filename);
+    // handle_course_input(windows, &active_window, &start_menu, &explorer_menu,
+    //                     &menu_items, db, &filename);
 }
 
 WINDOW *create_editor_window(int *active_window)

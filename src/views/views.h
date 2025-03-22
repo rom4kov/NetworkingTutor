@@ -11,16 +11,20 @@
 
 void initialize_colors();
 WINDOW *create_welcome_screen();
-void create_start_screen(sqlite3 *db);
+void create_start_screen(WINDOW **windows, int *active_window,
+                         MENU **start_menu, COURSE courses[], sqlite3 *db);
 WINDOW *create_navigation_window(int *active_win, MENU **start_menu);
 WINDOW *create_header_section(int *active_win);
 WINDOW *create_course_preview_card(int x_position, int *active_win,
                                    int curr_win_idx, COURSE *course);
 WINDOW *create_right_side_panel(int *active_win, sqlite3 **db, char *label);
-void input_handler(WINDOW **windows, int *active_win, MENU **start_menu,
-                   COURSE courses[], sqlite3 **db);
+// void handle_start_input(WINDOW **windows, int *active_win, MENU **start_menu,
+//                    COURSE courses[], sqlite3 **db);
 
-void create_course_view(sqlite3 *db);
+void create_course_view(WINDOW **windows, WINDOW **line_num_win,
+                        WINDOW **edit_window, int *active_window,
+                        MENU **start_menu, MENU **explorer_menu,
+                        ITEM ***menu_items, sqlite3 *db);
 WINDOW *create_editor_window(int *active_window);
 WINDOW *create_explorer_window(MENU **explorer_menu, ITEM ***menu_items);
 void create_explorer_menu(WINDOW **explorer_window, MENU **explorer_menu,

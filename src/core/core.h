@@ -2,11 +2,19 @@
 #include <menu.h>
 #include <ncurses.h>
 
-void input_handler(WINDOW **windows, int *active_win, MENU **start_menu,
-                   COURSE courses[], sqlite3 **db);
-void handle_course_input(WINDOW **windows, int *active_win, MENU **start_menu,
-                         MENU **explorer_menu, ITEM ***menu_items, sqlite3 *db,
-                         char **filename);
+void handle_start_input(int *ch, WINDOW **windows, bool *start_view_active,
+                        bool *course_view_active, bool *start_needs_redraw,
+                        bool *course_needs_redraw, int *active_win,
+                        MENU **start_menu, COURSE courses[], sqlite3 **db);
+void handle_course_input(int *ch, WINDOW **windows, WINDOW **line_num_win,
+                         WINDOW **edit_window, bool *start_view_active,
+                         bool *course_view_active, int *active_win,
+                         bool *start_needs_redraw, MENU **start_menu,
+                         ITEM **curr_item, MENU **explorer_menu,
+                         ITEM ***menu_items, char **filename,
+                         bool *explorer_mode, bool *editor_mode, FILE **file,
+                         TEXT_BUFFER *t_buffer, int *scroll_offset,
+                         int *lines_to_print, int *y, int *x);
 void move_down(TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **edit_window,
                int y, int x, int *scroll_offset, int lines_to_print);
 void move_up(TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **edit_window,
@@ -37,4 +45,4 @@ void focus_window(WINDOW **window, int color_pair, char *label);
 void trim(char *str);
 int get_length(char *str);
 void log_values(WINDOW **edit_window, int scroll_offset, TEXT_BUFFER *tbuf,
-                int lines_to_print);
+                int lines_to_print, int y, int x);

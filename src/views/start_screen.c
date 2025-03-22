@@ -1,9 +1,9 @@
 #define _XOPEN_SOURCE_EXTENDED 1
 
-#include "views.h"
 #include "../core/core.h"
 #include "start_menu.h"
 #include "user_form.h"
+#include "views.h"
 #include <curses.h>
 #include <form.h>
 #include <menu.h>
@@ -75,26 +75,27 @@ char *HTTP = " _     _   _             ____\n"
              "|_| |_|\\__|\\__| .__(_)_/_/  \n"
              "              |_|           \n";
 
-void create_start_screen(sqlite3 *db)
+void create_start_screen(WINDOW **windows, int *active_window,
+                         MENU **start_menu, COURSE courses[], sqlite3 *db)
 {
-    WINDOW *windows[WINDOW_COUNT];
-    int active_window = 0;
-    MENU *start_menu;
+    // WINDOW *windows[WINDOW_COUNT];
+    // int active_window = 0;
+    // MENU *start_menu;
+    //
+    // COURSE *courses = get_course_data(db);
 
-    COURSE *courses = get_course_data(db);
-
-    windows[0] = create_navigation_window(&active_window, &start_menu);
-    windows[1] = create_header_section(&active_window);
-    windows[2] = create_course_preview_card(0, &active_window, 2, &courses[0]);
+    windows[0] = create_navigation_window(active_window, start_menu);
+    windows[1] = create_header_section(active_window);
+    windows[2] = create_course_preview_card(0, active_window, 2, &courses[0]);
     windows[3] =
-        create_course_preview_card(CARD_WIDTH, &active_window, 3, &courses[1]);
-    windows[4] = create_course_preview_card(CARD_WIDTH * 2, &active_window, 4,
+        create_course_preview_card(CARD_WIDTH, active_window, 3, &courses[1]);
+    windows[4] = create_course_preview_card(CARD_WIDTH * 2, active_window, 4,
                                             &courses[2]);
-    windows[5] = create_right_side_panel(&active_window, &db, "Details");
+    windows[5] = create_right_side_panel(active_window, &db, "Details");
 
     wrefresh(windows[5]);
 
-    input_handler(windows, &active_window, &start_menu, courses, &db);
+    // input_handler(windows, &active_window, &start_menu, courses, &db);
 }
 
 WINDOW *create_navigation_window(int *active_win, MENU **start_menu)
@@ -257,8 +258,8 @@ MENU *create_start_menu(WINDOW *left_side_win)
 
     // Create the menu
     MENU *menu = new_menu(menu_items);
-    set_menu_format(menu, 1, 6);
-    set_menu_spacing(menu, 0, 0, 6);
+    set_menu_format(menu, 1, 8);
+    set_menu_spacing(menu, 0, 0, 8);
 
     // Set the window for the menu to be displayed inside left_inner_win
     set_menu_win(menu, left_side_win);

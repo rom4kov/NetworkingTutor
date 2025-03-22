@@ -1,7 +1,9 @@
 #include "src/core/core.h"
+#include "src/data/data_access_layer.h"
 #include "src/views/views.h"
 #include <curses.h>
 #include <locale.h>
+#include <menu.h>
 #include <ncurses.h>
 #include <sqlite3.h>
 #include <string.h>
@@ -9,6 +11,8 @@
 #define COLOR_GREY 16
 #define COLOR_ORANGE 17
 #define COLOR_DARKGREY 18
+#define START_WINDOW_COUNT 6
+#define COURSE_WINDOW_COUNT 4
 
 int main(void)
 {
@@ -41,7 +45,120 @@ int main(void)
     clear();
     refresh();
 
-    create_start_screen(db);
+    WINDOW *start_windows[START_WINDOW_COUNT];
+    WINDOW *course_windows[COURSE_WINDOW_COUNT];
+    WINDOW *line_num_win;
+    WINDOW *edit_window;
+    COURSE *courses = get_course_data(db);
+
+    int active_window = 0;
+    MENU *start_menu = NULL;
+    MENU *explorer_menu = NULL;
+    ITEM **menu_items = NULL;
+    ITEM *curr_item;
+
+    bool running = true;
+    bool start_needs_redraw = true;
+    bool first_start_draw = true;
+    bool first_course_draw = true;
+    bool course_needs_redraw = false;
+    bool start_view_active = true;
+    bool course_view_active = false;
+
+    FILE *file = NULL;
+
+    TEXT_BUFFER *t_buffer = initialize_buffer();
+
+    bool editor_mode = false;
+    bool explorer_mode = false;
+
+    int y, x;
+    int scroll_offset = 0;
+    int lines_to_print;
+
+    char *filename = (char *)calloc(30, sizeof(char));
+
+    ESCDELAY = 100;
+
+    while (running)
+    {
+        if (start_needs_redraw)
+        {
+            if (!first_start_draw)
+            {
+                endwin();
+                refresh();
+                for (int i = 0; i < START_WINDOW_COUNT; i++)
+                {
+                    if (start_windows[i] != NULL)
+                    {
+                        delwin(start_windows[i]);
+                    }
+                }
+            }
+            create_start_screen(start_windows, &active_window, &start_menu,
+                                courses, db);
+            start_needs_redraw = false;
+            first_start_draw = false;
+        }
+        else if (course_needs_redraw)
+        {
+            if (!first_course_draw)
+            {
+                endwin();
+                refresh();
+                for (int i = 0; i < COURSE_WINDOW_COUNT; i++)
+                {
+                    if (course_windows[i] != NULL)
+                    {
+                        delwin(course_windows[i]);
+                    }
+                }
+            }
+            create_course_view(course_windows, &line_num_win, &edit_window,
+                               &active_window, &start_menu, &explorer_menu,
+                               &menu_items, db);
+            course_needs_redraw = false;
+            first_course_draw = false;
+        }
+
+        int key = getch();
+
+        switch (key)
+        {
+            case KEY_RESIZE:
+                if (start_view_active)
+                {
+                    start_needs_redraw = true;
+                }
+                else if (course_view_active)
+                {
+                    course_needs_redraw = true;
+                }
+                break;
+            case 27:
+                running = false;
+                break;
+            default:
+                if (start_view_active)
+                {
+                    handle_start_input(&key, start_windows, &start_view_active,
+                                       &course_view_active, &start_needs_redraw,
+                                       &course_needs_redraw, &active_window,
+                                       &start_menu, courses, &db);
+                }
+                else if (course_view_active)
+                {
+                    handle_course_input(
+                        &key, course_windows, &line_num_win, &edit_window,
+                        &start_view_active, &course_view_active, &active_window,
+                        &start_needs_redraw, &start_menu, &curr_item,
+                        &explorer_menu, &menu_items, &filename, &explorer_mode,
+                        &editor_mode, &file, t_buffer, &scroll_offset,
+                        &lines_to_print, &y, &x);
+                }
+        }
+    }
 
     sqlite3_close(db);
 
@@ -62,8 +179,8 @@ void initialize_colors()
     init_pair(1, COLOR_GREY, -1);
     init_pair(2, -1, -1);
     init_pair(3, COLOR_RED, -1);
-    //if (can_change_color())
-    //     init_color(COLOR_WHITE, 195, 225, 225);
+    // if (can_change_color())
+    //      init_color(COLOR_WHITE, 195, 225, 225);
     init_pair(4, COLOR_GREEN, -1);
     init_pair(5, COLOR_YELLOW, -1);
     init_pair(6, COLOR_CYAN, -1);

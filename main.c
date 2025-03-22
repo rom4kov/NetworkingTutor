@@ -6,6 +6,7 @@
 #include <menu.h>
 #include <ncurses.h>
 #include <sqlite3.h>
+#include <stdio.h>
 #include <string.h>
 
 #define COLOR_GREY 16
@@ -75,6 +76,8 @@ int main(void)
     int y, x;
     int scroll_offset = 0;
     int lines_to_print;
+    int curr_line;
+    int curr_col;
 
     char *filename = (char *)calloc(30, sizeof(char));
 
@@ -118,6 +121,35 @@ int main(void)
             create_course_view(course_windows, &line_num_win, &edit_window,
                                &active_window, &start_menu, &explorer_menu,
                                &menu_items, db);
+            if (file)
+            {
+                fclose(file);
+                curr_line = t_buffer->curr_line_nr;
+                curr_col = t_buffer->current_col;
+                deallocate_buffer(t_buffer);
+                t_buffer = initialize_buffer();
+                open_file(filename, &file, t_buffer, &line_num_win,
+                          &course_windows[2], &edit_window, &scroll_offset,
+                          &lines_to_print);
+                t_buffer->curr_line_nr = curr_line;
+                t_buffer->current_col = curr_col;
+                t_buffer->current_line = t_buffer->first_line;
+                for (int i = 0; i < curr_line; i++)
+                {
+                    t_buffer->current_line = t_buffer->current_line->next;
+                }
+                explorer_mode = false;
+                editor_mode = true;
+                active_window = 2;
+                focus_window(&course_windows[2], 3, "Editor");
+                curs_set(2);
+                wmove(edit_window, curr_line, curr_col);
+                wnoutrefresh(course_windows[1]);
+                wnoutrefresh(line_num_win);
+                wnoutrefresh(course_windows[2]);
+                wnoutrefresh(edit_window);
+                doupdate();
+            }
             course_needs_redraw = false;
             first_course_draw = false;
         }

@@ -21,43 +21,6 @@ void handle_course_input(int *ch, WINDOW **windows, WINDOW **line_num_win,
                          TEXT_BUFFER *t_buffer, int *scroll_offset,
                          int *lines_to_print, int *y, int *x)
 {
-    // bool in_course_view = true;
-    // int scroll_offset = 0;
-    // int lines_to_print;
-
-    // WINDOW *line_num_win = derwin(windows[2], LINES - 6, 3, 2, 1);
-    // WINDOW *edit_window =
-    //     derwin(windows[2], LINES - 6, WU * 5 + (WU / 2) - 1, 2, 4);
-
-    // file = open_file(filename, t_buffer, &line_num_win, &windows[2],
-    //                        &edit_window, &scroll_offset, &lines_to_print);
-
-    // wrefresh(line_num_win);
-    // wrefresh(windows[2]);
-
-    // while (*course_view_active)
-    // {
-    //     ch = getch();
-
-    // if (ch == 27)
-    // {
-    //     break;
-    // }
-
-    // if (ch == KEY_RESIZE)
-    // {
-    //     endwin();
-    //     refresh();
-    //     for (int i = 0; i < WINDOW_COUNT; i++)
-    //     {
-    //         if (windows[i] != NULL)
-    //         {
-    //             delwin(windows[i]);
-    //         }
-    //     }
-    //     create_course_view(db);
-    // }
-
     if (*active_win == 0)
     {
         switch (*ch)
@@ -130,7 +93,7 @@ void handle_course_input(int *ch, WINDOW **windows, WINDOW **line_num_win,
                 break;
         }
     }
-    else if (*active_win == 2 && *editor_mode && file)
+    else if (*active_win == 2 && *editor_mode && *file)
     {
         handle_editor_input(*ch, line_num_win, edit_window, t_buffer, *file,
                             editor_mode, scroll_offset, lines_to_print, y, x);

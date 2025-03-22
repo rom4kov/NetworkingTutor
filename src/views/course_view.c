@@ -25,13 +25,7 @@ void create_course_view(WINDOW **windows, WINDOW **line_num_win,
                         MENU **start_menu, MENU **explorer_menu,
                         ITEM ***menu_items, sqlite3 *db)
 {
-    // WINDOW *windows[WINDOW_COUNT];
     *active_window = 0;
-    // MENU *start_menu;
-    // MENU *explorer_menu = NULL;
-    // ITEM **menu_items = NULL;
-
-    // char *filename = (char *)calloc(30, sizeof(char));
 
     windows[0] = create_navigation_window(active_window, start_menu);
     windows[1] = create_explorer_window(explorer_menu, menu_items);
@@ -49,9 +43,6 @@ void create_course_view(WINDOW **windows, WINDOW **line_num_win,
               "explorer");
     wattroff(windows[2], COLOR_PAIR(10));
     wrefresh(windows[2]);
-
-    // handle_course_input(windows, &active_window, &start_menu, &explorer_menu,
-    //                     &menu_items, db, &filename);
 }
 
 WINDOW *create_editor_window(int *active_window)

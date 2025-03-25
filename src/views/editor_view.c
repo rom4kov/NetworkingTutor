@@ -23,9 +23,13 @@ void update_line_numbers(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
 
         if (i + *scroll_offset < 9)
         {
+            mvwprintw(*line_num_win, i, 2, "%i", i + *scroll_offset + 1);
+        }
+        else if (i + *scroll_offset < 99)
+        {
             mvwprintw(*line_num_win, i, 1, "%i", i + *scroll_offset + 1);
         }
-        else
+        else 
         {
             mvwprintw(*line_num_win, i, 0, "%i", i + *scroll_offset + 1);
         }
@@ -43,12 +47,14 @@ void compile_patterns(pcre2_code **re, int p_codes_num, char **pattern_str)
 {
     int errcode;
     PCRE2_SIZE erroffset;
+    PCRE2_UCHAR buffer[30];
 
     for (int i = 0; i < p_codes_num; i++)
     {
         PCRE2_SPTR pattern = (PCRE2_SPTR)pattern_str[i];
         re[i] = pcre2_compile(pattern, PCRE2_ZERO_TERMINATED, PCRE2_UCP,
                               &errcode, &erroffset, NULL);
+        pcre2_get_error_message(errcode, buffer, 30);
         if (!re[i])
             return;
     }
@@ -100,11 +106,11 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
     pcre2_code *re[pattern_num];
     char *patterns[] = {
         ".",
-        "\\b(void|int|char|return|for|while|if|else|break|continue)\\b",
-        "#(include|define)|=|\\+|\\-|\\*|\\&|<|>",
+        "\\b(void|int|char|return|for|while|if|else|break|continue|bool|switch|case|default)\\b",
+        "#(include|define)|NULL|=|\\+|\\-|\\*|\\&|<|>|;",
         "(\".*\"|<.*\\.h>)",
         "([a-z0-9_]*)\\(.*\\)",
-        "\\b\\d*\\b",
+        "\\b(?:\\d+(\\.\\d+)?|true|false)\\b",
         "//.*",
     };
     int colors[] = {1, 8, 6, 4, 7, 9, 10};
@@ -139,12 +145,11 @@ void print_line(char *line_buf, int line_num, WINDOW **edit_window)
     pcre2_code *re[pattern_num];
     char *patterns[] = {
         ".",
-        "\\b(void|int|char|return|for|while|if|else|break|continue)\\b",
-        "#(include|define)|=|\\+|\\-|\\*|\\&",
+        "\\b(void|int|char|return|for|while|if|else|break|continue|bool|switch|case|default)\\b",
+        "#(include|define)|NULL|=|\\+|\\-|\\*|\\&|<|>|;",
         "(\".*\"|<.*\\.h>)",
         "([a-z0-9_]*)\\(.*\\)",
-        "\\d",
-        "//.*",
+        "\\b(?:\\d+(\\.\\d+)?|true|false)\\b",
     };
     int colors[] = {1, 8, 6, 4, 7, 9, 10};
     size_t subj_len = strlen(line_buf);

@@ -11,7 +11,8 @@
 
 void handle_editor_input(int ch, WINDOW **line_num_win, WINDOW **edit_window,
                          TEXT_BUFFER *text_buf, FILE *file, bool *editor_mode,
-                         int *scroll_offset, int *lines_to_print, int *y, int *x)
+                         int *scroll_offset, int *lines_to_print, int *y,
+                         int *x)
 {
     // curs_set(2);
     getyx(*edit_window, *y, *x);
@@ -25,10 +26,12 @@ void handle_editor_input(int ch, WINDOW **line_num_win, WINDOW **edit_window,
             move_left(text_buf, edit_window, *y, *x);
             break;
         case KEY_DOWN:
-            move_down(text_buf, line_num_win, edit_window, *y, *x, scroll_offset, *lines_to_print);
+            move_down(text_buf, line_num_win, edit_window, *y, *x,
+                      scroll_offset, *lines_to_print);
             break;
         case KEY_UP:
-            move_up(text_buf, line_num_win, edit_window, *y, *x, scroll_offset, lines_to_print);
+            move_up(text_buf, line_num_win, edit_window, *y, *x, scroll_offset,
+                    lines_to_print);
             break;
         case KEY_BACKSPACE:
             bs_delete_char_or_line(text_buf, line_num_win, edit_window, *y, *x,
@@ -62,7 +65,7 @@ void handle_editor_input(int ch, WINDOW **line_num_win, WINDOW **edit_window,
             write_buffer_to_file(text_buf, file, *y);
             break;
         default:
-            insert_char(text_buf, edit_window, *y, *x, ch);
+            insert_char(text_buf, edit_window, *scroll_offset, *y, *x, ch);
             break;
     }
 }

@@ -36,3 +36,12 @@ typedef struct _icon
   char *icon;
   int color;
 } ICON;
+
+typedef struct _dir_entry
+{
+  char *name;
+  char type;
+  int state;
+  struct DIR_ENTRY *prev;
+  struct DIR_ENTRY *next;
+} DIR_ENTRY;

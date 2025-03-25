@@ -101,17 +101,10 @@ void create_start_screen(WINDOW **windows, int *active_window,
 WINDOW *create_navigation_window(int *active_win, MENU **start_menu)
 {
     WINDOW *navigation;
-    // navigation = newwin(LINES, COLS / 6, 0, 0);
     navigation = newwin(3, WU * 7 + 4, 0, 0);
-    if (*active_win == 0)
-    {
-        draw_border(navigation, 3, "Navigation");
-        mvwprintw(navigation, 0, 2, "Navigation");
-    }
-    if (*active_win == 1 || *active_win == 0)
-    {
-        *start_menu = create_start_menu(navigation);
-    }
+    draw_border(navigation, *active_win == 0 ? 3 : 2, "");
+    *start_menu = create_start_menu(navigation);
+
     wattron(navigation, COLOR_PAIR(3));
     mvwprintw(navigation, 0, 2, "Navigation");
     wattroff(navigation, COLOR_PAIR(3));
@@ -159,7 +152,7 @@ WINDOW *create_course_preview_card(int x_position, int *active_win,
         derwin(course_preview_card_outer, height - 2,
                CARD_WIDTH - 2 + remainder, 1, 1);
     WINDOW *description_window =
-        derwin(course_preview_card_inner, height - 4, CARD_WIDTH - 6, 1, 2);
+        derwin(course_preview_card_inner, height - 4, CARD_WIDTH - 4, 1, 2);
     mvwprintw(description_window, 12, 2, "a: %i c: %i", *active_win,
               curr_win_idx);
 
@@ -176,7 +169,8 @@ WINDOW *create_course_preview_card(int x_position, int *active_win,
                  ACS_RTEE);
     }
 
-    mvwhline(course_preview_card_inner, 1, 0, ACS_HLINE, CARD_WIDTH);
+    mvwhline(course_preview_card_inner, 1, 0, ACS_HLINE,
+             CARD_WIDTH + remainder);
     wattron(course_preview_card_outer, COLOR_PAIR(3));
     mvwprintw(course_preview_card_outer, 0, 2, "Lesson #%i", course->id);
     wattroff(course_preview_card_outer, COLOR_PAIR(3));
@@ -184,8 +178,10 @@ WINDOW *create_course_preview_card(int x_position, int *active_win,
     mvwprintw(course_preview_card_inner, 0,
               (CARD_WIDTH - strlen(course->name)) / 2 - 1, "%s", course->name);
     wrefresh(course_preview_card_inner);
+    int y, x;
+    getmaxyx(description_window, y, x);
     mvwprintw(description_window, 2, 0, "%s",
-              wrap_text(course->short_desc, CARD_WIDTH - 10));
+              wrap_text(course->short_desc, x - 8));
     if (curr_win_idx == 2)
     {
         mvwprintw(description_window, 9, 0, "%s", HTTP);
@@ -198,7 +194,7 @@ WINDOW *create_right_side_panel(int *active_win, sqlite3 **db, char *label)
 {
     USER_DATA user_data = get_user_data(*db);
     int window_width = COLS - (WU * 7 + 4);
-    int intro_width = window_width - 6;
+    int intro_width = window_width - 10;
     WINDOW *right_panel = newwin(LINES, window_width, 0, WU * 7 + 4);
     // mvwprintw(right_panel, 1, 2, "Your progress: 🔥🔥🔥");
     if (*active_win == 5)

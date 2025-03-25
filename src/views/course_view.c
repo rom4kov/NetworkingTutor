@@ -35,7 +35,7 @@ void create_course_view(WINDOW **windows, WINDOW **line_num_win,
 
     *line_num_win = derwin(windows[2], LINES - 6, 3, 2, 1);
     *edit_window =
-        derwin(windows[2], LINES - 6, WU * 5 + (WU / 2) - 1, 2, 4);
+        derwin(windows[2], LINES - 6, WU * 5 + (WU / 2) - 2, 2, 5);
 
     wattron(windows[2], COLOR_PAIR(10));
     mvwprintw(windows[2], LINES - (LINES / 2) - 4, 7,
@@ -85,11 +85,14 @@ void create_explorer_menu(WINDOW **explorer_window, MENU **explorer_menu,
 
     struct dirent *next = readdir(dir);
 
+
     while (NULL != next)
     {
         dir_size++;
         next = readdir(dir);
     }
+
+    DIR_ENTRY entries[dir_size];
 
     mvwprintw(*explorer_window, LINES - 5, 2, "Press ? for Keys");
 
@@ -108,7 +111,7 @@ void create_explorer_menu(WINDOW **explorer_window, MENU **explorer_menu,
     *menu_items = (ITEM **)calloc(dir_size, sizeof(ITEM *));
     (*menu_items)[dir_size - 1] = NULL;
 
-    int item = 0;
+    int items = 0;
     for (int i = 0; i < dir_size - 1; i++)
     {
         next = readdir(dir);
@@ -116,18 +119,26 @@ void create_explorer_menu(WINDOW **explorer_window, MENU **explorer_menu,
         {
             if (next->d_type == 4)
             {
+                entries[items].name = next->d_name;
+                entries[items].type = next->d_type;
+                if (entries[items].state == 'o')
+                {
+                    open_sub_directory(next->d_name, dir_size, items, menu_items, entries);
+                }
                 wattron(*explorer_window, COLOR_PAIR(10));
-                mvwprintw(*explorer_window, item + 1, 2, " ");
+                mvwprintw(*explorer_window, items + 1, 2, " ");
                 wattroff(*explorer_window, COLOR_PAIR(10));
-                (*menu_items)[item] = new_item(next->d_name, "");
+
+                (*menu_items)[items] = new_item(next->d_name, "");
+
                 ICON icon = print_file_icon((char *)next->d_name);
                 if (icon.icon != NULL)
                 {
                     wattron(*explorer_window, COLOR_PAIR(icon.color));
-                    mvwprintw(*explorer_window, item + 1, 2, "%s", icon.icon);
+                    mvwprintw(*explorer_window, items + 1, 2, "%s", icon.icon);
                     wattroff(*explorer_window, COLOR_PAIR(icon.color));
                 }
-                item++;
+                items++;
             }
         }
     }
@@ -141,15 +152,19 @@ void create_explorer_menu(WINDOW **explorer_window, MENU **explorer_menu,
         {
             if (next->d_type != 4)
             {
-                (*menu_items)[item] = new_item(next->d_name, "");
+                entries[items].name = next->d_name;
+                entries[items].type = next->d_type;
+
+                (*menu_items)[items] = new_item(next->d_name, "");
+
                 ICON icon = print_file_icon((char *)next->d_name);
                 if (icon.icon != NULL)
                 {
                     wattron(*explorer_window, COLOR_PAIR(icon.color));
-                    mvwprintw(*explorer_window, item + 1, 2, "%s", icon.icon);
+                    mvwprintw(*explorer_window, items + 1, 2, "%s", icon.icon);
                     wattroff(*explorer_window, COLOR_PAIR(icon.color));
                 }
-                item++;
+                items++;
             }
         }
     }
@@ -168,4 +183,21 @@ void create_explorer_menu(WINDOW **explorer_window, MENU **explorer_menu,
     post_menu(*explorer_menu);
 
     wrefresh(*explorer_window);
+}
+
+void open_sub_directory(char *dir_name, int *dir_size, int *items, ITEM **menu_items,
+                        DIR_ENTRY *entries)
+{
+    DIR *dir = opendir(dir_name);
+
+    // int dir_size = 0;
+
+    struct dirent *next = readdir(dir);
+
+
+    while (NULL != next)
+    {
+        dir_size++;
+        next = readdir(dir);
+    }
 }

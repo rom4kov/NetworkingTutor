@@ -24,8 +24,8 @@ void move_left(TEXT_BUFFER *tbuf, WINDOW **edit_window, int y, int x);
 void move_to_start_of_line(TEXT_BUFFER *tbuf, WINDOW **edit_window, int y,
                            int x);
 void move_to_end_of_line(TEXT_BUFFER *tbuf, WINDOW **edit_window, int y, int x);
-void insert_char(TEXT_BUFFER *tbuf, WINDOW **edit_window, int y, int x,
-                 char ch);
+void insert_char(TEXT_BUFFER *tbuf, WINDOW **edit_window, int scroll_offset,
+                 int y, int x, char ch);
 void insert_tab(TEXT_BUFFER *tbuf, WINDOW **edit_window, int y, int x);
 void bs_delete_line(TEXT_BUFFER *tbuf, WINDOW **edit_window,
                     WINDOW **line_num_win, int y, int *scoll_offset,

@@ -57,6 +57,7 @@ int main(void)
     MENU *explorer_menu = NULL;
     ITEM **menu_items = NULL;
     ITEM *curr_item;
+    DIR_ENTRY entries[dir_size];
 
     bool running = true;
     bool start_needs_redraw = true;
@@ -121,13 +122,16 @@ int main(void)
             create_course_view(course_windows, &line_num_win, &edit_window,
                                &active_window, &start_menu, &explorer_menu,
                                &menu_items, db);
-            if (file)
+            if (file && file->_fileno > 0)
             {
                 fclose(file);
-                curr_line = t_buffer->curr_line_nr;
+                curr_line = t_buffer->curr_line_nr < LINES - 8
+                                ? t_buffer->curr_line_nr
+                                : scroll_offset + LINES - 8;
                 curr_col = t_buffer->current_col;
-                deallocate_buffer(t_buffer);
-                t_buffer = initialize_buffer();
+                // deallocate_buffer(t_buffer);
+                // t_buffer = initialize_buffer();
+                t_buffer->curr_line_nr = curr_line;
                 open_file(filename, &file, t_buffer, &line_num_win,
                           &course_windows[2], &edit_window, &scroll_offset,
                           &lines_to_print);
@@ -141,9 +145,10 @@ int main(void)
                 explorer_mode = false;
                 editor_mode = true;
                 active_window = 2;
+                focus_window(&course_windows[0], 2, "Explorer");
                 focus_window(&course_windows[2], 3, "Editor");
                 curs_set(2);
-                wmove(edit_window, curr_line, curr_col);
+                wmove(edit_window, curr_line - scroll_offset, curr_col);
                 wnoutrefresh(course_windows[1]);
                 wnoutrefresh(line_num_win);
                 wnoutrefresh(course_windows[2]);

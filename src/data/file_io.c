@@ -116,7 +116,7 @@ void open_file(char *filename, FILE **file, TEXT_BUFFER *tbuf,
         {
             prepare_empty_file(&tbuf);
         }
-        else
+        else if (tbuf->first_line->length < 2)
         {
             read_file_into_buffer(*file, tbuf);
         }
@@ -220,8 +220,11 @@ void write_buffer_to_file(TEXT_BUFFER *tbuf, FILE *file, int y)
 
 void deallocate_buffer(TEXT_BUFFER *tbuf)
 {
+    if (tbuf->first_line == NULL)
+        return;
+
     LINE *current_line = tbuf->first_line;
-    while (NULL != current_line->next)
+    while (current_line->next != NULL)
     {
         free(current_line->buf_);
         current_line = current_line->next;

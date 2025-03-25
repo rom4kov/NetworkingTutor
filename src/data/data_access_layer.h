@@ -1,5 +1,6 @@
 #include "../models/models.h"
 #include "form.h"
+#include "menu.h"
 #include "ncurses.h"
 #include <sqlite3.h>
 
@@ -13,9 +14,9 @@ TEXT_BUFFER *initialize_buffer();
 LINE *initialize_line();
 void prepare_empty_file(TEXT_BUFFER **tbuf);
 void open_new_file(char *filename, FILE **file, TEXT_BUFFER *tbuf,
-                    WINDOW **line_num_win, WINDOW **editor_window,
-                    WINDOW **edit_window, int *scroll_offset,
-                    int *lines_to_print);
+                   WINDOW **line_num_win, WINDOW **editor_window,
+                   WINDOW **edit_window, int *scroll_offset,
+                   int *lines_to_print);
 void open_file(char *filename, FILE **file, TEXT_BUFFER *tbuf,
                WINDOW **line_num_win, WINDOW **editor_window,
                WINDOW **edit_window, int *scroll_offset, int *lines_to_print);
@@ -24,3 +25,5 @@ void write_buffer_to_file(TEXT_BUFFER *tbuf, FILE *file, int y);
 void deallocate_buffer(TEXT_BUFFER *tbuf);
 void create_new_file_input(WINDOW **inner_win, WINDOW **form_window,
                            FORM **new_file_form, FIELD **field, char *label);
+void open_sub_directory(char *dir_name, int *dir_size, int *items, ITEM **menu_items,
+                        DIR_ENTRY *entries);

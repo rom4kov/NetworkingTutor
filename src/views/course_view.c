@@ -123,7 +123,7 @@ void create_explorer_menu(WINDOW **explorer_window, MENU **explorer_menu,
                 entries[items].type = next->d_type;
                 if (entries[items].state == 'o')
                 {
-                    open_sub_directory(next->d_name, dir_size, items, menu_items, entries);
+                    open_sub_directory(next->d_name, &dir_size, &items, *menu_items, entries);
                 }
                 wattron(*explorer_window, COLOR_PAIR(10));
                 mvwprintw(*explorer_window, items + 1, 2, " ");

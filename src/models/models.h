@@ -1,5 +1,8 @@
 #pragma once
 
+#include <menu.h>
+#include <ncurses.h>
+
 typedef struct _user_data
 {
     const unsigned char *name;
@@ -15,33 +18,73 @@ typedef struct _course_data
 
 typedef struct line
 {
-  char *buf_;
-  unsigned short line_num;
-  unsigned short length;
-  struct line *prev;
-  struct line *next;
+    char *buf_;
+    unsigned short line_num;
+    unsigned short length;
+    struct line *prev;
+    struct line *next;
 } LINE;
 
 typedef struct text_buffer
 {
-  LINE *first_line;
-  LINE *current_line;
-  unsigned short curr_line_nr;
-  unsigned short current_col;
-  unsigned short num_of_lines;
+    LINE *first_line;
+    LINE *current_line;
+    unsigned short curr_line_nr;
+    unsigned short current_col;
+    unsigned short num_of_lines;
 } TEXT_BUFFER;
 
 typedef struct _icon
 {
-  char *icon;
-  int color;
+    char *icon;
+    int color;
 } ICON;
 
 typedef struct _dir_entry
 {
-  char *name;
-  char type;
-  int state;
-  struct DIR_ENTRY *prev;
-  struct DIR_ENTRY *next;
+    char *name;
+    char type;
+    int state;
+    struct DIR_ENTRY *prev;
+    struct DIR_ENTRY *next;
 } DIR_ENTRY;
+
+typedef struct _file_tree
+{
+    DIR_ENTRY *first_entry;
+    DIR_ENTRY *current_entry;
+    unsigned short curr_entry_nr;
+    unsigned short num_of_entries;
+} FILE_TREE;
+
+typedef struct _app_context
+{
+    WINDOW *start_windows;
+    WINDOW *course_windows;
+    WINDOW *line_num_win;
+    WINDOW *edit_window;
+    COURSE *courses;
+    int active_window;
+    MENU *start_menu;
+    MENU *explorer_menu;
+    ITEM **menu_items;
+    ITEM *curr_item;
+    FILE_TREE *file_tree;
+    bool running;
+    bool start_needs_redraw;
+    bool first_start_draw;
+    bool first_course_draw;
+    bool course_needs_redraw;
+    bool start_view_active;
+    bool course_view_active;
+    bool editor_mode;
+    bool explorer_mode;
+    FILE *file;
+    char *filename;
+    TEXT_BUFFER *t_buffer;
+    int y, x;
+    int scroll_offset;
+    int lines_to_print;
+    int curr_line;
+    int curr_col;
+} APP_CONTEXT;

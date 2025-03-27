@@ -1,5 +1,6 @@
 #include "src/core/core.h"
 #include "src/data/data_access_layer.h"
+#include "src/models/models.h"
 #include "src/views/views.h"
 #include <curses.h>
 #include <locale.h>
@@ -57,7 +58,7 @@ int main(void)
     MENU *explorer_menu = NULL;
     ITEM **menu_items = NULL;
     ITEM *curr_item;
-    DIR_ENTRY entries[dir_size];
+    FILE_TREE *file_tree = initialize_file_tree();
 
     bool running = true;
     bool start_needs_redraw = true;
@@ -190,7 +191,7 @@ int main(void)
                         &key, course_windows, &line_num_win, &edit_window,
                         &start_view_active, &course_view_active, &active_window,
                         &start_needs_redraw, &start_menu, &curr_item,
-                        &explorer_menu, &menu_items, &filename, &explorer_mode,
+                        &explorer_menu, file_tree, &menu_items, &filename, &explorer_mode,
                         &editor_mode, &file, t_buffer, &scroll_offset,
                         &lines_to_print, &y, &x);
                 }

@@ -15,11 +15,23 @@
 #define WU COLS / 12 // WU for WIDTH_UNIT
 #define EDIT_MAX WU * 7 + 4
 
+FILE_TREE *initialize_file_tree()
+{
+    FILE_TREE *f_tree = malloc(sizeof(FILE_TREE));
+
+    f_tree->first_entry = malloc(sizeof(DIR_ENTRY));
+    f_tree->current_entry = f_tree->first_entry;
+    f_tree->curr_entry_nr = 0;
+    f_tree->num_of_entries = 1;
+
+    return f_tree;
+}
+
 TEXT_BUFFER *initialize_buffer()
 {
     TEXT_BUFFER *text_buf = malloc(sizeof(TEXT_BUFFER));
 
-    text_buf->first_line = calloc(100, sizeof(char));
+    text_buf->first_line->buf_ = calloc(100, sizeof(char));
     text_buf->current_line = text_buf->first_line;
     text_buf->num_of_lines = 0;
     text_buf->curr_line_nr = 0;

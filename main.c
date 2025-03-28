@@ -47,37 +47,52 @@ int main(void)
     clear();
     refresh();
 
-    WINDOW *start_windows[START_WINDOW_COUNT];
-    WINDOW *course_windows[COURSE_WINDOW_COUNT];
-    WINDOW *line_num_win;
-    WINDOW *edit_window;
-    COURSE *courses = get_course_data(db);
+    APP_CONTEXT *ctx = (APP_CONTEXT *)malloc(sizeof(APP_CONTEXT));
 
-    int active_window = 0;
-    MENU *start_menu = NULL;
-    MENU *explorer_menu = NULL;
-    ITEM **menu_items = NULL;
-    ITEM *curr_item;
-    FILE_TREE *file_tree = initialize_file_tree();
+    memset(ctx, 0, sizeof(APP_CONTEXT));
+    ctx->courses = get_course_data(db);
+    ctx->file_tree = initialize_file_tree();
+    ctx->t_buffer = initialize_buffer();
+    ctx->filename = (char *)calloc(30, sizeof(char));
+    ctx->running = true;
+    ctx->start_needs_redraw = true;
+    ctx->course_needs_redraw = false;
+    ctx->first_start_draw = true;
+    ctx->first_course_draw = true;
+    ctx->start_view_active = true;
+    ctx->course_view_active = false;
 
-    bool running = true;
-    bool start_needs_redraw = true;
-    bool first_start_draw = true;
-    bool first_course_draw = true;
-    bool course_needs_redraw = false;
-    bool start_view_active = true;
-    bool course_view_active = false;
+    // WINDOW *start_windows[START_WINDOW_COUNT];
+    // WINDOW *course_windows[COURSE_WINDOW_COUNT];
+    // WINDOW *line_num_win;
+    // WINDOW *edit_window;
+    // COURSE *courses = get_course_data(db);
 
-    FILE *file = NULL;
+    // int active_window = 0;
+    // MENU *start_menu = NULL;
+    // MENU *explorer_menu = NULL;
+    // ITEM **menu_items = NULL;
+    // ITEM *curr_item;
+    // FILE_TREE *file_tree = initialize_file_tree();
 
-    TEXT_BUFFER *t_buffer = initialize_buffer();
+    // bool running = true;
+    // bool start_needs_redraw = true;
+    // bool first_start_draw = true;
+    // bool first_course_draw = true;
+    // bool start_view_active = true;
+    // bool course_needs_redraw = false;
+    // bool course_view_active = false;
 
-    bool editor_mode = false;
-    bool explorer_mode = false;
+    // FILE *file = NULL;
 
-    int y, x;
-    int scroll_offset = 0;
-    int lines_to_print;
+    // TEXT_BUFFER *t_buffer = initialize_buffer();
+
+    // bool editor_mode = false;
+    // bool explorer_mode = false;
+
+    // int y, x;
+    // int scroll_offset = 0;
+    // int lines_to_print;
     int curr_line;
     int curr_col;
 
@@ -85,79 +100,77 @@ int main(void)
 
     ESCDELAY = 100;
 
-    while (running)
+    while (ctx->running)
     {
-        if (start_needs_redraw)
+        if (ctx->start_needs_redraw)
         {
-            if (!first_start_draw)
+            if (!ctx->first_start_draw)
             {
                 endwin();
                 refresh();
                 for (int i = 0; i < START_WINDOW_COUNT; i++)
                 {
-                    if (start_windows[i] != NULL)
+                    if (ctx->start_windows[i] != NULL)
                     {
-                        delwin(start_windows[i]);
+                        delwin(ctx->start_windows[i]);
                     }
                 }
             }
-            create_start_screen(start_windows, &active_window, &start_menu,
-                                courses, db);
-            start_needs_redraw = false;
-            first_start_draw = false;
+            create_start_screen(ctx->start_windows, &ctx->active_window, &ctx->start_menu,
+                                ctx->courses, db);
+            ctx->start_needs_redraw = false;
+            ctx->first_start_draw = false;
         }
-        else if (course_needs_redraw)
+        else if (ctx->course_needs_redraw)
         {
-            if (!first_course_draw)
+            if (!ctx->first_course_draw)
             {
                 endwin();
                 refresh();
                 for (int i = 0; i < COURSE_WINDOW_COUNT; i++)
                 {
-                    if (course_windows[i] != NULL)
+                    if (ctx->course_windows[i] != NULL)
                     {
-                        delwin(course_windows[i]);
+                        delwin(ctx->course_windows[i]);
                     }
                 }
             }
-            create_course_view(course_windows, &line_num_win, &edit_window,
-                               &active_window, &start_menu, &explorer_menu,
-                               &menu_items, db);
-            if (file && file->_fileno > 0)
+            create_course_view(ctx);
+            if (ctx->file && ctx->file->_fileno > 0)
             {
-                fclose(file);
-                curr_line = t_buffer->curr_line_nr < LINES - 8
-                                ? t_buffer->curr_line_nr
-                                : scroll_offset + LINES - 8;
-                curr_col = t_buffer->current_col;
+                fclose(ctx->file);
+                curr_line = ctx->t_buffer->curr_line_nr < LINES - 8
+                                ? ctx->t_buffer->curr_line_nr
+                                : ctx->scroll_offset + LINES - 8;
+                curr_col = ctx->t_buffer->current_col;
                 // deallocate_buffer(t_buffer);
                 // t_buffer = initialize_buffer();
-                t_buffer->curr_line_nr = curr_line;
-                open_file(filename, &file, t_buffer, &line_num_win,
-                          &course_windows[2], &edit_window, &scroll_offset,
-                          &lines_to_print);
-                t_buffer->curr_line_nr = curr_line;
-                t_buffer->current_col = curr_col;
-                t_buffer->current_line = t_buffer->first_line;
+                ctx->t_buffer->curr_line_nr = curr_line;
+                open_file(filename, &ctx->file, ctx->t_buffer, &ctx->line_num_win,
+                          &ctx->course_windows[2], &ctx->edit_window, &ctx->scroll_offset,
+                          &ctx->lines_to_print);
+                ctx->t_buffer->curr_line_nr = curr_line;
+                ctx->t_buffer->current_col = curr_col;
+                ctx->t_buffer->current_line = ctx->t_buffer->first_line;
                 for (int i = 0; i < curr_line; i++)
                 {
-                    t_buffer->current_line = t_buffer->current_line->next;
+                    ctx->t_buffer->current_line = ctx->t_buffer->current_line->next;
                 }
-                explorer_mode = false;
-                editor_mode = true;
-                active_window = 2;
-                focus_window(&course_windows[0], 2, "Explorer");
-                focus_window(&course_windows[2], 3, "Editor");
+                ctx->explorer_mode = false;
+                ctx->editor_mode = true;
+                ctx->active_window = 2;
+                focus_window(&ctx->course_windows[0], 2, "Explorer");
+                focus_window(&ctx->course_windows[2], 3, "Editor");
                 curs_set(2);
-                wmove(edit_window, curr_line - scroll_offset, curr_col);
-                wnoutrefresh(course_windows[1]);
-                wnoutrefresh(line_num_win);
-                wnoutrefresh(course_windows[2]);
-                wnoutrefresh(edit_window);
+                wmove(ctx->edit_window, curr_line - ctx->scroll_offset, curr_col);
+                wnoutrefresh(ctx->course_windows[1]);
+                wnoutrefresh(ctx->line_num_win);
+                wnoutrefresh(ctx->course_windows[2]);
+                wnoutrefresh(ctx->edit_window);
                 doupdate();
             }
-            course_needs_redraw = false;
-            first_course_draw = false;
+            ctx->course_needs_redraw = false;
+            ctx->first_course_draw = false;
         }
 
         int key = getch();
@@ -165,27 +178,27 @@ int main(void)
         switch (key)
         {
             case KEY_RESIZE:
-                if (start_view_active)
+                if (ctx->start_view_active)
                 {
-                    start_needs_redraw = true;
+                    ctx->start_needs_redraw = true;
                 }
-                else if (course_view_active)
+                else if (ctx->course_view_active)
                 {
-                    course_needs_redraw = true;
+                    ctx->course_needs_redraw = true;
                 }
                 break;
             case 27:
-                running = false;
+                ctx->running = false;
                 break;
             default:
-                if (start_view_active)
+                if (ctx->start_view_active)
                 {
                     handle_start_input(&key, start_windows, &start_view_active,
                                        &course_view_active, &start_needs_redraw,
                                        &course_needs_redraw, &active_window,
                                        &start_menu, courses, &db);
                 }
-                else if (course_view_active)
+                else if (ctx->course_view_active)
                 {
                     handle_course_input(
                         &key, course_windows, &line_num_win, &edit_window,

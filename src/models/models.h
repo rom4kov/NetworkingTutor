@@ -3,6 +3,9 @@
 #include <menu.h>
 #include <ncurses.h>
 
+#define START_WINDOW_COUNT 6
+#define COURSE_WINDOW_COUNT 4
+
 typedef struct _user_data
 {
     const unsigned char *name;
@@ -59,8 +62,8 @@ typedef struct _file_tree
 
 typedef struct _app_context
 {
-    WINDOW *start_windows;
-    WINDOW *course_windows;
+    WINDOW *start_windows[START_WINDOW_COUNT];
+    WINDOW *course_windows[COURSE_WINDOW_COUNT];
     WINDOW *line_num_win;
     WINDOW *edit_window;
     COURSE *courses;

@@ -11,13 +11,8 @@
 #define WU COLS / 12 // WU for WIDTH_UNIT
 #define CARD_WIDTH (((WU * 7) / 3) + 1)
 
-// void handle_start_input(int *ch, WINDOW **windows, bool *start_view_active,
-//                         bool *course_view_active, bool *start_needs_redraw,
-//                         bool *course_needs_redraw, int *ctx->active_window,
-//                         MENU **start_menu, COURSE courses[], sqlite3 **db)
 void handle_start_input(APP_CONTEXT *ctx)
 {
-    // bool on_main_menu = true;
     FORM *user_form = NULL;
     FIELD *fields[3];
     ITEM *curr_item;
@@ -126,7 +121,6 @@ void handle_start_input(APP_CONTEXT *ctx)
                     delwin(ctx->start_windows[i]);
                     wclear(ctx->start_windows[i]);
                 }
-                // create_course_view(*db);
                 break;
         }
     }
@@ -185,7 +179,6 @@ void handle_start_input(APP_CONTEXT *ctx)
                 trim(buf);
                 if (buf && get_length(buf) > 0)
                 {
-                    // form_driver(user_form, REQ_LEFT_CHAR);
                     form_driver(user_form, REQ_DEL_PREV);
                     wrefresh(ctx->start_windows[5]);
                 }
@@ -194,8 +187,6 @@ void handle_start_input(APP_CONTEXT *ctx)
                 form_driver(user_form, REQ_VALIDATION);
                 char *buf1 = field_buffer(fields[0], 0);
                 char *buf2 = field_buffer(fields[1], 0);
-                // mvwprintw(ctx->start_windows[5], 38, 2, "Buffer: %s", buf1);
-                // mvwprintw(ctx->start_windows[5], 39, 2, "Buffer: %s", buf2);
                 update_user(ctx->db, 1, buf1, buf2);
                 curs_set(0);
                 ctx->start_windows[5] = create_right_side_panel(
@@ -203,9 +194,6 @@ void handle_start_input(APP_CONTEXT *ctx)
                 wrefresh(ctx->start_windows[5]);
                 ctx->start_view_active = false;
                 ctx->start_needs_redraw = true;
-                // handle_start_input(windows, &ctx->active_window, start_menu,
-                // courses,
-                //                    db);
                 unpost_form(user_form);
                 free_form(user_form);
                 free_field(fields[0]);

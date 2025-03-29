@@ -32,13 +32,9 @@ int main(void)
 
     WINDOW *welcome_screen = create_welcome_screen();
 
-    // sqlite3 *db = create_database(welcome_screen);
-    // seed_courses_data(db, welcome_screen);
-
     int rc = wgetch(welcome_screen);
     if (rc == KEY_RESIZE)
     {
-        // wresize(welcome_screen, LINES, COLS);
         wclear(welcome_screen);
         wrefresh(welcome_screen);
     }
@@ -64,41 +60,8 @@ int main(void)
     ctx->start_view_active = true;
     ctx->course_view_active = false;
 
-    // WINDOW *start_windows[START_WINDOW_COUNT];
-    // WINDOW *course_windows[COURSE_WINDOW_COUNT];
-    // WINDOW *line_num_win;
-    // WINDOW *edit_window;
-    // COURSE *courses = get_course_data(db);
-
-    // int active_window = 0;
-    // MENU *start_menu = NULL;
-    // MENU *explorer_menu = NULL;
-    // ITEM **menu_items = NULL;
-    // ITEM *curr_item;
-    // FILE_TREE *file_tree = initialize_file_tree();
-
-    // bool running = true;
-    // bool start_needs_redraw = true;
-    // bool first_start_draw = true;
-    // bool first_course_draw = true;
-    // bool start_view_active = true;
-    // bool course_needs_redraw = false;
-    // bool course_view_active = false;
-
-    // FILE *file = NULL;
-
-    // TEXT_BUFFER *t_buffer = initialize_buffer();
-
-    // bool editor_mode = false;
-    // bool explorer_mode = false;
-
-    // int y, x;
-    // int scroll_offset = 0;
-    // int lines_to_print;
     int curr_line;
     int curr_col;
-
-    // char *filename = (char *)calloc(30, sizeof(char));
 
     ESCDELAY = 100;
 
@@ -145,8 +108,6 @@ int main(void)
                                 ? ctx->t_buffer->curr_line_nr
                                 : ctx->scroll_offset + LINES - 8;
                 curr_col = ctx->t_buffer->current_col;
-                // deallocate_buffer(t_buffer);
-                // t_buffer = initialize_buffer();
                 ctx->t_buffer->curr_line_nr = curr_line;
                 open_file(ctx);
                 ctx->t_buffer->curr_line_nr = curr_line;

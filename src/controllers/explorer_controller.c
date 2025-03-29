@@ -5,24 +5,17 @@
 #include "../models/models.h"
 #include "../views/views.h"
 
-#include <string.h>
 #include <curses.h>
 #include <form.h>
 #include <menu.h>
 #include <ncurses.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 
-// void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE **file,
-//                            char **filename, WINDOW **explorer_win,
-//                            WINDOW **line_num_win, WINDOW **editor_window,
-//                            WINDOW **edit_window, bool *editor_mode,
-//                            bool *explorer_mode, MENU **explorer_menu,
-//                            ITEM ***menu_items, int *scroll_offset,
-//                            int *lines_to_print, int *active_window)
 void handle_explorer_input(APP_CONTEXT *ctx)
 {
     ITEM *curr_item;
@@ -46,7 +39,6 @@ void handle_explorer_input(APP_CONTEXT *ctx)
         case 10:
             curr_item = current_item(ctx->explorer_menu);
             ctx->filename = (char *)item_name(curr_item);
-            // if (tbuf->first_line->length > 1)
             deallocate_buffer(ctx->t_buffer);
             ctx->t_buffer = initialize_buffer();
             if (ctx->file && ctx->file->_fileno > 0)
@@ -86,7 +78,6 @@ void handle_explorer_input(APP_CONTEXT *ctx)
                         trim(buf);
                         if (buf && get_length(buf) > 0)
                         {
-                            // form_driver(new_file_form, REQ_LEFT_CHAR);
                             form_driver(new_file_form, REQ_DEL_PREV);
                             wrefresh(form_window);
                         }
@@ -107,10 +98,12 @@ void handle_explorer_input(APP_CONTEXT *ctx)
                             fclose(ctx->file);
                         open_new_file(ctx);
 
-                        ctx->course_windows[1] =
-                            create_explorer_window(&ctx->explorer_menu, &ctx->menu_items);
+                        ctx->course_windows[1] = create_explorer_window(
+                            &ctx->explorer_menu, &ctx->menu_items,
+                            ctx->file_tree);
                         wmove(ctx->edit_window, 0, 0);
-                        mvwprintw(ctx->course_windows[1], 28, 2, "File: %s", ctx->filename);
+                        mvwprintw(ctx->course_windows[1], 28, 2, "File: %s",
+                                  ctx->filename);
                         wrefresh(ctx->course_windows[1]);
                         wrefresh(ctx->edit_window);
                         break;
@@ -121,8 +114,9 @@ void handle_explorer_input(APP_CONTEXT *ctx)
                         free_form(new_file_form);
                         free_field(field[0]);
                         menu_driver(ctx->explorer_menu, REQ_NEXT_ITEM);
-                        ctx->course_windows[1] =
-                            create_explorer_window(&ctx->explorer_menu, &ctx->menu_items);
+                        ctx->course_windows[1] = create_explorer_window(
+                            &ctx->explorer_menu, &ctx->menu_items,
+                            ctx->file_tree);
                         focus_window(&ctx->course_windows[1], 3, "Explorer");
                         break;
                     default:
@@ -153,14 +147,11 @@ void handle_explorer_input(APP_CONTEXT *ctx)
                         trim(buf);
                         if (buf && get_length(buf) > 0)
                         {
-                            // form_driver(new_file_form, REQ_LEFT_CHAR);
                             form_driver(new_file_form, REQ_DEL_PREV);
                             wrefresh(form_window);
                         }
                         break;
                     case 10:
-                        // curr_item = current_item(ctx->explorer_menu);
-                        // *filename = (char *)item_name(curr_item);
                         form_driver(new_file_form, REQ_VALIDATION);
                         char *new_file_name = field_buffer(field[0], 0);
                         trim(new_file_name);
@@ -182,11 +173,12 @@ void handle_explorer_input(APP_CONTEXT *ctx)
                             fclose(ctx->file);
                         remove(new_file_name);
 
-                        ctx->course_windows[1] =
-                            create_explorer_window(&ctx->explorer_menu, &ctx->menu_items);
+                        ctx->course_windows[1] = create_explorer_window(
+                            &ctx->explorer_menu, &ctx->menu_items, ctx->file_tree);
 
                         curs_set(0);
-                        mvwprintw(ctx->course_windows[1], 30, 2, "old: %s", ctx->filename);
+                        mvwprintw(ctx->course_windows[1], 30, 2, "old: %s",
+                                  ctx->filename);
                         mvwprintw(ctx->course_windows[1], 31, 2, "new: %s",
                                   new_file_name);
                         focus_window(&ctx->course_windows[2], 2, "Editor");
@@ -204,8 +196,8 @@ void handle_explorer_input(APP_CONTEXT *ctx)
                         free_form(new_file_form);
                         free_field(field[0]);
                         menu_driver(ctx->explorer_menu, REQ_NEXT_ITEM);
-                        ctx->course_windows[1] =
-                            create_explorer_window(&ctx->explorer_menu, &ctx->menu_items);
+                        ctx->course_windows[1] = create_explorer_window(
+                            &ctx->explorer_menu, &ctx->menu_items, ctx->file_tree);
                         focus_window(&ctx->course_windows[1], 3, "Explorer");
                         break;
                     default:

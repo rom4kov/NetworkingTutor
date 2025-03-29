@@ -15,14 +15,28 @@
 #define WU COLS / 12 // WU for WIDTH_UNIT
 #define EDIT_MAX WU * 7 + 4
 
+
+DIR_ENTRY *initialize_dir_entry()
+{
+    DIR_ENTRY *d_entry = malloc(sizeof(DIR_ENTRY));
+
+    d_entry->name = calloc(30, sizeof(char));
+    d_entry->state = 'c';
+    d_entry->type = 'd';
+    d_entry->prev = NULL;
+    d_entry->next = NULL;
+
+    return d_entry;
+}
+
 FILE_TREE *initialize_file_tree()
 {
-    FILE_TREE *f_tree = malloc(sizeof(FILE_TREE));
+    FILE_TREE *f_tree = calloc(1, sizeof(FILE_TREE));
 
-    f_tree->first_entry = malloc(sizeof(DIR_ENTRY));
+    f_tree->first_entry = calloc(1, sizeof(DIR_ENTRY));
     f_tree->current_entry = f_tree->first_entry;
     f_tree->curr_entry_nr = 0;
-    f_tree->num_of_entries = 1;
+    f_tree->num_of_entries = 0;
 
     return f_tree;
 }
@@ -64,10 +78,6 @@ void prepare_empty_file(TEXT_BUFFER **tbuf)
     (*tbuf)->num_of_lines = 1;
 }
 
-// void open_new_file(char *filename, FILE **file, TEXT_BUFFER *tbuf,
-//                    WINDOW **line_num_win, WINDOW **editor_window,
-//                    WINDOW **edit_window, int *scroll_offset,
-//                    int *lines_to_print)
 void open_new_file(APP_CONTEXT *ctx)
 {
     ctx->file = fopen(ctx->filename, "w+");
@@ -107,9 +117,6 @@ void open_new_file(APP_CONTEXT *ctx)
     wrefresh(ctx->course_windows[2]);
 }
 
-// void open_file(char *filename, FILE **file, TEXT_BUFFER *tbuf,
-//                WINDOW **line_num_win, WINDOW **editor_window,
-//                WINDOW **edit_window, int *scroll_offset, int *lines_to_print)
 void open_file(APP_CONTEXT *ctx)
 {
     int file_size = 0;

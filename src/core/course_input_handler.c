@@ -11,15 +11,6 @@
 #define WU COLS / 12 // WU for WIDTH_UNIT
 #define EDIT_MAX WU * 7 + 4
 
-// void handle_course_input(int *ch, WINDOW **windows, WINDOW **line_num_win,
-//                          WINDOW **edit_window, bool *start_view_active,
-//                          bool *course_view_active, int *active_win,
-//                          bool *start_needs_redraw, MENU **start_menu,
-//                          ITEM **curr_item, MENU **explorer_menu, FILE_TREE *f_tree,
-//                          ITEM ***menu_items, char **filename,
-//                          bool *explorer_mode, bool *editor_mode, FILE **file,
-//                          TEXT_BUFFER *t_buffer, int *scroll_offset,
-//                          int *lines_to_print, int *y, int *x)
 void handle_course_input(APP_CONTEXT *ctx)
 {
     if (ctx->active_window == 0)
@@ -69,10 +60,6 @@ void handle_course_input(APP_CONTEXT *ctx)
     }
     else if (ctx->active_window == 1 && ctx->explorer_mode)
     {
-        // handle_explorer_input(
-        //     *ch, t_buffer, file, filename, &ctx->course_windows[1], line_num_win,
-        //     &ctx->course_windows[2], edit_window, editor_mode, explorer_mode, explorer_menu,
-        //     menu_items, scroll_offset, lines_to_print, active_win);
         handle_explorer_input(ctx);
     }
     else if (ctx->active_window == 1)

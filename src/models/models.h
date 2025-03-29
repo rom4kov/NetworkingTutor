@@ -20,13 +20,13 @@ typedef struct _course_data
     char *short_desc;
 } COURSE;
 
-typedef struct line
+typedef struct _line
 {
-    char *buf_;
+    struct _line *prev;
+    struct _line *next;
     unsigned short line_num;
     unsigned short length;
-    struct line *prev;
-    struct line *next;
+    char *buf_;
 } LINE;
 
 typedef struct text_buffer
@@ -40,17 +40,17 @@ typedef struct text_buffer
 
 typedef struct _icon
 {
-    char *icon;
     int color;
+    char *icon;
 } ICON;
 
 typedef struct _dir_entry
 {
+    struct _dir_entry *prev;
+    struct _dir_entry *next;
+    int type;
     char *name;
-    char type;
-    int state;
-    struct DIR_ENTRY *prev;
-    struct DIR_ENTRY *next;
+    char state;
 } DIR_ENTRY;
 
 typedef struct _file_tree

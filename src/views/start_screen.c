@@ -78,12 +78,6 @@ char *HTTP = " _     _   _             ____\n"
 void create_start_screen(WINDOW **windows, int *active_window,
                          MENU **start_menu, COURSE courses[], sqlite3 *db)
 {
-    // WINDOW *windows[WINDOW_COUNT];
-    // int active_window = 0;
-    // MENU *start_menu;
-    //
-    // COURSE *courses = get_course_data(db);
-
     windows[0] = create_navigation_window(active_window, start_menu);
     windows[1] = create_header_section(active_window);
     windows[2] = create_course_preview_card(0, active_window, 2, &courses[0]);
@@ -94,8 +88,6 @@ void create_start_screen(WINDOW **windows, int *active_window,
     windows[5] = create_right_side_panel(active_window, &db, "Details");
 
     wrefresh(windows[5]);
-
-    // input_handler(windows, &active_window, &start_menu, courses, &db);
 }
 
 WINDOW *create_navigation_window(int *active_win, MENU **start_menu)
@@ -195,7 +187,6 @@ WINDOW *create_right_side_panel(int *active_win, sqlite3 **db, char *label)
     int window_width = COLS - (WU * 7 + 4);
     int intro_width = window_width - 10;
     WINDOW *right_panel = newwin(LINES, window_width, 0, WU * 7 + 4);
-    // mvwprintw(right_panel, 1, 2, "Your progress: 🔥🔥🔥");
     if (*active_win == 5)
     {
         draw_border(right_panel, 3, "Right Panel");

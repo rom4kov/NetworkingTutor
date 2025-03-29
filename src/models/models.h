@@ -2,6 +2,7 @@
 
 #include <menu.h>
 #include <ncurses.h>
+#include <sqlite3.h>
 
 #define START_WINDOW_COUNT 6
 #define COURSE_WINDOW_COUNT 4
@@ -62,17 +63,27 @@ typedef struct _file_tree
 
 typedef struct _app_context
 {
+    sqlite3 *db;
     WINDOW *start_windows[START_WINDOW_COUNT];
     WINDOW *course_windows[COURSE_WINDOW_COUNT];
     WINDOW *line_num_win;
     WINDOW *edit_window;
     COURSE *courses;
-    int active_window;
     MENU *start_menu;
     MENU *explorer_menu;
     ITEM **menu_items;
     ITEM *curr_item;
     FILE_TREE *file_tree;
+    FILE *file;
+    char *filename;
+    TEXT_BUFFER *t_buffer;
+    int key;
+    int active_window;
+    int y, x;
+    int scroll_offset;
+    int lines_to_print;
+    int curr_line;
+    int curr_col;
     bool running;
     bool start_needs_redraw;
     bool first_start_draw;
@@ -82,12 +93,4 @@ typedef struct _app_context
     bool course_view_active;
     bool editor_mode;
     bool explorer_mode;
-    FILE *file;
-    char *filename;
-    TEXT_BUFFER *t_buffer;
-    int y, x;
-    int scroll_offset;
-    int lines_to_print;
-    int curr_line;
-    int curr_col;
 } APP_CONTEXT;

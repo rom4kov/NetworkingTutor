@@ -32,7 +32,7 @@ int main(void)
 
     WINDOW *welcome_screen = create_welcome_screen();
 
-    sqlite3 *db = create_database(welcome_screen);
+    // sqlite3 *db = create_database(welcome_screen);
     // seed_courses_data(db, welcome_screen);
 
     int rc = wgetch(welcome_screen);
@@ -50,7 +50,9 @@ int main(void)
     APP_CONTEXT *ctx = (APP_CONTEXT *)malloc(sizeof(APP_CONTEXT));
 
     memset(ctx, 0, sizeof(APP_CONTEXT));
-    ctx->courses = get_course_data(db);
+
+    ctx->db = create_database();
+    ctx->courses = get_course_data(ctx->db);
     ctx->file_tree = initialize_file_tree();
     ctx->t_buffer = initialize_buffer();
     ctx->filename = (char *)calloc(30, sizeof(char));
@@ -96,7 +98,7 @@ int main(void)
     int curr_line;
     int curr_col;
 
-    char *filename = (char *)calloc(30, sizeof(char));
+    // char *filename = (char *)calloc(30, sizeof(char));
 
     ESCDELAY = 100;
 
@@ -117,7 +119,7 @@ int main(void)
                 }
             }
             create_start_screen(ctx->start_windows, &ctx->active_window, &ctx->start_menu,
-                                ctx->courses, db);
+                                ctx->courses, ctx->db);
             ctx->start_needs_redraw = false;
             ctx->first_start_draw = false;
         }
@@ -146,9 +148,7 @@ int main(void)
                 // deallocate_buffer(t_buffer);
                 // t_buffer = initialize_buffer();
                 ctx->t_buffer->curr_line_nr = curr_line;
-                open_file(filename, &ctx->file, ctx->t_buffer, &ctx->line_num_win,
-                          &ctx->course_windows[2], &ctx->edit_window, &ctx->scroll_offset,
-                          &ctx->lines_to_print);
+                open_file(ctx);
                 ctx->t_buffer->curr_line_nr = curr_line;
                 ctx->t_buffer->current_col = curr_col;
                 ctx->t_buffer->current_line = ctx->t_buffer->first_line;
@@ -173,9 +173,9 @@ int main(void)
             ctx->first_course_draw = false;
         }
 
-        int key = getch();
+        ctx->key = getch();
 
-        switch (key)
+        switch (ctx->key)
         {
             case KEY_RESIZE:
                 if (ctx->start_view_active)
@@ -193,25 +193,16 @@ int main(void)
             default:
                 if (ctx->start_view_active)
                 {
-                    handle_start_input(&key, start_windows, &start_view_active,
-                                       &course_view_active, &start_needs_redraw,
-                                       &course_needs_redraw, &active_window,
-                                       &start_menu, courses, &db);
+                    handle_start_input(ctx);
                 }
                 else if (ctx->course_view_active)
                 {
-                    handle_course_input(
-                        &key, course_windows, &line_num_win, &edit_window,
-                        &start_view_active, &course_view_active, &active_window,
-                        &start_needs_redraw, &start_menu, &curr_item,
-                        &explorer_menu, file_tree, &menu_items, &filename, &explorer_mode,
-                        &editor_mode, &file, t_buffer, &scroll_offset,
-                        &lines_to_print, &y, &x);
+                    handle_course_input(ctx);
                 }
         }
     }
 
-    sqlite3_close(db);
+    sqlite3_close(ctx->db);
 
     curs_set(1);
 

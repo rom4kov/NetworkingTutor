@@ -1,4 +1,3 @@
-#include <string.h>
 #define _DEFAULT_SOURCE
 
 #include "../core/core.h"
@@ -6,6 +5,7 @@
 #include "../models/models.h"
 #include "../views/views.h"
 
+#include <string.h>
 #include <curses.h>
 #include <form.h>
 #include <menu.h>
@@ -16,55 +16,55 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE **file,
-                           char **filename, WINDOW **explorer_win,
-                           WINDOW **line_num_win, WINDOW **editor_window,
-                           WINDOW **edit_window, bool *editor_mode,
-                           bool *explorer_mode, MENU **explorer_menu,
-                           ITEM ***menu_items, int *scroll_offset,
-                           int *lines_to_print, int *active_window)
+// void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE **file,
+//                            char **filename, WINDOW **explorer_win,
+//                            WINDOW **line_num_win, WINDOW **editor_window,
+//                            WINDOW **edit_window, bool *editor_mode,
+//                            bool *explorer_mode, MENU **explorer_menu,
+//                            ITEM ***menu_items, int *scroll_offset,
+//                            int *lines_to_print, int *active_window)
+void handle_explorer_input(APP_CONTEXT *ctx)
 {
     ITEM *curr_item;
     bool new_file_form_active = false;
     bool del_file_form_active = false;
-    WINDOW *inner_win = derwin(*explorer_win, 3, 18, 2, 2);
+    WINDOW *inner_win = derwin(ctx->course_windows[1], 3, 18, 2, 2);
     WINDOW *form_window = derwin(inner_win, 1, 16, 1, 1);
     FORM *new_file_form = NULL;
     FIELD *field[2];
 
-    switch (ch)
+    switch (ctx->key)
     {
         case KEY_DOWN:
-            menu_driver(*explorer_menu, REQ_NEXT_ITEM);
-            wrefresh(*explorer_win);
+            menu_driver(ctx->explorer_menu, REQ_NEXT_ITEM);
+            wrefresh(ctx->course_windows[1]);
             break;
         case KEY_UP:
-            menu_driver(*explorer_menu, REQ_PREV_ITEM);
-            wrefresh(*explorer_win);
+            menu_driver(ctx->explorer_menu, REQ_PREV_ITEM);
+            wrefresh(ctx->course_windows[1]);
             break;
         case 10:
-            curr_item = current_item(*explorer_menu);
-            *filename = (char *)item_name(curr_item);
+            curr_item = current_item(ctx->explorer_menu);
+            ctx->filename = (char *)item_name(curr_item);
             // if (tbuf->first_line->length > 1)
-            deallocate_buffer(tbuf);
-            tbuf = initialize_buffer();
-            if (*file && (*file)->_fileno > 0)
-                fclose(*file);
-            open_file(*filename, file, tbuf, line_num_win, editor_window,
-                      edit_window, scroll_offset, lines_to_print);
+            deallocate_buffer(ctx->t_buffer);
+            ctx->t_buffer = initialize_buffer();
+            if (ctx->file && ctx->file->_fileno > 0)
+                fclose(ctx->file);
+            open_file(ctx);
 
             new_file_form_active = false;
-            *explorer_mode = false;
-            *editor_mode = true;
-            *active_window = 2;
-            focus_window(explorer_win, 2, "Explorer");
-            focus_window(editor_window, 3, "Editor");
+            ctx->explorer_mode = false;
+            ctx->editor_mode = true;
+            ctx->active_window = 2;
+            focus_window(&ctx->course_windows[1], 2, "Explorer");
+            focus_window(&ctx->course_windows[2], 3, "Editor");
             curs_set(2);
-            wmove(*edit_window, 0, 0);
-            wnoutrefresh(*explorer_win);
-            wnoutrefresh(*line_num_win);
-            wnoutrefresh(*editor_window);
-            wnoutrefresh(*edit_window);
+            wmove(ctx->edit_window, 0, 0);
+            wnoutrefresh(ctx->course_windows[1]);
+            wnoutrefresh(ctx->line_num_win);
+            wnoutrefresh(ctx->course_windows[2]);
+            wnoutrefresh(ctx->edit_window);
             doupdate();
             break;
         case 'a':
@@ -75,9 +75,9 @@ void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE **file,
 
             while (new_file_form_active)
             {
-                ch = getch();
+                ctx->key = getch();
 
-                switch (ch)
+                switch (ctx->key)
                 {
                     case 263: // Backspace
                         form_driver(new_file_form, REQ_VALIDATION);
@@ -93,28 +93,26 @@ void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE **file,
                         break;
                     case 10:
                         form_driver(new_file_form, REQ_VALIDATION);
-                        *filename = field_buffer(field[0], 0);
-                        trim(*filename);
+                        ctx->filename = field_buffer(field[0], 0);
+                        trim(ctx->filename);
                         new_file_form_active = false;
-                        *explorer_mode = false;
-                        *editor_mode = true;
-                        *active_window = 2;
-                        focus_window(editor_window, 3, "Editor");
+                        ctx->explorer_mode = false;
+                        ctx->editor_mode = true;
+                        ctx->active_window = 2;
+                        focus_window(&ctx->course_windows[2], 3, "Editor");
 
-                        deallocate_buffer(tbuf);
-                        tbuf = initialize_buffer();
-                        if (*file)
-                            fclose(*file);
-                        open_new_file(*filename, file, tbuf, line_num_win,
-                                      editor_window, edit_window, scroll_offset,
-                                      lines_to_print);
+                        deallocate_buffer(ctx->t_buffer);
+                        ctx->t_buffer = initialize_buffer();
+                        if (ctx->file)
+                            fclose(ctx->file);
+                        open_new_file(ctx);
 
-                        *explorer_win =
-                            create_explorer_window(explorer_menu, menu_items);
-                        wmove(*edit_window, 0, 0);
-                        mvwprintw(*explorer_win, 28, 2, "File: %s", *filename);
-                        wrefresh(*explorer_win);
-                        wrefresh(*edit_window);
+                        ctx->course_windows[1] =
+                            create_explorer_window(&ctx->explorer_menu, &ctx->menu_items);
+                        wmove(ctx->edit_window, 0, 0);
+                        mvwprintw(ctx->course_windows[1], 28, 2, "File: %s", ctx->filename);
+                        wrefresh(ctx->course_windows[1]);
+                        wrefresh(ctx->edit_window);
                         break;
                     case 'q':
                         new_file_form_active = false;
@@ -122,13 +120,13 @@ void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE **file,
                         unpost_form(new_file_form);
                         free_form(new_file_form);
                         free_field(field[0]);
-                        menu_driver(*explorer_menu, REQ_NEXT_ITEM);
-                        *explorer_win =
-                            create_explorer_window(explorer_menu, menu_items);
-                        focus_window(explorer_win, 3, "Explorer");
+                        menu_driver(ctx->explorer_menu, REQ_NEXT_ITEM);
+                        ctx->course_windows[1] =
+                            create_explorer_window(&ctx->explorer_menu, &ctx->menu_items);
+                        focus_window(&ctx->course_windows[1], 3, "Explorer");
                         break;
                     default:
-                        form_driver(new_file_form, ch);
+                        form_driver(new_file_form, ctx->key);
                         wrefresh(form_window);
                         break;
                 }
@@ -144,9 +142,9 @@ void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE **file,
 
             while (del_file_form_active)
             {
-                ch = getch();
+                ctx->key = getch();
 
-                switch (ch)
+                switch (ctx->key)
                 {
                     case 263: // Backspace
                         form_driver(new_file_form, REQ_VALIDATION);
@@ -161,42 +159,42 @@ void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE **file,
                         }
                         break;
                     case 10:
-                        // curr_item = current_item(*explorer_menu);
+                        // curr_item = current_item(ctx->explorer_menu);
                         // *filename = (char *)item_name(curr_item);
                         form_driver(new_file_form, REQ_VALIDATION);
                         char *new_file_name = field_buffer(field[0], 0);
                         trim(new_file_name);
                         del_file_form_active = false;
-                        *explorer_mode = true;
-                        *editor_mode = false;
-                        *active_window = 1;
+                        ctx->explorer_mode = true;
+                        ctx->editor_mode = false;
+                        ctx->active_window = 1;
 
-                        if (strcmp(new_file_name, *filename) == 0)
+                        if (strcmp(new_file_name, ctx->filename) == 0)
                         {
-                            wclear(*line_num_win);
-                            wclear(*editor_window);
-                            wclear(*edit_window);
-                            deallocate_buffer(tbuf);
-                            tbuf = initialize_buffer();
+                            wclear(ctx->line_num_win);
+                            wclear(ctx->course_windows[2]);
+                            wclear(ctx->edit_window);
+                            deallocate_buffer(ctx->t_buffer);
+                            ctx->t_buffer = initialize_buffer();
                         }
 
-                        if (*file)
-                            fclose(*file);
+                        if (ctx->file)
+                            fclose(ctx->file);
                         remove(new_file_name);
 
-                        *explorer_win =
-                            create_explorer_window(explorer_menu, menu_items);
+                        ctx->course_windows[1] =
+                            create_explorer_window(&ctx->explorer_menu, &ctx->menu_items);
 
                         curs_set(0);
-                        mvwprintw(*explorer_win, 30, 2, "old: %s", *filename);
-                        mvwprintw(*explorer_win, 31, 2, "new: %s",
+                        mvwprintw(ctx->course_windows[1], 30, 2, "old: %s", ctx->filename);
+                        mvwprintw(ctx->course_windows[1], 31, 2, "new: %s",
                                   new_file_name);
-                        focus_window(editor_window, 2, "Editor");
-                        focus_window(explorer_win, 3, "Explorer");
-                        wnoutrefresh(*explorer_win);
-                        wnoutrefresh(*line_num_win);
-                        wnoutrefresh(*editor_window);
-                        wnoutrefresh(*edit_window);
+                        focus_window(&ctx->course_windows[2], 2, "Editor");
+                        focus_window(&ctx->course_windows[1], 3, "Explorer");
+                        wnoutrefresh(ctx->course_windows[1]);
+                        wnoutrefresh(ctx->line_num_win);
+                        wnoutrefresh(ctx->course_windows[2]);
+                        wnoutrefresh(ctx->edit_window);
                         doupdate();
                         break;
                     case 'q':
@@ -205,21 +203,21 @@ void handle_explorer_input(int ch, TEXT_BUFFER *tbuf, FILE **file,
                         unpost_form(new_file_form);
                         free_form(new_file_form);
                         free_field(field[0]);
-                        menu_driver(*explorer_menu, REQ_NEXT_ITEM);
-                        *explorer_win =
-                            create_explorer_window(explorer_menu, menu_items);
-                        focus_window(explorer_win, 3, "Explorer");
+                        menu_driver(ctx->explorer_menu, REQ_NEXT_ITEM);
+                        ctx->course_windows[1] =
+                            create_explorer_window(&ctx->explorer_menu, &ctx->menu_items);
+                        focus_window(&ctx->course_windows[1], 3, "Explorer");
                         break;
                     default:
-                        form_driver(new_file_form, ch);
+                        form_driver(new_file_form, ctx->key);
                         wrefresh(form_window);
                         break;
                 }
             }
             break;
         case KEY_F(1):
-            wrefresh(*explorer_win);
-            *explorer_mode = false;
+            wrefresh(ctx->course_windows[1]);
+            ctx->explorer_mode = false;
             break;
     }
 }

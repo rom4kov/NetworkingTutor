@@ -20,29 +20,30 @@
 #define WU COLS / 12 // WU for WIDTH_UNIT
 #define WIDTH_REMAINDER COLS % WU
 
-void create_course_view(WINDOW **windows, WINDOW **line_num_win,
-                        WINDOW **edit_window, int *active_window,
-                        MENU **start_menu, MENU **explorer_menu,
-                        ITEM ***menu_items, sqlite3 *db)
+// void create_course_view(WINDOW **windows, WINDOW **line_num_win,
+//                         WINDOW **edit_window, int *active_window,
+//                         MENU **start_menu, MENU **explorer_menu,
+//                         ITEM ***menu_items, sqlite3 *db)
+void create_course_view(APP_CONTEXT *ctx)
 {
-    *active_window = 0;
+    ctx->active_window = 0;
 
-    windows[0] = create_navigation_window(active_window, start_menu);
-    windows[1] = create_explorer_window(explorer_menu, menu_items);
-    windows[2] = create_editor_window(active_window);
-    windows[3] =
-        create_right_side_panel(active_window, &db, "Course instructions");
+    ctx->course_windows[0] = create_navigation_window(&ctx->active_window, &ctx->start_menu);
+    ctx->course_windows[1] = create_explorer_window(&ctx->explorer_menu, &ctx->menu_items);
+    ctx->course_windows[2] = create_editor_window(&ctx->active_window);
+    ctx->course_windows[3] =
+        create_right_side_panel(&ctx->active_window, &ctx->db, "Course instructions");
 
-    *line_num_win = derwin(windows[2], LINES - 6, 3, 2, 1);
-    *edit_window =
-        derwin(windows[2], LINES - 6, WU * 5 + (WU / 2) - 2, 2, 5);
+    ctx->line_num_win = derwin(ctx->course_windows[2], LINES - 6, 3, 2, 1);
+    ctx->edit_window =
+        derwin(ctx->course_windows[2], LINES - 6, WU * 5 + (WU / 2) - 2, 2, 5);
 
-    wattron(windows[2], COLOR_PAIR(10));
-    mvwprintw(windows[2], LINES - (LINES / 2) - 4, 7,
+    wattron(ctx->course_windows[2], COLOR_PAIR(10));
+    mvwprintw(ctx->course_windows[2], LINES - (LINES / 2) - 4, 7,
               "No file has been opened yet. Open or create a file in the file "
               "explorer");
-    wattroff(windows[2], COLOR_PAIR(10));
-    wrefresh(windows[2]);
+    wattroff(ctx->course_windows[2], COLOR_PAIR(10));
+    wrefresh(ctx->course_windows[2]);
 }
 
 WINDOW *create_editor_window(int *active_window)
@@ -92,7 +93,7 @@ void create_explorer_menu(WINDOW **explorer_window, MENU **explorer_menu,
         next = readdir(dir);
     }
 
-    DIR_ENTRY entries[dir_size];
+    // DIR_ENTRY entries[dir_size];
 
     mvwprintw(*explorer_window, LINES - 5, 2, "Press ? for Keys");
 
@@ -119,12 +120,12 @@ void create_explorer_menu(WINDOW **explorer_window, MENU **explorer_menu,
         {
             if (next->d_type == 4)
             {
-                entries[items].name = next->d_name;
-                entries[items].type = next->d_type;
-                if (entries[items].state == 'o')
-                {
-                    open_sub_directory(next->d_name, &dir_size, &items, *menu_items, entries);
-                }
+                // entries[items].name = next->d_name;
+                // entries[items].type = next->d_type;
+                // if (entries[items].state == 'o')
+                // {
+                //     open_sub_directory(next->d_name, &dir_size, &items, *menu_items, entries);
+                // }
                 wattron(*explorer_window, COLOR_PAIR(10));
                 mvwprintw(*explorer_window, items + 1, 2, " ");
                 wattroff(*explorer_window, COLOR_PAIR(10));
@@ -152,8 +153,8 @@ void create_explorer_menu(WINDOW **explorer_window, MENU **explorer_menu,
         {
             if (next->d_type != 4)
             {
-                entries[items].name = next->d_name;
-                entries[items].type = next->d_type;
+                // entries[items].name = next->d_name;
+                // entries[items].type = next->d_type;
 
                 (*menu_items)[items] = new_item(next->d_name, "");
 
@@ -184,20 +185,20 @@ void create_explorer_menu(WINDOW **explorer_window, MENU **explorer_menu,
 
     wrefresh(*explorer_window);
 }
-
-void open_sub_directory(char *dir_name, int *dir_size, int *items, ITEM **menu_items,
-                        DIR_ENTRY *entries)
-{
-    DIR *dir = opendir(dir_name);
-
-    // int dir_size = 0;
-
-    struct dirent *next = readdir(dir);
-
-
-    while (NULL != next)
-    {
-        dir_size++;
-        next = readdir(dir);
-    }
-}
+//
+// void open_sub_directory(char *dir_name, int *dir_size, int *items, ITEM **menu_items,
+//                         DIR_ENTRY *entries)
+// {
+//     DIR *dir = opendir(dir_name);
+//
+//     // int dir_size = 0;
+//
+//     struct dirent *next = readdir(dir);
+//
+//
+//     while (NULL != next)
+//     {
+//         dir_size++;
+//         next = readdir(dir);
+//     }
+// }

@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-sqlite3 *create_database(WINDOW *win)
+sqlite3 *create_database()
 {
     sqlite3 *db;
     int rc = sqlite3_open("src/data/networking_tutor.db", &db);
@@ -39,7 +39,7 @@ sqlite3 *create_database(WINDOW *win)
     //     sqlite3_close(db);
     // }
 
-    wrefresh(win);
+    // wrefresh(win);
 
     return db;
 }

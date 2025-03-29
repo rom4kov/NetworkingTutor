@@ -108,7 +108,6 @@ WINDOW *create_navigation_window(int *active_win, MENU **start_menu)
     wattron(navigation, COLOR_PAIR(3));
     mvwprintw(navigation, 0, 2, "Navigation");
     wattroff(navigation, COLOR_PAIR(3));
-
     wrefresh(navigation);
     return navigation;
 }

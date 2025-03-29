@@ -31,7 +31,7 @@ TEXT_BUFFER *initialize_buffer()
 {
     TEXT_BUFFER *text_buf = malloc(sizeof(TEXT_BUFFER));
 
-    text_buf->first_line->buf_ = calloc(100, sizeof(char));
+    text_buf->first_line = initialize_line();
     text_buf->current_line = text_buf->first_line;
     text_buf->num_of_lines = 0;
     text_buf->curr_line_nr = 0;
@@ -64,100 +64,103 @@ void prepare_empty_file(TEXT_BUFFER **tbuf)
     (*tbuf)->num_of_lines = 1;
 }
 
-void open_new_file(char *filename, FILE **file, TEXT_BUFFER *tbuf,
-                   WINDOW **line_num_win, WINDOW **editor_window,
-                   WINDOW **edit_window, int *scroll_offset,
-                   int *lines_to_print)
+// void open_new_file(char *filename, FILE **file, TEXT_BUFFER *tbuf,
+//                    WINDOW **line_num_win, WINDOW **editor_window,
+//                    WINDOW **edit_window, int *scroll_offset,
+//                    int *lines_to_print)
+void open_new_file(APP_CONTEXT *ctx)
 {
-    *file = fopen(filename, "w+");
+    ctx->file = fopen(ctx->filename, "w+");
 
-    if (*file == NULL)
+    if (ctx->file == NULL)
     {
-        printf("Could not open %s.\n", filename);
+        printf("Could not open %s.\n", ctx->filename);
     }
 
-    if (*file != NULL)
+    if (ctx->file != NULL)
     {
-        prepare_empty_file(&tbuf);
+        prepare_empty_file(&ctx->t_buffer);
 
-        *lines_to_print = 1;
+        ctx->lines_to_print = 1;
 
-        print_buffer(tbuf, edit_window, line_num_win, scroll_offset,
-                     *lines_to_print);
-        mvwprintw(*edit_window, LINES - 7, EDIT_MAX - 15, "     ");
-        mvwprintw(*edit_window, LINES - 7, EDIT_MAX - 15, "0 : 0");
+        print_buffer(ctx->t_buffer, &ctx->edit_window, &ctx->line_num_win, &ctx->scroll_offset,
+                     ctx->lines_to_print);
+        mvwprintw(ctx->edit_window, LINES - 7, EDIT_MAX - 15, "     ");
+        mvwprintw(ctx->edit_window, LINES - 7, EDIT_MAX - 15, "0 : 0");
 
-        rewind(*file);
+        rewind(ctx->file);
 
-        mvwprintw(*editor_window, 1, 4, "                                ");
-        ICON icon = print_file_icon((char *)filename);
+        mvwprintw(ctx->course_windows[2], 1, 4, "                                ");
+        ICON icon = print_file_icon((char *)ctx->filename);
 
-        wattron(*editor_window, COLOR_PAIR(icon.color));
-        mvwprintw(*editor_window, 1, 4, "%s", icon.icon);
-        wattroff(*editor_window, COLOR_PAIR(icon.color));
+        wattron(ctx->course_windows[2], COLOR_PAIR(icon.color));
+        mvwprintw(ctx->course_windows[2], 1, 4, "%s", icon.icon);
+        wattroff(ctx->course_windows[2], COLOR_PAIR(icon.color));
 
-        wattron(*editor_window, A_BOLD | COLOR_PAIR(1));
-        mvwprintw(*editor_window, 1, 6, "%s", filename);
-        wattroff(*editor_window, A_BOLD | COLOR_PAIR(1));
-        wrefresh(*edit_window);
+        wattron(ctx->course_windows[2], A_BOLD | COLOR_PAIR(1));
+        mvwprintw(ctx->course_windows[2], 1, 6, "%s", ctx->filename);
+        wattroff(ctx->course_windows[2], A_BOLD | COLOR_PAIR(1));
+        wrefresh(ctx->edit_window);
     }
 
-    wrefresh(*line_num_win);
-    wrefresh(*editor_window);
+    wrefresh(ctx->line_num_win);
+    wrefresh(ctx->course_windows[2]);
 }
 
-void open_file(char *filename, FILE **file, TEXT_BUFFER *tbuf,
-               WINDOW **line_num_win, WINDOW **editor_window,
-               WINDOW **edit_window, int *scroll_offset, int *lines_to_print)
+// void open_file(char *filename, FILE **file, TEXT_BUFFER *tbuf,
+//                WINDOW **line_num_win, WINDOW **editor_window,
+//                WINDOW **edit_window, int *scroll_offset, int *lines_to_print)
+void open_file(APP_CONTEXT *ctx)
 {
     int file_size = 0;
-    *file = fopen(filename, "r+");
+    ctx->file = fopen(ctx->filename, "r+");
 
-    if (*file == NULL)
+    if (ctx->file == NULL)
     {
-        printf("Could not open %s.\n", filename);
+        printf("Could not open %s.\n", ctx->filename);
     }
 
-    if (*file != NULL)
+    if (ctx->file != NULL)
     {
-        fseek(*file, 0, SEEK_END);
-        file_size = ftell(*file);
-        rewind(*file);
+        fseek(ctx->file, 0, SEEK_END);
+        file_size = ftell(ctx->file);
+        rewind(ctx->file);
 
         if (file_size == 0)
         {
-            prepare_empty_file(&tbuf);
+            prepare_empty_file(&ctx->t_buffer);
         }
-        else if (tbuf->first_line->length < 2)
+        else if (ctx->t_buffer->first_line->length < 2)
         {
-            read_file_into_buffer(*file, tbuf);
+            read_file_into_buffer(ctx->file, ctx->t_buffer);
         }
 
-        *lines_to_print =
-            tbuf->num_of_lines > (LINES - 7) ? (LINES - 7) : tbuf->num_of_lines;
+        ctx->lines_to_print = ctx->t_buffer->num_of_lines > (LINES - 7)
+                                  ? (LINES - 7)
+                                  : ctx->t_buffer->num_of_lines;
 
-        print_buffer(tbuf, edit_window, line_num_win, scroll_offset,
-                     *lines_to_print);
-        mvwprintw(*edit_window, LINES - 7, EDIT_MAX - 15, "     ");
-        mvwprintw(*edit_window, LINES - 7, EDIT_MAX - 15, "0 : 0");
+        print_buffer(ctx->t_buffer, &ctx->edit_window, &ctx->line_num_win, &ctx->scroll_offset,
+                     ctx->lines_to_print);
+        mvwprintw(ctx->edit_window, LINES - 7, EDIT_MAX - 15, "     ");
+        mvwprintw(ctx->edit_window, LINES - 7, EDIT_MAX - 15, "0 : 0");
 
-        rewind(*file);
+        rewind(ctx->file);
 
-        mvwprintw(*editor_window, 1, 4, "                                ");
-        ICON icon = print_file_icon((char *)filename);
+        mvwprintw(ctx->course_windows[2], 1, 4, "                                ");
+        ICON icon = print_file_icon((char *)ctx->filename);
 
-        wattron(*editor_window, COLOR_PAIR(icon.color));
-        mvwprintw(*editor_window, 1, 4, "%s", icon.icon);
-        wattroff(*editor_window, COLOR_PAIR(icon.color));
+        wattron(ctx->course_windows[2], COLOR_PAIR(icon.color));
+        mvwprintw(ctx->course_windows[2], 1, 4, "%s", icon.icon);
+        wattroff(ctx->course_windows[2], COLOR_PAIR(icon.color));
 
-        wattron(*editor_window, A_BOLD | COLOR_PAIR(1));
-        mvwprintw(*editor_window, 1, 6, "%s", filename);
-        wattroff(*editor_window, A_BOLD | COLOR_PAIR(1));
-        wrefresh(*edit_window);
+        wattron(ctx->course_windows[2], A_BOLD | COLOR_PAIR(1));
+        mvwprintw(ctx->course_windows[2], 1, 6, "%s", ctx->filename);
+        wattroff(ctx->course_windows[2], A_BOLD | COLOR_PAIR(1));
+        wrefresh(ctx->edit_window);
     }
 
-    wrefresh(*line_num_win);
-    wrefresh(*editor_window);
+    wrefresh(ctx->line_num_win);
+    wrefresh(ctx->course_windows[2]);
 }
 
 void read_file_into_buffer(FILE *file, TEXT_BUFFER *text_buf)

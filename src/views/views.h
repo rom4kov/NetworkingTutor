@@ -21,10 +21,11 @@ WINDOW *create_right_side_panel(int *active_win, sqlite3 **db, char *label);
 // void handle_start_input(WINDOW **windows, int *active_win, MENU **start_menu,
 //                    COURSE courses[], sqlite3 **db);
 
-void create_course_view(WINDOW **windows, WINDOW **line_num_win,
-                        WINDOW **edit_window, int *active_window,
-                        MENU **start_menu, MENU **explorer_menu,
-                        ITEM ***menu_items, sqlite3 *db);
+// void create_course_view(WINDOW **windows, WINDOW **line_num_win,
+//                         WINDOW **edit_window, int *active_window,
+//                         MENU **start_menu, MENU **explorer_menu,
+//                         ITEM ***menu_items, sqlite3 *db);
+void create_course_view(APP_CONTEXT *ctx);
 WINDOW *create_editor_window(int *active_window);
 WINDOW *create_explorer_window(MENU **explorer_menu, ITEM ***menu_items);
 void create_explorer_menu(WINDOW **explorer_window, MENU **explorer_menu,

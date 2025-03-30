@@ -1,6 +1,6 @@
 #include "../models/models.h"
 #include "form.h"
-#include "menu.h"
+// #include "menu.h"
 #include "ncurses.h"
 #include <sqlite3.h>
 
@@ -23,5 +23,4 @@ void write_buffer_to_file(TEXT_BUFFER *tbuf, FILE *file, int y);
 void deallocate_buffer(TEXT_BUFFER *tbuf);
 void create_new_file_input(WINDOW **inner_win, WINDOW **form_window,
                            FORM **new_file_form, FIELD **field, char *label);
-void open_sub_directory(char *dir_name, int *dir_size, int *items, ITEM **menu_items,
-                        DIR_ENTRY *entries);
+void open_sub_directory(char *dir_name, FILE_TREE *f_tree);

@@ -39,25 +39,50 @@ void handle_explorer_input(APP_CONTEXT *ctx)
         case 10:
             curr_item = current_item(ctx->explorer_menu);
             ctx->filename = (char *)item_name(curr_item);
-            deallocate_buffer(ctx->t_buffer);
-            ctx->t_buffer = initialize_buffer();
-            if (ctx->file && ctx->file->_fileno > 0)
-                fclose(ctx->file);
-            open_file(ctx);
+            while (ctx->file_tree->current_entry != NULL)
+            {
+                if (strcmp(ctx->filename,
+                           ctx->file_tree->current_entry->name) == 0)
+                {
+                    if (ctx->file_tree->current_entry->type == 4)
+                    {
+                        ctx->file_tree->current_entry->state =
+                            ctx->file_tree->current_entry->state == 'c' ? 'o'
+                                                                        : 'c';
+                        wclear(ctx->course_windows[1]);
+                        ctx->course_windows[1] = create_explorer_window(
+                            &ctx->explorer_menu, &ctx->menu_items,
+                            ctx->file_tree);
+                    }
+                    else
+                    {
+                        deallocate_buffer(ctx->t_buffer);
+                        ctx->t_buffer = initialize_buffer();
+                        if (ctx->file && ctx->file->_fileno > 0)
+                            fclose(ctx->file);
+                        open_file(ctx);
 
-            new_file_form_active = false;
-            ctx->explorer_mode = false;
-            ctx->editor_mode = true;
-            ctx->active_window = 2;
-            focus_window(&ctx->course_windows[1], 2, "Explorer");
-            focus_window(&ctx->course_windows[2], 3, "Editor");
-            curs_set(2);
-            wmove(ctx->edit_window, 0, 0);
-            wnoutrefresh(ctx->course_windows[1]);
-            wnoutrefresh(ctx->line_num_win);
-            wnoutrefresh(ctx->course_windows[2]);
-            wnoutrefresh(ctx->edit_window);
-            doupdate();
+                        new_file_form_active = false;
+                        ctx->explorer_mode = false;
+                        ctx->editor_mode = true;
+                        ctx->active_window = 2;
+                        focus_window(&ctx->course_windows[1], 2, "Explorer");
+                        focus_window(&ctx->course_windows[2], 3, "Editor");
+                        curs_set(2);
+                        wmove(ctx->edit_window, 0, 0);
+                        wnoutrefresh(ctx->course_windows[1]);
+                        wnoutrefresh(ctx->line_num_win);
+                        wnoutrefresh(ctx->course_windows[2]);
+                        wnoutrefresh(ctx->edit_window);
+                        doupdate();
+                        break;
+                    }
+                    wrefresh(ctx->course_windows[1]);
+                    break;
+                }
+                ctx->file_tree->current_entry =
+                    ctx->file_tree->current_entry->next;
+            }
             break;
         case 'a':
             create_new_file_input(&inner_win, &form_window, &new_file_form,
@@ -174,7 +199,8 @@ void handle_explorer_input(APP_CONTEXT *ctx)
                         remove(new_file_name);
 
                         ctx->course_windows[1] = create_explorer_window(
-                            &ctx->explorer_menu, &ctx->menu_items, ctx->file_tree);
+                            &ctx->explorer_menu, &ctx->menu_items,
+                            ctx->file_tree);
 
                         curs_set(0);
                         mvwprintw(ctx->course_windows[1], 30, 2, "old: %s",
@@ -197,7 +223,8 @@ void handle_explorer_input(APP_CONTEXT *ctx)
                         free_field(field[0]);
                         menu_driver(ctx->explorer_menu, REQ_NEXT_ITEM);
                         ctx->course_windows[1] = create_explorer_window(
-                            &ctx->explorer_menu, &ctx->menu_items, ctx->file_tree);
+                            &ctx->explorer_menu, &ctx->menu_items,
+                            ctx->file_tree);
                         focus_window(&ctx->course_windows[1], 3, "Explorer");
                         break;
                     default:

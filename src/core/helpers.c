@@ -48,13 +48,31 @@ void focus_window(WINDOW **window, int color_pair, char *label)
     wrefresh(*window);
 }
 
-void trim(char *str)
+void trim(char **str)
 {
     char *end;
-    end = str + strlen(str) - 1;
-    while (end > str && isspace((unsigned char)*end))
+
+    while(isspace(*str[0])) *str += 1;
+
+    end = *str + strlen(*str) - 1;
+    while (end > *str && isspace((unsigned char)*end))
         end--;
     end[1] = '\0';
+}
+
+char *return_trimmed(char *str)
+{
+    char *end;
+    char *strcop = str;
+
+    while(isspace(strcop[0])) strcop += 1;
+
+    end = strcop + strlen(strcop) - 1;
+    while (end > strcop && isspace((unsigned char)*end))
+        end--;
+    end[1] = '\0';
+
+    return strcop;
 }
 
 int get_length(char *str)

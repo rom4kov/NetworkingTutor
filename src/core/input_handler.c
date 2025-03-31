@@ -176,7 +176,7 @@ void handle_start_input(APP_CONTEXT *ctx)
                 form_driver(user_form, REQ_VALIDATION);
                 FIELD *current = current_field(user_form);
                 char *buf = field_buffer(current, 0);
-                trim(buf);
+                trim(&buf);
                 if (buf && get_length(buf) > 0)
                 {
                     form_driver(user_form, REQ_DEL_PREV);

@@ -21,12 +21,13 @@ DIR_ENTRY *initialize_dir_entry(WINDOW **win, int num)
     DIR_ENTRY *d_entry = malloc(sizeof(DIR_ENTRY));
 
     d_entry->name = (char *)malloc(30 * sizeof(char));
-    mvwprintw(*win, 30 + num, 2, "%p", &d_entry->name);
+    // mvwprintw(*win, 30 + num, 2, "%p", &d_entry->name);
     // wrefresh(*win);
     d_entry->path = (char *)malloc(30 * sizeof(char));
     d_entry->state = 'c';
     d_entry->type = 'd';
     d_entry->num_of_entries = 0;
+    d_entry->indent_level = 0;
     d_entry->prev = NULL;
     d_entry->next = NULL;
 

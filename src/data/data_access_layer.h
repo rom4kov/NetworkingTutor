@@ -11,7 +11,7 @@ COURSE *get_course_data(sqlite3 *db);
 int callback(void *NotUsed, int argc, char **argv, char **azColName);
 void update_user(sqlite3 *db, int id, char *name, char *language);
 
-DIR_ENTRY *initialize_dir_entry();
+DIR_ENTRY *initialize_dir_entry(WINDOW **win, int num);
 FILE_TREE *initialize_file_tree();
 TEXT_BUFFER *initialize_buffer();
 LINE *initialize_line();
@@ -23,4 +23,6 @@ void write_buffer_to_file(TEXT_BUFFER *tbuf, FILE *file, int y);
 void deallocate_buffer(TEXT_BUFFER *tbuf);
 void create_new_file_input(WINDOW **inner_win, WINDOW **form_window,
                            FORM **new_file_form, FIELD **field, char *label);
-void open_sub_directory(char *dir_name, FILE_TREE *f_tree);
+void open_sub_directory(char *dir_name, FILE_TREE *f_tree, WINDOW **win);
+void close_sub_directory(DIR_ENTRY *dir_to_close, int entries_in_dir,
+                         FILE_TREE *f_tree, WINDOW **win);

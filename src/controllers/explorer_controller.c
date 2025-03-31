@@ -46,13 +46,23 @@ void handle_explorer_input(APP_CONTEXT *ctx)
                 {
                     if (ctx->file_tree->current_entry->type == 4)
                     {
-                        ctx->file_tree->current_entry->state =
-                            ctx->file_tree->current_entry->state == 'c' ? 'o'
-                                                                        : 'c';
+                        if (ctx->file_tree->current_entry->state == 'c')
+                        {
+                            ctx->file_tree->current_entry->state = 'o';
+                        }
+                        else if (ctx->file_tree->current_entry->state == 'o')
+                        {
+                            ctx->file_tree->current_entry->state = 'c';
+                            close_sub_directory(
+                                ctx->file_tree->current_entry,
+                                ctx->file_tree->current_entry->num_of_entries,
+                                ctx->file_tree, &ctx->course_windows[2]);
+                        }
                         wclear(ctx->course_windows[1]);
+                        int i_idx = item_index(curr_item);
                         ctx->course_windows[1] = create_explorer_window(
                             &ctx->explorer_menu, &ctx->menu_items,
-                            ctx->file_tree);
+                            ctx->file_tree, &ctx->course_windows[2], i_idx);
                     }
                     else
                     {
@@ -125,7 +135,7 @@ void handle_explorer_input(APP_CONTEXT *ctx)
 
                         ctx->course_windows[1] = create_explorer_window(
                             &ctx->explorer_menu, &ctx->menu_items,
-                            ctx->file_tree);
+                            ctx->file_tree, &ctx->course_windows[2], 0);
                         wmove(ctx->edit_window, 0, 0);
                         mvwprintw(ctx->course_windows[1], 28, 2, "File: %s",
                                   ctx->filename);
@@ -141,7 +151,7 @@ void handle_explorer_input(APP_CONTEXT *ctx)
                         menu_driver(ctx->explorer_menu, REQ_NEXT_ITEM);
                         ctx->course_windows[1] = create_explorer_window(
                             &ctx->explorer_menu, &ctx->menu_items,
-                            ctx->file_tree);
+                            ctx->file_tree, &ctx->course_windows[2], 0);
                         focus_window(&ctx->course_windows[1], 3, "Explorer");
                         break;
                     default:
@@ -200,7 +210,7 @@ void handle_explorer_input(APP_CONTEXT *ctx)
 
                         ctx->course_windows[1] = create_explorer_window(
                             &ctx->explorer_menu, &ctx->menu_items,
-                            ctx->file_tree);
+                            ctx->file_tree, &ctx->course_windows[2], 0);
 
                         curs_set(0);
                         mvwprintw(ctx->course_windows[1], 30, 2, "old: %s",
@@ -224,7 +234,7 @@ void handle_explorer_input(APP_CONTEXT *ctx)
                         menu_driver(ctx->explorer_menu, REQ_NEXT_ITEM);
                         ctx->course_windows[1] = create_explorer_window(
                             &ctx->explorer_menu, &ctx->menu_items,
-                            ctx->file_tree);
+                            ctx->file_tree, &ctx->course_windows[2], 0);
                         focus_window(&ctx->course_windows[1], 3, "Explorer");
                         break;
                     default:

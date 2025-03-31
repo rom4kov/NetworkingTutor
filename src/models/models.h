@@ -50,7 +50,9 @@ typedef struct _dir_entry
     struct _dir_entry *next;
     int type;
     int indent_level;
+    int num_of_entries;
     char *name;
+    char *path;
     char state;
 } DIR_ENTRY;
 

@@ -125,7 +125,6 @@ void create_explorer_menu(WINDOW **explorer_window, MENU **explorer_menu,
                 curr_dir->path[29] = '\0';
                 curr_dir->type = next->d_type;
                 curr_dir->state = 'c';
-                curr_dir->indent_level = 0;
                 curr_dir->prev = prev_dir;
                 prev_dir->next = curr_dir;
                 prev_dir = curr_dir;
@@ -147,7 +146,7 @@ void create_explorer_menu(WINDOW **explorer_window, MENU **explorer_menu,
                 curr_dir->path[29] = '\0';
                 curr_dir->type = next->d_type;
                 curr_dir->state = 'c';
-                curr_dir->indent_level = 0;
+                // curr_dir->indent_level = 0;
                 curr_dir->prev = prev_dir;
                 prev_dir->next = curr_dir;
                 prev_dir = curr_dir;
@@ -168,57 +167,78 @@ void create_explorer_menu(WINDOW **explorer_window, MENU **explorer_menu,
     mvwprintw(*explorer_window, LINES - 5, 2, "Press ? for Keys");
     mvwprintw(*explorer_window, LINES - 6, 2, "%s", f_tree->first_entry->name);
 
-    unpost_menu(*explorer_menu);
-    free_menu(*explorer_menu);
-    if (*explorer_menu != NULL)
-    {
-        for (int i = 0; (*menu_items)[i] != NULL; i++)
-        {
-            free_item((*menu_items)[i]);
-        }
-    }
+    // unpost_menu(*explorer_menu);
+    // free_menu(*explorer_menu);
+    // if (*explorer_menu != NULL)
+    // {
+    //     for (int i = 0; (*menu_items)[i] != NULL; i++)
+    //     {
+    //         free_item((*menu_items)[i]);
+    //     }
+    // }
 
-    *menu_items = (ITEM **)calloc(f_tree->num_of_entries + 1, sizeof(ITEM *));
-    (*menu_items)[f_tree->num_of_entries] = NULL;
+    // *menu_items = (ITEM **)calloc(f_tree->num_of_entries + 1, sizeof(ITEM *));
+    // (*menu_items)[f_tree->num_of_entries] = NULL;
 
     int items = 0;
+    // for (int i = 0; i < f_tree->num_of_entries; i++)
+    // {
+    //     if (strcmp(f_tree->current_entry->name, "..") != 0 &&
+    //         strcmp(f_tree->current_entry->name, ".") != 0)
+    //     {
+    //         (*menu_items)[items] = new_item(f_tree->current_entry->name, "");
+    //         items++;
+    //     }
+    //     f_tree->current_entry = f_tree->current_entry->next;
+    // }
+
+    f_tree->current_entry = f_tree->first_entry;
+
+    // items = 0;
     for (int i = 0; i < f_tree->num_of_entries; i++)
     {
         if (strcmp(f_tree->current_entry->name, "..") != 0 &&
             strcmp(f_tree->current_entry->name, ".") != 0)
         {
-            int len = strlen(f_tree->current_entry->name);
-            int ind_level = f_tree->current_entry->indent_level;
+            // int len = strlen(f_tree->current_entry->name);
+            // int ind_level = f_tree->current_entry->indent_level;
+            //
+            // memmove(&f_tree->current_entry->name[ind_level],
+            //         f_tree->current_entry->name, len);
+            // memset(f_tree->current_entry->name, ' ', ind_level);
 
-            memmove(&f_tree->current_entry->name[ind_level],
-                    f_tree->current_entry->name, len);
-            memset(f_tree->current_entry->name, ' ', ind_level);
-
-            (*menu_items)[items] = new_item(f_tree->current_entry->name, "");
             if (f_tree->current_entry->type == 4)
             {
                 wattron(*explorer_window, COLOR_PAIR(10));
                 if (f_tree->current_entry->state == 'c')
                 {
                     mvwprintw(*explorer_window, items + 1,
-                              2 + (f_tree->current_entry->indent_level),
-                              " ");
+                              2 + f_tree->current_entry->indent_level, " ");
                 }
                 else
                 {
                     mvwprintw(*explorer_window, items + 1,
-                              2 + (f_tree->current_entry->indent_level),
-                              " ");
+                              2 + f_tree->current_entry->indent_level, " ");
                 }
                 wattroff(*explorer_window, COLOR_PAIR(10));
+                if (f_tree->curr_entry_nr == items)
+                    wattron(*explorer_window, A_BOLD | A_ITALIC);
+                mvwprintw(*explorer_window, items + 1,
+                          4 + f_tree->current_entry->indent_level, "%s",
+                          f_tree->current_entry->name);
+                if (f_tree->curr_entry_nr == items)
+                    wattroff(*explorer_window, A_BOLD | A_ITALIC);
 
                 items++;
             }
             else if (f_tree->current_entry->type != 4)
             {
-                (*menu_items)[items] =
-                    new_item(f_tree->current_entry->name, "");
+                // (*menu_items)[items] =
+                //     new_item(f_tree->current_entry->name, "");
 
+                // mvwprintw(*win, i + 2, 2, " "); mvwprintw(*win, i + 2, 2,
+                // "%s", return_trimmed(f_tree->current_entry->name));
+                // wrefresh(*win);
                 ICON icon =
                     print_file_icon((char *)f_tree->current_entry->name);
                 if (icon.icon != NULL)
@@ -229,6 +249,18 @@ void create_explorer_menu(WINDOW **explorer_window, MENU **explorer_menu,
                               icon.icon);
                     wattroff(*explorer_window, COLOR_PAIR(icon.color));
                 }
+                else {
+                    mvwprintw(*explorer_window, items + 1,
+                              2 + f_tree->current_entry->indent_level, " ");
+                }
+
+                if (f_tree->curr_entry_nr == items)
+                    wattron(*explorer_window, A_BOLD | A_ITALIC);
+                mvwprintw(*explorer_window, items + 1,
+                          4 + f_tree->current_entry->indent_level, "%s",
+                          f_tree->current_entry->name);
+                if (f_tree->curr_entry_nr == items)
+                    wattroff(*explorer_window, A_BOLD | A_ITALIC);
                 items++;
             }
         }
@@ -237,23 +269,23 @@ void create_explorer_menu(WINDOW **explorer_window, MENU **explorer_menu,
 
     f_tree->current_entry = f_tree->first_entry;
 
-    *explorer_menu = new_menu(*menu_items);
-    set_menu_format(*explorer_menu, 30, 1);
-    set_menu_spacing(*explorer_menu, 0, 1, 0);
+    // *explorer_menu = new_menu(*menu_items);
+    // set_menu_format(*explorer_menu, 30, 1);
+    // set_menu_spacing(*explorer_menu, 0, 1, 0);
+    //
+    // set_menu_win(*explorer_menu, *explorer_window);
+    // set_menu_sub(*explorer_menu,
+    //              derwin(*explorer_window, LINES - 7, WU + (WU / 2) - 6, 1, 4));
+    // set_menu_fore(*explorer_menu, A_BOLD | A_ITALIC | COLOR_PAIR(2));
+    // set_menu_back(*explorer_menu, COLOR_PAIR(1));
+    // set_menu_mark(*explorer_menu, "");
+    //
+    // post_menu(*explorer_menu);
 
-    set_menu_win(*explorer_menu, *explorer_window);
-    set_menu_sub(*explorer_menu,
-                 derwin(*explorer_window, LINES - 7, WU + (WU / 2) - 6, 1, 4));
-    set_menu_fore(*explorer_menu, A_BOLD | A_ITALIC | COLOR_PAIR(2));
-    set_menu_back(*explorer_menu, COLOR_PAIR(1));
-    set_menu_mark(*explorer_menu, "");
-
-    post_menu(*explorer_menu);
-
-    for (int i = 0; i < i_idx; i++)
-    {
-        menu_driver(*explorer_menu, REQ_NEXT_ITEM);
-    }
+    // for (int i = 0; i < i_idx; i++)
+    // {
+    //     menu_driver(*explorer_menu, REQ_NEXT_ITEM);
+    // }
 
     wrefresh(*explorer_window);
     // closedir(dir);
@@ -291,6 +323,15 @@ void open_sub_directory(char *dir_name, FILE_TREE *f_tree, WINDOW **win)
             curr_dir->type = next->d_type;
             curr_dir->state = 'c';
             curr_dir->indent_level = f_tree->current_entry->indent_level + 1;
+
+            int len = strlen(curr_dir->name);
+            int ind_level = curr_dir->indent_level;
+
+            memmove(&curr_dir->name[ind_level], curr_dir->name, len);
+            memset(curr_dir->name, ' ', ind_level);
+            mvwprintw(*win, 30, 2, "%i", f_tree->current_entry->indent_level);
+            wrefresh(*win);
+
             curr_dir->prev = prev_dir;
             prev_dir->next = curr_dir;
             prev_dir = curr_dir;
@@ -308,9 +349,29 @@ void open_sub_directory(char *dir_name, FILE_TREE *f_tree, WINDOW **win)
         strncpy(curr_dir->name, next->d_name, 30);
         if (next->d_type == 8)
         {
+            strncpy(curr_dir->name, next->d_name, 30);
+            curr_dir->name[29] = '\0';
+
+            strncpy(curr_dir->path, dir_name, strlen(dir_name));
+            memset(&curr_dir->path[strlen(dir_name)], '/', 1);
+            memmove(&curr_dir->path[strlen(dir_name) + 1], curr_dir->name,
+                    strlen(curr_dir->name));
+            memset(
+                &curr_dir->path[strlen(dir_name) + 1 + strlen(curr_dir->name)],
+                '\0', 1);
+
             curr_dir->type = next->d_type;
             curr_dir->state = 'c';
-            curr_dir->indent_level = 1;
+            curr_dir->indent_level = f_tree->current_entry->indent_level + 1;
+
+            int len = strlen(curr_dir->name);
+            int ind_level = curr_dir->indent_level;
+            mvwprintw(*win, 32, 2, "%i", f_tree->current_entry->indent_level);
+            wrefresh(*win);
+
+            memmove(&curr_dir->name[ind_level], curr_dir->name, len);
+            memset(curr_dir->name, ' ', ind_level);
+
             curr_dir->prev = prev_dir;
             prev_dir->next = curr_dir;
             prev_dir = curr_dir;
@@ -325,7 +386,7 @@ void open_sub_directory(char *dir_name, FILE_TREE *f_tree, WINDOW **win)
     prev_dir->next = next_orig_dir;
     next_orig_dir->prev = prev_dir;
 
-    closedir(dir);
+    // closedir(dir);
 }
 
 void close_sub_directory(DIR_ENTRY *dir_to_close, int entries_in_dir,

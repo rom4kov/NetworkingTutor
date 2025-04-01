@@ -127,7 +127,7 @@ void open_new_file(APP_CONTEXT *ctx)
 void open_file(APP_CONTEXT *ctx)
 {
     int file_size = 0;
-    ctx->file = fopen(ctx->filename, "r+");
+    ctx->file = fopen(ctx->file_tree->current_entry->path, "r+");
 
     if (ctx->file == NULL)
     {

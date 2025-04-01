@@ -60,8 +60,8 @@ typedef struct _file_tree
 {
     DIR_ENTRY *first_entry;
     DIR_ENTRY *current_entry;
-    unsigned short curr_entry_nr;
-    unsigned short num_of_entries;
+    int curr_entry_nr;
+    int num_of_entries;
 } FILE_TREE;
 
 typedef struct _app_context

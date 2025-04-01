@@ -32,116 +32,111 @@ void handle_explorer_input(APP_CONTEXT *ctx)
     switch (ctx->key)
     {
         case KEY_DOWN:
-            menu_driver(ctx->explorer_menu, REQ_NEXT_ITEM);
-            // mvwprintw(ctx->course_windows[2], 20, 2,
-            //           "                          ");
-            // mvwprintw(ctx->course_windows[2], 20, 2, "%s",
-            //           ctx->file_tree->current_entry->name);
-            // if (ctx->file_tree->curr_entry_nr <
-            //     ctx->file_tree->num_of_entries - 1)
-            // {
-            //     ctx->file_tree->current_entry =
-            //         ctx->file_tree->current_entry->next;
-            //     ctx->file_tree->curr_entry_nr++;
-            // }
-            // mvwprintw(ctx->course_windows[2], 21, 2,
-            //           "                          ");
-            // mvwprintw(ctx->course_windows[2], 21, 2, "%s",
-            //           ctx->file_tree->current_entry->name);
-            // wrefresh(ctx->course_windows[2]);
-            wrefresh(ctx->course_windows[1]);
+            if (ctx->file_tree->curr_entry_nr <
+                ctx->file_tree->num_of_entries - 2)
+            {
+                ctx->file_tree->current_entry = ctx->file_tree->current_entry->next;
+                mvwprintw(ctx->course_windows[0], 2, 24, "                            ");
+                mvwprintw(ctx->course_windows[0], 2, 24, "%s", ctx->file_tree->current_entry->path);
+                mvwprintw(ctx->course_windows[0], 2, 34, "%i", ctx->file_tree->curr_entry_nr);
+                wrefresh(ctx->course_windows[0]);
+                ctx->file_tree->curr_entry_nr++;
+                ctx->course_windows[1] = create_explorer_window(
+                    ctx->file_tree, &ctx->course_windows[2], ctx->file_tree->curr_entry_nr);
+                wrefresh(ctx->course_windows[1]);
+            }
             break;
         case KEY_UP:
-            menu_driver(ctx->explorer_menu, REQ_PREV_ITEM);
-            // if (ctx->file_tree->curr_entry_nr > 0)
-            // {
-            //     ctx->file_tree->current_entry =
-            //         ctx->file_tree->current_entry->prev;
-            //     ctx->file_tree->curr_entry_nr--;
-            // }
-            //
-            // mvwprintw(ctx->course_windows[2], 20, 2,
-            //           "                          ");
-            // mvwprintw(ctx->course_windows[2], 20, 2, "%s",
-            //           ctx->file_tree->current_entry->name);
-            // wrefresh(ctx->course_windows[2]);
-            wrefresh(ctx->course_windows[1]);
+            if (ctx->file_tree->curr_entry_nr > 0)
+            {
+                ctx->file_tree->current_entry = ctx->file_tree->current_entry->prev;
+                mvwprintw(ctx->course_windows[0], 2, 24, "                            ");
+                mvwprintw(ctx->course_windows[0], 2, 24, "%s", ctx->file_tree->current_entry->path);
+                mvwprintw(ctx->course_windows[0], 2, 34, "%i", ctx->file_tree->curr_entry_nr);
+                wrefresh(ctx->course_windows[0]);
+                ctx->file_tree->curr_entry_nr--;
+                ctx->course_windows[1] = create_explorer_window(
+                    ctx->file_tree, &ctx->course_windows[2], ctx->file_tree->curr_entry_nr);
+                wrefresh(ctx->course_windows[1]);
+            }
             break;
         case 10:
             curr_item = current_item(ctx->explorer_menu);
             ctx->filename = (char *)item_name(curr_item);
-            trim(&ctx->filename);
+            // trim(&ctx->filename);
             // mvwprintw(ctx->course_windows[0], 2, 0, "%s", ctx->filename);
             // wrefresh(ctx->course_windows[0]);
 
-            char *curr_name = calloc(30, sizeof(char));
+            // char *curr_name = calloc(30, sizeof(char));
             char *curr_path = calloc(30, sizeof(char));
             //     return_trimmed(ctx->file_tree->current_entry->name);
-            while (ctx->file_tree->current_entry != NULL)
+            // while (ctx->file_tree->current_entry != NULL)
+            // {
+            // for (int i = 0; i < 9; i++)
+            //     curr_name[i] = '\0';
+            // memset(curr_name, 0, strlen(curr_name));
+            // curr_name = return_trimmed(ctx->file_tree->current_entry->name);
+            curr_path = return_trimmed(ctx->file_tree->current_entry->path);
+            mvwprintw(ctx->course_windows[0], 2, 24, "%s", ctx->file_tree->current_entry->path);
+            wrefresh(ctx->course_windows[0]);
+            // curr_name[strlen(curr_name)] = '\0';
+            // mvwprintw(ctx->course_windows[0], 2, 12, "%s", curr_name);
+            // mvwprintw(ctx->course_windows[0], 2, 22, "%s", curr_path);
+            // wrefresh(ctx->course_windows[0]);
+            // if (strcmp(ctx->filename, curr_name) == 0)
+            // {
+            if (ctx->file_tree->current_entry->type == 4)
             {
-                // for (int i = 0; i < 9; i++)
-                //     curr_name[i] = '\0';
-                // memset(curr_name, 0, strlen(curr_name));
-                curr_name = return_trimmed(ctx->file_tree->current_entry->name);
-                curr_path = return_trimmed(ctx->file_tree->current_entry->path);
-                // curr_name[strlen(curr_name)] = '\0';
-                mvwprintw(ctx->course_windows[0], 2, 12, "%s", curr_name);
-                mvwprintw(ctx->course_windows[0], 2, 22, "%s", curr_path);
-                wrefresh(ctx->course_windows[0]);
-                if (strcmp(ctx->filename, curr_name) == 0)
+                if (ctx->file_tree->current_entry->state == 'c')
                 {
-                    if (ctx->file_tree->current_entry->type == 4)
-                    {
-                        if (ctx->file_tree->current_entry->state == 'c')
-                        {
-                            ctx->file_tree->current_entry->state = 'o';
-                            open_sub_directory(curr_path, ctx->file_tree,
-                                               &ctx->course_windows[2]);
-                        }
-                        else if (ctx->file_tree->current_entry->state == 'o')
-                        {
-                            ctx->file_tree->current_entry->state = 'c';
-                            close_sub_directory(
-                                ctx->file_tree->current_entry,
-                                ctx->file_tree->current_entry->num_of_entries,
-                                ctx->file_tree, &ctx->course_windows[2]);
-                        }
-                        wclear(ctx->course_windows[1]);
-                        int i_idx = item_index(curr_item);
-                        ctx->course_windows[1] = create_explorer_window(
-                            &ctx->explorer_menu, &ctx->menu_items,
-                            ctx->file_tree, &ctx->course_windows[2], i_idx);
-                    }
-                    else
-                    {
-                        deallocate_buffer(ctx->t_buffer);
-                        ctx->t_buffer = initialize_buffer();
-                        if (ctx->file && ctx->file->_fileno > 0)
-                            fclose(ctx->file);
-                        open_file(ctx);
-
-                        new_file_form_active = false;
-                        ctx->explorer_mode = false;
-                        ctx->editor_mode = true;
-                        ctx->active_window = 2;
-                        focus_window(&ctx->course_windows[1], 2, "Explorer");
-                        focus_window(&ctx->course_windows[2], 3, "Editor");
-                        curs_set(2);
-                        wmove(ctx->edit_window, 0, 0);
-                        wnoutrefresh(ctx->course_windows[1]);
-                        wnoutrefresh(ctx->line_num_win);
-                        wnoutrefresh(ctx->course_windows[2]);
-                        wnoutrefresh(ctx->edit_window);
-                        doupdate();
-                        break;
-                    }
-                    wrefresh(ctx->course_windows[1]);
-                    break;
+                    ctx->file_tree->current_entry->state = 'o';
+                    open_sub_directory(curr_path, ctx->file_tree,
+                                       &ctx->course_windows[2]);
                 }
-                ctx->file_tree->current_entry =
-                    ctx->file_tree->current_entry->next;
+                else if (ctx->file_tree->current_entry->state == 'o')
+                {
+                    ctx->file_tree->current_entry->state = 'c';
+                    close_sub_directory(
+                        ctx->file_tree->current_entry,
+                        ctx->file_tree->current_entry->num_of_entries,
+                        ctx->file_tree, &ctx->course_windows[2]);
+                }
+                wclear(ctx->course_windows[1]);
+                // int i_idx = item_index(curr_item);
+                ctx->course_windows[1] = create_explorer_window(
+                    ctx->file_tree, &ctx->course_windows[2], ctx->file_tree->curr_entry_nr);
+                break;
             }
+            else
+            {
+                deallocate_buffer(ctx->t_buffer);
+                ctx->t_buffer = initialize_buffer();
+                if (ctx->file && ctx->file->_fileno > 0)
+                    fclose(ctx->file);
+                open_file(ctx);
+
+                new_file_form_active = false;
+                ctx->explorer_mode = false;
+                ctx->editor_mode = true;
+                ctx->active_window = 2;
+                focus_window(&ctx->course_windows[1], 2, "Explorer");
+                focus_window(&ctx->course_windows[2], 3, "Editor");
+                curs_set(2);
+                wmove(ctx->edit_window, 0, 0);
+                wnoutrefresh(ctx->course_windows[1]);
+                wnoutrefresh(ctx->line_num_win);
+                wnoutrefresh(ctx->course_windows[2]);
+                wnoutrefresh(ctx->edit_window);
+                doupdate();
+                break;
+            }
+            wrefresh(ctx->course_windows[1]);
             break;
+            // }
+            // ctx->file_tree->current_entry =
+            //     ctx->file_tree->current_entry->next;
+            // // }
+            // break;
         case 'a':
             create_new_file_input(&inner_win, &form_window, &new_file_form,
                                   field, "Create file");
@@ -182,7 +177,6 @@ void handle_explorer_input(APP_CONTEXT *ctx)
                         open_new_file(ctx);
 
                         ctx->course_windows[1] = create_explorer_window(
-                            &ctx->explorer_menu, &ctx->menu_items,
                             ctx->file_tree, &ctx->course_windows[2], 0);
                         wmove(ctx->edit_window, 0, 0);
                         // mvwprintw(ctx->course_windows[1], 28, 2, "File: %s",
@@ -198,7 +192,6 @@ void handle_explorer_input(APP_CONTEXT *ctx)
                         free_field(field[0]);
                         menu_driver(ctx->explorer_menu, REQ_NEXT_ITEM);
                         ctx->course_windows[1] = create_explorer_window(
-                            &ctx->explorer_menu, &ctx->menu_items,
                             ctx->file_tree, &ctx->course_windows[2], 0);
                         focus_window(&ctx->course_windows[1], 3, "Explorer");
                         break;
@@ -257,7 +250,6 @@ void handle_explorer_input(APP_CONTEXT *ctx)
                         remove(new_file_name);
 
                         ctx->course_windows[1] = create_explorer_window(
-                            &ctx->explorer_menu, &ctx->menu_items,
                             ctx->file_tree, &ctx->course_windows[2], 0);
 
                         curs_set(0);
@@ -281,7 +273,6 @@ void handle_explorer_input(APP_CONTEXT *ctx)
                         free_field(field[0]);
                         menu_driver(ctx->explorer_menu, REQ_NEXT_ITEM);
                         ctx->course_windows[1] = create_explorer_window(
-                            &ctx->explorer_menu, &ctx->menu_items,
                             ctx->file_tree, &ctx->course_windows[2], 0);
                         focus_window(&ctx->course_windows[1], 3, "Explorer");
                         break;

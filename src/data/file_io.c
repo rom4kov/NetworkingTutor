@@ -128,10 +128,12 @@ void open_file(APP_CONTEXT *ctx)
 {
     int file_size = 0;
     ctx->file = fopen(ctx->file_tree->current_entry->path, "r+");
+    mvwprintw(ctx->course_windows[0], 2, 24, "%s", ctx->file_tree->current_entry->path);
+    wrefresh(ctx->course_windows[0]);
 
     if (ctx->file == NULL)
     {
-        printf("Could not open %s.\n", ctx->filename);
+        printf("Could not open %s.\n", ctx->file_tree->current_entry->path);
     }
 
     if (ctx->file != NULL)
@@ -161,14 +163,14 @@ void open_file(APP_CONTEXT *ctx)
         rewind(ctx->file);
 
         mvwprintw(ctx->course_windows[2], 1, 4, "                                ");
-        ICON icon = print_file_icon((char *)ctx->filename);
+        ICON icon = print_file_icon((char *)ctx->file_tree->current_entry->path);
 
         wattron(ctx->course_windows[2], COLOR_PAIR(icon.color));
-        mvwprintw(ctx->course_windows[2], 1, 4, "%s", icon.icon);
+        mvwprintw(ctx->course_windows[2], 1, 5, "%s", icon.icon);
         wattroff(ctx->course_windows[2], COLOR_PAIR(icon.color));
 
         wattron(ctx->course_windows[2], A_BOLD | COLOR_PAIR(1));
-        mvwprintw(ctx->course_windows[2], 1, 6, "%s", ctx->filename);
+        mvwprintw(ctx->course_windows[2], 1, 7, "%s", ctx->file_tree->current_entry->name);
         wattroff(ctx->course_windows[2], A_BOLD | COLOR_PAIR(1));
         wrefresh(ctx->edit_window);
     }

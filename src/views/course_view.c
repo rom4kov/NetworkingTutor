@@ -28,8 +28,7 @@ void create_course_view(APP_CONTEXT *ctx)
     ctx->course_windows[0] =
         create_navigation_window(&ctx->active_window, &ctx->start_menu);
     ctx->course_windows[1] =
-        create_explorer_window(&ctx->explorer_menu, &ctx->menu_items,
-                               ctx->file_tree, &ctx->course_windows[2], 0);
+        create_explorer_window(ctx->file_tree, &ctx->course_windows[2], 0);
     ctx->course_windows[2] = create_editor_window(&ctx->active_window);
     ctx->course_windows[3] = create_right_side_panel(
         &ctx->active_window, &ctx->db, "Course instructions");
@@ -63,8 +62,7 @@ WINDOW *create_editor_window(int *active_window)
     return editor_window;
 }
 
-WINDOW *create_explorer_window(MENU **explorer_menu, ITEM ***menu_items,
-                               FILE_TREE *file_tree, WINDOW **win, int i_idx)
+WINDOW *create_explorer_window(FILE_TREE *file_tree, WINDOW **win, int i_idx)
 {
     WINDOW *explorer_window = newwin(LINES - 3, WU + WU / 2, 3, 0);
     draw_border(explorer_window, 2, "Explorer");
@@ -73,15 +71,13 @@ WINDOW *create_explorer_window(MENU **explorer_menu, ITEM ***menu_items,
     mvwprintw(explorer_window, 0, 2, "Explorer");
     wattroff(explorer_window, COLOR_PAIR(3));
 
-    create_explorer_menu(&explorer_window, explorer_menu, menu_items, file_tree,
-                         win, i_idx);
+    create_explorer_menu(&explorer_window, file_tree, win, i_idx);
 
     return explorer_window;
 }
 
-void create_explorer_menu(WINDOW **explorer_window, MENU **explorer_menu,
-                          ITEM ***menu_items, FILE_TREE *f_tree, WINDOW **win,
-                          int i_idx)
+void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree,
+                          WINDOW **win, int i_idx)
 {
     DIR *dir = opendir(".");
 
@@ -177,7 +173,8 @@ void create_explorer_menu(WINDOW **explorer_window, MENU **explorer_menu,
     //     }
     // }
 
-    // *menu_items = (ITEM **)calloc(f_tree->num_of_entries + 1, sizeof(ITEM *));
+    // *menu_items = (ITEM **)calloc(f_tree->num_of_entries + 1, sizeof(ITEM
+    // *));
     // (*menu_items)[f_tree->num_of_entries] = NULL;
 
     int items = 0;
@@ -249,7 +246,8 @@ void create_explorer_menu(WINDOW **explorer_window, MENU **explorer_menu,
                               icon.icon);
                     wattroff(*explorer_window, COLOR_PAIR(icon.color));
                 }
-                else {
+                else
+                {
                     mvwprintw(*explorer_window, items + 1,
                               2 + f_tree->current_entry->indent_level, " ");
                 }
@@ -268,14 +266,23 @@ void create_explorer_menu(WINDOW **explorer_window, MENU **explorer_menu,
     }
 
     f_tree->current_entry = f_tree->first_entry;
-
+    for (int i = 0; i < f_tree->curr_entry_nr; i++)
+    {
+        f_tree->current_entry = f_tree->current_entry->next;
+    }
+    if (f_tree->curr_entry_nr == 0)
+    {
+        f_tree->current_entry = f_tree->first_entry;
+    }
+    // f_tree->current_entry = f_tree->first_entry;
     // *explorer_menu = new_menu(*menu_items);
     // set_menu_format(*explorer_menu, 30, 1);
     // set_menu_spacing(*explorer_menu, 0, 1, 0);
     //
     // set_menu_win(*explorer_menu, *explorer_window);
     // set_menu_sub(*explorer_menu,
-    //              derwin(*explorer_window, LINES - 7, WU + (WU / 2) - 6, 1, 4));
+    //              derwin(*explorer_window, LINES - 7, WU + (WU / 2) - 6, 1,
+    //              4));
     // set_menu_fore(*explorer_menu, A_BOLD | A_ITALIC | COLOR_PAIR(2));
     // set_menu_back(*explorer_menu, COLOR_PAIR(1));
     // set_menu_mark(*explorer_menu, "");
@@ -324,13 +331,13 @@ void open_sub_directory(char *dir_name, FILE_TREE *f_tree, WINDOW **win)
             curr_dir->state = 'c';
             curr_dir->indent_level = f_tree->current_entry->indent_level + 1;
 
-            int len = strlen(curr_dir->name);
-            int ind_level = curr_dir->indent_level;
-
-            memmove(&curr_dir->name[ind_level], curr_dir->name, len);
-            memset(curr_dir->name, ' ', ind_level);
-            mvwprintw(*win, 30, 2, "%i", f_tree->current_entry->indent_level);
-            wrefresh(*win);
+            // int len = strlen(curr_dir->name);
+            // int ind_level = curr_dir->indent_level;
+            //
+            // memmove(&curr_dir->name[ind_level], curr_dir->name, len);
+            // memset(curr_dir->name, ' ', ind_level);
+            // mvwprintw(*win, 30, 2, "%i", f_tree->current_entry->indent_level);
+            // wrefresh(*win);
 
             curr_dir->prev = prev_dir;
             prev_dir->next = curr_dir;
@@ -364,13 +371,13 @@ void open_sub_directory(char *dir_name, FILE_TREE *f_tree, WINDOW **win)
             curr_dir->state = 'c';
             curr_dir->indent_level = f_tree->current_entry->indent_level + 1;
 
-            int len = strlen(curr_dir->name);
-            int ind_level = curr_dir->indent_level;
-            mvwprintw(*win, 32, 2, "%i", f_tree->current_entry->indent_level);
-            wrefresh(*win);
-
-            memmove(&curr_dir->name[ind_level], curr_dir->name, len);
-            memset(curr_dir->name, ' ', ind_level);
+            // int len = strlen(curr_dir->name);
+            // int ind_level = curr_dir->indent_level;
+            // mvwprintw(*win, 32, 2, "%i", f_tree->current_entry->indent_level);
+            // wrefresh(*win);
+            //
+            // memmove(&curr_dir->name[ind_level], curr_dir->name, len);
+            // memset(curr_dir->name, ' ', ind_level);
 
             curr_dir->prev = prev_dir;
             prev_dir->next = curr_dir;

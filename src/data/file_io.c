@@ -24,9 +24,10 @@ DIR_ENTRY *initialize_dir_entry(WINDOW **win, int num)
     d_entry->path = (char *)malloc(50 * sizeof(char));
     d_entry->state = 'c';
     d_entry->type = 'd';
-    d_entry->sub_entry_nr = 0;
+    // d_entry->sub_entry_nr = 0;
     d_entry->num_of_entries = 0;
     d_entry->indent_level = 0;
+    d_entry->last_in_sub_dir = false;
     d_entry->parent_dir = NULL;
     d_entry->prev = NULL;
     d_entry->next = NULL;

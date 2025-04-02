@@ -1,4 +1,5 @@
 #define _POSIX_C_SOURCE 200809L
+#include <stdlib.h>
 #include <ctype.h>
 #include <ncurses.h>
 #include <string.h>
@@ -75,15 +76,15 @@ char *return_trimmed(char *str)
     return strcop;
 }
 
-int get_length(char *str)
-{
-    int i = 0;
-    while (str[i] != ' ')
-    {
-        i++;
-    }
-    return i;
-}
+// int strlen(char *str)
+// {
+//     int i = 0;
+//     while (str[i] != ' ')
+//     {
+//         i++;
+//     }
+//     return i;
+// }
 
 char *wrap_text(char *text, int width)
 {
@@ -110,4 +111,14 @@ char *wrap_text(char *text, int width)
     }
 
     return str;
+}
+
+char *trunc_str(char *str, int win_width, int offset)
+{
+    char *str_copy = malloc(30 * sizeof(char));
+
+    strcpy(str_copy, str);
+    str_copy[win_width - offset] = '\0';
+
+    return str_copy;
 }

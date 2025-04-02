@@ -33,6 +33,7 @@ void draw_border(WINDOW *win, int color_pair, char *label);
 void focus_window(WINDOW **window, int color_pair, char *label);
 void trim(char **str);
 char *return_trimmed(char *str);
-int get_length(char *str);
+char *trunc_str(char *str, int win_width, int offset);
+// int strlen(char *str);
 void log_values(WINDOW **edit_window, int scroll_offset, TEXT_BUFFER *tbuf,
                 int lines_to_print, int y, int x);

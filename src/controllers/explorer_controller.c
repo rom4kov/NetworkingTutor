@@ -33,13 +33,13 @@ void handle_explorer_input(APP_CONTEXT *ctx)
     {
         case KEY_DOWN:
             if (ctx->file_tree->curr_entry_nr <
-                ctx->file_tree->num_of_entries - 2)
+                ctx->file_tree->num_of_entries - 1)
             {
                 ctx->file_tree->current_entry = ctx->file_tree->current_entry->next;
-                mvwprintw(ctx->course_windows[0], 2, 24, "                            ");
-                mvwprintw(ctx->course_windows[0], 2, 24, "%s", ctx->file_tree->current_entry->path);
-                mvwprintw(ctx->course_windows[0], 2, 34, "%i", ctx->file_tree->curr_entry_nr);
-                wrefresh(ctx->course_windows[0]);
+                // mvwprintw(ctx->course_windows[0], 2, 24, "                            ");
+                // mvwprintw(ctx->course_windows[0], 2, 24, "%s", ctx->file_tree->current_entry->path);
+                // mvwprintw(ctx->course_windows[0], 2, 34, "%i", ctx->file_tree->curr_entry_nr);
+                // wrefresh(ctx->course_windows[0]);
                 ctx->file_tree->curr_entry_nr++;
                 ctx->course_windows[1] = create_explorer_window(
                     ctx->file_tree, &ctx->course_windows[2], ctx->file_tree->curr_entry_nr);
@@ -50,10 +50,10 @@ void handle_explorer_input(APP_CONTEXT *ctx)
             if (ctx->file_tree->curr_entry_nr > 0)
             {
                 ctx->file_tree->current_entry = ctx->file_tree->current_entry->prev;
-                mvwprintw(ctx->course_windows[0], 2, 24, "                            ");
-                mvwprintw(ctx->course_windows[0], 2, 24, "%s", ctx->file_tree->current_entry->path);
-                mvwprintw(ctx->course_windows[0], 2, 34, "%i", ctx->file_tree->curr_entry_nr);
-                wrefresh(ctx->course_windows[0]);
+                // mvwprintw(ctx->course_windows[0], 2, 24, "                            ");
+                // mvwprintw(ctx->course_windows[0], 2, 24, "%s", ctx->file_tree->current_entry->path);
+                // mvwprintw(ctx->course_windows[0], 2, 34, "%i", ctx->file_tree->curr_entry_nr);
+                // wrefresh(ctx->course_windows[0]);
                 ctx->file_tree->curr_entry_nr--;
                 ctx->course_windows[1] = create_explorer_window(
                     ctx->file_tree, &ctx->course_windows[2], ctx->file_tree->curr_entry_nr);
@@ -77,8 +77,8 @@ void handle_explorer_input(APP_CONTEXT *ctx)
             // memset(curr_name, 0, strlen(curr_name));
             // curr_name = return_trimmed(ctx->file_tree->current_entry->name);
             curr_path = return_trimmed(ctx->file_tree->current_entry->path);
-            mvwprintw(ctx->course_windows[0], 2, 24, "%s", ctx->file_tree->current_entry->path);
-            wrefresh(ctx->course_windows[0]);
+            // mvwprintw(ctx->course_windows[0], 2, 24, "%s", ctx->file_tree->current_entry->path);
+            // wrefresh(ctx->course_windows[0]);
             // curr_name[strlen(curr_name)] = '\0';
             // mvwprintw(ctx->course_windows[0], 2, 12, "%s", curr_name);
             // mvwprintw(ctx->course_windows[0], 2, 22, "%s", curr_path);
@@ -154,7 +154,7 @@ void handle_explorer_input(APP_CONTEXT *ctx)
                         FIELD *current = current_field(new_file_form);
                         char *buf = field_buffer(current, 0);
                         trim(&buf);
-                        if (buf && get_length(buf) > 0)
+                        if (buf && strlen(buf) > 0)
                         {
                             form_driver(new_file_form, REQ_DEL_PREV);
                             wrefresh(form_window);
@@ -221,7 +221,7 @@ void handle_explorer_input(APP_CONTEXT *ctx)
                         FIELD *current = current_field(new_file_form);
                         char *buf = field_buffer(current, 0);
                         trim(&buf);
-                        if (buf && get_length(buf) > 0)
+                        if (buf && strlen(buf) > 0)
                         {
                             form_driver(new_file_form, REQ_DEL_PREV);
                             wrefresh(form_window);

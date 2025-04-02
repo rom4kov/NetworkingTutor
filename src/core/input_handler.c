@@ -177,7 +177,7 @@ void handle_start_input(APP_CONTEXT *ctx)
                 FIELD *current = current_field(user_form);
                 char *buf = field_buffer(current, 0);
                 trim(&buf);
-                if (buf && get_length(buf) > 0)
+                if (buf && strlen(buf) > 0)
                 {
                     form_driver(user_form, REQ_DEL_PREV);
                     wrefresh(ctx->start_windows[5]);

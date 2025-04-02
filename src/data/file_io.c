@@ -20,14 +20,14 @@ DIR_ENTRY *initialize_dir_entry(WINDOW **win, int num)
 {
     DIR_ENTRY *d_entry = malloc(sizeof(DIR_ENTRY));
 
-    d_entry->name = (char *)malloc(30 * sizeof(char));
-    // mvwprintw(*win, 30 + num, 2, "%p", &d_entry->name);
-    // wrefresh(*win);
-    d_entry->path = (char *)malloc(30 * sizeof(char));
+    d_entry->name = (char *)malloc(50 * sizeof(char));
+    d_entry->path = (char *)malloc(50 * sizeof(char));
     d_entry->state = 'c';
     d_entry->type = 'd';
+    d_entry->sub_entry_nr = 0;
     d_entry->num_of_entries = 0;
     d_entry->indent_level = 0;
+    d_entry->parent_dir = NULL;
     d_entry->prev = NULL;
     d_entry->next = NULL;
 
@@ -39,8 +39,8 @@ FILE_TREE *initialize_file_tree()
     FILE_TREE *f_tree = calloc(1, sizeof(FILE_TREE));
 
     f_tree->first_entry = calloc(1, sizeof(DIR_ENTRY));
-    f_tree->first_entry->name = (char *)malloc((30 * sizeof(char)));
-    f_tree->first_entry->path = (char *)malloc((30 * sizeof(char)));
+    f_tree->first_entry->name = (char *)malloc((50 * sizeof(char)));
+    f_tree->first_entry->path = (char *)malloc((50 * sizeof(char)));
     f_tree->current_entry = f_tree->first_entry;
     f_tree->curr_entry_nr = 0;
     f_tree->num_of_entries = 0;

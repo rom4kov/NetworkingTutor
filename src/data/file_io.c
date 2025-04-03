@@ -15,8 +15,7 @@
 #define WU COLS / 12 // WU for WIDTH_UNIT
 #define EDIT_MAX WU * 7 + 4
 
-
-DIR_ENTRY *initialize_dir_entry(WINDOW **win, int num)
+DIR_ENTRY *initialize_dir_entry()
 {
     DIR_ENTRY *d_entry = malloc(sizeof(DIR_ENTRY));
 
@@ -24,7 +23,6 @@ DIR_ENTRY *initialize_dir_entry(WINDOW **win, int num)
     d_entry->path = (char *)malloc(50 * sizeof(char));
     d_entry->state = 'c';
     d_entry->type = 'd';
-    // d_entry->sub_entry_nr = 0;
     d_entry->num_of_entries = 0;
     d_entry->indent_level = 0;
     d_entry->last_in_sub_dir = false;
@@ -101,14 +99,15 @@ void open_new_file(APP_CONTEXT *ctx)
 
         ctx->lines_to_print = 1;
 
-        print_buffer(ctx->t_buffer, &ctx->edit_window, &ctx->line_num_win, &ctx->scroll_offset,
-                     ctx->lines_to_print);
+        print_buffer(ctx->t_buffer, &ctx->edit_window, &ctx->line_num_win,
+                     &ctx->scroll_offset, ctx->lines_to_print);
         mvwprintw(ctx->edit_window, LINES - 7, EDIT_MAX - 15, "     ");
         mvwprintw(ctx->edit_window, LINES - 7, EDIT_MAX - 15, "0 : 0");
 
         rewind(ctx->file);
 
-        mvwprintw(ctx->course_windows[2], 1, 4, "                                ");
+        mvwprintw(ctx->course_windows[2], 1, 4,
+                  "                                ");
         ICON icon = print_file_icon((char *)ctx->filename);
 
         wattron(ctx->course_windows[2], COLOR_PAIR(icon.color));
@@ -129,8 +128,6 @@ void open_file(APP_CONTEXT *ctx)
 {
     int file_size = 0;
     ctx->file = fopen(ctx->file_tree->current_entry->path, "r+");
-    mvwprintw(ctx->course_windows[0], 2, 24, "%s", ctx->file_tree->current_entry->path);
-    wrefresh(ctx->course_windows[0]);
 
     if (ctx->file == NULL)
     {
@@ -156,22 +153,25 @@ void open_file(APP_CONTEXT *ctx)
                                   ? (LINES - 7)
                                   : ctx->t_buffer->num_of_lines;
 
-        print_buffer(ctx->t_buffer, &ctx->edit_window, &ctx->line_num_win, &ctx->scroll_offset,
-                     ctx->lines_to_print);
+        print_buffer(ctx->t_buffer, &ctx->edit_window, &ctx->line_num_win,
+                     &ctx->scroll_offset, ctx->lines_to_print);
         mvwprintw(ctx->edit_window, LINES - 7, EDIT_MAX - 15, "     ");
         mvwprintw(ctx->edit_window, LINES - 7, EDIT_MAX - 15, "0 : 0");
 
         rewind(ctx->file);
 
-        mvwprintw(ctx->course_windows[2], 1, 4, "                                ");
-        ICON icon = print_file_icon((char *)ctx->file_tree->current_entry->path);
+        mvwprintw(ctx->course_windows[2], 1, 4,
+                  "                                ");
+        ICON icon =
+            print_file_icon((char *)ctx->file_tree->current_entry->path);
 
         wattron(ctx->course_windows[2], COLOR_PAIR(icon.color));
         mvwprintw(ctx->course_windows[2], 1, 5, "%s", icon.icon);
         wattroff(ctx->course_windows[2], COLOR_PAIR(icon.color));
 
         wattron(ctx->course_windows[2], A_BOLD | COLOR_PAIR(1));
-        mvwprintw(ctx->course_windows[2], 1, 7, "%s", ctx->file_tree->current_entry->name);
+        mvwprintw(ctx->course_windows[2], 1, 7, "%s",
+                  ctx->file_tree->current_entry->name);
         wattroff(ctx->course_windows[2], A_BOLD | COLOR_PAIR(1));
         wrefresh(ctx->edit_window);
     }
@@ -292,4 +292,222 @@ void create_new_file_input(WINDOW **inner_win, WINDOW **form_window,
     curs_set(1);
     set_current_field(*new_file_form, field[0]);
     post_form(*new_file_form);
+}
+
+void open_or_close_dir(FILE_TREE *f_tree, WINDOW **explorer_window)
+{
+    char *curr_path = calloc(30, sizeof(char));
+    curr_path = return_trimmed(f_tree->current_entry->path);
+
+    if (f_tree->current_entry->state == 'c')
+    {
+        f_tree->current_entry->state = 'o';
+        open_sub_directory(curr_path, f_tree);
+    }
+    else if (f_tree->current_entry->state == 'o')
+    {
+        f_tree->current_entry->state = 'c';
+        close_sub_directory(f_tree->current_entry,
+                            f_tree->current_entry->num_of_entries, f_tree);
+    }
+    wclear(*explorer_window);
+    *explorer_window = create_explorer_window(f_tree);
+    focus_window(explorer_window, 3, "Explorer");
+    doupdate();
+}
+
+void open_fiLe_from_explorer(APP_CONTEXT *ctx, bool *new_file_form_active)
+{
+    deallocate_buffer(ctx->t_buffer);
+    ctx->t_buffer = initialize_buffer();
+    if (ctx->file && ctx->file->_fileno > 0)
+        fclose(ctx->file);
+    open_file(ctx);
+
+    *new_file_form_active = false;
+    ctx->explorer_mode = false;
+    ctx->editor_mode = true;
+    ctx->active_window = 2;
+    focus_window(&ctx->course_windows[1], 2, "Explorer");
+    focus_window(&ctx->course_windows[2], 3, "Editor");
+    curs_set(2);
+    wmove(ctx->edit_window, 0, 0);
+    wnoutrefresh(ctx->course_windows[1]);
+    wnoutrefresh(ctx->line_num_win);
+    wnoutrefresh(ctx->course_windows[2]);
+    wnoutrefresh(ctx->edit_window);
+    doupdate();
+}
+
+void create_new_file(APP_CONTEXT *ctx, WINDOW **form_window, WINDOW **inner_win,
+                     bool *new_file_form_active, FORM **new_file_form,
+                     FIELD **field)
+{
+    create_new_file_input(inner_win, form_window, new_file_form, field,
+                          "Create file");
+
+    *new_file_form_active = true;
+
+    while (*new_file_form_active)
+    {
+        ctx->key = getch();
+
+        switch (ctx->key)
+        {
+            case 263: // Backspace
+                form_driver(*new_file_form, REQ_VALIDATION);
+                FIELD *current = current_field(*new_file_form);
+                char *buf = field_buffer(current, 0);
+                trim(&buf);
+                if (buf && strlen(buf) > 0)
+                {
+                    form_driver(*new_file_form, REQ_DEL_PREV);
+                    wrefresh(*form_window);
+                }
+                break;
+            case 10:
+                form_driver(*new_file_form, REQ_VALIDATION);
+                strncpy(ctx->filename, field_buffer(field[0], 0), 30);
+                ctx->filename[29] = '\0';
+                trim(&ctx->filename);
+                *new_file_form_active = false;
+                ctx->explorer_mode = false;
+                ctx->editor_mode = true;
+                ctx->active_window = 2;
+                focus_window(&ctx->course_windows[2], 3, "Editor");
+
+                deallocate_buffer(ctx->t_buffer);
+                ctx->t_buffer = initialize_buffer();
+                if (ctx->file)
+                    fclose(ctx->file);
+                open_new_file(ctx);
+
+                DIR_ENTRY *current_entry = ctx->file_tree->current_entry;
+                DIR_ENTRY *next_entry = current_entry->next;
+
+                create_new_entry_for_file(ctx, current_entry, next_entry);
+
+                // ctx->file_tree->current_entry = ctx->file_tree->first_entry;
+                // while (ctx->file_tree->current_entry->type != 8 ||
+                //        ctx->file_tree->current_entry->name[0] >
+                //            ctx->filename[0])
+                // {
+                //     ctx->file_tree->current_entry =
+                //         ctx->file_tree->current_entry->next;
+                // }
+                //
+                // DIR_ENTRY *new_entry = initialize_dir_entry();
+                // new_entry->name = ctx->filename;
+                //
+                // if (current_entry->parent_dir)
+                // {
+                //     strncpy(new_entry->path, current_entry->parent_dir->name,
+                //             strlen(current_entry->parent_dir->name));
+                //     memset(&new_entry
+                //                 ->path[strlen(current_entry->parent_dir->name)],
+                //            '/', 1);
+                //     memmove(
+                //         &new_entry
+                //              ->path[strlen(current_entry->parent_dir->name) +
+                //                     1],
+                //         new_entry->name, strlen(new_entry->name));
+                //     memset(&new_entry
+                //                 ->path[strlen(current_entry->parent_dir->name) +
+                //                        1 + strlen(new_entry->name)],
+                //            '\0', 1);
+                //     new_entry->parent_dir = current_entry->parent_dir;
+                // }
+                // else
+                // {
+                //     new_entry->path = ctx->filename;
+                // }
+                //
+                // new_entry->indent_level = current_entry->indent_level;
+                // new_entry->type = 8;
+                //
+                // current_entry->next = new_entry;
+                // new_entry->prev = current_entry;
+                // new_entry->next = next_entry;
+                // next_entry->prev = new_entry;
+                //
+                // ctx->file_tree->num_of_entries++;
+                // ctx->file_tree->curr_entry_nr++;
+
+                unpost_form(*new_file_form);
+                free_form(*new_file_form);
+                free_field(field[0]);
+                ctx->course_windows[1] = create_explorer_window(ctx->file_tree);
+                focus_window(&ctx->course_windows[2], 3, "Editor");
+                wmove(ctx->edit_window, 0, 0);
+                wnoutrefresh(ctx->course_windows[1]);
+                wnoutrefresh(ctx->edit_window);
+                doupdate();
+                break;
+            case 'q':
+                *new_file_form_active = false;
+                curs_set(0);
+                unpost_form(*new_file_form);
+                free_form(*new_file_form);
+                free_field(field[0]);
+                ctx->course_windows[1] = create_explorer_window(ctx->file_tree);
+                focus_window(&ctx->course_windows[1], 3, "Explorer");
+                doupdate();
+                break;
+            default:
+                form_driver(*new_file_form, ctx->key);
+                wrefresh(*form_window);
+                break;
+        }
+    }
+}
+
+void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
+                               DIR_ENTRY *next_entry)
+{
+    // DIR_ENTRY *current_entry = ctx->file_tree->current_entry;
+    // DIR_ENTRY *next_entry = ctx->file_tree->current_entry->next;
+
+    ctx->file_tree->current_entry = ctx->file_tree->first_entry;
+    while (ctx->file_tree->current_entry->type != 8 ||
+           ctx->file_tree->current_entry->name[0] > ctx->filename[0])
+    {
+        ctx->file_tree->current_entry = ctx->file_tree->current_entry->next;
+    }
+
+    DIR_ENTRY *new_entry = initialize_dir_entry();
+    strncpy(new_entry->name, ctx->filename, strlen(ctx->filename) + 1);
+    new_entry->name[strlen(new_entry->name) + 1] = '\0';
+    // new_entry->name = ctx->filename;
+
+    if (current_entry->parent_dir)
+    {
+        strncpy(new_entry->path, current_entry->parent_dir->name,
+                strlen(current_entry->parent_dir->name));
+        memset(&new_entry->path[strlen(current_entry->parent_dir->name)], '/',
+               1);
+        memmove(&new_entry->path[strlen(current_entry->parent_dir->name) + 1],
+                new_entry->name, strlen(new_entry->name));
+        memset(&new_entry->path[strlen(current_entry->parent_dir->name) + 1 +
+                                strlen(new_entry->name)],
+               '\0', 1);
+        new_entry->parent_dir = current_entry->parent_dir;
+    }
+    else
+    {
+        strncpy(new_entry->path, ctx->filename, sizeof(ctx->filename) - 1);
+        new_entry->path[sizeof(new_entry->path) - 1] = '\0';
+    }
+
+    new_entry->indent_level = current_entry->indent_level;
+    new_entry->type = 8;
+
+    new_entry->prev = ctx->file_tree->current_entry;
+    if (ctx->file_tree->current_entry->next)
+        new_entry->next = ctx->file_tree->current_entry->next;
+    ctx->file_tree->current_entry->next = new_entry;
+    if (ctx->file_tree->current_entry->next)
+        ctx->file_tree->current_entry->next->prev = new_entry;
+
+    ctx->file_tree->num_of_entries++;
+    ctx->file_tree->curr_entry_nr++;
 }

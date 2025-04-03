@@ -20,7 +20,8 @@ void print_entries(FILE_TREE *f_tree, WINDOW **explorer_window)
             {
                 wattron(*explorer_window, COLOR_PAIR(10));
                 for (int j = 0; j < f_tree->current_entry->indent_level; j++)
-                    mvwaddch(*explorer_window, items + 1, (j * 2) + 2, ACS_VLINE);
+                    mvwaddch(*explorer_window, items + 1, (j * 2) + 2,
+                             ACS_VLINE);
 
                 if (f_tree->current_entry->last_in_sub_dir)
                     mvwaddch(*explorer_window, items + 1,
@@ -96,4 +97,26 @@ void print_entries(FILE_TREE *f_tree, WINDOW **explorer_window)
         }
         f_tree->current_entry = f_tree->current_entry->next;
     }
+}
+
+void move_to_next_entry(FILE_TREE *f_tree, WINDOW **explorer_window)
+{
+    f_tree->current_entry = f_tree->current_entry->next;
+    f_tree->curr_entry_nr++;
+    *explorer_window =
+        create_explorer_window(f_tree);
+    focus_window(explorer_window, 3, "Explorer");
+    wnoutrefresh(*explorer_window);
+    doupdate();
+}
+
+void move_to_prev_entry(FILE_TREE *f_tree, WINDOW **explorer_window)
+{
+    f_tree->current_entry = f_tree->current_entry->prev;
+    f_tree->curr_entry_nr--;
+    *explorer_window =
+        create_explorer_window(f_tree);
+    focus_window(&*explorer_window, 3, "Explorer");
+    wnoutrefresh(*explorer_window);
+    doupdate();
 }

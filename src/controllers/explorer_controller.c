@@ -26,7 +26,6 @@ void handle_explorer_input(APP_CONTEXT *ctx)
     WINDOW *form_window = derwin(inner_win, 1, 16, 1, 1);
     FORM *new_file_form = NULL;
     FIELD *field[2];
-    char *curr_path;
 
     switch (ctx->key)
     {
@@ -34,161 +33,31 @@ void handle_explorer_input(APP_CONTEXT *ctx)
             if (ctx->file_tree->curr_entry_nr <
                 ctx->file_tree->num_of_entries - 1)
             {
-                // mvwprintw(ctx->course_windows[2], 29, 2, "   ");
-                // mvwprintw(ctx->course_windows[2], 30, 2, "   ");
-                // if (ctx->file_tree->current_entry->next->parent_dir)
-                //     mvwprintw(
-                //         ctx->course_windows[2], 29, 2, "%i",
-                //         ctx->file_tree->current_entry->next->parent_dir->num_of_entries);
-                // mvwprintw(ctx->course_windows[2], 30, 2, "%i",
-                //           ctx->file_tree->current_entry->next->sub_entry_nr);
-                // wrefresh(ctx->course_windows[2]);
-                ctx->file_tree->current_entry =
-                    ctx->file_tree->current_entry->next;
-                ctx->file_tree->curr_entry_nr++;
-                ctx->course_windows[1] = create_explorer_window(
-                    ctx->file_tree, &ctx->course_windows[2],
-                    ctx->file_tree->curr_entry_nr);
-                wrefresh(ctx->course_windows[1]);
+                move_to_next_entry(ctx->file_tree, &ctx->course_windows[1]);
             }
             break;
         case KEY_UP:
             if (ctx->file_tree->curr_entry_nr > 0)
             {
-                // mvwprintw(ctx->course_windows[2], 29, 2, "   ");
-                // mvwprintw(ctx->course_windows[2], 30, 2, "   ");
-                // if (ctx->file_tree->current_entry->prev->parent_dir)
-                //     mvwprintw(
-                //         ctx->course_windows[2], 29, 2, "%i",
-                //         ctx->file_tree->current_entry->prev->parent_dir->num_of_entries);
-                // mvwprintw(ctx->course_windows[2], 30, 2, "%i",
-                //           ctx->file_tree->current_entry->prev->sub_entry_nr);
-                // wrefresh(ctx->course_windows[2]);
-                ctx->file_tree->current_entry =
-                    ctx->file_tree->current_entry->prev;
-                ctx->file_tree->curr_entry_nr--;
-                ctx->course_windows[1] = create_explorer_window(
-                    ctx->file_tree, &ctx->course_windows[2],
-                    ctx->file_tree->curr_entry_nr);
-                wrefresh(ctx->course_windows[1]);
+                move_to_prev_entry(ctx->file_tree, &ctx->course_windows[1]);
             }
             break;
         case 10:
-            curr_path = calloc(30, sizeof(char));
-            curr_path = return_trimmed(ctx->file_tree->current_entry->path);
-
             if (ctx->file_tree->current_entry->type == 4)
             {
-                if (ctx->file_tree->current_entry->state == 'c')
-                {
-                    ctx->file_tree->current_entry->state = 'o';
-                    open_sub_directory(curr_path, ctx->file_tree,
-                                       &ctx->course_windows[2]);
-                }
-                else if (ctx->file_tree->current_entry->state == 'o')
-                {
-                    ctx->file_tree->current_entry->state = 'c';
-                    close_sub_directory(
-                        ctx->file_tree->current_entry,
-                        ctx->file_tree->current_entry->num_of_entries,
-                        ctx->file_tree, &ctx->course_windows[2]);
-                }
-                wclear(ctx->course_windows[1]);
-                ctx->course_windows[1] = create_explorer_window(
-                    ctx->file_tree, &ctx->course_windows[2],
-                    ctx->file_tree->curr_entry_nr);
+                open_or_close_dir(ctx->file_tree, &ctx->course_windows[1]);
                 break;
             }
             else
             {
-                deallocate_buffer(ctx->t_buffer);
-                ctx->t_buffer = initialize_buffer();
-                if (ctx->file && ctx->file->_fileno > 0)
-                    fclose(ctx->file);
-                open_file(ctx);
-
-                new_file_form_active = false;
-                ctx->explorer_mode = false;
-                ctx->editor_mode = true;
-                ctx->active_window = 2;
-                focus_window(&ctx->course_windows[1], 2, "Explorer");
-                focus_window(&ctx->course_windows[2], 3, "Editor");
-                curs_set(2);
-                wmove(ctx->edit_window, 0, 0);
-                wnoutrefresh(ctx->course_windows[1]);
-                wnoutrefresh(ctx->line_num_win);
-                wnoutrefresh(ctx->course_windows[2]);
-                wnoutrefresh(ctx->edit_window);
-                doupdate();
+                open_fiLe_from_explorer(ctx, &new_file_form_active);
                 break;
             }
             wrefresh(ctx->course_windows[1]);
             break;
         case 'a':
-            create_new_file_input(&inner_win, &form_window, &new_file_form,
-                                  field, "Create file");
-
-            new_file_form_active = true;
-
-            while (new_file_form_active)
-            {
-                ctx->key = getch();
-
-                switch (ctx->key)
-                {
-                    case 263: // Backspace
-                        form_driver(new_file_form, REQ_VALIDATION);
-                        FIELD *current = current_field(new_file_form);
-                        char *buf = field_buffer(current, 0);
-                        trim(&buf);
-                        if (buf && strlen(buf) > 0)
-                        {
-                            form_driver(new_file_form, REQ_DEL_PREV);
-                            wrefresh(form_window);
-                        }
-                        break;
-                    case 10:
-                        form_driver(new_file_form, REQ_VALIDATION);
-                        ctx->filename = field_buffer(field[0], 0);
-                        trim(&ctx->filename);
-                        new_file_form_active = false;
-                        ctx->explorer_mode = false;
-                        ctx->editor_mode = true;
-                        ctx->active_window = 2;
-                        focus_window(&ctx->course_windows[2], 3, "Editor");
-
-                        deallocate_buffer(ctx->t_buffer);
-                        ctx->t_buffer = initialize_buffer();
-                        if (ctx->file)
-                            fclose(ctx->file);
-                        open_new_file(ctx);
-
-                        ctx->course_windows[1] = create_explorer_window(
-                            ctx->file_tree, &ctx->course_windows[2], 0);
-                        wmove(ctx->edit_window, 0, 0);
-                        // mvwprintw(ctx->course_windows[1], 28, 2, "File: %s",
-                        //           ctx->filename);
-                        wrefresh(ctx->course_windows[1]);
-                        wrefresh(ctx->edit_window);
-                        break;
-                    case 'q':
-                        new_file_form_active = false;
-                        curs_set(0);
-                        unpost_form(new_file_form);
-                        free_form(new_file_form);
-                        free_field(field[0]);
-                        menu_driver(ctx->explorer_menu, REQ_NEXT_ITEM);
-                        ctx->course_windows[1] = create_explorer_window(
-                            ctx->file_tree, &ctx->course_windows[2], 0);
-                        focus_window(&ctx->course_windows[1], 3, "Explorer");
-                        break;
-                    default:
-                        form_driver(new_file_form, ctx->key);
-                        wrefresh(form_window);
-                        break;
-                }
-            }
-
+            create_new_file(ctx, &form_window, &inner_win,
+                            &new_file_form_active, &new_file_form, field);
             break;
         case 'r':
             break;
@@ -237,13 +106,9 @@ void handle_explorer_input(APP_CONTEXT *ctx)
                         remove(new_file_name);
 
                         ctx->course_windows[1] = create_explorer_window(
-                            ctx->file_tree, &ctx->course_windows[2], 0);
+                            ctx->file_tree);
 
                         curs_set(0);
-                        // mvwprintw(ctx->course_windows[1], 30, 2, "old: %s",
-                        //           ctx->filename);
-                        // mvwprintw(ctx->course_windows[1], 31, 2, "new: %s",
-                        //           new_file_name);
                         focus_window(&ctx->course_windows[2], 2, "Editor");
                         focus_window(&ctx->course_windows[1], 3, "Explorer");
                         wnoutrefresh(ctx->course_windows[1]);
@@ -260,8 +125,9 @@ void handle_explorer_input(APP_CONTEXT *ctx)
                         free_field(field[0]);
                         menu_driver(ctx->explorer_menu, REQ_NEXT_ITEM);
                         ctx->course_windows[1] = create_explorer_window(
-                            ctx->file_tree, &ctx->course_windows[2], 0);
+                            ctx->file_tree);
                         focus_window(&ctx->course_windows[1], 3, "Explorer");
+                        doupdate();
                         break;
                     default:
                         form_driver(new_file_form, ctx->key);

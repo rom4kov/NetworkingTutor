@@ -53,8 +53,6 @@ typedef struct _dir_entry
     char *path;
     int type;
     int indent_level;
-    // int entry_nr;
-    // int sub_entry_nr;
     int num_of_entries;
     char state;
     bool last_in_sub_dir;

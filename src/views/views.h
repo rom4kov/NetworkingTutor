@@ -20,9 +20,8 @@ WINDOW *create_course_preview_card(int x_position, int *active_win,
 WINDOW *create_right_side_panel(int *active_win, sqlite3 **db, char *label);
 void create_course_view(APP_CONTEXT *ctx);
 WINDOW *create_editor_window(int *active_window);
-WINDOW *create_explorer_window(FILE_TREE *file_tree, WINDOW **win, int i_idx);
-void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree,
-                          WINDOW **win, int i_idx);
+WINDOW *create_explorer_window(FILE_TREE *file_tree);
+void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree);
 void create_user_form(WINDOW **window, FORM **user_form, FIELD **fields);
 
 void update_line_numbers(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
@@ -36,4 +35,5 @@ char *get_file_icon(pcre2_code *re, int subj_len, char *filename, char *icon,
 ICON print_file_icon(char *filename);
 
 void print_entries(FILE_TREE *f_tree, WINDOW **explorer_window);
-void print_sub_entries(FILE_TREE *f_tree, int *items, WINDOW **explorer_window);
+void move_to_next_entry(FILE_TREE *f_tree, WINDOW **explorer_window);
+void move_to_prev_entry(FILE_TREE *f_tree, WINDOW **explorer_window);

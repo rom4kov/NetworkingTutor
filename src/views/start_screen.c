@@ -11,6 +11,7 @@
 #include <sqlite3.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #define WINDOW_COUNT 6
 #define WU COLS / 12 // WU for WIDTH_UNIT
@@ -228,7 +229,7 @@ WINDOW *create_right_side_panel(int *active_win, sqlite3 **db, char *label)
     return right_panel;
 }
 
-MENU *create_start_menu(WINDOW *left_side_win)
+MENU *create_start_menu(WINDOW *nav_window)
 {
     const char *choices[] = {
         "Home",      "Courses", "Account", "Progress", "Settings", "Shortcuts",
@@ -242,14 +243,39 @@ MENU *create_start_menu(WINDOW *left_side_win)
         menu_items[i] = new_item(choices[i], "");
     }
 
+    TABSIZE = 12;
+
+    int MENU_SPACING;
+
+    if (COLS > 240)
+    {
+        MENU_SPACING = 12;
+    }
+    else if (COLS > 220)
+    {
+        MENU_SPACING = 10;
+    }
+    else if (COLS > 200)
+    {
+        MENU_SPACING = 8;
+    }
+    else if (COLS > 180)
+    {
+        MENU_SPACING = 6;
+    }
+    else {
+        MENU_SPACING = 4;
+    }
+
     // Create the menu
     MENU *menu = new_menu(menu_items);
-    set_menu_format(menu, 1, 8);
-    set_menu_spacing(menu, 0, 0, 8);
+    set_menu_format(menu, 1, 12);
+    set_menu_spacing(menu, 0, 1, MENU_SPACING);
+    mvwprintw(nav_window, 2, 3, "%i", COLS);
 
     // Set the window for the menu to be displayed inside left_inner_win
-    set_menu_win(menu, left_side_win);
-    set_menu_sub(menu, derwin(left_side_win, 1, WU * 7 + 2, 1, 1));
+    set_menu_win(menu, nav_window);
+    set_menu_sub(menu, derwin(nav_window, 1, WU * 7, 1, 1));
     set_menu_fore(menu, A_BOLD | A_ITALIC);
     set_menu_mark(menu, " > "); // Mark for the selected item
 
@@ -257,6 +283,6 @@ MENU *create_start_menu(WINDOW *left_side_win)
     post_menu(menu);
 
     // Refresh the left_inner_win window
-    wrefresh(left_side_win);
+    wrefresh(nav_window);
     return menu;
 }

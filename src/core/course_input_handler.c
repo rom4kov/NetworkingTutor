@@ -19,17 +19,20 @@ void handle_course_input(APP_CONTEXT *ctx)
         {
             case KEY_LEFT:
                 menu_driver(ctx->start_menu, REQ_PREV_ITEM);
-                wrefresh(ctx->course_windows[0]);
+                wnoutrefresh(ctx->course_windows[0]);
+                doupdate();
                 break;
             case KEY_RIGHT:
                 menu_driver(ctx->start_menu, REQ_NEXT_ITEM);
-                wrefresh(ctx->course_windows[0]);
+                wnoutrefresh(ctx->course_windows[0]);
+                doupdate();
                 break;
             case 9:
             case KEY_DOWN:
                 ctx->active_window = 2;
                 focus_window(&ctx->course_windows[0], 2, "Navigation");
                 focus_window(&ctx->course_windows[2], 3, "Editor");
+                doupdate();
                 break;
             case '\n':
                 ctx->curr_item = current_item(ctx->start_menu);
@@ -53,7 +56,8 @@ void handle_course_input(APP_CONTEXT *ctx)
                     ctx->active_window = 5;
                     focus_window(&ctx->start_windows[5], 3, "Details");
                     wmove(ctx->start_windows[5], 4, 14);
-                    wrefresh(ctx->start_windows[5]);
+                    wnoutrefresh(ctx->start_windows[5]);
+                    doupdate();
                 }
                 break;
         }
@@ -71,11 +75,13 @@ void handle_course_input(APP_CONTEXT *ctx)
                 ctx->active_window = 2;
                 focus_window(&ctx->course_windows[1], 2, "Explorer");
                 focus_window(&ctx->course_windows[2], 3, "Editor");
+                doupdate();
                 break;
             case KEY_UP:
                 ctx->active_window = 0;
                 focus_window(&ctx->course_windows[1], 2, "Explorer");
                 focus_window(&ctx->course_windows[0], 3, "Navigation");
+                doupdate();
                 break;
             case 10:
                 ctx->explorer_mode = true;
@@ -95,16 +101,19 @@ void handle_course_input(APP_CONTEXT *ctx)
                 ctx->active_window = 1;
                 focus_window(&ctx->course_windows[2], 2, "Editor");
                 focus_window(&ctx->course_windows[1], 3, "Explorer");
+                doupdate();
                 break;
             case KEY_RIGHT:
                 ctx->active_window = 3;
                 focus_window(&ctx->course_windows[2], 2, "Editor");
                 focus_window(&ctx->course_windows[3], 3, "Course Instructions");
+                doupdate();
                 break;
             case KEY_UP:
                 ctx->active_window = 0;
                 focus_window(&ctx->course_windows[0], 3, "Navigation");
                 focus_window(&ctx->course_windows[2], 2, "Editor");
+                doupdate();
                 break;
             case 10:
                 ctx->editor_mode = true;
@@ -122,6 +131,7 @@ void handle_course_input(APP_CONTEXT *ctx)
                 ctx->active_window = 2;
                 focus_window(&ctx->course_windows[2], 3, "Editor");
                 focus_window(&ctx->course_windows[3], 2, "Course Instructions");
+                doupdate();
                 break;
         }
     }

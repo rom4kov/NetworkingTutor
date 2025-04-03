@@ -1,4 +1,5 @@
 #define _POSIX_C_SOURCE 200809L
+#include <curses.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <ncurses.h>
@@ -37,7 +38,7 @@ void draw_border(WINDOW *win, int color_pair, char *label)
     }
 
     wattroff(win, COLOR_PAIR(color_pair));
-    wrefresh(win);
+    wnoutrefresh(win);
 }
 
 void focus_window(WINDOW **window, int color_pair, char *label)
@@ -46,7 +47,7 @@ void focus_window(WINDOW **window, int color_pair, char *label)
     wattron(*window, COLOR_PAIR(3));
     mvwprintw(*window, 0, 2, "%s", label);
     wattroff(*window, COLOR_PAIR(3));
-    wrefresh(*window);
+    wnoutrefresh(*window);
 }
 
 void trim(char **str)

@@ -11,7 +11,6 @@
 #include <sqlite3.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 
 #define WINDOW_COUNT 6
 #define WU COLS / 12 // WU for WIDTH_UNIT

@@ -160,7 +160,7 @@ void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree)
 
     // select current entry of file tree
     f_tree->current_entry = f_tree->first_entry;
-    for (int i = 0; i < f_tree->curr_entry_nr; i++)
+    for (int i = 0; i < f_tree->curr_entry_nr && f_tree->current_entry != NULL; i++)
     {
         f_tree->current_entry = f_tree->current_entry->next;
     }

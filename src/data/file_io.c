@@ -4,6 +4,7 @@
 #include "../data/data_access_layer.h"
 #include "../models/models.h"
 #include "../views/views.h"
+#include <curses.h>
 #include <dirent.h>
 #include <form.h>
 #include <ncurses.h>
@@ -111,11 +112,11 @@ void open_new_file(APP_CONTEXT *ctx)
         ICON icon = print_file_icon((char *)ctx->filename);
 
         wattron(ctx->course_windows[2], COLOR_PAIR(icon.color));
-        mvwprintw(ctx->course_windows[2], 1, 4, "%s", icon.icon);
+        mvwprintw(ctx->course_windows[2], 1, 5, "%s", icon.icon);
         wattroff(ctx->course_windows[2], COLOR_PAIR(icon.color));
 
         wattron(ctx->course_windows[2], A_BOLD | COLOR_PAIR(1));
-        mvwprintw(ctx->course_windows[2], 1, 6, "%s", ctx->filename);
+        mvwprintw(ctx->course_windows[2], 1, 7, "%s", ctx->filename);
         wattroff(ctx->course_windows[2], A_BOLD | COLOR_PAIR(1));
         wrefresh(ctx->edit_window);
     }
@@ -270,7 +271,7 @@ void create_new_file_input(WINDOW **inner_win, WINDOW **form_window,
 {
     int rows, cols;
 
-    field[0] = new_field(1, 14, 0, 0, 0, 0);
+    field[0] = new_field(1, 18, 0, 0, 0, 0);
     field[1] = NULL;
 
     field_opts_off(field[0], O_AUTOSKIP);
@@ -387,52 +388,6 @@ void create_new_file(APP_CONTEXT *ctx, WINDOW **form_window, WINDOW **inner_win,
 
                 create_new_entry_for_file(ctx, current_entry, next_entry);
 
-                // ctx->file_tree->current_entry = ctx->file_tree->first_entry;
-                // while (ctx->file_tree->current_entry->type != 8 ||
-                //        ctx->file_tree->current_entry->name[0] >
-                //            ctx->filename[0])
-                // {
-                //     ctx->file_tree->current_entry =
-                //         ctx->file_tree->current_entry->next;
-                // }
-                //
-                // DIR_ENTRY *new_entry = initialize_dir_entry();
-                // new_entry->name = ctx->filename;
-                //
-                // if (current_entry->parent_dir)
-                // {
-                //     strncpy(new_entry->path, current_entry->parent_dir->name,
-                //             strlen(current_entry->parent_dir->name));
-                //     memset(&new_entry
-                //                 ->path[strlen(current_entry->parent_dir->name)],
-                //            '/', 1);
-                //     memmove(
-                //         &new_entry
-                //              ->path[strlen(current_entry->parent_dir->name) +
-                //                     1],
-                //         new_entry->name, strlen(new_entry->name));
-                //     memset(&new_entry
-                //                 ->path[strlen(current_entry->parent_dir->name) +
-                //                        1 + strlen(new_entry->name)],
-                //            '\0', 1);
-                //     new_entry->parent_dir = current_entry->parent_dir;
-                // }
-                // else
-                // {
-                //     new_entry->path = ctx->filename;
-                // }
-                //
-                // new_entry->indent_level = current_entry->indent_level;
-                // new_entry->type = 8;
-                //
-                // current_entry->next = new_entry;
-                // new_entry->prev = current_entry;
-                // new_entry->next = next_entry;
-                // next_entry->prev = new_entry;
-                //
-                // ctx->file_tree->num_of_entries++;
-                // ctx->file_tree->curr_entry_nr++;
-
                 unpost_form(*new_file_form);
                 free_form(*new_file_form);
                 free_field(field[0]);
@@ -464,9 +419,6 @@ void create_new_file(APP_CONTEXT *ctx, WINDOW **form_window, WINDOW **inner_win,
 void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
                                DIR_ENTRY *next_entry)
 {
-    // DIR_ENTRY *current_entry = ctx->file_tree->current_entry;
-    // DIR_ENTRY *next_entry = ctx->file_tree->current_entry->next;
-
     ctx->file_tree->current_entry = ctx->file_tree->first_entry;
     while (ctx->file_tree->current_entry->type != 8 ||
            ctx->file_tree->current_entry->name[0] > ctx->filename[0])
@@ -476,8 +428,7 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
 
     DIR_ENTRY *new_entry = initialize_dir_entry();
     strncpy(new_entry->name, ctx->filename, strlen(ctx->filename) + 1);
-    new_entry->name[strlen(new_entry->name) + 1] = '\0';
-    // new_entry->name = ctx->filename;
+    // new_entry->name[strlen(new_entry->name) + 1] = '\0';
 
     if (current_entry->parent_dir)
     {
@@ -499,15 +450,57 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
     }
 
     new_entry->indent_level = current_entry->indent_level;
+    mvwprintw(ctx->course_windows[1], 30, 2, "%i", new_entry->indent_level);
     new_entry->type = 8;
 
     new_entry->prev = ctx->file_tree->current_entry;
     if (ctx->file_tree->current_entry->next)
+    {
         new_entry->next = ctx->file_tree->current_entry->next;
-    ctx->file_tree->current_entry->next = new_entry;
-    if (ctx->file_tree->current_entry->next)
         ctx->file_tree->current_entry->next->prev = new_entry;
+    }
+    ctx->file_tree->current_entry->next = new_entry;
 
     ctx->file_tree->num_of_entries++;
-    ctx->file_tree->curr_entry_nr++;
+}
+
+void remove_entry_from_file_tree(FILE_TREE *f_tree, WINDOW **win)
+{
+    if (f_tree == NULL || f_tree->current_entry == NULL)
+    {
+        return;
+    }
+
+    DIR_ENTRY *entry_to_remove = f_tree->current_entry;
+
+    free(entry_to_remove->name);
+    free(entry_to_remove->path);
+
+    if (entry_to_remove->prev == NULL && entry_to_remove->next == NULL)
+    {
+        f_tree->current_entry = NULL; // List becomes empty
+        f_tree->curr_entry_nr = 0;
+    }
+    else if (entry_to_remove->prev == NULL)
+    {
+        f_tree->curr_entry_nr++;
+        f_tree->current_entry = entry_to_remove->next;
+        f_tree->current_entry->prev = NULL;
+    }
+    else if (entry_to_remove->next == NULL)
+    {
+        f_tree->current_entry = entry_to_remove->prev;
+        f_tree->current_entry->next = NULL;
+        f_tree->curr_entry_nr--;
+    }
+    else
+    {
+        f_tree->current_entry = entry_to_remove->prev; // Move to next node
+        f_tree->curr_entry_nr--;
+        entry_to_remove->prev->next = entry_to_remove->next;
+        entry_to_remove->next->prev = entry_to_remove->prev;
+    }
+
+    f_tree->num_of_entries--;
+    free(entry_to_remove);
 }

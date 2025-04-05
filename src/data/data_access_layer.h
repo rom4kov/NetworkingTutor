@@ -37,3 +37,5 @@ void remove_entry_from_file_tree(FILE_TREE *f_tree, WINDOW **win);
 void delete_file(APP_CONTEXT *ctx, bool *del_file_form_active,
                  WINDOW **inner_win, WINDOW **form_window, FORM **new_file_form,
                  FIELD **field);
+void rename_file(APP_CONTEXT *ctx, WINDOW **inner_win, WINDOW **form_window,
+                 FORM **new_file_form, FIELD **field);

@@ -63,6 +63,7 @@ void handle_explorer_input(APP_CONTEXT *ctx)
                             &new_file_form_active, &new_file_form, field);
             break;
         case 'r':
+            rename_file(ctx, &inner_win, &form_window, &new_file_form, field);
             break;
         case 'd':
             delete_file(ctx, &del_file_form_active, &inner_win, &form_window,

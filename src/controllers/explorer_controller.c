@@ -18,6 +18,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#define WU COLS / 12 // WU for WIDTH_UNIT
+#define EDITOR_WIDTH WU * 5 + WU / 2 + 5
+
 void handle_explorer_input(APP_CONTEXT *ctx)
 {
     bool new_file_form_active = false;
@@ -25,8 +28,6 @@ void handle_explorer_input(APP_CONTEXT *ctx)
     WINDOW *inner_win = derwin(ctx->course_windows[1], 3, 22, 2, 2);
     WINDOW *form_window = derwin(inner_win, 1, 18, 1, 1);
     FORM *new_file_form = NULL;
-    char *filename;
-    char *answer;
     FIELD *field[2];
 
     switch (ctx->key)
@@ -64,115 +65,8 @@ void handle_explorer_input(APP_CONTEXT *ctx)
         case 'r':
             break;
         case 'd':
-            filename = ctx->file_tree->current_entry->name;
-            char *msg = "Delete ";
-            char *label = malloc(strlen(msg) + strlen(filename) + 1);
-            strcpy(label, msg);
-            strcat(label, filename);
-            create_new_file_input(&inner_win, &form_window, &new_file_form,
-                                  field, label);
-            del_file_form_active = true;
-
-            while (del_file_form_active)
-            {
-                ctx->key = getch();
-
-                switch (ctx->key)
-                {
-                    case 263: // Backspace
-                        form_driver(new_file_form, REQ_VALIDATION);
-                        FIELD *current = current_field(new_file_form);
-                        char *buf = field_buffer(current, 0);
-                        trim(&buf);
-                        if (buf && strlen(buf) > 0)
-                        {
-                            form_driver(new_file_form, REQ_DEL_PREV);
-                            wrefresh(form_window);
-                        }
-                        break;
-                    case 10:
-                        form_driver(new_file_form, REQ_VALIDATION);
-                        answer = field_buffer(field[0], 0);
-                        trim(&answer);
-
-                        if (strcmp(answer, "y") == 0)
-                        {
-                            del_file_form_active = false;
-                            ctx->explorer_mode = true;
-                            ctx->editor_mode = false;
-                            ctx->active_window = 1;
-
-                            if (strcmp(ctx->file_tree->current_entry->path,
-                                       ctx->filename) == 0)
-                            {
-                                wclear(ctx->line_num_win);
-                                wclear(ctx->course_windows[2]);
-                                wclear(ctx->edit_window);
-                                ctx->course_windows[2] =
-                                    create_editor_window(&ctx->active_window);
-                                deallocate_buffer(ctx->t_buffer);
-                                ctx->t_buffer = initialize_buffer();
-                            }
-
-                            if (ctx->file)
-                                fclose(ctx->file);
-                            remove(ctx->file_tree->current_entry->path);
-
-                            remove_entry_from_file_tree(
-                                ctx->file_tree, &ctx->course_windows[0]);
-
-                            curs_set(0);
-                            unpost_form(new_file_form);
-                            free_form(new_file_form);
-                            free_field(field[0]);
-                            // menu_driver(ctx->explorer_menu, REQ_NEXT_ITEM);
-
-                            wclear(ctx->course_windows[1]);
-                            ctx->course_windows[1] =
-                                create_explorer_window(ctx->file_tree);
-
-                            focus_window(&ctx->course_windows[2], 2, "Editor");
-                            focus_window(&ctx->course_windows[1], 3,
-                                         "Explorer");
-                            wnoutrefresh(ctx->course_windows[1]);
-                            wnoutrefresh(ctx->line_num_win);
-                            wnoutrefresh(ctx->course_windows[2]);
-                            wnoutrefresh(ctx->edit_window);
-                            doupdate();
-                        }
-                        else
-                        {
-                            del_file_form_active = false;
-                            curs_set(0);
-                            unpost_form(new_file_form);
-                            free_form(new_file_form);
-                            free_field(field[0]);
-                            menu_driver(ctx->explorer_menu, REQ_NEXT_ITEM);
-                            ctx->course_windows[1] =
-                                create_explorer_window(ctx->file_tree);
-                            focus_window(&ctx->course_windows[1], 3,
-                                         "Explorer");
-                            doupdate();
-                        }
-                        break;
-                    case 'q':
-                        del_file_form_active = false;
-                        curs_set(0);
-                        unpost_form(new_file_form);
-                        free_form(new_file_form);
-                        free_field(field[0]);
-                        menu_driver(ctx->explorer_menu, REQ_NEXT_ITEM);
-                        ctx->course_windows[1] =
-                            create_explorer_window(ctx->file_tree);
-                        focus_window(&ctx->course_windows[1], 3, "Explorer");
-                        doupdate();
-                        break;
-                    default:
-                        form_driver(new_file_form, ctx->key);
-                        wrefresh(form_window);
-                        break;
-                }
-            }
+            delete_file(ctx, &del_file_form_active, &inner_win, &form_window,
+                        &new_file_form, field);
             break;
         case KEY_F(1):
             wrefresh(ctx->course_windows[1]);

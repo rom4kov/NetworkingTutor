@@ -34,3 +34,6 @@ void create_new_file(APP_CONTEXT *ctx, WINDOW **form_window, WINDOW **inner_win,
 void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
                                DIR_ENTRY *next_entry);
 void remove_entry_from_file_tree(FILE_TREE *f_tree, WINDOW **win);
+void delete_file(APP_CONTEXT *ctx, bool *del_file_form_active,
+                 WINDOW **inner_win, WINDOW **form_window, FORM **new_file_form,
+                 FIELD **field);

@@ -22,6 +22,8 @@ void create_course_view(APP_CONTEXT *ctx);
 WINDOW *create_editor_window(int *active_window);
 WINDOW *create_explorer_window(FILE_TREE *file_tree);
 void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree);
+void print_no_open_file_msg(WINDOW **editor_window);
+
 void create_user_form(WINDOW **window, FORM **user_form, FIELD **fields);
 
 void update_line_numbers(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
@@ -37,3 +39,4 @@ ICON print_file_icon(char *filename);
 void print_entries(FILE_TREE *f_tree, WINDOW **explorer_window);
 void move_to_next_entry(FILE_TREE *f_tree, WINDOW **explorer_window);
 void move_to_prev_entry(FILE_TREE *f_tree, WINDOW **explorer_window);
+void print_no_open_file_msg(WINDOW **editor_window);

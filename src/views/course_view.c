@@ -19,6 +19,8 @@
 #define WINDOW_COUNT 4
 #define WU COLS / 12 // WU for WIDTH_UNIT
 #define WIDTH_REMAINDER COLS % WU
+#define EDITOR_WIDTH WU * 5 + WU / 2 + 5
+#define EDIT_WIN_WIDTH WU * 5 + WU / 2
 
 void create_course_view(APP_CONTEXT *ctx)
 {
@@ -26,8 +28,7 @@ void create_course_view(APP_CONTEXT *ctx)
 
     ctx->course_windows[0] =
         create_navigation_window(&ctx->active_window, &ctx->start_menu);
-    ctx->course_windows[1] =
-        create_explorer_window(ctx->file_tree);
+    ctx->course_windows[1] = create_explorer_window(ctx->file_tree);
     ctx->course_windows[2] = create_editor_window(&ctx->active_window);
     ctx->course_windows[3] = create_right_side_panel(
         &ctx->active_window, &ctx->db, "Course instructions");
@@ -37,17 +38,15 @@ void create_course_view(APP_CONTEXT *ctx)
         derwin(ctx->course_windows[2], LINES - 6, WU * 5 + (WU / 2) - 2, 2, 5);
 
     wattron(ctx->course_windows[2], COLOR_PAIR(10));
-    mvwprintw(ctx->course_windows[2], LINES - (LINES / 2) - 4, 7,
-              "No file has been opened yet. Open or create a file in the file "
-              "explorer");
+    print_no_open_file_msg(&ctx->course_windows[2]);
     wattroff(ctx->course_windows[2], COLOR_PAIR(10));
+
     wrefresh(ctx->course_windows[2]);
 }
 
 WINDOW *create_editor_window(int *active_window)
 {
-    WINDOW *editor_window =
-        newwin(LINES - 3, WU * 5 + WU / 2 + 5, 3, WU + WU / 2);
+    WINDOW *editor_window = newwin(LINES - 3, EDITOR_WIDTH, 3, WU + WU / 2);
     draw_border(editor_window, 2, "Editor");
 
     mvwprintw(editor_window, 0, 2, "%i", *active_window);
@@ -160,7 +159,8 @@ void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree)
 
     // select current entry of file tree
     f_tree->current_entry = f_tree->first_entry;
-    for (int i = 0; i < f_tree->curr_entry_nr && f_tree->current_entry != NULL; i++)
+    for (int i = 0; i < f_tree->curr_entry_nr && f_tree->current_entry != NULL;
+         i++)
     {
         f_tree->current_entry = f_tree->current_entry->next;
     }
@@ -298,4 +298,14 @@ void close_sub_directory(DIR_ENTRY *dir_to_close, int entries_in_dir,
         dir_to_close->parent_dir->num_of_entries -=
             dir_to_close->num_of_entries;
     dir_to_close->num_of_entries -= entries_in_dir;
+}
+
+void print_no_open_file_msg(WINDOW **editor_window)
+{
+    char *msg1 = "No file has been opened yet.";
+    char *msg2 = "Open or create a file in the file explorer";
+    int left_pad1 = (EDITOR_WIDTH - strlen(msg1)) / 2;
+    int left_pad2 = (EDITOR_WIDTH - strlen(msg2)) / 2;
+    mvwprintw(*editor_window, LINES - (LINES / 2) - 6, left_pad1, "%s", msg1);
+    mvwprintw(*editor_window, LINES - (LINES / 2) - 5, left_pad2, "%s", msg2);
 }

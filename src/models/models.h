@@ -81,6 +81,7 @@ typedef struct _app_context
     FILE_TREE *file_tree;
     FILE *file;
     char *filename;
+    char *curr_file_path;
     TEXT_BUFFER *t_buffer;
     int key;
     int active_window;

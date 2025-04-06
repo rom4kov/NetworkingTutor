@@ -20,13 +20,14 @@
 
 #define WU COLS / 12 // WU for WIDTH_UNIT
 #define EDITOR_WIDTH WU * 5 + WU / 2 + 5
+#define EXPLORER_WIDTH WU + WU / 2
 
 void handle_explorer_input(APP_CONTEXT *ctx)
 {
     bool new_file_form_active = false;
     bool del_file_form_active = false;
-    WINDOW *inner_win = derwin(ctx->course_windows[1], 3, 22, 2, 2);
-    WINDOW *form_window = derwin(inner_win, 1, 18, 1, 1);
+    WINDOW *inner_win = derwin(ctx->course_windows[1], 3, EXPLORER_WIDTH - 2, 1, 1);
+    WINDOW *form_window = derwin(inner_win, 1, EXPLORER_WIDTH - 4, 1, 1);
     FORM *new_file_form = NULL;
     FIELD *field[2];
 
@@ -67,6 +68,10 @@ void handle_explorer_input(APP_CONTEXT *ctx)
             break;
         case 'd':
             delete_file(ctx, &del_file_form_active, &inner_win, &form_window,
+                        &new_file_form, field);
+            break;
+        case 'm':
+            create_directory(ctx, &inner_win, &form_window,
                         &new_file_form, field);
             break;
         case KEY_F(1):

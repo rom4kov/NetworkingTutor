@@ -16,6 +16,7 @@ FILE_TREE *initialize_file_tree();
 TEXT_BUFFER *initialize_buffer();
 LINE *initialize_line();
 void prepare_empty_file(TEXT_BUFFER **tbuf);
+void print_buffer_label(APP_CONTEXT *ctx);
 void open_new_file(APP_CONTEXT *ctx);
 void open_file(APP_CONTEXT *ctx);
 void read_file_into_buffer(FILE *file, TEXT_BUFFER *text_buf);
@@ -32,10 +33,14 @@ void create_new_file(APP_CONTEXT *ctx, WINDOW **form_window, WINDOW **inner_win,
                      bool *new_file_form_active, FORM **new_file_form,
                      FIELD **field);
 void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
-                               DIR_ENTRY *next_entry);
+                               DIR_ENTRY *next_entry, char *new_filename,
+                               int type);
 void remove_entry_from_file_tree(FILE_TREE *f_tree, WINDOW **win);
 void delete_file(APP_CONTEXT *ctx, bool *del_file_form_active,
                  WINDOW **inner_win, WINDOW **form_window, FORM **new_file_form,
                  FIELD **field);
 void rename_file(APP_CONTEXT *ctx, WINDOW **inner_win, WINDOW **form_window,
                  FORM **new_file_form, FIELD **field);
+void create_directory(APP_CONTEXT *ctx, WINDOW **inner_win,
+                      WINDOW **form_window, FORM **new_file_form,
+                      FIELD **field);

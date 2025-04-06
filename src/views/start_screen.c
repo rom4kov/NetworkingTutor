@@ -270,7 +270,7 @@ MENU *create_start_menu(WINDOW *nav_window)
     MENU *menu = new_menu(menu_items);
     set_menu_format(menu, 1, 12);
     set_menu_spacing(menu, 0, 1, MENU_SPACING);
-    mvwprintw(nav_window, 2, 3, "%i", COLS);
+    // mvwprintw(nav_window, 2, 3, "%i", COLS);
 
     // Set the window for the menu to be displayed inside left_inner_win
     set_menu_win(menu, nav_window);

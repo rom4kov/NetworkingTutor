@@ -32,9 +32,9 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
                   WINDOW **line_num_win, int *scroll_offset,
                   int lines_to_print);
 void print_line(char *line_buf, int line_num, WINDOW **edit_window);
-char *get_file_icon(pcre2_code *re, int subj_len, char *filename, char *icon,
+char *match_file_icon(pcre2_code *re, int subj_len, char *filename, char *icon,
                     int color);
-ICON print_file_icon(char *filename);
+ICON get_file_icon(char *filename);
 
 void print_entries(FILE_TREE *f_tree, WINDOW **explorer_window);
 void move_to_next_entry(FILE_TREE *f_tree, WINDOW **explorer_window);

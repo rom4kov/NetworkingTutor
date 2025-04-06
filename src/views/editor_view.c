@@ -166,7 +166,7 @@ void print_line(char *line_buf, int line_num, WINDOW **edit_window)
         pcre2_code_free(re[i]);
 }
 
-char *get_file_icon(pcre2_code *re, int subj_len, char *filename, char **icon)
+char *match_file_icon(pcre2_code *re, int subj_len, char *filename, char **icon)
 {
     PCRE2_SPTR subject = (PCRE2_SPTR)filename;
     pcre2_match_data *md = pcre2_match_data_create_from_pattern(re, NULL);
@@ -185,7 +185,7 @@ char *get_file_icon(pcre2_code *re, int subj_len, char *filename, char **icon)
     return NULL;
 }
 
-ICON print_file_icon(char *filename)
+ICON get_file_icon(char *filename)
 {
     int pattern_num = 10;
     pcre2_code *re[pattern_num];
@@ -207,7 +207,7 @@ ICON print_file_icon(char *filename)
 
     for (int i = 0; i < pattern_num; i++)
     {
-        matched_icon.icon = get_file_icon(re[i], subj_len, filename, &icons[i]);
+        matched_icon.icon = match_file_icon(re[i], subj_len, filename, &icons[i]);
 
         if (matched_icon.icon != NULL)
         {

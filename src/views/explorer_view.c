@@ -66,7 +66,7 @@ void print_entries(FILE_TREE *f_tree, WINDOW **explorer_window)
                 wattroff(*explorer_window, COLOR_PAIR(10));
 
                 ICON icon =
-                    print_file_icon((char *)f_tree->current_entry->name);
+                    get_file_icon((char *)f_tree->current_entry->name);
                 if (icon.icon != NULL)
                 {
                     wattron(*explorer_window, COLOR_PAIR(icon.color));

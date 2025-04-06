@@ -52,6 +52,7 @@ int main(void)
     ctx->file_tree = initialize_file_tree();
     ctx->t_buffer = initialize_buffer();
     ctx->filename = (char *)calloc(30, sizeof(char));
+    ctx->curr_file_path = (char *)calloc(30, sizeof(char));
     ctx->running = true;
     ctx->start_needs_redraw = true;
     ctx->course_needs_redraw = false;

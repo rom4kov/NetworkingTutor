@@ -19,6 +19,7 @@
 #define WINDOW_COUNT 4
 #define WU COLS / 12 // WU for WIDTH_UNIT
 #define WIDTH_REMAINDER COLS % WU
+#define EXPLORER_WIDTH WU + WU / 2
 #define EDITOR_WIDTH WU * 5 + WU / 2 + 5
 #define EDIT_WIN_WIDTH WU * 5 + WU / 2
 
@@ -62,7 +63,7 @@ WINDOW *create_editor_window(int *active_window)
 
 WINDOW *create_explorer_window(FILE_TREE *file_tree)
 {
-    WINDOW *explorer_window = newwin(LINES - 3, WU + WU / 2, 3, 0);
+    WINDOW *explorer_window = newwin(LINES - 3, EXPLORER_WIDTH, 3, 0);
     draw_border(explorer_window, 2, "Explorer");
 
     wattron(explorer_window, COLOR_PAIR(3));
@@ -183,8 +184,6 @@ void open_sub_directory(char *dir_name, FILE_TREE *f_tree)
     DIR_ENTRY *curr_dir = initialize_dir_entry();
 
     DIR_ENTRY *next_orig_dir = f_tree->current_entry->next;
-
-    // int sub_entry_nr = 0;
 
     while (NULL != next)
     {

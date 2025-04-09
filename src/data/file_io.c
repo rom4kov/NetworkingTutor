@@ -127,8 +127,9 @@ void open_new_file(APP_CONTEXT *ctx)
         print_buffer_label(ctx);
     }
 
-    wrefresh(ctx->line_num_win);
-    wrefresh(ctx->course_windows[2]);
+    wnoutrefresh(ctx->line_num_win);
+    wnoutrefresh(ctx->course_windows[2]);
+    doupdate();
 }
 
 void open_file(APP_CONTEXT *ctx)
@@ -172,8 +173,9 @@ void open_file(APP_CONTEXT *ctx)
         print_buffer_label(ctx);
     }
 
-    wrefresh(ctx->line_num_win);
-    wrefresh(ctx->course_windows[2]);
+    wnoutrefresh(ctx->line_num_win);
+    wnoutrefresh(ctx->course_windows[2]);
+    doupdate();
 }
 
 void read_file_into_buffer(FILE *file, TEXT_BUFFER *text_buf)
@@ -367,13 +369,16 @@ void create_new_file(APP_CONTEXT *ctx, WINDOW **form_window, WINDOW **inner_win,
                 char *new_filename = field_buffer(field[0], 0);
                 strncpy(ctx->filename, field_buffer(field[0], 0), 30);
                 ctx->filename[29] = '\0';
+
                 if (ctx->file_tree->current_entry->state == 'o')
                 {
 
-                    strcpy(ctx->curr_file_path, ctx->file_tree->current_entry->path);
+                    strcpy(ctx->curr_file_path,
+                           ctx->file_tree->current_entry->path);
                     strcat(ctx->curr_file_path, "/");
                     strcat(ctx->curr_file_path, new_filename);
-                    mvwprintw(ctx->course_windows[3], 2, 50, "%s", ctx->file_tree->current_entry->path);
+                    mvwprintw(ctx->course_windows[3], 2, 50, "%s",
+                              ctx->file_tree->current_entry->path);
                 }
                 else if (ctx->file_tree->current_entry->parent_dir)
                 {
@@ -393,20 +398,21 @@ void create_new_file(APP_CONTEXT *ctx, WINDOW **form_window, WINDOW **inner_win,
                     strncpy(ctx->curr_file_path, field_buffer(field[0], 0), 30);
                     ctx->curr_file_path[29] = '\0';
                 }
+
                 trim(&ctx->curr_file_path);
                 *new_file_form_active = false;
                 ctx->explorer_mode = false;
                 ctx->editor_mode = true;
                 ctx->active_window = 2;
-
-                if (ctx->file_tree->current_entry->parent_dir)
-                {
-                    mvwprintw(ctx->course_windows[3], 5, 2, "%s",
-                              ctx->file_tree->current_entry->parent_dir->path);
-                    mvwprintw(ctx->course_windows[3], 6, 2, "%s",
-                              ctx->file_tree->current_entry->parent_dir->name);
-                    wrefresh(ctx->course_windows[3]);
-                }
+                //
+                // if (ctx->file_tree->current_entry->parent_dir)
+                // {
+                //     mvwprintw(ctx->course_windows[3], 5, 2, "%s",
+                //               ctx->file_tree->current_entry->parent_dir->path);
+                //     mvwprintw(ctx->course_windows[3], 6, 2, "%s",
+                //               ctx->file_tree->current_entry->parent_dir->name);
+                //     wrefresh(ctx->course_windows[3]);
+                // }
 
                 deallocate_buffer(ctx->t_buffer);
                 ctx->t_buffer = initialize_buffer();
@@ -426,6 +432,7 @@ void create_new_file(APP_CONTEXT *ctx, WINDOW **form_window, WINDOW **inner_win,
                 ctx->course_windows[1] = create_explorer_window(ctx->file_tree);
                 focus_window(&ctx->course_windows[1], 2, "Explorer");
                 focus_window(&ctx->course_windows[2], 3, "Editor");
+                curs_set(2);
                 wmove(ctx->edit_window, 0, 0);
                 wnoutrefresh(ctx->course_windows[1]);
                 wnoutrefresh(ctx->line_num_win);
@@ -458,7 +465,7 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
     {
         ctx->file_tree->current_entry = current_entry;
     }
-    else 
+    else
     {
         if (current_entry->parent_dir)
             ctx->file_tree->current_entry = current_entry->parent_dir;
@@ -466,7 +473,7 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
             ctx->file_tree->current_entry = ctx->file_tree->first_entry;
 
         while (ctx->file_tree->current_entry->type != 8 ||
-            ctx->file_tree->current_entry->name[0] > new_filename[0])
+               ctx->file_tree->current_entry->name[0] > new_filename[0])
         {
             ctx->file_tree->current_entry = ctx->file_tree->current_entry->next;
         }
@@ -478,24 +485,32 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
 
     if (current_entry->state == 'o')
     {
-        mvwprintw(ctx->course_windows[3], 2, 50, "%s", current_entry->path);
+        // mvwprintw(ctx->course_windows[3], 2, 50, "%s", current_entry->path);
 
         strcpy(new_entry->path, current_entry->path);
         strcat(new_entry->path, "/");
         strcat(new_entry->path, new_entry->name);
 
-        mvwprintw(ctx->course_windows[3], 3, 50, "%s", new_entry->path);
-        wrefresh(ctx->course_windows[3]);
+        // mvwprintw(ctx->course_windows[3], 3, 50, "%s", new_entry->path);
+        // wrefresh(ctx->course_windows[3]);
 
-        if (current_entry->parent_dir)
+        DIR_ENTRY *entries_iterator = current_entry;
+
+        while (entries_iterator)
         {
-            new_entry->parent_dir = current_entry->parent_dir;
-
-            if (current_entry->parent_dir->parent_dir)
-            {
-                current_entry->parent_dir->parent_dir->num_of_entries++;
-            }
+            entries_iterator->num_of_entries++;
+            entries_iterator = entries_iterator->parent_dir;
         }
+
+        // if (current_entry->parent_dir)
+        // {
+        //     new_entry->parent_dir = current_entry->parent_dir;
+        //
+        //     if (current_entry->parent_dir->parent_dir)
+        //     {
+        //         current_entry->parent_dir->parent_dir->num_of_entries++;
+        //     }
+        // }
 
         if (current_entry->num_of_entries == 0)
         {
@@ -503,11 +518,11 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
         }
 
         new_entry->indent_level = current_entry->indent_level + 1;
-        current_entry->num_of_entries++;
-        if (current_entry->parent_dir)
-        {
-            current_entry->parent_dir->num_of_entries++;
-        }
+
+        // if (current_entry->parent_dir)
+        // {
+        //     current_entry->parent_dir->num_of_entries++;
+        // }
     }
     else if (current_entry->parent_dir)
     {
@@ -529,15 +544,15 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
             current_entry->parent_dir->parent_dir->num_of_entries++;
         }
 
-        mvwprintw(ctx->course_windows[3], 3, 45, "                       ");
-        mvwprintw(ctx->course_windows[3], 3, 45, "%s", current_entry->name);
-        mvwprintw(ctx->course_windows[3], 4, 45, "                       ");
-        mvwprintw(ctx->course_windows[3], 4, 45, "%s",
-                  current_entry->parent_dir->name);
-        mvwprintw(ctx->course_windows[3], 5, 45, "                       ");
-        mvwprintw(ctx->course_windows[3], 5, 45, "%i",
-                  current_entry->parent_dir->num_of_entries);
-        wrefresh(ctx->course_windows[3]);
+        // mvwprintw(ctx->course_windows[3], 3, 45, "                       ");
+        // mvwprintw(ctx->course_windows[3], 3, 45, "%s", current_entry->name);
+        // mvwprintw(ctx->course_windows[3], 4, 45, "                       ");
+        // mvwprintw(ctx->course_windows[3], 4, 45, "%s",
+        //           current_entry->parent_dir->name);
+        // mvwprintw(ctx->course_windows[3], 5, 45, "                       ");
+        // mvwprintw(ctx->course_windows[3], 5, 45, "%i",
+        //           current_entry->parent_dir->num_of_entries);
+        // wrefresh(ctx->course_windows[3]);
     }
     else
     {
@@ -793,9 +808,10 @@ void rename_file(APP_CONTEXT *ctx, WINDOW **inner_win, WINDOW **form_window,
                         new_path = malloc(sizeof(new_filename) + 1);
                         strcpy(new_path, new_filename);
                     }
-                    rename(ctx->file_tree->current_entry->path, new_path);
-                    strcpy(ctx->file_tree->current_entry->path, new_path);
 
+                    rename(ctx->file_tree->current_entry->path, new_path);
+
+                    strcpy(ctx->file_tree->current_entry->path, new_path);
                     strcpy(ctx->file_tree->current_entry->name, new_filename);
                     strncpy(ctx->filename, ctx->file_tree->current_entry->name,
                             30);
@@ -845,7 +861,8 @@ void create_directory(APP_CONTEXT *ctx, WINDOW **inner_win,
                       WINDOW **form_window, FORM **new_file_form, FIELD **field)
 {
     bool make_dir_form_active = true;
-    create_new_file_input(inner_win, form_window, new_file_form, field, "Create directory");
+    create_new_file_input(inner_win, form_window, new_file_form, field,
+                          "Create directory");
 
     while (make_dir_form_active)
     {
@@ -878,25 +895,15 @@ void create_directory(APP_CONTEXT *ctx, WINDOW **inner_win,
                 ctx->active_window = 1;
 
                 char *new_path;
-                if (ctx->file_tree->current_entry->parent_dir)
+                if (ctx->file_tree->current_entry->state == 'o')
                 {
-                    new_path = malloc(
-                        strlen(
-                            ctx->file_tree->current_entry->parent_dir->path) +
-                        strlen(new_dirname) + 1);
-                    strcpy(new_path,
-                           ctx->file_tree->current_entry->parent_dir->path);
+                    new_path =
+                        malloc(strlen(ctx->file_tree->current_entry->path) +
+                               strlen(new_dirname) + 1);
+                    strcpy(new_path, ctx->file_tree->current_entry->path);
                     strcat(new_path, "/");
                     strcat(new_path, new_dirname);
-                    if (ctx->file_tree->current_entry->parent_dir->state == 'o')
-                    {
-                        DIR_ENTRY *current_entry =
-                            ctx->file_tree->current_entry;
-                        DIR_ENTRY *next_entry = current_entry->next;
 
-                        create_new_entry_for_file(ctx, current_entry,
-                                                  next_entry, new_dirname, 4);
-                    }
                     mvwprintw(ctx->course_windows[3], 5, 2,
                               "                  ");
                     mvwprintw(ctx->course_windows[3], 6, 2,
@@ -905,8 +912,7 @@ void create_directory(APP_CONTEXT *ctx, WINDOW **inner_win,
                     mvwprintw(ctx->course_windows[3], 6, 2, "%s", new_path);
                     wrefresh(ctx->course_windows[3]);
                 }
-                else if (ctx->file_tree->current_entry->type == 4 &&
-                         ctx->file_tree->current_entry->state == 'o')
+                else if (ctx->file_tree->current_entry->parent_dir)
                 {
                     new_path = malloc(
                         strlen(
@@ -916,28 +922,32 @@ void create_directory(APP_CONTEXT *ctx, WINDOW **inner_win,
                            ctx->file_tree->current_entry->parent_dir->path);
                     strcat(new_path, "/");
                     strcat(new_path, new_dirname);
-                }
-                else if (ctx->file_tree->current_entry->type == 4)
-                {
-                    new_path =
-                        malloc(strlen(ctx->file_tree->current_entry->path) +
-                               strlen(new_dirname) + 2);
-                    strcpy(new_path, ctx->file_tree->current_entry->path);
-                    memset(
-                        &new_path[strlen(ctx->file_tree->current_entry->path)],
-                        '/', 1);
-                    memmove(
-                        &new_path[strlen(ctx->file_tree->current_entry->path) +
-                                  1],
-                        new_dirname, strlen(new_dirname));
-                    memset(
-                        &new_path[strlen(ctx->file_tree->current_entry->path) +
-                                  1 + strlen(new_dirname)],
-                        '\0', 1);
+
                     mvwprintw(ctx->course_windows[3], 5, 2, "2");
                     mvwprintw(ctx->course_windows[3], 6, 2, "%s", new_path);
                     wrefresh(ctx->course_windows[3]);
                 }
+                // else if (ctx->file_tree->current_entry->type == 4)
+                // {
+                //     new_path =
+                //         malloc(strlen(ctx->file_tree->current_entry->path) +
+                //                strlen(new_dirname) + 2);
+                //     strcpy(new_path, ctx->file_tree->current_entry->path);
+                //     memset(
+                //         &new_path[strlen(ctx->file_tree->current_entry->path)],
+                //         '/', 1);
+                //     memmove(
+                //         &new_path[strlen(ctx->file_tree->current_entry->path) +
+                //                   1],
+                //         new_dirname, strlen(new_dirname));
+                //     memset(
+                //         &new_path[strlen(ctx->file_tree->current_entry->path) +
+                //                   1 + strlen(new_dirname)],
+                //         '\0', 1);
+                //     mvwprintw(ctx->course_windows[3], 5, 2, "2");
+                //     mvwprintw(ctx->course_windows[3], 6, 2, "%s", new_path);
+                //     wrefresh(ctx->course_windows[3]);
+                // }
                 else
                 {
                     new_path = malloc(sizeof(new_dirname) + 1);
@@ -946,7 +956,15 @@ void create_directory(APP_CONTEXT *ctx, WINDOW **inner_win,
                     mvwprintw(ctx->course_windows[3], 6, 2, "%s", new_path);
                     wrefresh(ctx->course_windows[3]);
                 }
+
                 mkdir(new_path, 0777);
+
+                DIR_ENTRY *current_entry =
+                    ctx->file_tree->current_entry;
+                DIR_ENTRY *next_entry = current_entry->next;
+
+                create_new_entry_for_file(ctx, current_entry,
+                                          next_entry, new_dirname, 4);
 
                 curs_set(0);
                 unpost_form(*new_file_form);

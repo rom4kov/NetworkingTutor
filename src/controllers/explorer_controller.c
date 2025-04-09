@@ -49,27 +49,27 @@ void handle_explorer_input(APP_CONTEXT *ctx)
                 ctx->file_tree->num_of_entries - 1)
             {
                 move_to_next_entry(ctx->file_tree, &ctx->course_windows[1]);
-                log_ft_values(ctx);
+                // log_ft_values(ctx);
             }
             break;
         case KEY_UP:
             if (ctx->file_tree->curr_entry_nr > 0)
             {
                 move_to_prev_entry(ctx->file_tree, &ctx->course_windows[1]);
-                log_ft_values(ctx);
+                // log_ft_values(ctx);
             }
             break;
         case 10:
             if (ctx->file_tree->current_entry->type == 4)
             {
                 open_or_close_dir(ctx->file_tree, &ctx->course_windows[1]);
-                log_ft_values(ctx);
+                // log_ft_values(ctx);
                 break;
             }
             else
             {
                 open_fiLe_from_explorer(ctx, &new_file_form_active);
-                log_ft_values(ctx);
+                // log_ft_values(ctx);
                 break;
             }
             wrefresh(ctx->course_windows[1]);
@@ -77,7 +77,7 @@ void handle_explorer_input(APP_CONTEXT *ctx)
         case 'a':
             create_new_file(ctx, &form_window, &inner_win,
                             &new_file_form_active, &new_file_form, field);
-            log_ft_values(ctx);
+            // log_ft_values(ctx);
             break;
         case 'r':
             rename_file(ctx, &inner_win, &form_window, &new_file_form, field);
@@ -85,12 +85,12 @@ void handle_explorer_input(APP_CONTEXT *ctx)
         case 'd':
             delete_file(ctx, &del_file_form_active, &inner_win, &form_window,
                         &new_file_form, field);
-            log_ft_values(ctx);
+            // log_ft_values(ctx);
             break;
         case 'm':
             create_directory(ctx, &inner_win, &form_window,
                         &new_file_form, field);
-            log_ft_values(ctx);
+            // log_ft_values(ctx);
             break;
         case KEY_F(1):
             wrefresh(ctx->course_windows[1]);

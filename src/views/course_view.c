@@ -251,9 +251,19 @@ void open_sub_directory(char *dir_name, FILE_TREE *f_tree)
     if (f_tree->current_entry->num_of_entries > 0)
         prev_dir->last_in_sub_dir = true;
     next_orig_dir->prev = prev_dir;
-    if (f_tree->current_entry->parent_dir)
-        f_tree->current_entry->parent_dir->num_of_entries +=
+
+    DIR_ENTRY *entries_iterator = f_tree->current_entry;
+
+    while (entries_iterator->parent_dir)
+    {
+        entries_iterator->parent_dir->num_of_entries +=
             f_tree->current_entry->num_of_entries;
+        entries_iterator = entries_iterator->parent_dir;
+    }
+
+    // if (f_tree->current_entry->parent_dir)
+    //     f_tree->current_entry->parent_dir->num_of_entries +=
+    //         f_tree->current_entry->num_of_entries;
 
     closedir(dir);
 }
@@ -293,9 +303,18 @@ void close_sub_directory(DIR_ENTRY *dir_to_close, int entries_in_dir,
     if (curr_entry)
         curr_entry->prev = curr_dir;
     f_tree->num_of_entries -= entries_in_dir;
-    if (dir_to_close->parent_dir != NULL)
-        dir_to_close->parent_dir->num_of_entries -=
-            dir_to_close->num_of_entries;
+
+    DIR_ENTRY *entries_iterator = f_tree->current_entry;
+
+    while (entries_iterator->parent_dir)
+    {
+        entries_iterator->parent_dir->num_of_entries -= dir_to_close->num_of_entries;
+        entries_iterator = entries_iterator->parent_dir;
+    }
+
+    // if (dir_to_close->parent_dir != NULL)
+    //     dir_to_close->parent_dir->num_of_entries -=
+    //         dir_to_close->num_of_entries;
     dir_to_close->num_of_entries -= entries_in_dir;
 }
 

@@ -11,7 +11,6 @@
 void update_line_numbers(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
                          int *scroll_offset, int lines_to_print)
 {
-    // if (lines_to_print < tbuf->num_of_lines && tbuf->num_of_lines)
     for (int i = 0; i < lines_to_print; i++)
     {
         wattron(*line_num_win, COLOR_PAIR(10));

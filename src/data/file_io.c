@@ -16,6 +16,7 @@
 
 #define WU COLS / 12 // WU for WIDTH_UNIT
 #define EDIT_MAX WU * 7 + 4
+#define EXPLORER_WIDTH WU + WU / 2
 
 DIR_ENTRY *initialize_dir_entry()
 {
@@ -491,8 +492,10 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
         strcat(new_entry->path, "/");
         strcat(new_entry->path, new_entry->name);
 
-        // mvwprintw(ctx->course_windows[3], 3, 50, "%s", new_entry->path);
-        // wrefresh(ctx->course_windows[3]);
+        if (current_entry->num_of_entries == 0)
+        {
+            new_entry->last_in_sub_dir = true;
+        }
 
         DIR_ENTRY *entries_iterator = current_entry;
 
@@ -511,13 +514,9 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
         //         current_entry->parent_dir->parent_dir->num_of_entries++;
         //     }
         // }
-
-        if (current_entry->num_of_entries == 0)
-        {
-            new_entry->last_in_sub_dir = true;
-        }
-
         new_entry->indent_level = current_entry->indent_level + 1;
+
+        new_entry->parent_dir = current_entry;
 
         // if (current_entry->parent_dir)
         // {
@@ -536,8 +535,8 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
         memset(&new_entry->path[strlen(current_entry->parent_dir->path) + 1 +
                                 strlen(new_entry->name)],
                '\0', 1);
-        new_entry->parent_dir = current_entry->parent_dir;
         new_entry->indent_level = current_entry->indent_level;
+        new_entry->parent_dir = current_entry->parent_dir;
 
         if (current_entry->parent_dir->parent_dir)
         {
@@ -559,12 +558,25 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
         strncpy(new_entry->path, ctx->filename, sizeof(ctx->filename) + 1);
         new_entry->path[sizeof(new_entry->path) + 1] = '\0';
         new_entry->indent_level = current_entry->indent_level;
+        new_entry->parent_dir = current_entry->parent_dir;
     }
 
-    new_entry->parent_dir = current_entry->parent_dir;
     // mvwprintw(ctx->course_windows[3], 5, 2, "%s", new_entry->path);
     // wnoutrefresh(ctx->course_windows[3]);
     new_entry->type = type;
+
+    mvwprintw(ctx->course_windows[3], 3, 50, "            ");
+    mvwprintw(ctx->course_windows[3], 4, 50, "            ");
+    mvwprintw(ctx->course_windows[3], 5, 50, "            ");
+    mvwprintw(ctx->course_windows[3], 6, 50, "            ");
+    mvwprintw(ctx->course_windows[3], 3, 50, "new entry: %s", new_entry->name);
+    mvwprintw(ctx->course_windows[3], 4, 50, "last: %b",
+              new_entry->last_in_sub_dir);
+    mvwprintw(ctx->course_windows[3], 5, 50, "indent: %i",
+              new_entry->indent_level);
+    mvwprintw(ctx->course_windows[3], 6, 50, "parent: %s",
+              new_entry->parent_dir->path);
+    wrefresh(ctx->course_windows[3]);
 
     new_entry->prev = ctx->file_tree->current_entry;
     if (ctx->file_tree->current_entry->next)
@@ -581,6 +593,25 @@ void delete_file(APP_CONTEXT *ctx, bool *del_file_form_active,
                  WINDOW **inner_win, WINDOW **form_window, FORM **new_file_form,
                  FIELD **field)
 {
+    if (ctx->file_tree->current_entry->type == 4 &&
+        ctx->file_tree->current_entry->num_of_entries > 0)
+    {
+        mvwprintw(ctx->course_windows[3], 15, 50, "%s",
+                  ctx->file_tree->current_entry->path);
+        mvwprintw(ctx->course_windows[3], 16, 50, "%i",
+                  ctx->file_tree->current_entry->num_of_entries);
+        mvwprintw(ctx->course_windows[3], 17, 50, "%i",
+                  ctx->file_tree->current_entry->type);
+        wrefresh(ctx->course_windows[3]);
+        WINDOW *cannot_delete_win =
+            derwin(ctx->course_windows[1], 3, EXPLORER_WIDTH - 2,
+                   ctx->file_tree->curr_entry_nr + 1, 1);
+        draw_border(cannot_delete_win, 2, "");
+        mvwprintw(cannot_delete_win, 1, 1, "Dir. not empty");
+        wrefresh(cannot_delete_win);
+        return;
+    }
+
     char *filename = ctx->file_tree->current_entry->name;
     char *msg = "Delete ";
     char *label = malloc(strlen(msg) + strlen(filename) + 1);
@@ -638,6 +669,9 @@ void delete_file(APP_CONTEXT *ctx, bool *del_file_form_active,
 
                     if (ctx->file && ctx->file->_fileno > 0)
                         fclose(ctx->file);
+                    // mvwprintw(ctx->course_windows[3], 15, 50, "%s",
+                    //           ctx->file_tree->current_entry->path);
+                    // wrefresh(ctx->course_windows[3]);
                     remove(ctx->file_tree->current_entry->path);
 
                     remove_entry_from_file_tree(ctx->file_tree,
@@ -709,6 +743,13 @@ void remove_entry_from_file_tree(FILE_TREE *f_tree, WINDOW **win)
 
     DIR_ENTRY *entry_to_remove = f_tree->current_entry;
 
+    // mvwprintw(*win, 2, 2, " "); mvwprintw(*win, 2, 2, "%s",
+    // entry_to_remove->name); mvwprintw(*win, 2, 10, "%s",
+    // entry_to_remove->parent_dir->name); mvwprintw(*win, 2, 18, "%i",
+    // entry_to_remove->parent_dir->num_of_entries); mvwprintw(*win, 2, 26,
+    // "%i", entry_to_remove->prev->last_in_sub_dir); mvwprintw(*win, 2, 30,
+    // "%s", entry_to_remove->prev->name); wrefresh(*win);
+
     free(entry_to_remove->name);
     free(entry_to_remove->path);
 
@@ -739,11 +780,26 @@ void remove_entry_from_file_tree(FILE_TREE *f_tree, WINDOW **win)
 
     if (entry_to_remove->parent_dir)
     {
-        entry_to_remove->parent_dir->num_of_entries--;
-        if (entry_to_remove->parent_dir->parent_dir)
+        if (entry_to_remove->last_in_sub_dir &&
+            entry_to_remove->parent_dir->num_of_entries > 1)
         {
-            entry_to_remove->parent_dir->parent_dir->num_of_entries--;
+            entry_to_remove->prev->last_in_sub_dir = true;
         }
+
+        // entry_to_remove->parent_dir->num_of_entries--;
+
+        DIR_ENTRY *entry_iterator = entry_to_remove;
+
+        while (entry_iterator->parent_dir)
+        {
+            entry_iterator->parent_dir->num_of_entries--;
+            entry_iterator = entry_iterator->parent_dir;
+        }
+
+        // if (entry_to_remove->parent_dir->parent_dir)
+        // {
+        //     entry_to_remove->parent_dir->parent_dir->num_of_entries--;
+        // }
     }
 
     f_tree->num_of_entries--;
@@ -937,11 +993,13 @@ void create_directory(APP_CONTEXT *ctx, WINDOW **inner_win,
                 //         &new_path[strlen(ctx->file_tree->current_entry->path)],
                 //         '/', 1);
                 //     memmove(
-                //         &new_path[strlen(ctx->file_tree->current_entry->path) +
+                //         &new_path[strlen(ctx->file_tree->current_entry->path)
+                //         +
                 //                   1],
                 //         new_dirname, strlen(new_dirname));
                 //     memset(
-                //         &new_path[strlen(ctx->file_tree->current_entry->path) +
+                //         &new_path[strlen(ctx->file_tree->current_entry->path)
+                //         +
                 //                   1 + strlen(new_dirname)],
                 //         '\0', 1);
                 //     mvwprintw(ctx->course_windows[3], 5, 2, "2");
@@ -959,12 +1017,11 @@ void create_directory(APP_CONTEXT *ctx, WINDOW **inner_win,
 
                 mkdir(new_path, 0777);
 
-                DIR_ENTRY *current_entry =
-                    ctx->file_tree->current_entry;
+                DIR_ENTRY *current_entry = ctx->file_tree->current_entry;
                 DIR_ENTRY *next_entry = current_entry->next;
 
-                create_new_entry_for_file(ctx, current_entry,
-                                          next_entry, new_dirname, 4);
+                create_new_entry_for_file(ctx, current_entry, next_entry,
+                                          new_dirname, 4);
 
                 curs_set(0);
                 unpost_form(*new_file_form);

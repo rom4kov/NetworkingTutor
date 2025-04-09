@@ -92,6 +92,9 @@ void handle_explorer_input(APP_CONTEXT *ctx)
                         &new_file_form, field);
             // log_ft_values(ctx);
             break;
+        case '?':
+            create_keybinds_window();
+            break;
         case KEY_F(1):
             wrefresh(ctx->course_windows[1]);
             ctx->explorer_mode = false;

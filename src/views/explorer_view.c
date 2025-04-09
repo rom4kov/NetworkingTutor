@@ -18,10 +18,15 @@ void print_entries(FILE_TREE *f_tree, WINDOW **explorer_window)
         {
             if (f_tree->current_entry->type == 4)
             {
+                DIR_ENTRY *parent_level = initialize_dir_entry();
                 wattron(*explorer_window, COLOR_PAIR(10));
                 for (int j = 0; j < f_tree->current_entry->indent_level; j++)
                 {
-                    if (!f_tree->current_entry->parent_dir->last_in_sub_dir)
+                    parent_level = f_tree->current_entry; 
+                    for (int k = j + 1;
+                         k < f_tree->current_entry->indent_level; k++)
+                        parent_level = parent_level->parent_dir;
+                    if (parent_level && !parent_level->last_in_sub_dir)
                         mvwaddch(*explorer_window, items + 1, (j * 2) + 2,
                                  ACS_VLINE);
                 }
@@ -59,15 +64,14 @@ void print_entries(FILE_TREE *f_tree, WINDOW **explorer_window)
             else if (f_tree->current_entry->type != 4)
             {
                 DIR_ENTRY *parent_level = initialize_dir_entry();
-                parent_level->last_in_sub_dir = false;
                 wattron(*explorer_window, COLOR_PAIR(10));
                 for (int j = 0; j < f_tree->current_entry->indent_level; j++)
                 {
                     parent_level = f_tree->current_entry; 
-                    for (int k = 1;
-                         k < f_tree->current_entry->indent_level - j; k++)
+                    for (int k = j + 1;
+                         k < f_tree->current_entry->indent_level; k++)
                         parent_level = parent_level->parent_dir;
-                    if (!parent_level->last_in_sub_dir)
+                    if (parent_level && !parent_level->last_in_sub_dir)
                         mvwaddch(*explorer_window, items + 1, (j * 2) + 2,
                                  ACS_VLINE);
                 }

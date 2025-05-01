@@ -63,27 +63,57 @@ USER_DATA get_user_data(sqlite3 *db)
 
 void seed_courses_data(sqlite3 *db, WINDOW *win)
 {
-    const char *sql =
-        "CREATE TABLE IF NOT EXISTS courses (id INTEGER PRIMARY KEY, name "
-        "varchar(255) NOT NULL, short_desc varchar(255));"
-        "INSERT OR IGNORE INTO courses (name, short_desc) VALUES('Build an "
-        "HTTP Server in C', "
-        "'In this first and short project you will learn how to build a simple "
-        "HTTP "
-        "server in C, using the very basic version 1.0 of the HTTP protocol.');"
-        "INSERT OR IGNORE INTO courses (name, short_desc) VALUES('Handling "
-        "multiple clients', "
-        "'In the second project you will learn how to build a simple HTTP "
-        "server in C, using the very basic version 1.0 of the HTTP protocol.');"
-        "INSERT OR IGNORE INTO courses (name, short_desc) VALUES('Secure "
-        "communication with "
-        "SSL', 'In the second project you will learn how to build a simple "
-        "HTTP server in C, "
-        "using the very basic version 1.0 of the HTTP protocol.');";
+    // const char *course_overview =
+    //     "CREATE TABLE IF NOT EXISTS courses (id INTEGER PRIMARY KEY, name "
+    //     "varchar(255) NOT NULL, short_desc varchar(255));"
+    //
+    //     "INSERT OR IGNORE INTO courses (name, short_desc) VALUES('Build an "
+    //     "HTTP Server in C', "
+    //     "'In this first and short project you will learn how to build a
+    //     simple " "HTTP " "server in C, using the very basic version 1.0 of
+    //     the HTTP protocol.');"
+    //
+    //     "INSERT OR IGNORE INTO courses (name, short_desc) VALUES('Handling "
+    //     "multiple clients', "
+    //     "'In the second project you will learn how to build a simple HTTP "
+    //     "server in C, using the very basic version 1.0 of the HTTP
+    //     protocol.');"
+    //
+    //     "INSERT OR IGNORE INTO courses (name, short_desc) VALUES('Secure "
+    //     "communication with "
+    //     "SSL', 'In the second project you will learn how to build a simple "
+    //     "HTTP server in C, "
+    //     "using the very basic version 1.0 of the HTTP protocol.');";
+
+    const char *course_details =
+        "CREATE TABLE IF NOT EXISTS materials (id INTEGER PRIMARY KEY, "
+        "course_id INTEGER NOT NULL, section_title TEXT, section_id INTEGER "
+        "NOT NULL, content TEXT, order_num INTEGER, FOREIGN KEY(course_id) "
+        "REFERENCES courses(id));"
+
+        "INSERT OR IGNORE INTO materials (course_id, section_title, "
+        "section_id, content, "
+        "order_num) VALUES(1, 'Intro', 0, '  _     _   _             "
+        "____\n "
+        "| |__ | |_| |_ _ __ _   / / /\n | `_ \\| __| __| `_ (_) / / /\n | | | "
+        "| |_| |_| |_) | / / / \n |_| |_|\\__|\\__| .__(_)_/_/  \n             "
+        "  |_|         "
+        "  \n', 0);"
+
+        "INSERT OR IGNORE INTO materials (course_id, section_title, "
+        "section_id, content, order_num) VALUES(1, 'Intro', 0, 'To get "
+        "started, there are a few things we have to talk about so that we "
+        "are on the same page as to what it is we are actually dealing with.'"
+        ", 1);";
+    //
+    // "INSERT OR IGNORE materials (course_id, section_title, content, "
+    // "order_num) VALUES(1, 'First steps', 'To get started, there are a"
+    // " few things we have to talk about so that we are on the same page "
+    // "as to what it is we are actually dealing with.', 3);";
 
     char *err_msg = 0;
 
-    int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+    int rc = sqlite3_exec(db, course_details, 0, 0, &err_msg);
 
     if (rc != SQLITE_OK)
     {
@@ -134,6 +164,62 @@ COURSE *get_course_data(sqlite3 *db)
 
     sqlite3_finalize(stmt);
     return course_data;
+}
+
+COURSE_SECTION *get_course_section_data(sqlite3 *db, int active_course,
+                                       int section)
+{
+    int rc = 0;
+
+    const char *sql =
+        "SELECT * FROM materials WHERE course_id = ? AND section_id = ?;";
+
+    sqlite3_stmt *stmt;
+    rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+
+    if (rc != SQLITE_OK)
+    {
+        sqlite3_finalize(stmt);
+    }
+
+    if (rc == SQLITE_OK)
+    {
+        sqlite3_bind_int(stmt, 1, active_course);
+        sqlite3_bind_int(stmt, 2, section);
+    }
+
+    int num_steps = 1;
+    // if (sqlite3_step(stmt) != SQLITE_ROW)
+    // {
+    //     return NULL;
+    // }
+    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW)
+    {
+        num_steps++;
+    }
+    sqlite3_reset(stmt);
+
+    COURSE_SECTION *course_section_data = malloc(sizeof(COURSE_SECTION) * num_steps);
+
+    int i = 0;
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        const int id = sqlite3_column_int(stmt, 1);
+        const unsigned char *section_title = sqlite3_column_text(stmt, 2);
+        const int section_id = sqlite3_column_int(stmt, 3);
+        const unsigned char *content = sqlite3_column_text(stmt, 4);
+        const int order_num = sqlite3_column_int(stmt, 5);
+
+        course_section_data[i].id = id;
+        course_section_data[i].section_title = strdup((const char *)section_title);
+        course_section_data[i].section_id = section_id;
+        course_section_data[i].content = strdup((const char *)content);
+        course_section_data[i].order_num = order_num;
+        i++;
+    }
+
+    sqlite3_finalize(stmt);
+    return course_section_data;
 }
 
 void update_user(sqlite3 *db, int id, char *name, char *language)

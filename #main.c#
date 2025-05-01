@@ -117,7 +117,7 @@ int main(void)
                 ctx->t_buffer->current_col = curr_col;
                 ctx->t_buffer->current_line = ctx->t_buffer->first_line;
                 for (int i = 0; i < curr_line; i++)
-                {
+		                  {
                     ctx->t_buffer->current_line = ctx->t_buffer->current_line->next;
                 }
                 ctx->explorer_mode = false;

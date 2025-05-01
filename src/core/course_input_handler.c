@@ -117,6 +117,8 @@ void handle_course_input(APP_CONTEXT *ctx)
                 break;
             case 10:
                 ctx->editor_mode = true;
+                if (ctx->file)
+                    curs_set(2);
                 wmove(ctx->edit_window, 0, 0);
                 wrefresh(ctx->edit_window);
                 break;

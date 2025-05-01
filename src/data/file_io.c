@@ -164,8 +164,12 @@ void open_file(APP_CONTEXT *ctx)
                                   ? (LINES - 7)
                                   : ctx->t_buffer->num_of_lines;
 
+        if (ctx->t_buffer->num_of_lines == 0)
+            ctx->t_buffer->num_of_lines = 1;
+
         print_buffer(ctx->t_buffer, &ctx->edit_window, &ctx->line_num_win,
                      &ctx->scroll_offset, ctx->lines_to_print);
+
         mvwprintw(ctx->edit_window, LINES - 7, EDIT_MAX - 15, "     ");
         mvwprintw(ctx->edit_window, LINES - 7, EDIT_MAX - 15, "0 : 0");
 
@@ -174,8 +178,7 @@ void open_file(APP_CONTEXT *ctx)
         print_buffer_label(ctx);
     }
 
-    wnoutrefresh(ctx->line_num_win);
-    wnoutrefresh(ctx->course_windows[2]);
+    // wnoutrefresh(ctx->course_windows[2]);
     doupdate();
 }
 
@@ -315,10 +318,11 @@ void open_or_close_dir(FILE_TREE *f_tree, WINDOW **explorer_window)
     doupdate();
 }
 
-void open_fiLe_from_explorer(APP_CONTEXT *ctx, bool *new_file_form_active)
+void open_file_from_explorer(APP_CONTEXT *ctx, bool *new_file_form_active)
 {
     deallocate_buffer(ctx->t_buffer);
     ctx->t_buffer = initialize_buffer();
+    ctx->scroll_offset = 0;
     if (ctx->file && ctx->file->_fileno > 0)
         fclose(ctx->file);
     open_file(ctx);
@@ -743,13 +747,6 @@ void remove_entry_from_file_tree(FILE_TREE *f_tree, WINDOW **win)
 
     DIR_ENTRY *entry_to_remove = f_tree->current_entry;
 
-    // mvwprintw(*win, 2, 2, " "); mvwprintw(*win, 2, 2, "%s",
-    // entry_to_remove->name); mvwprintw(*win, 2, 10, "%s",
-    // entry_to_remove->parent_dir->name); mvwprintw(*win, 2, 18, "%i",
-    // entry_to_remove->parent_dir->num_of_entries); mvwprintw(*win, 2, 26,
-    // "%i", entry_to_remove->prev->last_in_sub_dir); mvwprintw(*win, 2, 30,
-    // "%s", entry_to_remove->prev->name); wrefresh(*win);
-
     free(entry_to_remove->name);
     free(entry_to_remove->path);
 
@@ -983,29 +980,6 @@ void create_directory(APP_CONTEXT *ctx, WINDOW **inner_win,
                     mvwprintw(ctx->course_windows[3], 6, 2, "%s", new_path);
                     wrefresh(ctx->course_windows[3]);
                 }
-                // else if (ctx->file_tree->current_entry->type == 4)
-                // {
-                //     new_path =
-                //         malloc(strlen(ctx->file_tree->current_entry->path) +
-                //                strlen(new_dirname) + 2);
-                //     strcpy(new_path, ctx->file_tree->current_entry->path);
-                //     memset(
-                //         &new_path[strlen(ctx->file_tree->current_entry->path)],
-                //         '/', 1);
-                //     memmove(
-                //         &new_path[strlen(ctx->file_tree->current_entry->path)
-                //         +
-                //                   1],
-                //         new_dirname, strlen(new_dirname));
-                //     memset(
-                //         &new_path[strlen(ctx->file_tree->current_entry->path)
-                //         +
-                //                   1 + strlen(new_dirname)],
-                //         '\0', 1);
-                //     mvwprintw(ctx->course_windows[3], 5, 2, "2");
-                //     mvwprintw(ctx->course_windows[3], 6, 2, "%s", new_path);
-                //     wrefresh(ctx->course_windows[3]);
-                // }
                 else
                 {
                     new_path = malloc(sizeof(new_dirname) + 1);
@@ -1058,4 +1032,30 @@ void create_directory(APP_CONTEXT *ctx, WINDOW **inner_win,
                 break;
         }
     }
+}
+
+void create_keybinds_window(WINDOW **explorer_window)
+{
+    wclear(*explorer_window);
+
+    WINDOW *kb_window =
+        derwin(*explorer_window, LINES - 5, EXPLORER_WIDTH - 4, 1, 2);
+
+    char *keybindings =
+        "Press:\n\nUP or DOWN key to move between entries\n\nENTER to open a "
+        "file or directory\n\n'a' to create a "
+        "new file\n\n'm' to create a "
+        "directory\n\n'r' to rename a "
+        "file or directory\n\n'd' to delete a file or directory";
+
+    char *kb_wrapped = wrap_text(keybindings, EXPLORER_WIDTH - 6);
+
+    wattron(kb_window, A_BOLD);
+    mvwprintw(kb_window, 1, 0, "File Explorer");
+    mvwprintw(kb_window, 2, 0, "Keybindings");
+    wattroff(kb_window, A_BOLD);
+
+    mvwprintw(kb_window, 4, 0, "%s", kb_wrapped);
+    focus_window(explorer_window, 3, "Explorer");
+    wrefresh(kb_window);
 }

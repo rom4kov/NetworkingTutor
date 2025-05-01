@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #define _DEFAULT_SOURCE
 
 // #include <ctype.h>
@@ -13,6 +12,7 @@
 #include <ncurses.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -37,7 +37,8 @@ void handle_explorer_input(APP_CONTEXT *ctx)
 {
     bool new_file_form_active = false;
     bool del_file_form_active = false;
-    WINDOW *inner_win = derwin(ctx->course_windows[1], 3, EXPLORER_WIDTH - 2, 1, 1);
+    WINDOW *inner_win =
+        derwin(ctx->course_windows[1], 3, EXPLORER_WIDTH - 2, 1, 1);
     WINDOW *form_window = derwin(inner_win, 1, EXPLORER_WIDTH - 4, 1, 1);
     FORM *new_file_form = NULL;
     FIELD *field[2];
@@ -68,7 +69,7 @@ void handle_explorer_input(APP_CONTEXT *ctx)
             }
             else
             {
-                open_fiLe_from_explorer(ctx, &new_file_form_active);
+                open_file_from_explorer(ctx, &new_file_form_active);
                 // log_ft_values(ctx);
                 break;
             }
@@ -88,12 +89,12 @@ void handle_explorer_input(APP_CONTEXT *ctx)
             // log_ft_values(ctx);
             break;
         case 'm':
-            create_directory(ctx, &inner_win, &form_window,
-                        &new_file_form, field);
+            create_directory(ctx, &inner_win, &form_window, &new_file_form,
+                             field);
             // log_ft_values(ctx);
             break;
         case '?':
-            create_keybinds_window();
+            create_keybinds_window(&ctx->course_windows[1]);
             break;
         case KEY_F(1):
             wrefresh(ctx->course_windows[1]);

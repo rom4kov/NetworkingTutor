@@ -20,22 +20,22 @@ void move_down(TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **edit_window,
     {
         tbuf->current_line = tbuf->current_line->next;
         tbuf->curr_line_nr++;
-        mvwprintw(*edit_window, LINES - 7, EDIT_MAX - 12, "         ");
-        mvwprintw(*edit_window, LINES - 7, EDIT_MAX - 12, "%i : %i",
-                  tbuf->curr_line_nr, tbuf->current_col);
+        // mvwprintw(*edit_window, LINES - 7, EDIT_MAX - 12, "         ");
+        // mvwprintw(*edit_window, LINES - 7, EDIT_MAX - 12, "%i : %i",
+        //           tbuf->curr_line_nr, tbuf->current_col);
         if (tbuf->curr_line_nr > *scroll_offset + LINES - 8)
         {
             curs_set(0);
             *scroll_offset += 1;
             print_buffer(tbuf, edit_window, line_num_win, scroll_offset,
                          lines_to_print);
-            log_values(edit_window, *scroll_offset, tbuf, lines_to_print, y, x);
+            // log_values(edit_window, *scroll_offset, tbuf, lines_to_print, y, x);
             wmove(*edit_window, y, x);
             curs_set(2);
         }
         else
         {
-            log_values(edit_window, *scroll_offset, tbuf, lines_to_print, y, x);
+            // log_values(edit_window, *scroll_offset, tbuf, lines_to_print, y, x);
             wmove(*edit_window, y + 1, x);
         }
     }
@@ -44,22 +44,23 @@ void move_down(TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **edit_window,
         tbuf->current_line = tbuf->current_line->next;
         tbuf->curr_line_nr++;
         tbuf->current_col = tbuf->current_line->length - 1;
-        mvwprintw(*edit_window, LINES - 7, EDIT_MAX - 12, "         ");
-        mvwprintw(*edit_window, LINES - 7, EDIT_MAX - 12, "%i : %i",
-                  tbuf->curr_line_nr, tbuf->current_col);
+        // mvwprintw(*edit_window, LINES - 7, EDIT_MAX - 12, "         ");
+        // mvwprintw(*edit_window, LINES - 7, EDIT_MAX - 12, "%i : %i",
+        //           tbuf->curr_line_nr, tbuf->current_col);
         if (tbuf->curr_line_nr > *scroll_offset + LINES - 8)
         {
             curs_set(0);
             *scroll_offset += 1;
             print_buffer(tbuf, edit_window, line_num_win, scroll_offset,
                          lines_to_print);
-            log_values(edit_window, *scroll_offset, tbuf, lines_to_print, y, x);
+            // log_values(edit_window, *scroll_offset, tbuf, lines_to_print, y, x);
             wmove(*edit_window, y, tbuf->current_line->length - 1);
             curs_set(2);
         }
         else
         {
-            log_values(edit_window, *scroll_offset, tbuf, lines_to_print, y, x);
+            curs_set(0);
+            // log_values(edit_window, *scroll_offset, tbuf, lines_to_print, y, x);
             wmove(*edit_window, y + 1, tbuf->current_line->length - 1);
             curs_set(2);
         }
@@ -83,25 +84,25 @@ void move_up(TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **edit_window,
     {
         tbuf->current_line = tbuf->current_line->prev;
         tbuf->curr_line_nr--;
-        mvwprintw(*edit_window, LINES - 7, EDIT_MAX - 12, "         ");
-        mvwprintw(*edit_window, LINES - 7, EDIT_MAX - 12, "%i : %i",
-                  tbuf->curr_line_nr, tbuf->current_col);
+        // mvwprintw(*edit_window, LINES - 7, EDIT_MAX - 12, "         ");
+        // mvwprintw(*edit_window, LINES - 7, EDIT_MAX - 12, "%i : %i",
+        //           tbuf->curr_line_nr, tbuf->current_col);
         if (tbuf->curr_line_nr < *scroll_offset)
         {
             curs_set(0);
             *scroll_offset -= 1;
             print_buffer(tbuf, edit_window, line_num_win, scroll_offset,
                          *lines_to_print);
-            log_values(edit_window, *scroll_offset, tbuf, *lines_to_print, y,
-                       x);
+            // log_values(edit_window, *scroll_offset, tbuf, *lines_to_print, y,
+            //            x);
             wmove(*edit_window, y, x);
             curs_set(2);
         }
         else
         {
             curs_set(0);
-            log_values(edit_window, *scroll_offset, tbuf, *lines_to_print, y,
-                       x);
+            // log_values(edit_window, *scroll_offset, tbuf, *lines_to_print, y,
+            //            x);
             wmove(*edit_window, y - 1, x);
             curs_set(2);
         }
@@ -120,16 +121,16 @@ void move_up(TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **edit_window,
             *scroll_offset -= 1;
             print_buffer(tbuf, edit_window, line_num_win, scroll_offset,
                          *lines_to_print);
-            log_values(edit_window, *scroll_offset, tbuf, *lines_to_print, y,
-                       x);
+            // log_values(edit_window, *scroll_offset, tbuf, *lines_to_print, y,
+            //            x);
             wmove(*edit_window, y, tbuf->current_line->length - 1);
             curs_set(2);
         }
         else
         {
             curs_set(0);
-            log_values(edit_window, *scroll_offset, tbuf, *lines_to_print, y,
-                       x);
+            // log_values(edit_window, *scroll_offset, tbuf, *lines_to_print, y,
+            //            x);
             wmove(*edit_window, y - 1, tbuf->current_line->length - 1);
             curs_set(2);
         }
@@ -203,6 +204,7 @@ void insert_char(TEXT_BUFFER *tbuf, WINDOW **edit_window, int scroll_offset,
     tbuf->current_col++;
     print_line(tbuf->current_line->buf_, tbuf->curr_line_nr - scroll_offset,
                edit_window);
+    log_values(edit_window, scroll_offset, tbuf, 0, y, x);
     wmove(*edit_window, y, x + 1);
     wrefresh(*edit_window);
 }
@@ -268,6 +270,7 @@ void delete_char_or_line(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
         mvwprintw(*edit_window, y, tbuf->current_line->length - 1, " ");
         print_line(tbuf->current_line->buf_,
                    tbuf->curr_line_nr - *scroll_offset, edit_window);
+        log_values(edit_window, *scroll_offset, tbuf, 0, y, x);
         wmove(*edit_window, y, x);
         wrefresh(*edit_window);
     }

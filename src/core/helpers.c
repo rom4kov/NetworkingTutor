@@ -1,4 +1,5 @@
 #define _POSIX_C_SOURCE 200809L
+
 #include <curses.h>
 #include <stdlib.h>
 #include <ctype.h>

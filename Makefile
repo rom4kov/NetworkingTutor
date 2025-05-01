@@ -5,7 +5,7 @@ INC=-Isrc/
 
 TARGET = main
 
-SRC = $(wildcard *.c) $(wildcard src/**/*.c)
+SRC = $(wildcard *.c) $(wildcard src/**/*.c) $(wildcard src/**/**/*.c)
 
 $(TARGET): $(SRC)
 		$(CC) $(CFLAGS) $(SRC) -o $(TARGET) $(LDFLAGS)

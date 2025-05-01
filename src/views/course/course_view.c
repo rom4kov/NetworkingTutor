@@ -1,10 +1,10 @@
 #define _XOPEN_SOURCE_EXTENDED 1
 #define _GNU_SOURCE
 
-#include "../core/core.h"
-#include "../models/models.h"
-#include "start_menu.h"
-#include "views.h"
+#include "../../core/core.h"
+#include "../../models/models.h"
+#include "../start/start_menu.h"
+#include "../views.h"
 #include <curses.h>
 #include <dirent.h>
 #include <form.h>
@@ -31,16 +31,18 @@ void create_course_view(APP_CONTEXT *ctx)
         create_navigation_window(&ctx->active_window, &ctx->start_menu);
     ctx->course_windows[1] = create_explorer_window(ctx->file_tree);
     ctx->course_windows[2] = create_editor_window(&ctx->active_window);
-    ctx->course_windows[3] = create_right_side_panel(
-        &ctx->active_window, &ctx->db, "Course instructions");
+    ctx->course_windows[3] = create_right_side_panel(ctx, "Course instructions");
 
     ctx->line_num_win = derwin(ctx->course_windows[2], LINES - 6, 3, 2, 1);
     ctx->edit_window =
         derwin(ctx->course_windows[2], LINES - 6, WU * 5 + (WU / 2) - 2, 2, 5);
 
-    wattron(ctx->course_windows[2], COLOR_PAIR(10));
-    print_no_open_file_msg(&ctx->course_windows[2]);
-    wattroff(ctx->course_windows[2], COLOR_PAIR(10));
+    if (ctx->file == NULL)
+    {
+        wattron(ctx->course_windows[2], COLOR_PAIR(10));
+        print_no_open_file_msg(&ctx->course_windows[2]);
+        wattroff(ctx->course_windows[2], COLOR_PAIR(10));
+    }
 
     wrefresh(ctx->course_windows[2]);
 }
@@ -261,10 +263,6 @@ void open_sub_directory(char *dir_name, FILE_TREE *f_tree)
         entries_iterator = entries_iterator->parent_dir;
     }
 
-    // if (f_tree->current_entry->parent_dir)
-    //     f_tree->current_entry->parent_dir->num_of_entries +=
-    //         f_tree->current_entry->num_of_entries;
-
     closedir(dir);
 }
 
@@ -308,7 +306,8 @@ void close_sub_directory(DIR_ENTRY *dir_to_close, int entries_in_dir,
 
     while (entries_iterator->parent_dir)
     {
-        entries_iterator->parent_dir->num_of_entries -= dir_to_close->num_of_entries;
+        entries_iterator->parent_dir->num_of_entries -=
+            dir_to_close->num_of_entries;
         entries_iterator = entries_iterator->parent_dir;
     }
 

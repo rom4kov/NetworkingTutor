@@ -1,9 +1,9 @@
 #define _XOPEN_SOURCE_EXTENDED 1
 
-#include "../core/core.h"
+#include "../../core/core.h"
+#include "../views.h"
 #include "start_menu.h"
 #include "user_form.h"
-#include "views.h"
 #include <curses.h>
 #include <form.h>
 #include <menu.h>
@@ -43,31 +43,6 @@ char *PROGRAMM_DESC =
     "Expand your knowledge step by step and master "
     "networking fundamentals—one challenge at a time.\nReady to begin? 🚀";
 
-char *INTRODUCTION =
-    "Step 1: Customize Your Profile\n"
-    "Navigate to the Account section in the navigation bar to change your name "
-    "and personalize your experience.\n\n"
-    "Step 2: Choose Your First Course\n"
-    "Focus on one of the course cards (like \"Build an HTTP Server in C\") and "
-    "press Enter to begin your learning journey.\n\n";
-
-char *INTRODUCTION2 =
-    "Step-by-Step Learning\n\n"
-    "Each course is designed to guide you through small, manageable steps.\n"
-    "You'll learn by:\n\n"
-    "Short instructions to get you started.\n\n"
-    "Reading material and links to deepen your understanding.\n\n"
-    "Hands-on tasks to practice and apply what you've learned in the built-in "
-    "editor.\n\n"
-    "Testing and Feedback\n\n"
-    "Once you've completed a task, you'll be prompted to test your solution. "
-    "Submit it for evaluation to receive feedback and gain points. Use these "
-    "points to unlock the next level and continue your learning adventure!\n\n";
-
-char *INTRODUCTION3 =
-    "Once you're ready, choose a course and dive in! The app is here to help "
-    "guide you, and you'll learn while having fun.\n";
-
 char *HTTP = " _     _   _             ____\n"
              "| |__ | |_| |_ _ __ _   / / /\n"
              "| '_ \\| __| __| '_ (_) / / /\n"
@@ -75,19 +50,20 @@ char *HTTP = " _     _   _             ____\n"
              "|_| |_|\\__|\\__| .__(_)_/_/  \n"
              "              |_|           \n";
 
-void create_start_screen(WINDOW **windows, int *active_window,
-                         MENU **start_menu, COURSE courses[], sqlite3 *db)
+void create_start_screen(APP_CONTEXT *ctx)
 {
-    windows[0] = create_navigation_window(active_window, start_menu);
-    windows[1] = create_header_section(active_window);
-    windows[2] = create_course_preview_card(0, active_window, 2, &courses[0]);
-    windows[3] =
-        create_course_preview_card(CARD_WIDTH, active_window, 3, &courses[1]);
-    windows[4] = create_course_preview_card(CARD_WIDTH * 2, active_window, 4,
-                                            &courses[2]);
-    windows[5] = create_right_side_panel(active_window, &db, "Details");
+    ctx->start_windows[0] =
+        create_navigation_window(&ctx->active_window, &ctx->start_menu);
+    ctx->start_windows[1] = create_header_section(&ctx->active_window);
+    ctx->start_windows[2] =
+        create_course_preview_card(0, &ctx->active_window, 2, &ctx->courses[0]);
+    ctx->start_windows[3] = create_course_preview_card(
+        CARD_WIDTH, &ctx->active_window, 3, &ctx->courses[1]);
+    ctx->start_windows[4] = create_course_preview_card(
+        CARD_WIDTH * 2, &ctx->active_window, 4, &ctx->courses[2]);
+    ctx->start_windows[5] = create_right_side_panel(ctx, "Details");
 
-    wrefresh(windows[5]);
+    wrefresh(ctx->start_windows[5]);
 }
 
 WINDOW *create_navigation_window(int *active_win, MENU **start_menu)
@@ -181,13 +157,18 @@ WINDOW *create_course_preview_card(int x_position, int *active_win,
     return course_preview_card_outer;
 }
 
-WINDOW *create_right_side_panel(int *active_win, sqlite3 **db, char *label)
+WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label)
 {
-    USER_DATA user_data = get_user_data(*db);
     int window_width = COLS - (WU * 7 + 4);
     int intro_width = window_width - 10;
+
     WINDOW *right_panel = newwin(LINES, window_width, 0, WU * 7 + 4);
-    if (*active_win == 5)
+    WINDOW *header_win =
+        derwin(right_panel, 6, window_width / 2, 3, window_width / 4 + 6);
+    WINDOW *inner_win =
+        derwin(right_panel, LINES - 15, window_width - 4, 14, 3);
+
+    if (ctx->active_window == 5)
     {
         draw_border(right_panel, 3, "Right Panel");
     }
@@ -195,36 +176,37 @@ WINDOW *create_right_side_panel(int *active_win, sqlite3 **db, char *label)
     {
         draw_border(right_panel, 2, "Right Panel");
     }
+
     wattron(right_panel, COLOR_PAIR(3));
     mvwprintw(right_panel, 0, 2, "%s", label);
     wattroff(right_panel, COLOR_PAIR(3));
 
-    mvwprintw(right_panel, 2, 3, "Your name: %s", user_data.name);
-    mvwprintw(right_panel, 3, 3, "Language:  %s", user_data.language);
+    if (ctx->start_view_active)
+    {
+        USER_DATA user_data = get_user_data(ctx->db);
+        mvwprintw(right_panel, 2, 3, "Your name: %s", user_data.name);
+        mvwprintw(right_panel, 3, 3, "Language:  %s", user_data.language);
+        print_intro(&right_panel, window_width, intro_width);
+    }
+    else if (ctx->course_view_active)
+    {
+        COURSE_SECTION *course_section_data =
+            get_course_section_data(ctx->db, 1, 0);
+        mvwprintw(header_win, 0, 0, "%s", course_section_data[0].content);
+        wattron(right_panel, A_UNDERLINE | A_BOLD | A_BLINK);
+        mvwprintw(right_panel, 10, window_width / 4 + 8, "%s",
+                  ctx->courses[0].name);
+        wattroff(right_panel, A_UNDERLINE | A_BOLD | A_BLINK);
+        mvwprintw(right_panel, 12, window_width / 2 - 4, "%s",
+                  course_section_data[0].section_title);
+        mvwprintw(inner_win, 0, 0, "%s",
+                  wrap_text(course_section_data[1].content, window_width - 8));
+    }
 
-    WINDOW *intro_win = derwin(right_panel, LINES - 8, window_width - 6, 6, 3);
-    wattron(intro_win, A_BOLD | A_UNDERLINE);
-    mvwprintw(intro_win, 1, 0, "GET STARTED\n");
-    wattroff(intro_win, A_BOLD | A_UNDERLINE);
-    wprintw(intro_win, "\n");
-    wprintw(intro_win, "%s", wrap_text(INTRODUCTION, intro_width));
-    wprintw(intro_win, "\n");
-
-    wattron(intro_win, A_BOLD | A_UNDERLINE);
-    wprintw(intro_win, "HOW THE COURSES WORK\n");
-    wattroff(intro_win, A_BOLD | A_UNDERLINE);
-    wprintw(intro_win, "\n");
-    wprintw(intro_win, "%s", wrap_text(INTRODUCTION2, intro_width));
-    wprintw(intro_win, "\n");
-
-    wattron(intro_win, A_BOLD | A_UNDERLINE);
-    wprintw(intro_win, "READY TO START?\n");
-    wattroff(intro_win, A_BOLD | A_UNDERLINE);
-    wprintw(intro_win, "\n");
-    wprintw(intro_win, "%s", wrap_text(INTRODUCTION3, intro_width));
-
-    wrefresh(right_panel);
-    wrefresh(intro_win);
+    wnoutrefresh(right_panel);
+    wnoutrefresh(header_win);
+    wnoutrefresh(inner_win);
+    doupdate();
     return right_panel;
 }
 
@@ -262,7 +244,8 @@ MENU *create_start_menu(WINDOW *nav_window)
     {
         MENU_SPACING = 6;
     }
-    else {
+    else
+    {
         MENU_SPACING = 4;
     }
 

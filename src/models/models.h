@@ -20,6 +20,16 @@ typedef struct _course_data
     char *short_desc;
 } COURSE;
 
+typedef struct _course_section
+{
+  int id;
+  int course_id;
+  int order_num;
+  int section_id;
+  char *section_title;
+  char *content;
+} COURSE_SECTION;
+
 typedef struct _line
 {
     struct _line *prev;
@@ -85,6 +95,7 @@ typedef struct _app_context
     TEXT_BUFFER *t_buffer;
     int key;
     int active_window;
+    int active_course;
     int y, x;
     int scroll_offset;
     int lines_to_print;

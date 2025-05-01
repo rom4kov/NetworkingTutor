@@ -1,6 +1,6 @@
-#include "../core/core.h"
-#include "../models/models.h"
-#include "../views/views.h"
+#include "../../core/core.h"
+#include "../../models/models.h"
+#include "../../views/views.h"
 #include <curses.h>
 #include <ncurses.h>
 #include <string.h>

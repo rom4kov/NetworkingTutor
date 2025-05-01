@@ -1,4 +1,4 @@
-#include "../views/user_form.h"
+#include "../views/start/user_form.h"
 #include "../views/views.h"
 #include "core.h"
 #include <curses.h>
@@ -122,9 +122,11 @@ void handle_start_input(APP_CONTEXT *ctx)
                 doupdate();
                 break;
             case 10: // Enter / Return key
+                this_win = ctx->active_window;
                 ctx->start_view_active = false;
                 ctx->course_needs_redraw = true;
                 ctx->course_view_active = true;
+                ctx->active_course = ctx->courses[this_win - 2].id;
                 for (int i = 1; i < WINDOW_COUNT; ++i)
                 {
                     delwin(ctx->start_windows[i]);
@@ -204,8 +206,7 @@ void handle_start_input(APP_CONTEXT *ctx)
                 char *buf2 = field_buffer(fields[1], 0);
                 update_user(ctx->db, 1, buf1, buf2);
                 curs_set(0);
-                ctx->start_windows[5] = create_right_side_panel(
-                    &ctx->active_window, &ctx->db, "Details");
+                ctx->start_windows[5] = create_right_side_panel(ctx, "Details");
                 wrefresh(ctx->start_windows[5]);
                 ctx->start_view_active = false;
                 ctx->start_needs_redraw = true;
@@ -233,5 +234,4 @@ void handle_start_input(APP_CONTEXT *ctx)
                 break;
         }
     }
-    // }
 }

@@ -164,7 +164,7 @@ WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label)
 
     WINDOW *right_panel = newwin(LINES, window_width, 0, WU * 7 + 4);
     WINDOW *header_win =
-        derwin(right_panel, 6, window_width / 2, 3, window_width / 4 + 6);
+        derwin(right_panel, 6, window_width / 2, 3, window_width / 4 + 8);
     WINDOW *inner_win =
         derwin(right_panel, LINES - 15, window_width - 4, 14, 3);
 
@@ -194,7 +194,7 @@ WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label)
             get_course_section_data(ctx->db, 1, 0);
         mvwprintw(header_win, 0, 0, "%s", course_section_data[0].content);
         wattron(right_panel, A_UNDERLINE | A_BOLD | A_BLINK);
-        mvwprintw(right_panel, 10, window_width / 4 + 8, "%s",
+        mvwprintw(right_panel, 10, window_width / 4 + 10, "%s",
                   ctx->courses[0].name);
         wattroff(right_panel, A_UNDERLINE | A_BOLD | A_BLINK);
         mvwprintw(right_panel, 12, window_width / 2 - 4, "%s",
@@ -202,6 +202,10 @@ WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label)
         mvwprintw(inner_win, 0, 0, "%s",
                   wrap_text(course_section_data[1].content, window_width - 8));
     }
+
+    char *query = read_sql_query("SQL/create_users_table.sql");
+
+    mvwprintw(inner_win, 32, 0, "%s", query);
 
     wnoutrefresh(right_panel);
     wnoutrefresh(header_win);

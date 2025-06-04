@@ -17,31 +17,31 @@ sqlite3 *create_database()
         sqlite3_close(db);
     }
 
-    // const char *zSql = "CREATE TABLE IF NOT EXISTS users (id int NOT NULL, "
-    //                    "name varchar(255) NOT NULL, "
-    //                    "short_desc varchar(255), PRIMARY KEY (id))";
-    //
-    // sqlite3_stmt *stmt;
-    //
-    // rc = sqlite3_prepare_v2(db, zSql, -1, &stmt, 0);
-    //
-    // if (rc != SQLITE_OK)
-    // {
-    //     mvwprintw(win, 1, 2, "Prepare Failed: %s", sqlite3_errmsg(db));
-    //     sqlite3_close(db);
-    // }
-    //
-    // rc = sqlite3_step(stmt);
-    //
-    // if (rc != SQLITE_OK)
-    // {
-    //     mvwprintw(win, 1, 2, "Step Failed: %s", sqlite3_errmsg(db));
-    //     sqlite3_close(db);
-    // }
-
-    // wrefresh(win);
-
     return db;
+}
+
+char *read_sql_query(char *filename)
+{
+    char c;
+    int i = 0;
+
+    FILE *sql_query_file = fopen(filename, "r+");
+    if (sql_query_file == NULL)
+    {
+        perror("file");
+    }
+
+    char *query_string = malloc(512 * sizeof(char));
+
+    while ((fread(&c, sizeof(char), 1, sql_query_file))) 
+    {
+        query_string[i] = c;
+        i++;
+    }
+
+    query_string[i + 1] = '\0';
+
+    return query_string;
 }
 
 USER_DATA get_user_data(sqlite3 *db)

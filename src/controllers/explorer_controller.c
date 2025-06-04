@@ -1,6 +1,5 @@
 #define _DEFAULT_SOURCE
 
-// #include <ctype.h>
 #include "../core/core.h"
 #include "../data/data_access_layer.h"
 #include "../models/models.h"
@@ -11,9 +10,6 @@
 #include <menu.h>
 #include <ncurses.h>
 #include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>

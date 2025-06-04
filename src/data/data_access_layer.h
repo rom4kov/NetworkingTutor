@@ -5,6 +5,7 @@
 #include <sqlite3.h>
 
 sqlite3 *create_database();
+char *read_sql_query(char *filename);
 USER_DATA get_user_data(sqlite3 *db);
 void seed_courses_data(sqlite3 *db, WINDOW *win);
 COURSE *get_course_data(sqlite3 *db);

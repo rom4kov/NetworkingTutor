@@ -31,7 +31,11 @@ char *read_sql_query(char *filename)
         perror("file");
     }
 
-    char *query_string = malloc(512 * sizeof(char));
+    fseek(sql_query_file, 0, SEEK_END);
+    int file_size = ftell(sql_query_file);
+    rewind(sql_query_file);
+
+    char *query_string = calloc(file_size, sizeof(char));
 
     while ((fread(&c, sizeof(char), 1, sql_query_file))) 
     {
@@ -85,26 +89,27 @@ void seed_courses_data(sqlite3 *db, WINDOW *win)
     //     "HTTP server in C, "
     //     "using the very basic version 1.0 of the HTTP protocol.');";
 
-    const char *course_details =
-        "CREATE TABLE IF NOT EXISTS materials (id INTEGER PRIMARY KEY, "
-        "course_id INTEGER NOT NULL, section_title TEXT, section_id INTEGER "
-        "NOT NULL, content TEXT, order_num INTEGER, FOREIGN KEY(course_id) "
-        "REFERENCES courses(id));"
-
-        "INSERT OR IGNORE INTO materials (course_id, section_title, "
-        "section_id, content, "
-        "order_num) VALUES(1, 'Intro', 0, '  _     _   _             "
-        "____\n "
-        "| |__ | |_| |_ _ __ _   / / /\n | `_ \\| __| __| `_ (_) / / /\n | | | "
-        "| |_| |_| |_) | / / / \n |_| |_|\\__|\\__| .__(_)_/_/  \n             "
-        "  |_|         "
-        "  \n', 0);"
-
-        "INSERT OR IGNORE INTO materials (course_id, section_title, "
-        "section_id, content, order_num) VALUES(1, 'Intro', 0, 'To get "
-        "started, there are a few things we have to talk about so that we "
-        "are on the same page as to what it is we are actually dealing with.'"
-        ", 1);";
+    // const char *course_details =
+    //     "CREATE TABLE IF NOT EXISTS materials (id INTEGER PRIMARY KEY, "
+    //     "course_id INTEGER NOT NULL, section_title TEXT, section_id INTEGER "
+    //     "NOT NULL, content TEXT, order_num INTEGER, FOREIGN KEY(course_id) "
+    //     "REFERENCES courses(id));"
+    //
+    //     "INSERT OR IGNORE INTO materials (course_id, section_title, "
+    //     "section_id, content, "
+    //     "order_num) VALUES(1, 'Intro', 0, '  _     _   _             "
+    //     "____\n "
+    //     "| |__ | |_| |_ _ __ _   / / /\n | `_ \\| __| __| `_ (_) / / /\n | | | "
+    //     "| |_| |_| |_) | / / / \n |_| |_|\\__|\\__| .__(_)_/_/  \n             "
+    //     "  |_|         "
+    //     "  \n', 0);"
+    //
+    //     "INSERT OR IGNORE INTO materials (course_id, section_title, "
+    //     "section_id, content, order_num) VALUES(1, 'Intro', 0, 'To get "
+    //     "started, there are a few things we have to talk about so that we "
+    //     "are on the same page as to what it is we are actually dealing with.'"
+    //     ", 1);";
+    const char *course_details = read_sql_query("SQL/courses/http_server/intro/create.sql");
     //
     // "INSERT OR IGNORE materials (course_id, section_title, content, "
     // "order_num) VALUES(1, 'First steps', 'To get started, there are a"

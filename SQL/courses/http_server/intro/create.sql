@@ -5,7 +5,9 @@ CREATE TABLE IF NOT EXISTS materials (
     section_id INTEGER NOT NULL,
     content TEXT,
     order_num INTEGER,
-    FOREIGN KEY(course_id) REFERENCES courses(id)
+    FOREIGN KEY(course_id)
+    REFERENCES courses(id)
+    UNIQUE(course_id, section_id, order_num)
 );
 
 INSERT
@@ -21,12 +23,12 @@ VALUES
         1,
         'Intro',
         0,
-        '  _     _   _             
-____\n 
-| |__ | |_| |_ _ __ _   / / /\n | `_ \\| __| __| `_ (_) / / /\n | | | 
-| |_| |_| |_) | / / / \n |_| |_|\\__|\\__| .__(_)_/_/  \n             
-  |_|         
-  \n',
+        '  _     _   _             ____\n 
+          | |__ | |_| |_ _ __ _   / / /\n
+          | `_ \\| __| __| `_ (_) / / /\n
+          | | | | |_| |_| |_) | / / / \n
+          |_| |_|\\__|\\__| .__(_)_/_/  \n
+                          |_|\n',
         0
     );
 
@@ -62,8 +64,9 @@ VALUES
         1,
         'Intro',
         0,
-        'To get 
-started, there are a few things we have to talk about so that we 
-are on the same page as to what it is we are actually dealing with.',
+        '1. Building an HTTP server from scratch is a great starting point
+for learning network programming because it doesn’t require prior knowledge
+of networking and still teaches you core concepts by creating something
+practical.',
         2
     );

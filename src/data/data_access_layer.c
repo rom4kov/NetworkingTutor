@@ -39,7 +39,14 @@ char *read_sql_query(char *filename)
 
     while ((fread(&c, sizeof(char), 1, sql_query_file))) 
     {
-        query_string[i] = c;
+        if (c == '\n')
+        {
+            query_string[i] = ' ';
+        }
+        else 
+        {
+            query_string[i] = c;
+        }
         i++;
     }
 

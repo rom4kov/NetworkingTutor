@@ -166,7 +166,7 @@ WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label)
     WINDOW *header_win =
         derwin(right_panel, 6, window_width / 2, 3, window_width / 4 + 8);
     WINDOW *inner_win =
-        derwin(right_panel, LINES - 15, window_width - 4, 14, 3);
+        derwin(right_panel, LINES - 15, window_width - 5, 14, 3);
 
     if (ctx->active_window == 5)
     {
@@ -197,15 +197,19 @@ WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label)
         mvwprintw(right_panel, 10, window_width / 4 + 10, "%s",
                   ctx->courses[0].name);
         wattroff(right_panel, A_UNDERLINE | A_BOLD | A_BLINK);
-        mvwprintw(right_panel, 12, window_width / 2 - 4, "%s",
+        mvwprintw(right_panel, 12, window_width / 2 - 2, "%s",
                   course_section_data[0].section_title);
         mvwprintw(inner_win, 0, 0, "%s",
-                  wrap_text(course_section_data[1].content, window_width - 8));
+                  wrap_text(course_section_data[1].content,
+                            window_width - (COLS / 18) + 1));
+        mvwprintw(inner_win, 4, 0, "%s",
+                  wrap_text(course_section_data[2].content,
+                            window_width - (COLS / 18) + 1));
     }
 
-    char *query = read_sql_query("SQL/create_users_table.sql");
-
-    mvwprintw(inner_win, 32, 0, "%s", query);
+    // char *query = read_sql_query("SQL/create_users_table.sql");
+    //
+    // mvwprintw(inner_win, 32, 0, "%s", query);
 
     wnoutrefresh(right_panel);
     wnoutrefresh(header_win);

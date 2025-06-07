@@ -1,6 +1,7 @@
 #define _XOPEN_SOURCE_EXTENDED 1
 
 #include "../../core/core.h"
+#include "../../models/models.h"
 #include "../views.h"
 #include "start_menu.h"
 #include "user_form.h"
@@ -159,63 +160,57 @@ WINDOW *create_course_preview_card(int x_position, int *active_win,
 
 WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label)
 {
-    int window_width = COLS - (WU * 7 + 4);
-    int intro_width = window_width - 10;
-
-    WINDOW *right_panel = newwin(LINES, window_width, 0, WU * 7 + 4);
-    WINDOW *header_win =
-        derwin(right_panel, 6, window_width / 2, 3, window_width / 4 + 8);
-    WINDOW *inner_win =
-        derwin(right_panel, LINES - 15, window_width - 5, 14, 3);
+    init_right_panel_state(ctx->rp_state);
 
     if (ctx->active_window == 5)
     {
-        draw_border(right_panel, 3, "Right Panel");
+        draw_border(ctx->rp_state->right_panel, 3, "Right Panel");
     }
     else
     {
-        draw_border(right_panel, 2, "Right Panel");
+        draw_border(ctx->rp_state->right_panel, 2, "Right Panel");
     }
 
-    wattron(right_panel, COLOR_PAIR(3));
-    mvwprintw(right_panel, 0, 2, "%s", label);
-    wattroff(right_panel, COLOR_PAIR(3));
+    wattron(ctx->rp_state->right_panel, COLOR_PAIR(3));
+    mvwprintw(ctx->rp_state->right_panel, 0, 2, "%s", label);
+    wattroff(ctx->rp_state->right_panel, COLOR_PAIR(3));
 
     if (ctx->start_view_active)
     {
         USER_DATA user_data = get_user_data(ctx->db);
-        mvwprintw(right_panel, 2, 3, "Your name: %s", user_data.name);
-        mvwprintw(right_panel, 3, 3, "Language:  %s", user_data.language);
-        print_intro(&right_panel, window_width, intro_width);
+        mvwprintw(ctx->rp_state->right_panel, 2, 3, "Your name: %s",
+                  user_data.name);
+        mvwprintw(ctx->rp_state->right_panel, 3, 3, "Language:  %s",
+                  user_data.language);
+        print_intro(&ctx->rp_state->right_panel, ctx->rp_state->window_width,
+                    ctx->rp_state->intro_width);
     }
     else if (ctx->course_view_active)
     {
-        COURSE_SECTION *course_section_data =
+        ctx->rp_state->course_section_data =
             get_course_section_data(ctx->db, 1, 0);
-        mvwprintw(header_win, 0, 0, "%s", course_section_data[0].content);
-        wattron(right_panel, A_UNDERLINE | A_BOLD | A_BLINK);
-        mvwprintw(right_panel, 10, window_width / 4 + 10, "%s",
+        mvwprintw(ctx->rp_state->header_win, 0, 0, "%s",
+                  ctx->rp_state->course_section_data[0].content);
+        wattron(ctx->rp_state->right_panel, A_UNDERLINE | A_BOLD | A_BLINK);
+        mvwprintw(ctx->rp_state->right_panel, 10,
+                  ctx->rp_state->window_width / 4 + 10, "%s",
                   ctx->courses[0].name);
-        wattroff(right_panel, A_UNDERLINE | A_BOLD | A_BLINK);
-        mvwprintw(right_panel, 12, window_width / 2 - 2, "%s",
-                  course_section_data[0].section_title);
-        mvwprintw(inner_win, 0, 0, "%s",
-                  wrap_text(course_section_data[1].content,
-                            window_width - (COLS / 18) + 1));
-        mvwprintw(inner_win, 4, 0, "%s",
-                  wrap_text(course_section_data[2].content,
-                            window_width - (COLS / 18) + 1));
+        wattroff(ctx->rp_state->right_panel, A_UNDERLINE | A_BOLD | A_BLINK);
+        mvwprintw(ctx->rp_state->right_panel, 12,
+                  ctx->rp_state->window_width / 2 - 2, "%s",
+                  ctx->rp_state->course_section_data[0].section_title);
+
+        print_next_course_item(1, ctx->rp_state);
+
+        mvwprintw(ctx->rp_state->right_panel, LINES - 2, 3,
+                  "Press SPACE to continue");
     }
 
-    // char *query = read_sql_query("SQL/create_users_table.sql");
-    //
-    // mvwprintw(inner_win, 32, 0, "%s", query);
-
-    wnoutrefresh(right_panel);
-    wnoutrefresh(header_win);
-    wnoutrefresh(inner_win);
+    wnoutrefresh(ctx->rp_state->right_panel);
+    wnoutrefresh(ctx->rp_state->header_win);
+    wnoutrefresh(ctx->rp_state->inner_win);
     doupdate();
-    return right_panel;
+    return ctx->rp_state->right_panel;
 }
 
 MENU *create_start_menu(WINDOW *nav_window)
@@ -275,4 +270,34 @@ MENU *create_start_menu(WINDOW *nav_window)
     // Refresh the left_inner_win window
     wrefresh(nav_window);
     return menu;
+}
+
+void init_right_panel_state(RIGHT_PANEL_STATE *rp_state)
+{
+    rp_state->window_width = COLS - (WU * 7 + 4);
+    rp_state->intro_width = rp_state->window_width - 10;
+
+    rp_state->right_panel =
+        newwin(LINES, rp_state->window_width, 0, WU * 7 + 4);
+    rp_state->header_win =
+        derwin(rp_state->right_panel, 6, 31, 3, rp_state->window_width / 4 + 8);
+    rp_state->inner_win = derwin(rp_state->right_panel, LINES - 15,
+                                 rp_state->window_width - 5, 14, 3);
+}
+
+void print_next_course_item(int item, RIGHT_PANEL_STATE *rp_state)
+{
+    char *title = rp_state->course_section_data[item].content_title;
+    char *text = rp_state->course_section_data[item].content;
+    rp_state->curr_item = item;
+    rp_state->curr_offset = item < 2 ? 0
+                          : rp_state->curr_offset +
+                                (strlen(text) / rp_state->window_width) +
+                                (item > 1 ? 3 : 0);
+    wattron(rp_state->inner_win, A_BOLD);
+    mvwprintw(rp_state->inner_win, rp_state->curr_offset, 0, "%s",
+              wrap_text(title, rp_state->window_width - (COLS / 18) + 1));
+    wattroff(rp_state->inner_win, A_BOLD);
+    mvwprintw(rp_state->inner_win, rp_state->curr_offset + 1, 0, "%s",
+              wrap_text(text, rp_state->window_width - (COLS / 14) + 1));
 }

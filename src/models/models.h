@@ -1,5 +1,6 @@
 #pragma once
 
+#include <curses.h>
 #include <menu.h>
 #include <ncurses.h>
 #include <sqlite3.h>
@@ -27,6 +28,7 @@ typedef struct _course_section
   int order_num;
   int section_id;
   char *section_title;
+  char *content_title;
   char *content;
 } COURSE_SECTION;
 
@@ -76,6 +78,18 @@ typedef struct _file_tree
     int num_of_entries;
 } FILE_TREE;
 
+typedef struct _right_panel_state
+{
+    int window_width;  
+    int intro_width;  
+    int curr_item;
+    int curr_offset;
+    WINDOW *right_panel;
+    WINDOW *header_win;
+    WINDOW *inner_win;
+    COURSE_SECTION *course_section_data;
+} RIGHT_PANEL_STATE;
+
 typedef struct _app_context
 {
     sqlite3 *db;
@@ -83,6 +97,7 @@ typedef struct _app_context
     WINDOW *course_windows[COURSE_WINDOW_COUNT];
     WINDOW *line_num_win;
     WINDOW *edit_window;
+    RIGHT_PANEL_STATE *rp_state;
     COURSE *courses;
     MENU *start_menu;
     MENU *explorer_menu;

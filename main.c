@@ -8,6 +8,7 @@
 #include <ncurses.h>
 #include <sqlite3.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define COLOR_GREY 16
@@ -35,6 +36,7 @@ int main(void)
     memset(ctx, 0, sizeof(APP_CONTEXT));
 
     ctx->db = create_database();
+    ctx->rp_state = (RIGHT_PANEL_STATE *)malloc(sizeof(RIGHT_PANEL_STATE));
     ctx->courses = get_course_data(ctx->db);
     ctx->file = NULL;
     ctx->file_tree = initialize_file_tree();

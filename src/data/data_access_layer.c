@@ -43,6 +43,10 @@ char *read_sql_query(char *filename)
         {
             query_string[i] = ' ';
         }
+        else if (c == '@')
+        {
+            query_string[i] = '\n';
+        }
         else 
         {
             query_string[i] = c;
@@ -219,12 +223,14 @@ COURSE_SECTION *get_course_section_data(sqlite3 *db, int active_course,
         const int id = sqlite3_column_int(stmt, 1);
         const unsigned char *section_title = sqlite3_column_text(stmt, 2);
         const int section_id = sqlite3_column_int(stmt, 3);
-        const unsigned char *content = sqlite3_column_text(stmt, 4);
-        const int order_num = sqlite3_column_int(stmt, 5);
+        const unsigned char *content_title = sqlite3_column_text(stmt, 4);
+        const unsigned char *content = sqlite3_column_text(stmt, 5);
+        const int order_num = sqlite3_column_int(stmt, 6);
 
         course_section_data[i].id = id;
         course_section_data[i].section_title = strdup((const char *)section_title);
         course_section_data[i].section_id = section_id;
+        course_section_data[i].content_title = strdup((const char *)content_title);
         course_section_data[i].content = strdup((const char *)content);
         course_section_data[i].order_num = order_num;
         i++;

@@ -135,6 +135,11 @@ void handle_course_input(APP_CONTEXT *ctx)
                 focus_window(&ctx->course_windows[3], 2, "Course Instructions");
                 doupdate();
                 break;
+            case ' ':
+                print_next_course_item(ctx->rp_state->curr_item + 1,
+                                       ctx->rp_state);
+                wrefresh(ctx->rp_state->inner_win);
+                break;
         }
     }
 }

@@ -78,54 +78,7 @@ USER_DATA get_user_data(sqlite3 *db)
 
 void seed_courses_data(sqlite3 *db, WINDOW *win)
 {
-    // const char *course_overview =
-    //     "CREATE TABLE IF NOT EXISTS courses (id INTEGER PRIMARY KEY, name "
-    //     "varchar(255) NOT NULL, short_desc varchar(255));"
-    //
-    //     "INSERT OR IGNORE INTO courses (name, short_desc) VALUES('Build an "
-    //     "HTTP Server in C', "
-    //     "'In this first and short project you will learn how to build a
-    //     simple " "HTTP " "server in C, using the very basic version 1.0 of
-    //     the HTTP protocol.');"
-    //
-    //     "INSERT OR IGNORE INTO courses (name, short_desc) VALUES('Handling "
-    //     "multiple clients', "
-    //     "'In the second project you will learn how to build a simple HTTP "
-    //     "server in C, using the very basic version 1.0 of the HTTP
-    //     protocol.');"
-    //
-    //     "INSERT OR IGNORE INTO courses (name, short_desc) VALUES('Secure "
-    //     "communication with "
-    //     "SSL', 'In the second project you will learn how to build a simple "
-    //     "HTTP server in C, "
-    //     "using the very basic version 1.0 of the HTTP protocol.');";
-
-    // const char *course_details =
-    //     "CREATE TABLE IF NOT EXISTS materials (id INTEGER PRIMARY KEY, "
-    //     "course_id INTEGER NOT NULL, section_title TEXT, section_id INTEGER "
-    //     "NOT NULL, content TEXT, order_num INTEGER, FOREIGN KEY(course_id) "
-    //     "REFERENCES courses(id));"
-    //
-    //     "INSERT OR IGNORE INTO materials (course_id, section_title, "
-    //     "section_id, content, "
-    //     "order_num) VALUES(1, 'Intro', 0, '  _     _   _             "
-    //     "____\n "
-    //     "| |__ | |_| |_ _ __ _   / / /\n | `_ \\| __| __| `_ (_) / / /\n | | | "
-    //     "| |_| |_| |_) | / / / \n |_| |_|\\__|\\__| .__(_)_/_/  \n             "
-    //     "  |_|         "
-    //     "  \n', 0);"
-    //
-    //     "INSERT OR IGNORE INTO materials (course_id, section_title, "
-    //     "section_id, content, order_num) VALUES(1, 'Intro', 0, 'To get "
-    //     "started, there are a few things we have to talk about so that we "
-    //     "are on the same page as to what it is we are actually dealing with.'"
-    //     ", 1);";
     const char *course_details = read_sql_query("SQL/courses/http_server/intro/create.sql");
-    //
-    // "INSERT OR IGNORE materials (course_id, section_title, content, "
-    // "order_num) VALUES(1, 'First steps', 'To get started, there are a"
-    // " few things we have to talk about so that we are on the same page "
-    // "as to what it is we are actually dealing with.', 3);";
 
     char *err_msg = 0;
 
@@ -183,7 +136,7 @@ COURSE *get_course_data(sqlite3 *db)
 }
 
 COURSE_SECTION *get_course_section_data(sqlite3 *db, int active_course,
-                                       int section)
+                                       int section, int *num_of_items)
 {
     int rc = 0;
 
@@ -235,6 +188,8 @@ COURSE_SECTION *get_course_section_data(sqlite3 *db, int active_course,
         course_section_data[i].order_num = order_num;
         i++;
     }
+
+    *num_of_items = i + 1;
 
     sqlite3_finalize(stmt);
     return course_section_data;

@@ -187,17 +187,17 @@ WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label)
     }
     else if (ctx->course_view_active)
     {
-        ctx->rp_state->course_section_data =
-            get_course_section_data(ctx->db, 1, 0);
+        ctx->rp_state->course_section_data = get_course_section_data(
+            ctx->db, 1, 0, &ctx->rp_state->num_of_section_items);
         mvwprintw(ctx->rp_state->header_win, 0, 0, "%s",
                   ctx->rp_state->course_section_data[0].content);
         wattron(ctx->rp_state->right_panel, A_UNDERLINE | A_BOLD | A_BLINK);
         mvwprintw(ctx->rp_state->right_panel, 10,
-                  ctx->rp_state->window_width / 4 + 10, "%s",
+                  ctx->rp_state->window_width / 4 + 9, "%s",
                   ctx->courses[0].name);
         wattroff(ctx->rp_state->right_panel, A_UNDERLINE | A_BOLD | A_BLINK);
         mvwprintw(ctx->rp_state->right_panel, 12,
-                  ctx->rp_state->window_width / 2 - 2, "%s",
+                  ctx->rp_state->window_width / 2 - 3, "%s",
                   ctx->rp_state->course_section_data[0].section_title);
 
         print_next_course_item(1, ctx->rp_state);
@@ -280,7 +280,7 @@ void init_right_panel_state(RIGHT_PANEL_STATE *rp_state)
     rp_state->right_panel =
         newwin(LINES, rp_state->window_width, 0, WU * 7 + 4);
     rp_state->header_win =
-        derwin(rp_state->right_panel, 6, 31, 3, rp_state->window_width / 4 + 8);
+        derwin(rp_state->right_panel, 6, 31, 3, rp_state->window_width / 4 + 7);
     rp_state->inner_win = derwin(rp_state->right_panel, LINES - 15,
                                  rp_state->window_width - 5, 14, 3);
 }
@@ -290,10 +290,11 @@ void print_next_course_item(int item, RIGHT_PANEL_STATE *rp_state)
     char *title = rp_state->course_section_data[item].content_title;
     char *text = rp_state->course_section_data[item].content;
     rp_state->curr_item = item;
-    rp_state->curr_offset = item < 2 ? 0
-                          : rp_state->curr_offset +
-                                (strlen(text) / rp_state->window_width) +
-                                (item > 1 ? 3 : 0);
+    rp_state->curr_offset = item < 2
+                                ? 0
+                                : rp_state->curr_offset +
+                                      (strlen(text) / rp_state->window_width) +
+                                      (item > 1 ? 3 : 0);
     wattron(rp_state->inner_win, A_BOLD);
     mvwprintw(rp_state->inner_win, rp_state->curr_offset, 0, "%s",
               wrap_text(title, rp_state->window_width - (COLS / 18) + 1));

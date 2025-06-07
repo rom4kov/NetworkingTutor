@@ -84,6 +84,7 @@ typedef struct _right_panel_state
     int intro_width;  
     int curr_item;
     int curr_offset;
+    int num_of_section_items;
     WINDOW *right_panel;
     WINDOW *header_win;
     WINDOW *inner_win;

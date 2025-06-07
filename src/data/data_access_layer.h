@@ -11,7 +11,7 @@ void seed_courses_data(sqlite3 *db, WINDOW *win);
 COURSE *get_course_data(sqlite3 *db);
 int callback(void *NotUsed, int argc, char **argv, char **azColName);
 COURSE_SECTION *get_course_section_data(sqlite3 *db, int active_course,
-                                       int section);
+                                       int section, int *num_of_items);
 void update_user(sqlite3 *db, int id, char *name, char *language);
 
 DIR_ENTRY *initialize_dir_entry();

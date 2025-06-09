@@ -25,7 +25,7 @@ void print_course_instructions(APP_CONTEXT *ctx, int course_num)
     print_next_course_item(1, ctx->rp_state);
 
     char *press_space = "Press SPACE to continue";
-    mvwprintw(ctx->rp_state->right_panel, LINES - 2,
+    mvwprintw(ctx->rp_state->right_panel, LINES - 5,
               (ctx->rp_state->window_width - strlen(press_space)) / 2, "%s",
               press_space);
 }

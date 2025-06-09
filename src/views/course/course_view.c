@@ -32,7 +32,7 @@ void create_course_view(APP_CONTEXT *ctx)
     ctx->course_windows[2] = create_editor_window(&ctx->active_window);
     ctx->course_windows[3] =
         create_right_side_panel(ctx, "Course instructions");
-    ctx->course_windows[4] = create_progress_window();
+    ctx->course_windows[4] = create_progress_window(ctx);
 
     ctx->line_num_win = derwin(ctx->course_windows[2], LINES - 6, 3, 2, 1);
     ctx->edit_window =
@@ -177,16 +177,20 @@ void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree)
     closedir(dir);
 }
 
-WINDOW *create_progress_window()
+WINDOW *create_progress_window(APP_CONTEXT *ctx)
 {
-    int width = COLS - (WU * 7 + 4);
-    WINDOW *progress_window = newwin(3, width, LINES - 3, WU * 7 + 4);
+    WINDOW *progress_window =
+        newwin(3, ctx->rp_state->window_width, LINES - 3, WU * 7 + 4);
     draw_border(progress_window, 2, "Progress");
+
     wattron(progress_window, COLOR_PAIR(3));
-    mvwprintw(progress_window, 0, 1, "Progress");
+    mvwprintw(progress_window, 0, 2, "Status");
     wattroff(progress_window, COLOR_PAIR(3));
-    char *progress_text = "Courses 0 -- Sections 0";
-    mvwprintw(progress_window, 1, width - strlen(progress_text) - 2, "%s",
+
+    mvwprintw(progress_window, 1, 2, "Current course: %s", ctx->current_course);
+    char *progress_text = "Progress: Courses 0 -- Sections 0";
+    mvwprintw(progress_window, 1,
+              ctx->rp_state->window_width - strlen(progress_text) - 2, "%s",
               progress_text);
     wrefresh(progress_window);
     return progress_window;

@@ -116,3 +116,24 @@ into low-level server architecture, this project teaches you the essential
 building blocks that apply to both.",
         4
     );
+
+INSERT
+    OR IGNORE INTO materials (
+        course_id,
+        section_title,
+        section_id,
+        content_title,
+        content,
+        order_num
+    )
+VALUES
+    (
+        1,
+        'Intro',
+        0,
+        "",
+        "And here's a short outline of how we will proceed: the course is 
+divided in small, concise sections, each of which covers an essential part,
+system call, function or component of a minimal, working HTTP server.",
+        5
+    );

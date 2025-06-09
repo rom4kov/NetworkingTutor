@@ -6,7 +6,7 @@
 #include <sqlite3.h>
 
 #define START_WINDOW_COUNT 6
-#define COURSE_WINDOW_COUNT 4
+#define COURSE_WINDOW_COUNT 5
 
 typedef struct _user_data
 {
@@ -108,6 +108,7 @@ typedef struct _app_context
     FILE *file;
     char *filename;
     char *curr_file_path;
+    char *current_course;
     TEXT_BUFFER *t_buffer;
     int key;
     int active_window;

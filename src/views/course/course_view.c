@@ -30,7 +30,9 @@ void create_course_view(APP_CONTEXT *ctx)
         create_navigation_window(&ctx->active_window, &ctx->start_menu);
     ctx->course_windows[1] = create_explorer_window(ctx->file_tree);
     ctx->course_windows[2] = create_editor_window(&ctx->active_window);
-    ctx->course_windows[3] = create_right_side_panel(ctx, "Course instructions");
+    ctx->course_windows[3] =
+        create_right_side_panel(ctx, "Course instructions");
+    ctx->course_windows[4] = create_progress_window();
 
     ctx->line_num_win = derwin(ctx->course_windows[2], LINES - 6, 3, 2, 1);
     ctx->edit_window =
@@ -173,6 +175,21 @@ void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree)
 
     wnoutrefresh(*explorer_window);
     closedir(dir);
+}
+
+WINDOW *create_progress_window()
+{
+    int width = COLS - (WU * 7 + 4);
+    WINDOW *progress_window = newwin(3, width, LINES - 3, WU * 7 + 4);
+    draw_border(progress_window, 2, "Progress");
+    wattron(progress_window, COLOR_PAIR(3));
+    mvwprintw(progress_window, 0, 1, "Progress");
+    wattroff(progress_window, COLOR_PAIR(3));
+    char *progress_text = "Courses 0 -- Sections 0";
+    mvwprintw(progress_window, 1, width - strlen(progress_text) - 2, "%s",
+              progress_text);
+    wrefresh(progress_window);
+    return progress_window;
 }
 
 void open_sub_directory(char *dir_name, FILE_TREE *f_tree)

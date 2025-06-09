@@ -15,7 +15,6 @@
 #define COLOR_ORANGE 17
 #define COLOR_DARKGREY 18
 #define START_WINDOW_COUNT 6
-#define COURSE_WINDOW_COUNT 4
 
 int main(void)
 {

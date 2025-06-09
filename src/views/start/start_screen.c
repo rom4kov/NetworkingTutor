@@ -160,7 +160,7 @@ WINDOW *create_course_preview_card(int x_position, int *active_win,
 
 WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label)
 {
-    init_right_panel_state(ctx->rp_state);
+    init_right_panel_state(ctx->rp_state, ctx->course_view_active);
 
     if (ctx->active_window == 5)
     {
@@ -187,23 +187,29 @@ WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label)
     }
     else if (ctx->course_view_active)
     {
-        ctx->rp_state->course_section_data = get_course_section_data(
-            ctx->db, 1, 0, &ctx->rp_state->num_of_section_items);
-        mvwprintw(ctx->rp_state->header_win, 0, 0, "%s",
-                  ctx->rp_state->course_section_data[0].content);
-        wattron(ctx->rp_state->right_panel, A_UNDERLINE | A_BOLD | A_BLINK);
-        mvwprintw(ctx->rp_state->right_panel, 10,
-                  ctx->rp_state->window_width / 4 + 9, "%s",
-                  ctx->courses[0].name);
-        wattroff(ctx->rp_state->right_panel, A_UNDERLINE | A_BOLD | A_BLINK);
-        mvwprintw(ctx->rp_state->right_panel, 12,
-                  ctx->rp_state->window_width / 2 - 3, "%s",
-                  ctx->rp_state->course_section_data[0].section_title);
-
-        print_next_course_item(1, ctx->rp_state);
-
-        mvwprintw(ctx->rp_state->right_panel, LINES - 2, 3,
-                  "Press SPACE to continue");
+        print_course_instructions(ctx, 1);
+        // ctx->rp_state->course_section_data = get_course_section_data(
+        //     ctx->db, 1, 0, &ctx->rp_state->num_of_section_items);
+        // mvwprintw(ctx->rp_state->header_win, 0, 0, "%s",
+        //           ctx->rp_state->course_section_data[0].content);
+        // wattron(ctx->rp_state->right_panel, A_UNDERLINE | A_BOLD | A_BLINK);
+        // mvwprintw(
+        //     ctx->rp_state->right_panel, 10,
+        //     ((ctx->rp_state->window_width - strlen(ctx->courses[0].name)) / 2),
+        //     "%s", ctx->courses[0].name);
+        // wattroff(ctx->rp_state->right_panel, A_UNDERLINE | A_BOLD | A_BLINK);
+        // char *section_title =
+        //     ctx->rp_state->course_section_data[0].section_title;
+        // mvwprintw(ctx->rp_state->right_panel, 12,
+        //           ((ctx->rp_state->window_width - strlen(section_title)) / 2),
+        //           "%s", section_title);
+        //
+        // print_next_course_item(1, ctx->rp_state);
+        //
+        // char *press_space = "Press SPACE to continue";
+        // mvwprintw(ctx->rp_state->right_panel, LINES - 5,
+        //           (ctx->rp_state->window_width - strlen(press_space)) / 2, "%s",
+        //           press_space);
     }
 
     wnoutrefresh(ctx->rp_state->right_panel);
@@ -272,33 +278,16 @@ MENU *create_start_menu(WINDOW *nav_window)
     return menu;
 }
 
-void init_right_panel_state(RIGHT_PANEL_STATE *rp_state)
+void init_right_panel_state(RIGHT_PANEL_STATE *rp_state,
+                            bool course_view_active)
 {
     rp_state->window_width = COLS - (WU * 7 + 4);
     rp_state->intro_width = rp_state->window_width - 10;
 
     rp_state->right_panel =
-        newwin(LINES, rp_state->window_width, 0, WU * 7 + 4);
-    rp_state->header_win =
-        derwin(rp_state->right_panel, 6, 31, 3, rp_state->window_width / 4 + 7);
-    rp_state->inner_win = derwin(rp_state->right_panel, LINES - 15,
+        newwin(course_view_active ? LINES - 3 : LINES, rp_state->window_width, 0, WU * 7 + 4);
+    rp_state->header_win = derwin(rp_state->right_panel, 6, 31, 3,
+                                  (rp_state->window_width - 30) / 2);
+    rp_state->inner_win = derwin(rp_state->right_panel, LINES - 18,
                                  rp_state->window_width - 5, 14, 3);
-}
-
-void print_next_course_item(int item, RIGHT_PANEL_STATE *rp_state)
-{
-    char *title = rp_state->course_section_data[item].content_title;
-    char *text = rp_state->course_section_data[item].content;
-    rp_state->curr_item = item;
-    rp_state->curr_offset = item < 2
-                                ? 0
-                                : rp_state->curr_offset +
-                                      (strlen(text) / rp_state->window_width) +
-                                      (item > 1 ? 3 : 0);
-    wattron(rp_state->inner_win, A_BOLD);
-    mvwprintw(rp_state->inner_win, rp_state->curr_offset, 0, "%s",
-              wrap_text(title, rp_state->window_width - (COLS / 18) + 1));
-    wattroff(rp_state->inner_win, A_BOLD);
-    mvwprintw(rp_state->inner_win, rp_state->curr_offset + 1, 0, "%s",
-              wrap_text(text, rp_state->window_width - (COLS / 14) + 1));
 }

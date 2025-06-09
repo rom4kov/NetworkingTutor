@@ -18,7 +18,9 @@ WINDOW *create_header_section(int *active_win);
 WINDOW *create_course_preview_card(int x_position, int *active_win,
                                    int curr_win_idx, COURSE *course);
 WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label);
-void init_right_panel_state(RIGHT_PANEL_STATE *rp_state);
+void print_course_instructions(APP_CONTEXT *ctx, int course_num);
+void init_right_panel_state(RIGHT_PANEL_STATE *rp_state,
+                            bool course_view_active);
 void print_next_course_item(int item, RIGHT_PANEL_STATE *rp_state);
 
 void print_intro(WINDOW **right_panel, int window_width, int intro_width);
@@ -27,6 +29,7 @@ void create_course_view(APP_CONTEXT *ctx);
 WINDOW *create_editor_window(int *active_window);
 WINDOW *create_explorer_window(FILE_TREE *file_tree);
 void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree);
+WINDOW *create_progress_window();
 void print_no_open_file_msg(WINDOW **editor_window);
 
 void create_user_form(WINDOW **window, FORM **user_form, FIELD **fields);

@@ -149,7 +149,7 @@ WINDOW *create_course_preview_card(int x_position, int *active_win,
     int y, x;
     getmaxyx(description_window, y, x);
     mvwprintw(description_window, 2, 0, "%s",
-              wrap_text(course->short_desc, x - 8));
+              wrap_text(course->short_desc, x - 8, NULL));
     if (curr_win_idx == 2)
     {
         mvwprintw(description_window, 9, 0, "%s", HTTP);

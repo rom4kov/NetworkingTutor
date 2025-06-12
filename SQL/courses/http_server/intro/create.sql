@@ -131,9 +131,51 @@ VALUES
         1,
         'Intro',
         0,
-        "",
-        "And here's a short outline of how we will proceed: the course is 
-divided in small, concise sections, each of which covers an essential part,
-system call, function or component of a minimal, working HTTP server.",
+        "What to expect",
+        "The course is divided into short, focused sections. Each one introduces 
+a key system call, concept, or component involved in building a working HTTP 
+server in C.",
         5
+    );
+
+INSERT
+    OR IGNORE INTO materials (
+        course_id,
+        section_title,
+        section_id,
+        content_title,
+        content,
+        order_num
+    )
+VALUES
+    (
+        1,
+        'Intro',
+        0,
+        "",
+        "1. Basics: TCP/IP + HTTP   2. getaddrinfo()   3. socket()   
+4. bind()   5. listen()   6. accecpt()   7. recv()   8. send()
+9. send an HTTP headers with HTML file",
+        6
+    );
+
+INSERT
+    OR IGNORE INTO materials (
+        course_id,
+        section_title,
+        section_id,
+        content_title,
+        content,
+        order_num
+    )
+VALUES
+    (
+        1,
+        'Intro',
+        0,
+        "",
+        "At the end of each section, you’ll implement what you’ve learned by 
+coding a small part of the server. Once your solution passes the tests, 
+you’ll earn progress points and unlock the next step.",
+        7
     );

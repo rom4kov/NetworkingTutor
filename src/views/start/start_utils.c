@@ -34,21 +34,21 @@ void print_intro(WINDOW **right_panel, int window_width, int intro_width)
     mvwprintw(intro_win, 1, 0, "GET STARTED\n");
     wattroff(intro_win, A_BOLD | A_UNDERLINE);
     wprintw(intro_win, "\n");
-    wprintw(intro_win, "%s", wrap_text(INTRODUCTION, intro_width));
+    wprintw(intro_win, "%s", wrap_text(INTRODUCTION, intro_width, NULL));
     wprintw(intro_win, "\n");
 
     wattron(intro_win, A_BOLD | A_UNDERLINE);
     wprintw(intro_win, "HOW THE COURSES WORK\n");
     wattroff(intro_win, A_BOLD | A_UNDERLINE);
     wprintw(intro_win, "\n");
-    wprintw(intro_win, "%s", wrap_text(INTRODUCTION2, intro_width));
+    wprintw(intro_win, "%s", wrap_text(INTRODUCTION2, intro_width, NULL));
     wprintw(intro_win, "\n");
 
     wattron(intro_win, A_BOLD | A_UNDERLINE);
     wprintw(intro_win, "READY TO START?\n");
     wattroff(intro_win, A_BOLD | A_UNDERLINE);
     wprintw(intro_win, "\n");
-    wprintw(intro_win, "%s", wrap_text(INTRODUCTION3, intro_width));
+    wprintw(intro_win, "%s", wrap_text(INTRODUCTION3, intro_width, NULL));
 
     wnoutrefresh(intro_win);
 }

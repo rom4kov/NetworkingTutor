@@ -1048,7 +1048,7 @@ void create_keybinds_window(WINDOW **explorer_window)
         "directory\n\n'r' to rename a "
         "file or directory\n\n'd' to delete a file or directory";
 
-    char *kb_wrapped = wrap_text(keybindings, EXPLORER_WIDTH - 6);
+    char *kb_wrapped = wrap_text(keybindings, EXPLORER_WIDTH - 6, NULL);
 
     wattron(kb_window, A_BOLD);
     mvwprintw(kb_window, 1, 0, "File Explorer");

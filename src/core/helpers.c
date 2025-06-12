@@ -78,21 +78,11 @@ char *return_trimmed(char *str)
     return strcop;
 }
 
-// int strlen(char *str)
-// {
-//     int i = 0;
-//     while (str[i] != ' ')
-//     {
-//         i++;
-//     }
-//     return i;
-// }
-
-char *wrap_text(char *text, int width)
+char *wrap_text(char *text, int width, int *curr_offset)
 {
     char *str = strdup(text);
-    int i, col, last_space;
-    i = col = last_space = 0;
+    int i, col, last_space, offset;
+    i = col = last_space = offset = 0;
     while (str[i])
     {
         if (str[i] == '\n')
@@ -103,6 +93,7 @@ char *wrap_text(char *text, int width)
         {
             str[last_space] = '\n';
             col = 0;
+            offset++;
         }
         else if (str[i] == ' ')
         {
@@ -110,6 +101,11 @@ char *wrap_text(char *text, int width)
         }
         col++;
         i++;
+    }
+
+    if (curr_offset != NULL)
+    {
+        *curr_offset = *curr_offset + offset + 3;
     }
 
     return str;

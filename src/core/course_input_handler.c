@@ -119,7 +119,11 @@ void handle_course_input(APP_CONTEXT *ctx)
                 ctx->editor_mode = true;
                 if (ctx->file)
                     curs_set(2);
-                wmove(ctx->edit_window, 0, 0);
+                if (ctx->file)
+                    wmove(ctx->edit_window, ctx->t_buffer->curr_line_nr,
+                          ctx->t_buffer->current_col);
+                else
+                    wmove(ctx->edit_window, 0, 0);
                 wrefresh(ctx->edit_window);
                 break;
         }
@@ -136,7 +140,8 @@ void handle_course_input(APP_CONTEXT *ctx)
                 doupdate();
                 break;
             case ' ':
-                if (ctx->rp_state->curr_item + 2 < ctx->rp_state->num_of_section_items)
+                if (ctx->rp_state->curr_item + 2 <
+                    ctx->rp_state->num_of_section_items)
                 {
                     print_next_course_item(ctx->rp_state->curr_item + 1,
                                            ctx->rp_state);

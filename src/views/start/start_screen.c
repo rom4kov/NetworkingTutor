@@ -149,7 +149,7 @@ WINDOW *create_course_preview_card(int x_position, int *active_win,
     int y, x;
     getmaxyx(description_window, y, x);
     mvwprintw(description_window, 2, 0, "%s",
-              wrap_text(course->short_desc, x - 8, NULL));
+              wrap_text(course->short_desc, x - 8));
     if (curr_win_idx == 2)
     {
         mvwprintw(description_window, 9, 0, "%s", HTTP);
@@ -264,8 +264,8 @@ void init_right_panel_state(RIGHT_PANEL_STATE *rp_state,
 
     rp_state->right_panel =
         newwin(course_view_active ? LINES - 3 : LINES, rp_state->window_width, 0, WU * 7 + 4);
-    rp_state->header_win = derwin(rp_state->right_panel, 6, 31, 3,
+    rp_state->header_win = derwin(rp_state->right_panel, 6, 31, 2,
                                   (rp_state->window_width - 30) / 2);
     rp_state->inner_win = derwin(rp_state->right_panel, LINES - 18,
-                                 rp_state->window_width - 5, 14, 3);
+                                 rp_state->window_width - 6, 13, 4);
 }

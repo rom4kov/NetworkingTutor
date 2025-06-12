@@ -133,7 +133,7 @@ VALUES
         0,
         "What to expect",
         "The course is divided into short, focused sections. Each one introduces 
-a key system call, concept, or component involved in building a working HTTP 
+a key system call, concept, or component involved in building a working HTTP
 server in C.",
         5
     );

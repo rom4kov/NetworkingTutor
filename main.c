@@ -92,6 +92,7 @@ int main(void)
         }
         else if (ctx->course_needs_redraw)
         {
+            ctx->rp_state->curr_offset = 0;
             if (!ctx->first_course_draw)
             {
                 endwin();

@@ -28,11 +28,12 @@ void bs_delete_char_or_line(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
 void insert_line(TEXT_BUFFER *tbuf, WINDOW **edit_window, WINDOW **line_num_win,
                  int y, int x, int *scroll_offset, int *lines_to_print);
 
-char *wrap_text(char *text, int width, int *curr_offset);
+char *wrap_text(char *text, int width);
 void draw_border(WINDOW *win, int color_pair, char *label);
 void focus_window(WINDOW **window, int color_pair, char *label);
 void trim(char **str);
 char *return_trimmed(char *str);
 char *trunc_str(char *str, int win_width, int offset);
+int c_round(float x);
 void log_values(WINDOW **edit_window, int scroll_offset, TEXT_BUFFER *tbuf,
                 int lines_to_print, int y, int x);

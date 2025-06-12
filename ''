@@ -18,7 +18,7 @@ void print_course_instructions(APP_CONTEXT *ctx, int course_num)
         "%s", ctx->courses[0].name);
     wattroff(ctx->rp_state->right_panel, A_UNDERLINE | A_BOLD | A_BLINK);
     char *section_title = ctx->rp_state->course_section_data[0].section_title;
-    mvwprintw(ctx->rp_state->right_panel, 11,
+    mvwprintw(ctx->rp_state->right_panel, 12,
               ((ctx->rp_state->window_width - strlen(section_title)) / 2), "%s",
               section_title);
 

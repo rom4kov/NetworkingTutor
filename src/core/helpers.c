@@ -1,5 +1,6 @@
 #define _POSIX_C_SOURCE 200809L
 
+#include <math.h>
 #include <curses.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -78,22 +79,22 @@ char *return_trimmed(char *str)
     return strcop;
 }
 
-char *wrap_text(char *text, int width, int *curr_offset)
+char *wrap_text(char *text, int width)
 {
     char *str = strdup(text);
     int i, col, last_space, offset;
     i = col = last_space = offset = 0;
     while (str[i])
     {
-        if (str[i] == '\n')
-        {
-            col = 0;
-        }
+        // if (str[i] == '\n')
+        // {
+        //     col = 0;
+        // }
         if (col > width)
         {
             str[last_space] = '\n';
             col = 0;
-            offset++;
+            // offset++;
         }
         else if (str[i] == ' ')
         {
@@ -103,10 +104,10 @@ char *wrap_text(char *text, int width, int *curr_offset)
         i++;
     }
 
-    if (curr_offset != NULL)
-    {
-        *curr_offset = *curr_offset + offset + 3;
-    }
+    // if (curr_offset != NULL)
+    // {
+    //     *curr_offset = *curr_offset + offset + 3;
+    // }
 
     return str;
 }
@@ -119,4 +120,11 @@ char *trunc_str(char *str, int win_width, int offset)
     str_copy[win_width - offset] = '\0';
 
     return str_copy;
+}
+
+int c_round(float x)
+{
+    float fract = x - floor(x);
+    if (fract <= 0.1) return (int)floor(x);
+    else return (int)ceil(x);
 }

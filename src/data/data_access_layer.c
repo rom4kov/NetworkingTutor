@@ -78,7 +78,7 @@ USER_DATA get_user_data(sqlite3 *db)
 
 void seed_courses_data(sqlite3 *db, WINDOW *win)
 {
-    const char *course_details = read_sql_query("SQL/courses/http_server/intro/create.sql");
+    const char *course_details = read_sql_query("SQL/courses/http_server/intro/0_intro.sql");
 
     char *err_msg = 0;
 
@@ -189,7 +189,7 @@ COURSE_SECTION *get_course_section_data(sqlite3 *db, int active_course,
         i++;
     }
 
-    *num_of_items = i + 1;
+    *num_of_items = i;
 
     sqlite3_finalize(stmt);
     return course_section_data;

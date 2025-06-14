@@ -132,9 +132,8 @@ VALUES
         'Intro',
         0,
         "What to expect",
-        "The course is divided into short, focused sections. Each one introduces 
-a key system call, concept, or component involved in building a working HTTP
-server in C.",
+        "The course is divided into short, focused sections. Each one introduces
+a key system call, concept, or component involved in building a working HTTP server in C.",
         5
     );
 
@@ -174,8 +173,8 @@ VALUES
         'Intro',
         0,
         "",
-        "At the end of each section, you’ll implement what you’ve learned by 
-coding a small part of the server. Once your solution passes the tests, 
+        "At the end of each section, you’ll implement what you’ve learned by
+coding a small part of the server. Once your solution passes the tests,
 you’ll earn progress points and unlock the next step.",
         7
     );

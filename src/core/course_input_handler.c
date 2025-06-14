@@ -6,6 +6,7 @@
 #include <curses.h>
 #include <menu.h>
 #include <ncurses.h>
+#include <string.h>
 
 #define WINDOW_COUNT 4
 #define WU COLS / 12 // WU for WIDTH_UNIT
@@ -140,12 +141,24 @@ void handle_course_input(APP_CONTEXT *ctx)
                 doupdate();
                 break;
             case ' ':
-                if (ctx->rp_state->curr_item + 2 <
+                if (ctx->rp_state->curr_item + 1 <
                     ctx->rp_state->num_of_section_items)
                 {
                     print_next_course_item(ctx->rp_state->curr_item + 1,
                                            ctx->rp_state);
+                    if (ctx->rp_state->curr_item + 1 == ctx->rp_state->num_of_section_items)
+                    {
+                        char *press_enter = "Press ENTER to go to next section";
+                        mvwprintw(ctx->rp_state->right_panel, LINES - 5,
+                                  (ctx->rp_state->window_width - strlen(press_enter)) / 2, "%s",
+                                  press_enter);
+                        wrefresh(ctx->rp_state->right_panel);
+                    }
                     wrefresh(ctx->rp_state->inner_win);
+                }
+                else 
+                {
+
                 }
                 break;
         }

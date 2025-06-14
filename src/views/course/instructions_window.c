@@ -1,7 +1,6 @@
 #include "../../core/core.h"
 #include "../views.h"
 #include <curses.h>
-#include <math.h>
 #include <string.h>
 
 void print_course_instructions(APP_CONTEXT *ctx, int course_num)
@@ -32,37 +31,28 @@ void print_course_instructions(APP_CONTEXT *ctx, int course_num)
 
 void print_next_course_item(int item, RIGHT_PANEL_STATE *rp_state)
 {
-    mvwprintw(rp_state->inner_win, 34, 4, "%s", "  ");
     char *title = rp_state->course_section_data[item].content_title;
     char *text = rp_state->course_section_data[item].content;
-    // int lines = ceil(1.0 * strlen(text) / (rp_state->window_width -
-    // (int)(COLS / 16) + 1)); mvwprintw(rp_state->inner_win, 33, 4, "%i",
-    // lines);
     rp_state->curr_item = item;
+
     wattron(rp_state->inner_win, A_BOLD);
     if (strcmp(title, "") != 0)
     {
         mvwprintw(rp_state->inner_win, rp_state->curr_offset, 0, "%s",
                   wrap_text(title, rp_state->window_width - (COLS / 16) + 1));
-        mvwprintw(rp_state->inner_win, 34, 4, "%i", rp_state->curr_offset);
         rp_state->curr_offset = rp_state->curr_offset + 1;
     }
     wattroff(rp_state->inner_win, A_BOLD);
+
     char *wr_text = wrap_text(text, rp_state->window_width - (COLS / 16) + 1);
     mvwprintw(rp_state->inner_win, rp_state->curr_offset, 0, "%s", wr_text);
-    mvwprintw(rp_state->inner_win, 35, 4, "offest before calc: %i",
-              rp_state->curr_offset);
+
     for (int i = 0; i < strlen(text); i++)
     {
-        mvwprintw(rp_state->inner_win, 30, 3, "test %i", i);
         if (wr_text[i] == '\n')
         {
             rp_state->curr_offset += 1;
-            mvwprintw(rp_state->inner_win, 30, i, "%i", wr_text[i]);
         }
     }
     rp_state->curr_offset += 2;
-    mvwprintw(rp_state->inner_win, 36, 4, "offset at end:  %i",
-              rp_state->curr_offset);
-    // rp_state->curr_offset = rp_state->curr_offset + lines + 1;
 }

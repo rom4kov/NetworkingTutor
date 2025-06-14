@@ -268,4 +268,6 @@ void init_right_panel_state(RIGHT_PANEL_STATE *rp_state,
                                   (rp_state->window_width - 30) / 2);
     rp_state->inner_win = derwin(rp_state->right_panel, LINES - 18,
                                  rp_state->window_width - 6, 13, 4);
+
+    rp_state->num_of_section_items = 0;
 }

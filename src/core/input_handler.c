@@ -126,7 +126,7 @@ void handle_start_input(APP_CONTEXT *ctx)
                 ctx->start_view_active = false;
                 ctx->course_needs_redraw = true;
                 ctx->course_view_active = true;
-                ctx->active_course = ctx->courses[this_win - 2].id;
+                ctx->current_course_id = ctx->courses[this_win - 2].id;
                 for (int i = 1; i < WINDOW_COUNT; ++i)
                 {
                     delwin(ctx->start_windows[i]);

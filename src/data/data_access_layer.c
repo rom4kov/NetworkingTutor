@@ -76,9 +76,9 @@ USER_DATA get_user_data(sqlite3 *db)
     return user_data;
 }
 
-void seed_courses_data(sqlite3 *db, WINDOW *win)
+void seed_courses_data(sqlite3 *db, WINDOW *win, char *query)
 {
-    const char *course_details = read_sql_query("SQL/courses/http_server/intro/0_intro.sql");
+    const char *course_details = read_sql_query(query);
 
     char *err_msg = 0;
 
@@ -124,7 +124,6 @@ COURSE *get_course_data(sqlite3 *db)
         const int id = sqlite3_column_int(stmt, 0);
         const unsigned char *name = sqlite3_column_text(stmt, 1);
         const unsigned char *description = sqlite3_column_text(stmt, 2);
-
         course_data[i].id = id;
         course_data[i].name = strdup((const char *)name);
         course_data[i].short_desc = strdup((const char *)description);
@@ -135,7 +134,37 @@ COURSE *get_course_data(sqlite3 *db)
     return course_data;
 }
 
-COURSE_SECTION *get_course_section_data(sqlite3 *db, int active_course,
+const unsigned char *get_section_title(APP_CONTEXT *ctx)
+{
+    const unsigned char *section_title = malloc(64 * sizeof(char));
+
+    int rc = 0;
+
+    const char *sql = 
+        "SELECT * FROM sections WHERE course_id = ? AND order_num = ?;";
+
+    sqlite3_stmt *stmt;
+    rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
+    if (rc != SQLITE_OK)
+    {
+        sqlite3_finalize(stmt);
+    }
+
+    if (rc == SQLITE_OK)
+    {
+        sqlite3_bind_int(stmt, 1, ctx->current_course_id);
+        sqlite3_bind_int(stmt, 2, ctx->rp_state->curr_section);
+    }
+
+    if (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        section_title = sqlite3_column_text(stmt, 2);
+    }
+
+    return section_title;
+}
+
+COURSE_SECTION *get_course_section_materials(sqlite3 *db, int course,
                                        int section, int *num_of_items)
 {
     int rc = 0;
@@ -145,7 +174,6 @@ COURSE_SECTION *get_course_section_data(sqlite3 *db, int active_course,
 
     sqlite3_stmt *stmt;
     rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
-
     if (rc != SQLITE_OK)
     {
         sqlite3_finalize(stmt);
@@ -153,15 +181,12 @@ COURSE_SECTION *get_course_section_data(sqlite3 *db, int active_course,
 
     if (rc == SQLITE_OK)
     {
-        sqlite3_bind_int(stmt, 1, active_course);
+        sqlite3_bind_int(stmt, 1, course);
         sqlite3_bind_int(stmt, 2, section);
     }
 
     int num_steps = 1;
-    // if (sqlite3_step(stmt) != SQLITE_ROW)
-    // {
-    //     return NULL;
-    // }
+
     while ((rc = sqlite3_step(stmt)) == SQLITE_ROW)
     {
         num_steps++;
@@ -174,14 +199,14 @@ COURSE_SECTION *get_course_section_data(sqlite3 *db, int active_course,
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
         const int id = sqlite3_column_int(stmt, 1);
-        const unsigned char *section_title = sqlite3_column_text(stmt, 2);
+        // const unsigned char *section_title = sqlite3_column_text(stmt, 2);
         const int section_id = sqlite3_column_int(stmt, 3);
         const unsigned char *content_title = sqlite3_column_text(stmt, 4);
         const unsigned char *content = sqlite3_column_text(stmt, 5);
         const int order_num = sqlite3_column_int(stmt, 6);
 
         course_section_data[i].id = id;
-        course_section_data[i].section_title = strdup((const char *)section_title);
+        // course_section_data[i].section_title = strdup((const char *)section_title);
         course_section_data[i].section_id = section_id;
         course_section_data[i].content_title = strdup((const char *)content_title);
         course_section_data[i].content = strdup((const char *)content);

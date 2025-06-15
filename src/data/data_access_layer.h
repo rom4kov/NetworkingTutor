@@ -7,10 +7,11 @@
 sqlite3 *create_database();
 char *read_sql_query(char *filename);
 USER_DATA get_user_data(sqlite3 *db);
-void seed_courses_data(sqlite3 *db, WINDOW *win);
+void seed_courses_data(sqlite3 *db, WINDOW *win, char *query);
 COURSE *get_course_data(sqlite3 *db);
+const unsigned char *get_section_title(APP_CONTEXT *ctx);
 int callback(void *NotUsed, int argc, char **argv, char **azColName);
-COURSE_SECTION *get_course_section_data(sqlite3 *db, int active_course,
+COURSE_SECTION *get_course_section_materials(sqlite3 *db, int course,
                                        int section, int *num_of_items);
 void update_user(sqlite3 *db, int id, char *name, char *language);
 

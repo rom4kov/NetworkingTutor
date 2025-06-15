@@ -144,23 +144,54 @@ void handle_course_input(APP_CONTEXT *ctx)
                 if (ctx->rp_state->curr_item + 1 <
                     ctx->rp_state->num_of_section_items)
                 {
-                    print_next_course_item(ctx->rp_state->curr_item + 1,
-                                           ctx->rp_state);
-                    if (ctx->rp_state->curr_item + 1 == ctx->rp_state->num_of_section_items)
+                    ctx->rp_state->curr_item += 1;
+                    print_next_course_item(ctx->rp_state);
+                    if (ctx->rp_state->curr_item + 1 ==
+                        ctx->rp_state->num_of_section_items)
                     {
                         char *press_enter = "Press ENTER to go to next section";
                         mvwprintw(ctx->rp_state->right_panel, LINES - 5,
-                                  (ctx->rp_state->window_width - strlen(press_enter)) / 2, "%s",
-                                  press_enter);
+                                  (ctx->rp_state->window_width -
+                                   strlen(press_enter)) /
+                                      2,
+                                  "%s", press_enter);
                         wrefresh(ctx->rp_state->right_panel);
                     }
                     wrefresh(ctx->rp_state->inner_win);
                 }
-                else 
-                {
-
-                }
                 break;
+            case 10:
+                if (ctx->rp_state->curr_item + 1 ==
+                    ctx->rp_state->num_of_section_items)
+                {
+                    ctx->rp_state->curr_section += 1;
+                    ctx->rp_state->curr_item = 0;
+                    ctx->rp_state->curr_offset = 0;
+                    if (ctx->rp_state->curr_section == 1)
+                    {
+                        wclear(ctx->rp_state->header_win);
+                        delwin(ctx->rp_state->header_win);
+                        wclear(ctx->rp_state->inner_win);
+                        delwin(ctx->rp_state->inner_win);
+                        char blank_line[ctx->rp_state->window_width - 4];
+                        memset(blank_line, 32, sizeof(blank_line));
+                        memset(&blank_line[sizeof(blank_line) - 1], '\0', 1);
+
+                        mvwprintw(
+                            ctx->rp_state->right_panel, 9, 3,
+                            "%s", blank_line);
+                        mvwprintw(
+                            ctx->rp_state->right_panel, 11, 3,
+                            "%s", blank_line);
+                        ctx->rp_state->inner_win =
+                            derwin(ctx->rp_state->right_panel, LINES - 7,
+                                   ctx->rp_state->window_width - 6, 4, 4);
+                    }
+                    print_course_instructions(ctx);
+                    wnoutrefresh(ctx->rp_state->right_panel);
+                    wnoutrefresh(ctx->rp_state->inner_win);
+                    doupdate();
+                }
         }
     }
 }

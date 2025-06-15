@@ -1,7 +1,6 @@
 CREATE TABLE IF NOT EXISTS materials (
     id INTEGER PRIMARY KEY,
     course_id INTEGER NOT NULL,
-    section_title TEXT,
     section_id INTEGER NOT NULL,
     content_title TEXT,
     content TEXT,
@@ -12,7 +11,6 @@ CREATE TABLE IF NOT EXISTS materials (
 INSERT
     OR IGNORE INTO materials (
         course_id,
-        section_title,
         section_id,
         content_title,
         content,
@@ -21,7 +19,6 @@ INSERT
 VALUES
     (
         1,
-        'Intro',
         0,
         "",
         '  _     _   _             ____@
@@ -36,7 +33,6 @@ VALUES
 INSERT
     OR IGNORE INTO materials (
         course_id,
-        section_title,
         section_id,
         content_title,
         content,
@@ -45,7 +41,6 @@ INSERT
 VALUES
     (
         1,
-        'Intro',
         0,
         "",
         'So why of all things build an HTTP server as the first project
@@ -57,7 +52,6 @@ but here we want to emphasize three in particular:',
 INSERT
     OR IGNORE INTO materials (
         course_id,
-        section_title,
         section_id,
         content_title,
         content,
@@ -66,7 +60,6 @@ INSERT
 VALUES
     (
         1,
-        'Intro',
         0,
         "1. It demystifies how the web works.",
         "By building an HTTP server from scratch, you'll finally see
@@ -78,7 +71,6 @@ real sockets, headers, and responses.",
 INSERT
     OR IGNORE INTO materials (
         course_id,
-        section_title,
         section_id,
         content_title,
         content,
@@ -87,7 +79,6 @@ INSERT
 VALUES
     (
         1,
-        'Intro',
         0,
         "2. It’s the perfect starting point for network programming.",
         "You don’t need any prior knowledge of the network stack to begin,
@@ -99,7 +90,6 @@ sockets, ports, and protocols.",
 INSERT
     OR IGNORE INTO materials (
         course_id,
-        section_title,
         section_id,
         content_title,
         content,
@@ -108,7 +98,6 @@ INSERT
 VALUES
     (
         1,
-        'Intro',
         0,
         "3. It lays a solid foundation for any future path.",
         "Whether you plan to work with high-level web frameworks or dive
@@ -120,7 +109,6 @@ building blocks that apply to both.",
 INSERT
     OR IGNORE INTO materials (
         course_id,
-        section_title,
         section_id,
         content_title,
         content,
@@ -129,7 +117,6 @@ INSERT
 VALUES
     (
         1,
-        'Intro',
         0,
         "What to expect",
         "The course is divided into short, focused sections. Each one introduces
@@ -140,7 +127,6 @@ a key system call, concept, or component involved in building a working HTTP ser
 INSERT
     OR IGNORE INTO materials (
         course_id,
-        section_title,
         section_id,
         content_title,
         content,
@@ -149,7 +135,6 @@ INSERT
 VALUES
     (
         1,
-        'Intro',
         0,
         "",
         "1. Basics: TCP/IP + HTTP   2. getaddrinfo()   3. socket()   
@@ -161,7 +146,6 @@ VALUES
 INSERT
     OR IGNORE INTO materials (
         course_id,
-        section_title,
         section_id,
         content_title,
         content,
@@ -170,7 +154,6 @@ INSERT
 VALUES
     (
         1,
-        'Intro',
         0,
         "",
         "At the end of each section, you’ll implement what you’ve learned by

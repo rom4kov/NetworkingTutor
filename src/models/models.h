@@ -82,6 +82,7 @@ typedef struct _right_panel_state
 {
     int window_width;  
     int intro_width;  
+    int curr_section;
     int curr_item;
     int curr_offset;
     int num_of_section_items;
@@ -112,7 +113,7 @@ typedef struct _app_context
     TEXT_BUFFER *t_buffer;
     int key;
     int active_window;
-    int active_course;
+    int current_course_id;
     int y, x;
     int scroll_offset;
     int lines_to_print;

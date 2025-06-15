@@ -55,7 +55,12 @@ int main(void)
 
     WINDOW *welcome_screen = create_welcome_screen();
 
-    // seed_courses_data(ctx->db, welcome_screen);
+    // seed_courses_data(ctx->db, welcome_screen,
+    //                   "SQL/create_sections_table.sql");
+    // seed_courses_data(ctx->db, welcome_screen,
+    //                   "SQL/courses/http_server/sections.sql");
+    // seed_courses_data(ctx->db, welcome_screen,
+    //                   "SQL/courses/http_server/1_foundations.sql");
 
     int rc = wgetch(welcome_screen);
     if (rc == KEY_RESIZE)
@@ -120,7 +125,8 @@ int main(void)
                 ctx->t_buffer->current_line = ctx->t_buffer->first_line;
                 for (int i = 0; i < curr_line; i++)
                 {
-                    ctx->t_buffer->current_line = ctx->t_buffer->current_line->next;
+                    ctx->t_buffer->current_line =
+                        ctx->t_buffer->current_line->next;
                 }
                 ctx->explorer_mode = false;
                 ctx->editor_mode = true;
@@ -128,7 +134,8 @@ int main(void)
                 focus_window(&ctx->course_windows[0], 2, "Explorer");
                 focus_window(&ctx->course_windows[2], 3, "Editor");
                 curs_set(2);
-                wmove(ctx->edit_window, curr_line - ctx->scroll_offset, curr_col);
+                wmove(ctx->edit_window, curr_line - ctx->scroll_offset,
+                      curr_col);
                 wnoutrefresh(ctx->course_windows[1]);
                 wnoutrefresh(ctx->line_num_win);
                 wnoutrefresh(ctx->course_windows[2]);

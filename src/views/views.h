@@ -18,10 +18,10 @@ WINDOW *create_header_section(int *active_win);
 WINDOW *create_course_preview_card(int x_position, int *active_win,
                                    int curr_win_idx, COURSE *course);
 WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label);
-void print_course_instructions(APP_CONTEXT *ctx, int course_num);
+void print_course_instructions(APP_CONTEXT *ctx);
 void init_right_panel_state(RIGHT_PANEL_STATE *rp_state,
                             bool course_view_active);
-void print_next_course_item(int item, RIGHT_PANEL_STATE *rp_state);
+void print_next_course_item(RIGHT_PANEL_STATE *rp_state);
 
 void print_intro(WINDOW **right_panel, int window_width, int intro_width);
 

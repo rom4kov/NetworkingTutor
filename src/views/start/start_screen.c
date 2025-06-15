@@ -187,7 +187,7 @@ WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label)
     }
     else if (ctx->course_view_active)
     {
-        print_course_instructions(ctx, 1);
+        print_course_instructions(ctx);
     }
 
     wnoutrefresh(ctx->rp_state->right_panel);
@@ -269,5 +269,6 @@ void init_right_panel_state(RIGHT_PANEL_STATE *rp_state,
     rp_state->inner_win = derwin(rp_state->right_panel, LINES - 18,
                                  rp_state->window_width - 6, 13, 4);
 
+    rp_state->curr_section = 0;
     rp_state->num_of_section_items = 0;
 }

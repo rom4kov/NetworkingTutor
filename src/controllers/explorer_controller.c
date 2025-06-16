@@ -15,7 +15,6 @@
 #include <unistd.h>
 
 #define WU COLS / 12 // WU for WIDTH_UNIT
-#define EDITOR_WIDTH WU * 5 + WU / 2 + 5
 #define EXPLORER_WIDTH WU + WU / 2
 
 void log_ft_values(APP_CONTEXT *ctx)

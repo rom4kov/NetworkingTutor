@@ -86,10 +86,10 @@ char *wrap_text(char *text, int width)
     i = col = last_space = offset = 0;
     while (str[i])
     {
-        // if (str[i] == '\n')
-        // {
-        //     col = 0;
-        // }
+        if (str[i] == '\n')
+        {
+            col = 0;
+        }
         if (col > width)
         {
             str[last_space] = '\n';

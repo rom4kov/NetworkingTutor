@@ -59,8 +59,8 @@ int main(void)
     //                   "SQL/create_sections_table.sql");
     // seed_courses_data(ctx->db, welcome_screen,
     //                   "SQL/courses/http_server/sections.sql");
-    // seed_courses_data(ctx->db, welcome_screen,
-    //                   "SQL/courses/http_server/1_foundations.sql");
+    seed_courses_data(ctx->db, welcome_screen,
+                      "SQL/courses/http_server/1_foundations.sql");
 
     int rc = wgetch(welcome_screen);
     if (rc == KEY_RESIZE)

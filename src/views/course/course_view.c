@@ -19,7 +19,7 @@
 #define WU COLS / 12 // WU for WIDTH_UNIT
 #define WIDTH_REMAINDER COLS % WU
 #define EXPLORER_WIDTH WU + WU / 2
-#define EDITOR_WIDTH WU * 5 + WU / 2 + 5
+#define EDITOR_WIDTH ((WU * 7 + 4) - (WU + WU / 2))
 #define EDIT_WIN_WIDTH WU * 5 + WU / 2
 
 void create_course_view(APP_CONTEXT *ctx)
@@ -58,6 +58,8 @@ WINDOW *create_editor_window(int *active_window)
     wattron(editor_window, COLOR_PAIR(3));
     mvwprintw(editor_window, 0, 2, "Editor");
     wattroff(editor_window, COLOR_PAIR(3));
+    mvwprintw(editor_window, 9, 2, "COLS: %i", COLS);
+    mvwprintw(editor_window, 10, 2, "Editor width: %i", EDITOR_WIDTH);
 
     wrefresh(editor_window);
 

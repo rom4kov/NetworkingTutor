@@ -58,8 +58,8 @@ WINDOW *create_editor_window(int *active_window)
     wattron(editor_window, COLOR_PAIR(3));
     mvwprintw(editor_window, 0, 2, "Editor");
     wattroff(editor_window, COLOR_PAIR(3));
-    mvwprintw(editor_window, 9, 2, "COLS: %i", COLS);
-    mvwprintw(editor_window, 10, 2, "Editor width: %i", EDITOR_WIDTH);
+    // mvwprintw(editor_window, 9, 2, "COLS: %i", COLS);
+    // mvwprintw(editor_window, 10, 2, "Editor width: %i", EDITOR_WIDTH);
 
     wrefresh(editor_window);
 

@@ -90,7 +90,7 @@ char *wrap_text(char *text, int width)
         {
             col = 0;
         }
-        if (col > width)
+        if (col > width - 2)
         {
             str[last_space] = '\n';
             col = 0;

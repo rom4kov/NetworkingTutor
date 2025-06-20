@@ -53,6 +53,7 @@ int main(void)
     ctx->rp_state->curr_item = 0;
     ctx->rp_state->items_to_print = 1;
     ctx->rp_state->curr_offset = 0;
+    ctx->rp_state->scroll_height = 0;
 
     int curr_line;
     int curr_col;
@@ -149,12 +150,14 @@ int main(void)
                 curs_set(2);
                 wmove(ctx->edit_window, curr_line - ctx->scroll_offset,
                       curr_col);
-                wnoutrefresh(ctx->course_windows[1]);
-                wnoutrefresh(ctx->line_num_win);
-                wnoutrefresh(ctx->course_windows[2]);
-                wnoutrefresh(ctx->edit_window);
-                doupdate();
             }
+            wnoutrefresh(ctx->course_windows[0]);
+            wnoutrefresh(ctx->course_windows[1]);
+            wnoutrefresh(ctx->line_num_win);
+            wnoutrefresh(ctx->course_windows[2]);
+            wnoutrefresh(ctx->edit_window);
+            wnoutrefresh(ctx->course_windows[4]);
+            doupdate();
             ctx->course_needs_redraw = false;
             ctx->first_course_draw = false;
         }

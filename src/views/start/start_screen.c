@@ -271,6 +271,7 @@ void init_right_panel_state(RIGHT_PANEL_STATE *rp_state,
 
     rp_state->right_panel = newwin(course_view_active ? LINES - 3 : LINES,
                                    rp_state->window_width, 0, WU * 7 + 4);
+    getbegyx(rp_state->right_panel, rp_state->y, rp_state->x);
     // getbegyx(rp_state->right_panel, y, x);
     // mvwprintw(rp_state->right_panel, 1, 2, "%i", y);
     // mvwprintw(rp_state->right_panel, 1, 7, "%i", x);

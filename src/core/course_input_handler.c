@@ -6,6 +6,7 @@
 #include <curses.h>
 #include <menu.h>
 #include <ncurses.h>
+#include <stdbool.h>
 #include <string.h>
 
 #define WINDOW_COUNT 4
@@ -111,8 +112,7 @@ void handle_course_input(APP_CONTEXT *ctx)
                 int x, y;
                 getbegyx(ctx->rp_state->right_panel, y, x);
                 pnoutrefresh(ctx->rp_state->inner_win, 0, 0,
-                             y + ctx->rp_state->pad_start, x + 4,
-                             LINES - 12,
+                             y + ctx->rp_state->pad_start, x + 4, LINES - 12,
                              x + ctx->rp_state->window_width - 6);
                 doupdate();
                 break;
@@ -147,8 +147,7 @@ void handle_course_input(APP_CONTEXT *ctx)
                 int x, y;
                 getbegyx(ctx->rp_state->right_panel, y, x);
                 pnoutrefresh(ctx->rp_state->inner_win, 0, 0,
-                             y + ctx->rp_state->pad_start, x + 4,
-                             LINES - 12,
+                             y + ctx->rp_state->pad_start, x + 4, LINES - 12,
                              x + ctx->rp_state->window_width - 6);
                 doupdate();
                 break;
@@ -171,18 +170,21 @@ void handle_course_input(APP_CONTEXT *ctx)
                         wrefresh(ctx->rp_state->right_panel);
                     }
 
-                    int x, y;
-                    getbegyx(ctx->rp_state->right_panel, y, x);
+                    // int x, y;
+                    // getbegyx(ctx->rp_state->right_panel, y, x);
                     if (ctx->rp_state->curr_offset < LINES - 12)
                         prefresh(ctx->rp_state->inner_win, 0, 0,
-                                 y + ctx->rp_state->pad_start, x + 4,
-                                 LINES - 7,
-                                 x + ctx->rp_state->window_width - 6);
+                                 ctx->rp_state->y + ctx->rp_state->pad_start,
+                                 ctx->rp_state->x + 4, LINES - 7,
+                                 ctx->rp_state->x +
+                                     ctx->rp_state->window_width - 6);
                     else
                         prefresh(ctx->rp_state->inner_win,
                                  ctx->rp_state->curr_offset - (LINES - 12), 0,
-                                 y + ctx->rp_state->pad_start, x + 4, LINES - 7,
-                                 x + ctx->rp_state->window_width - 6);
+                                 ctx->rp_state->y + ctx->rp_state->pad_start,
+                                 ctx->rp_state->x + 4, LINES - 7,
+                                 ctx->rp_state->x +
+                                     ctx->rp_state->window_width - 6);
                 }
                 break;
             case 10:
@@ -198,7 +200,7 @@ void handle_course_input(APP_CONTEXT *ctx)
                         wclear(ctx->rp_state->header_win);
                         delwin(ctx->rp_state->header_win);
                         wclear(ctx->rp_state->inner_win);
-                        // delwin(ctx->rp_state->inner_win);
+                        delwin(ctx->rp_state->inner_win);
                         char blank_line[ctx->rp_state->window_width - 4];
                         memset(blank_line, 32, sizeof(blank_line));
                         memset(&blank_line[sizeof(blank_line) - 1], '\0', 1);
@@ -214,15 +216,137 @@ void handle_course_input(APP_CONTEXT *ctx)
                             newpad(LINES + 38, ctx->rp_state->window_width - 6);
                     }
                     print_course_instructions(ctx);
-                    int x, y;
-                    getbegyx(ctx->rp_state->right_panel, y, x);
-                    wnoutrefresh(ctx->rp_state->right_panel);
+                    // int x, y;
+                    // getbegyx(ctx->rp_state->right_panel, y, x);
+                    // wnoutrefresh(ctx->course_windows[1]);
+                    // wnoutrefresh(ctx->course_windows[2]);
+                    // wnoutrefresh(ctx->rp_state->right_panel);
+                    leaveok(ctx->rp_state->inner_win, TRUE);
+                    leaveok(ctx->course_windows[1], TRUE);
+                    leaveok(ctx->course_windows[2], TRUE);
+                    leaveok(ctx->course_windows[3], TRUE);
+                    leaveok(ctx->course_windows[4], TRUE);
+                    leaveok(ctx->edit_window, TRUE);
+                    leaveok(ctx->line_num_win, TRUE);
+                    idlok(ctx->rp_state->inner_win, TRUE);
+                    idlok(ctx->course_windows[1], TRUE);
+                    idlok(ctx->course_windows[2], TRUE);
+                    idlok(ctx->course_windows[3], TRUE);
+                    idlok(ctx->course_windows[4], TRUE);
+                    idlok(ctx->edit_window, TRUE);
+                    idlok(ctx->line_num_win, TRUE);
+                    curs_set(0);
+                    // wnoutrefresh(stdscr);
+                    // wclear(ctx->course_windows[0]);
+                    // wnoutrefresh(ctx->course_windows[0]);
+                    // wclear(ctx->course_windows[1]);
+                    // wnoutrefresh(ctx->course_windows[1]);
+                    // wclear(ctx->course_windows[2]);
+                    // wnoutrefresh(ctx->course_windows[2]);
+                    // wclear(ctx->edit_window);
+                    // wnoutrefresh(ctx->edit_window);
+                    // wclear(ctx->line_num_win);
+                    // wnoutrefresh(ctx->line_num_win);
+                    // wnoutrefresh(ctx->course_windows[3]);
+                    // wclear(ctx->course_windows[4]);
                     pnoutrefresh(ctx->rp_state->inner_win, 0, 0,
-                             y + ctx->rp_state->pad_start, x + 4,
-                             LINES - 7,
-                             x + ctx->rp_state->window_width - 6);
+                                 ctx->rp_state->y + ctx->rp_state->pad_start,
+                                 ctx->rp_state->x + 4, LINES - 7,
+                                 ctx->rp_state->x +
+                                     ctx->rp_state->window_width - 6);
                     doupdate();
                 }
+            case KEY_DOWN:
+                if (ctx->rp_state->curr_offset >
+                    LINES - ctx->rp_state->pad_start)
+                {
+                    ctx->rp_state->scroll_height++;
+                    // int x, y;
+                    // getbegyx(ctx->rp_state->right_panel, y, x);
+                    // leaveok(ctx->rp_state->inner_win, TRUE);
+                    // leaveok(ctx->course_windows[1], TRUE);
+                    // leaveok(ctx->course_windows[2], TRUE);
+                    // leaveok(ctx->course_windows[3], TRUE);
+                    // leaveok(ctx->course_windows[4], TRUE);
+                    // idlok(ctx->rp_state->inner_win, TRUE);
+                    // idlok(ctx->course_windows[1], TRUE);
+                    // idlok(ctx->course_windows[2], TRUE);
+                    // idlok(ctx->course_windows[3], TRUE);
+                    // idlok(ctx->course_windows[4], TRUE);
+                    // curs_set(1);
+                    // wnoutrefresh(stdscr);
+                    // wclear(ctx->course_windows[0]);
+                    // wnoutrefresh(ctx->course_windows[0]);
+                    // touchwin(ctx->course_windows[1]);
+                    // wnoutrefresh(ctx->edit_window);
+                    // touchwin(ctx->course_windows[3]);
+                    // wclear(ctx->course_windows[2]);
+                    // wnoutrefresh(ctx->course_windows[2]);
+                    // wnoutrefresh(ctx->course_windows[1]);
+                    // wnoutrefresh(ctx->edit_window);
+                    // wclear(ctx->line_num_win);
+                    // wnoutrefresh(ctx->line_num_win);
+                    // wnoutrefresh(ctx->course_windows[3]);
+                    // // wclear(ctx->course_windows[4]);
+                    // curs_set(0);
+                    // wclear(ctx->edit_window);
+                    // print_no_open_file_msg(&ctx->edit_window);
+                    // wnoutrefresh(ctx->edit_window);
+                    pnoutrefresh(
+                        ctx->rp_state->inner_win, ctx->rp_state->scroll_height,
+                        0, ctx->rp_state->y + ctx->rp_state->pad_start,
+                        ctx->rp_state->x + 4, LINES - 8,
+                        ctx->rp_state->x + ctx->rp_state->window_width - 6);
+                    wnoutrefresh(ctx->course_windows[3]);
+                    doupdate();
+                }
+                break;
+            case KEY_UP:
+                if (ctx->rp_state->scroll_height > 0 &&
+                    ctx->rp_state->curr_offset >
+                        LINES - ctx->rp_state->pad_start)
+                {
+                    ctx->rp_state->scroll_height--;
+                    // int x, y;
+                    // getbegyx(ctx->rp_state->right_panel, y, x);
+                    // leaveok(ctx->rp_state->inner_win, TRUE);
+                    // leaveok(ctx->course_windows[1], TRUE);
+                    // leaveok(ctx->course_windows[2], TRUE);
+                    // leaveok(ctx->course_windows[3], TRUE);
+                    // leaveok(ctx->course_windows[4], TRUE);
+                    // idlok(ctx->rp_state->inner_win, TRUE);
+                    // idlok(ctx->course_windows[1], TRUE);
+                    // idlok(ctx->course_windows[2], TRUE);
+                    // idlok(ctx->course_windows[3], TRUE);
+                    // idlok(ctx->course_windows[4], TRUE);
+                    // curs_set(1);
+                    // wnoutrefresh(stdscr);
+                    // wclear(ctx->course_windows[0]);
+                    // wnoutrefresh(ctx->course_windows[0]);
+                    // touchwin(ctx->course_windows[1]);
+                    // wclear(ctx->course_windows[2]);
+                    // wnoutrefresh(ctx->course_windows[2]);
+                    // touchwin(ctx->edit_window);
+                    // wclear(ctx->line_num_win);
+                    // wnoutrefresh(ctx->line_num_win);
+                    // touchwin(ctx->course_windows[3]);
+                    // wnoutrefresh(ctx->course_windows[1]);
+                    // wnoutrefresh(ctx->edit_window);
+                    // wnoutrefresh(ctx->course_windows[3]);
+                    // wclear(ctx->course_windows[4]);
+                    // curs_set(0);
+                    // wclear(ctx->edit_window);
+                    // print_no_open_file_msg(&ctx->edit_window);
+                    // wnoutrefresh(ctx->edit_window);
+                    pnoutrefresh(
+                        ctx->rp_state->inner_win, ctx->rp_state->scroll_height,
+                        0, ctx->rp_state->y + ctx->rp_state->pad_start,
+                        ctx->rp_state->x + 4, LINES - 8,
+                        ctx->rp_state->x + ctx->rp_state->window_width - 6);
+                    wnoutrefresh(ctx->course_windows[3]);
+                    doupdate();
+                }
+                break;
         }
     }
 }

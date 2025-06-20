@@ -124,6 +124,12 @@ void handle_start_input(APP_CONTEXT *ctx)
             case 10: // Enter / Return key
                 this_win = ctx->active_window;
                 ctx->start_view_active = false;
+                for (int i = 0; i < WINDOW_COUNT; i++)
+                {
+                    wclear(ctx->start_windows[i]);
+                    wnoutrefresh(ctx->start_windows[i]);
+                }
+                doupdate();
                 ctx->course_needs_redraw = true;
                 ctx->course_view_active = true;
                 ctx->current_course_id = ctx->courses[this_win - 2].id;

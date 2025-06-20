@@ -36,7 +36,7 @@ void create_course_view(APP_CONTEXT *ctx)
 
     ctx->line_num_win = derwin(ctx->course_windows[2], LINES - 6, 3, 2, 1);
     ctx->edit_window =
-        derwin(ctx->course_windows[2], LINES - 6, WU * 5 + (WU / 2) - 2, 2, 5);
+        derwin(ctx->course_windows[2], LINES - 9, WU * 5 + (WU / 2) - 30, 2, 5);
 
     if (ctx->file == NULL)
     {
@@ -45,7 +45,7 @@ void create_course_view(APP_CONTEXT *ctx)
         wattroff(ctx->course_windows[2], COLOR_PAIR(10));
     }
 
-    wrefresh(ctx->course_windows[2]);
+    wnoutrefresh(ctx->course_windows[2]);
 }
 
 WINDOW *create_editor_window(int *active_window)
@@ -61,7 +61,7 @@ WINDOW *create_editor_window(int *active_window)
     // mvwprintw(editor_window, 9, 2, "COLS: %i", COLS);
     // mvwprintw(editor_window, 10, 2, "Editor width: %i", EDITOR_WIDTH);
 
-    wrefresh(editor_window);
+    wnoutrefresh(editor_window);
 
     return editor_window;
 }
@@ -194,7 +194,7 @@ WINDOW *create_progress_window(APP_CONTEXT *ctx)
     mvwprintw(progress_window, 1,
               ctx->rp_state->window_width - strlen(progress_text) - 2, "%s",
               progress_text);
-    wrefresh(progress_window);
+    // wnoutrefresh(progress_window);
     return progress_window;
 }
 

@@ -8,10 +8,10 @@ void print_course_instructions(APP_CONTEXT *ctx)
     ctx->rp_state->course_section_data = get_course_section_materials(
         ctx->db, ctx->current_course_id, ctx->rp_state->curr_section,
         &ctx->rp_state->num_of_section_items);
-    ctx->current_course = ctx->courses[ctx->current_course_id - 1].name;
 
     if (ctx->rp_state->curr_section == 0)
     {
+        ctx->current_course = ctx->courses[ctx->current_course_id - 1].name;
         mvwprintw(ctx->rp_state->header_win, 0, 0, "%s",
                   ctx->rp_state->course_section_data[0].content);
         wattron(ctx->rp_state->right_panel, A_UNDERLINE | A_BOLD | A_BLINK);
@@ -24,17 +24,22 @@ void print_course_instructions(APP_CONTEXT *ctx)
 
     char *section_title = (char *)get_section_title(ctx);
     if (ctx->rp_state->curr_section > 0)
-        wattron(ctx->rp_state->right_panel, A_UNDERLINE);
+        wattron(ctx->rp_state->right_panel, A_UNDERLINE | A_BOLD);
     mvwprintw(ctx->rp_state->right_panel,
               ctx->rp_state->curr_section == 0 ? 11 : 2,
               ((ctx->rp_state->window_width - strlen(section_title)) / 2), "%s",
               section_title);
     if (ctx->rp_state->curr_section > 0)
-        wattroff(ctx->rp_state->right_panel, A_UNDERLINE);
+        wattroff(ctx->rp_state->right_panel, A_UNDERLINE | A_BOLD);
 
     if (ctx->rp_state->curr_section == 0)
         ctx->rp_state->curr_item += 1;
-    print_next_course_item(ctx->rp_state);
+
+    for (int i = 0; i < ctx->rp_state->items_to_print; i++)
+    {
+        print_next_course_item(ctx->rp_state);
+        ctx->rp_state->curr_item += 1;
+    }
 
     char *press_space = "Press SPACE to continue";
     if (ctx->rp_state->curr_section > 0)
@@ -52,7 +57,6 @@ void print_next_course_item(RIGHT_PANEL_STATE *rp_state)
     char *title =
         rp_state->course_section_data[rp_state->curr_item].content_title;
     char *text = rp_state->course_section_data[rp_state->curr_item].content;
-    // rp_state->curr_rp_state->curr_item = item;
 
     wattron(rp_state->inner_win, A_BOLD);
     if (title && strcmp(title, "") != 0)
@@ -73,5 +77,6 @@ void print_next_course_item(RIGHT_PANEL_STATE *rp_state)
             rp_state->curr_offset += 1;
         }
     }
+    // rp_state->curr_item += 1;
     rp_state->curr_offset += 2;
 }

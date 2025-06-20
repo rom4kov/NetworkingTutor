@@ -98,7 +98,7 @@ void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree)
         }
         strncpy(prev_dir->name, next->d_name, 30);
         prev_dir->name[29] = '\0';
-        mvwprintw(*explorer_window, LINES - 7, 2, "%s", prev_dir->name);
+        // mvwprintw(*explorer_window, LINES - 7, 2, "%s", prev_dir->name);
         strncpy(prev_dir->path, next->d_name, 30);
         prev_dir->path[29] = '\0';
         prev_dir->type = next->d_type;

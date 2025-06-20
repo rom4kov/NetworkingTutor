@@ -49,6 +49,10 @@ int main(void)
     ctx->first_course_draw = true;
     ctx->start_view_active = true;
     ctx->course_view_active = false;
+    ctx->rp_state->curr_section = 0;
+    ctx->rp_state->curr_item = 0;
+    ctx->rp_state->items_to_print = 1;
+    ctx->rp_state->curr_offset = 0;
 
     int curr_line;
     int curr_col;
@@ -98,8 +102,17 @@ int main(void)
         else if (ctx->course_needs_redraw)
         {
             ctx->rp_state->curr_offset = 0;
+
             if (!ctx->first_course_draw)
             {
+                if (ctx->rp_state->curr_section > 0)
+                    ctx->rp_state->items_to_print = ctx->rp_state->curr_item;
+                else
+                    ctx->rp_state->items_to_print =
+                        ctx->rp_state->curr_item - 1;
+
+                ctx->rp_state->curr_item = 0;
+
                 endwin();
                 refresh();
                 for (int i = 0; i < COURSE_WINDOW_COUNT; i++)

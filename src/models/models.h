@@ -94,6 +94,7 @@ typedef struct _right_panel_state
     WINDOW *header_win;
     WINDOW *inner_win;
     COURSE_SECTION *course_section_data;
+    TEXT_BUFFER *it_buffer;
 } RIGHT_PANEL_STATE;
 
 typedef struct _app_context

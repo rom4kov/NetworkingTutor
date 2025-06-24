@@ -63,6 +63,19 @@ TEXT_BUFFER *initialize_buffer()
     return text_buf;
 }
 
+I_TEXT_BUFFER *initialize_it_buffer()
+{
+    I_TEXT_BUFFER *text_buf = malloc(sizeof(I_TEXT_BUFFER));
+
+    text_buf->first_line = initialize_iline();
+    text_buf->current_line = text_buf->first_line;
+    text_buf->num_of_lines = 0;
+    text_buf->curr_line_nr = 0;
+    text_buf->current_col = 0;
+
+    return text_buf;
+}
+
 LINE *initialize_line()
 {
     LINE *line = malloc(sizeof(LINE));
@@ -70,6 +83,21 @@ LINE *initialize_line()
     line->buf_ = calloc(100, sizeof(char));
     line->line_num = 0;
     line->length = 1;
+    line->prev = NULL;
+    line->next = NULL;
+
+    return line;
+}
+
+I_LINE *initialize_iline()
+{
+    I_LINE *line = malloc(sizeof(LINE));
+
+    line->buf_ = calloc(100, sizeof(char));
+    line->line_num = 0;
+    line->length = 1;
+    line->style = 0;
+    line->centered = false;
     line->prev = NULL;
     line->next = NULL;
 

@@ -54,7 +54,7 @@ int main(void)
     ctx->rp_state->items_to_print = 1;
     ctx->rp_state->curr_offset = 0;
     ctx->rp_state->scroll_height = 0;
-    ctx->rp_state->it_buffer = initialize_buffer();
+    ctx->rp_state->it_buffer = initialize_it_buffer();
 
     int curr_line;
     int curr_col;

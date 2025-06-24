@@ -173,18 +173,20 @@ void handle_course_input(APP_CONTEXT *ctx)
                     // int x, y;
                     // getbegyx(ctx->rp_state->right_panel, y, x);
                     if (ctx->rp_state->curr_offset < LINES - 12)
-                        prefresh(ctx->rp_state->inner_win, 0, 0,
-                                 ctx->rp_state->y + ctx->rp_state->pad_start,
-                                 ctx->rp_state->x + 4, LINES - 7,
-                                 ctx->rp_state->x +
-                                     ctx->rp_state->window_width - 6);
+                        wrefresh(ctx->rp_state->inner_win);
+                        // prefresh(ctx->rp_state->inner_win, 0, 0,
+                        //          ctx->rp_state->y + ctx->rp_state->pad_start,
+                        //          ctx->rp_state->x + 4, LINES - 7,
+                        //          ctx->rp_state->x +
+                        //              ctx->rp_state->window_width - 6);
                     else
-                        prefresh(ctx->rp_state->inner_win,
-                                 ctx->rp_state->curr_offset - (LINES - 12), 0,
-                                 ctx->rp_state->y + ctx->rp_state->pad_start,
-                                 ctx->rp_state->x + 4, LINES - 7,
-                                 ctx->rp_state->x +
-                                     ctx->rp_state->window_width - 6);
+                        wrefresh(ctx->rp_state->inner_win);
+                        // prefresh(ctx->rp_state->inner_win,
+                        //          ctx->rp_state->curr_offset - (LINES - 12), 0,
+                        //          ctx->rp_state->y + ctx->rp_state->pad_start,
+                        //          ctx->rp_state->x + 4, LINES - 7,
+                        //          ctx->rp_state->x +
+                        //              ctx->rp_state->window_width - 6);
                 }
                 break;
             case 10:

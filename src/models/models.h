@@ -7,6 +7,12 @@
 
 #define START_WINDOW_COUNT 6
 #define COURSE_WINDOW_COUNT 5
+//
+// #define BOLD 1
+// #define UNDERLINE 2
+// #define CENTERED 4
+// #define O_LIST 8
+// #define U_LIST 16
 
 typedef struct _user_data
 {
@@ -41,6 +47,17 @@ typedef struct _line
     char *buf_;
 } LINE;
 
+typedef struct _instructions_line
+{
+    struct _instructions_line *prev;
+    struct _instructions_line *next;
+    unsigned short line_num;
+    unsigned short length;
+    char *buf_;
+    int style;
+    bool centered;
+} I_LINE;
+
 typedef struct text_buffer
 {
     LINE *first_line;
@@ -49,6 +66,15 @@ typedef struct text_buffer
     unsigned short current_col;
     unsigned short num_of_lines;
 } TEXT_BUFFER;
+
+typedef struct instructions_text_buffer
+{
+    I_LINE *first_line;
+    I_LINE *current_line;
+    unsigned short curr_line_nr;
+    unsigned short current_col;
+    unsigned short num_of_lines;
+} I_TEXT_BUFFER;
 
 typedef struct _icon
 {
@@ -94,7 +120,7 @@ typedef struct _right_panel_state
     WINDOW *header_win;
     WINDOW *inner_win;
     COURSE_SECTION *course_section_data;
-    TEXT_BUFFER *it_buffer;
+    I_TEXT_BUFFER *it_buffer;
 } RIGHT_PANEL_STATE;
 
 typedef struct _app_context

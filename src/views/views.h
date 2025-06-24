@@ -18,8 +18,8 @@ WINDOW *create_header_section(int *active_win);
 WINDOW *create_course_preview_card(int x_position, int *active_win,
                                    int curr_win_idx, COURSE *course);
 WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label);
-// void read_item_into_buffer(COURSE_SECTION *c_sec, TEXT_BUFFER *text_buf);
-void read_item_into_buffer(WINDOW *win, COURSE_SECTION *c_sec, I_TEXT_BUFFER *text_buf);
+void read_item_into_buffer(APP_CONTEXT *ctx);
+// void read_item_into_buffer(WINDOW *win, COURSE_SECTION *c_sec, I_TEXT_BUFFER *text_buf);
 void print_course_instructions(APP_CONTEXT *ctx);
 void init_right_panel_state(RIGHT_PANEL_STATE *rp_state,
                             bool course_view_active);

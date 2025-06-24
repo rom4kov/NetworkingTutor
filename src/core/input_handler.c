@@ -133,6 +133,7 @@ void handle_start_input(APP_CONTEXT *ctx)
                 ctx->course_needs_redraw = true;
                 ctx->course_view_active = true;
                 ctx->current_course_id = ctx->courses[this_win - 2].id;
+                ctx->current_course = ctx->courses[this_win - 2].name;
                 for (int i = 1; i < WINDOW_COUNT; ++i)
                 {
                     delwin(ctx->start_windows[i]);

@@ -275,11 +275,11 @@ void init_right_panel_state(RIGHT_PANEL_STATE *rp_state,
     // getbegyx(rp_state->right_panel, y, x);
     // mvwprintw(rp_state->right_panel, 1, 2, "%i", y);
     // mvwprintw(rp_state->right_panel, 1, 7, "%i", x);
-    rp_state->header_win = derwin(rp_state->right_panel, 6, 31, 2,
-                                  (rp_state->window_width - 30) / 2);
+    // rp_state->header_win = derwin(rp_state->right_panel, 6, 31, 2,
+    //                               (rp_state->window_width - 30) / 2);
     rp_state->inner_win = derwin(rp_state->right_panel, LINES - 18,
-                                 rp_state->window_width - 6, 13, 4);
-    rp_state->pad_start = 13;
+                                 rp_state->window_width - 6, 2, 4);
+    rp_state->pad_start = 7;
     // rp_state->inner_win = newpad(LINES + 28, rp_state->window_width - 6);
 
     // rp_state->curr_item = 0;

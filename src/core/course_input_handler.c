@@ -218,39 +218,6 @@ void handle_course_input(APP_CONTEXT *ctx)
                             newpad(LINES + 38, ctx->rp_state->window_width - 6);
                     }
                     print_course_instructions(ctx);
-                    // int x, y;
-                    // getbegyx(ctx->rp_state->right_panel, y, x);
-                    // wnoutrefresh(ctx->course_windows[1]);
-                    // wnoutrefresh(ctx->course_windows[2]);
-                    // wnoutrefresh(ctx->rp_state->right_panel);
-                    leaveok(ctx->rp_state->inner_win, TRUE);
-                    leaveok(ctx->course_windows[1], TRUE);
-                    leaveok(ctx->course_windows[2], TRUE);
-                    leaveok(ctx->course_windows[3], TRUE);
-                    leaveok(ctx->course_windows[4], TRUE);
-                    leaveok(ctx->edit_window, TRUE);
-                    leaveok(ctx->line_num_win, TRUE);
-                    idlok(ctx->rp_state->inner_win, TRUE);
-                    idlok(ctx->course_windows[1], TRUE);
-                    idlok(ctx->course_windows[2], TRUE);
-                    idlok(ctx->course_windows[3], TRUE);
-                    idlok(ctx->course_windows[4], TRUE);
-                    idlok(ctx->edit_window, TRUE);
-                    idlok(ctx->line_num_win, TRUE);
-                    curs_set(0);
-                    // wnoutrefresh(stdscr);
-                    // wclear(ctx->course_windows[0]);
-                    // wnoutrefresh(ctx->course_windows[0]);
-                    // wclear(ctx->course_windows[1]);
-                    // wnoutrefresh(ctx->course_windows[1]);
-                    // wclear(ctx->course_windows[2]);
-                    // wnoutrefresh(ctx->course_windows[2]);
-                    // wclear(ctx->edit_window);
-                    // wnoutrefresh(ctx->edit_window);
-                    // wclear(ctx->line_num_win);
-                    // wnoutrefresh(ctx->line_num_win);
-                    // wnoutrefresh(ctx->course_windows[3]);
-                    // wclear(ctx->course_windows[4]);
                     pnoutrefresh(ctx->rp_state->inner_win, 0, 0,
                                  ctx->rp_state->y + ctx->rp_state->pad_start,
                                  ctx->rp_state->x + 4, LINES - 7,
@@ -263,37 +230,6 @@ void handle_course_input(APP_CONTEXT *ctx)
                     LINES - ctx->rp_state->pad_start)
                 {
                     ctx->rp_state->scroll_height++;
-                    // int x, y;
-                    // getbegyx(ctx->rp_state->right_panel, y, x);
-                    // leaveok(ctx->rp_state->inner_win, TRUE);
-                    // leaveok(ctx->course_windows[1], TRUE);
-                    // leaveok(ctx->course_windows[2], TRUE);
-                    // leaveok(ctx->course_windows[3], TRUE);
-                    // leaveok(ctx->course_windows[4], TRUE);
-                    // idlok(ctx->rp_state->inner_win, TRUE);
-                    // idlok(ctx->course_windows[1], TRUE);
-                    // idlok(ctx->course_windows[2], TRUE);
-                    // idlok(ctx->course_windows[3], TRUE);
-                    // idlok(ctx->course_windows[4], TRUE);
-                    // curs_set(1);
-                    // wnoutrefresh(stdscr);
-                    // wclear(ctx->course_windows[0]);
-                    // wnoutrefresh(ctx->course_windows[0]);
-                    // touchwin(ctx->course_windows[1]);
-                    // wnoutrefresh(ctx->edit_window);
-                    // touchwin(ctx->course_windows[3]);
-                    // wclear(ctx->course_windows[2]);
-                    // wnoutrefresh(ctx->course_windows[2]);
-                    // wnoutrefresh(ctx->course_windows[1]);
-                    // wnoutrefresh(ctx->edit_window);
-                    // wclear(ctx->line_num_win);
-                    // wnoutrefresh(ctx->line_num_win);
-                    // wnoutrefresh(ctx->course_windows[3]);
-                    // // wclear(ctx->course_windows[4]);
-                    // curs_set(0);
-                    // wclear(ctx->edit_window);
-                    // print_no_open_file_msg(&ctx->edit_window);
-                    // wnoutrefresh(ctx->edit_window);
                     pnoutrefresh(
                         ctx->rp_state->inner_win, ctx->rp_state->scroll_height,
                         0, ctx->rp_state->y + ctx->rp_state->pad_start,
@@ -309,37 +245,6 @@ void handle_course_input(APP_CONTEXT *ctx)
                         LINES - ctx->rp_state->pad_start)
                 {
                     ctx->rp_state->scroll_height--;
-                    // int x, y;
-                    // getbegyx(ctx->rp_state->right_panel, y, x);
-                    // leaveok(ctx->rp_state->inner_win, TRUE);
-                    // leaveok(ctx->course_windows[1], TRUE);
-                    // leaveok(ctx->course_windows[2], TRUE);
-                    // leaveok(ctx->course_windows[3], TRUE);
-                    // leaveok(ctx->course_windows[4], TRUE);
-                    // idlok(ctx->rp_state->inner_win, TRUE);
-                    // idlok(ctx->course_windows[1], TRUE);
-                    // idlok(ctx->course_windows[2], TRUE);
-                    // idlok(ctx->course_windows[3], TRUE);
-                    // idlok(ctx->course_windows[4], TRUE);
-                    // curs_set(1);
-                    // wnoutrefresh(stdscr);
-                    // wclear(ctx->course_windows[0]);
-                    // wnoutrefresh(ctx->course_windows[0]);
-                    // touchwin(ctx->course_windows[1]);
-                    // wclear(ctx->course_windows[2]);
-                    // wnoutrefresh(ctx->course_windows[2]);
-                    // touchwin(ctx->edit_window);
-                    // wclear(ctx->line_num_win);
-                    // wnoutrefresh(ctx->line_num_win);
-                    // touchwin(ctx->course_windows[3]);
-                    // wnoutrefresh(ctx->course_windows[1]);
-                    // wnoutrefresh(ctx->edit_window);
-                    // wnoutrefresh(ctx->course_windows[3]);
-                    // wclear(ctx->course_windows[4]);
-                    // curs_set(0);
-                    // wclear(ctx->edit_window);
-                    // print_no_open_file_msg(&ctx->edit_window);
-                    // wnoutrefresh(ctx->edit_window);
                     pnoutrefresh(
                         ctx->rp_state->inner_win, ctx->rp_state->scroll_height,
                         0, ctx->rp_state->y + ctx->rp_state->pad_start,

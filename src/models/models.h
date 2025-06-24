@@ -29,13 +29,13 @@ typedef struct _course_data
 
 typedef struct _course_section
 {
-  int id;
-  int course_id;
-  int order_num;
-  int section_id;
-  char *section_title;
-  char *content_title;
-  char *content;
+    int id;
+    int course_id;
+    int order_num;
+    int section_id;
+    char *section_title;
+    char *content_title;
+    char *content;
 } COURSE_SECTION;
 
 typedef struct _line
@@ -106,8 +106,13 @@ typedef struct _file_tree
 
 typedef struct _right_panel_state
 {
-    int window_width;  
-    int intro_width;  
+    I_TEXT_BUFFER *it_buffer;
+    COURSE_SECTION *course_section_data;
+    WINDOW *right_panel;
+    WINDOW *header_win;
+    WINDOW *inner_win;
+    int window_width;
+    int intro_width;
     int curr_section;
     int curr_item;
     int items_to_print;
@@ -116,11 +121,7 @@ typedef struct _right_panel_state
     int scroll_height;
     int num_of_section_items;
     int y, x;
-    WINDOW *right_panel;
-    WINDOW *header_win;
-    WINDOW *inner_win;
-    COURSE_SECTION *course_section_data;
-    I_TEXT_BUFFER *it_buffer;
+    char *curr_section_title;
 } RIGHT_PANEL_STATE;
 
 typedef struct _app_context

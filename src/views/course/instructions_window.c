@@ -9,42 +9,10 @@ void print_course_instructions(APP_CONTEXT *ctx)
         ctx->db, ctx->current_course_id, ctx->rp_state->curr_section,
         &ctx->rp_state->num_of_section_items);
 
-    // if (ctx->rp_state->curr_section == 0)
-    // {
-    //     ctx->current_course = ctx->courses[ctx->current_course_id - 1].name;
-    //     mvwprintw(ctx->rp_state->header_win, 0, 0, "%s",
-    //               ctx->rp_state->course_section_data[0].content);
-    //     wattron(ctx->rp_state->right_panel, A_UNDERLINE | A_BOLD | A_BLINK);
-    //     mvwprintw(
-    //         ctx->rp_state->right_panel, 9,
-    //         ((ctx->rp_state->window_width - strlen(ctx->courses[0].name)) /
-    //         2),
-    //         "%s", ctx->courses[0].name);
-    //     wattroff(ctx->rp_state->right_panel, A_UNDERLINE | A_BOLD | A_BLINK);
-    // }
-
     ctx->rp_state->curr_section_title = (char *)get_section_title(ctx);
-    // if (ctx->rp_state->curr_section > 0)
-    //     wattron(ctx->rp_state->right_panel, A_UNDERLINE | A_BOLD);
-    // mvwprintw(ctx->rp_state->right_panel,
-    //           ctx->rp_state->curr_section == 0 ? 11 : 2,
-    //           ((ctx->rp_state->window_width -
-    //             strlen(ctx->rp_state->curr_section_title)) /
-    //            2),
-    //           "%s", ctx->rp_state->curr_section_title);
-    // if (ctx->rp_state->curr_section > 0)
-    //     wattroff(ctx->rp_state->right_panel, A_UNDERLINE | A_BOLD);
 
-    // if (ctx->rp_state->curr_section == 0)
-    //     ctx->rp_state->curr_item += 1;
-
-    // for (int i = 0; i < ctx->rp_state->num_of_section_items; i++)
-    // {
-    // read_item_into_buffer(ctx->rp_state->right_panel,
-    //                       &ctx->rp_state->course_section_data[i],
-    //                       ctx->rp_state->it_buffer);
     read_item_into_buffer(ctx);
-    // }
+
     print_next_course_item(ctx->rp_state);
     // mvwprintw(ctx->rp_state->inner_win, 28, 25, "%i",
     //           ctx->rp_state->it_buffer->num_of_lines);

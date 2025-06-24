@@ -2,6 +2,7 @@
 #include "../../models/models.h"
 #include <curses.h>
 #include <string.h>
+#include <stdlib.h>
 
 void add_line_break(RIGHT_PANEL_STATE *rps, I_LINE **curr_line, int i, int *j,
                     int *k, int *line_number, int *last_space_pos, bool overflow)
@@ -206,4 +207,19 @@ void read_item_into_buffer(APP_CONTEXT *ctx)
     }
     // mvwprintw(ctx->course_windows[2], 2, 3, "%s", ctx->current_course);
     // wrefresh(ctx->course_windows[2]);
+}
+
+void deallocate_it_buffer(I_TEXT_BUFFER *tbuf)
+{
+    if (tbuf->first_line == NULL)
+        return;
+
+    I_LINE *current_line = tbuf->first_line;
+    while (current_line->next != NULL)
+    {
+        free(current_line->buf_);
+        current_line = current_line->next;
+        // free(current_line->prev);
+    }
+    free(tbuf);
 }

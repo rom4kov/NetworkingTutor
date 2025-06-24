@@ -115,6 +115,8 @@ int main(void)
 
                 ctx->rp_state->curr_item = 0;
 
+                ctx->rp_state->it_buffer = initialize_it_buffer();
+
                 endwin();
                 refresh();
                 for (int i = 0; i < COURSE_WINDOW_COUNT; i++)

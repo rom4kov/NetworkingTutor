@@ -265,23 +265,13 @@ MENU *create_start_menu(WINDOW *nav_window)
 void init_right_panel_state(RIGHT_PANEL_STATE *rp_state,
                             bool course_view_active)
 {
-    // int x, y;
     rp_state->window_width = COLS - (WU * 7 + 4);
-    rp_state->intro_width = rp_state->window_width - 10;
 
     rp_state->right_panel = newwin(course_view_active ? LINES - 3 : LINES,
                                    rp_state->window_width, 0, WU * 7 + 4);
-    getbegyx(rp_state->right_panel, rp_state->y, rp_state->x);
-    // getbegyx(rp_state->right_panel, y, x);
-    // mvwprintw(rp_state->right_panel, 1, 2, "%i", y);
-    // mvwprintw(rp_state->right_panel, 1, 7, "%i", x);
-    // rp_state->header_win = derwin(rp_state->right_panel, 6, 31, 2,
-    //                               (rp_state->window_width - 30) / 2);
-    rp_state->inner_win = derwin(rp_state->right_panel, LINES - 18,
+    rp_state->inner_win = derwin(rp_state->right_panel, LINES - 8,
                                  rp_state->window_width - 6, 2, 4);
     rp_state->pad_start = 7;
-    // rp_state->inner_win = newpad(LINES + 28, rp_state->window_width - 6);
 
-    // rp_state->curr_item = 0;
     rp_state->num_of_section_items = 0;
 }

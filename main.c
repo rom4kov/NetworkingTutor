@@ -50,10 +50,10 @@ int main(void)
     ctx->start_view_active = true;
     ctx->course_view_active = false;
     ctx->rp_state->curr_section = 0;
-    ctx->rp_state->curr_item = 0;
+    ctx->rp_state->curr_item = 2;
     ctx->rp_state->items_to_print = 1;
     ctx->rp_state->curr_offset = 0;
-    ctx->rp_state->scroll_height = 0;
+    ctx->rp_state->scroll_offset = 0;
     ctx->rp_state->it_buffer = initialize_it_buffer();
 
     int curr_line;
@@ -103,8 +103,6 @@ int main(void)
         }
         else if (ctx->course_needs_redraw)
         {
-            ctx->rp_state->curr_offset = 0;
-
             if (!ctx->first_course_draw)
             {
                 if (ctx->rp_state->curr_section > 0)
@@ -113,7 +111,7 @@ int main(void)
                     ctx->rp_state->items_to_print =
                         ctx->rp_state->curr_item - 1;
 
-                ctx->rp_state->curr_item = 0;
+                // ctx->rp_state->curr_item = 0;
 
                 ctx->rp_state->it_buffer = initialize_it_buffer();
 
@@ -228,6 +226,7 @@ void initialize_colors()
     init_color(COLOR_DARKGREY, 500, 500, 500);
 
     init_pair(10, COLOR_DARKGREY, -1);
+    init_pair(11, COLOR_BLACK, -1);
 }
 
 WINDOW *create_welcome_screen()

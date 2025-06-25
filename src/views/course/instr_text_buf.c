@@ -1,22 +1,26 @@
+#ifdef __STDC_ALLOC_LIB__
+#define __STDC_WANT_LIB_EXT2__ 1
+#else
+#define _POSIX_C_SOURCE 200809L
+#endif
+
 #include "../../data/data_access_layer.h"
 #include "../../models/models.h"
 #include <curses.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 void add_line_break(RIGHT_PANEL_STATE *rps, I_LINE **curr_line, int i, int *j,
-                    int *k, int *line_number, int *last_space_pos, bool overflow)
+                    int *k, int *line_number, int *last_space_pos,
+                    bool overflow)
 {
     if (overflow)
     {
-        // (*curr_line)->buf_[*last_space_pos] =
-        //     rps->course_section_data[i].content[*j];
         (*curr_line)->buf_[*last_space_pos] = '\n';
         *j -= *k - *last_space_pos - 1;
     }
     else
     {
-        // (*curr_line)->buf_[*k] = rps->course_section_data[i].content[*j];
         (*curr_line)->buf_[*k] = '\n';
         *j += 1;
     }
@@ -40,8 +44,6 @@ void add_line_break(RIGHT_PANEL_STATE *rps, I_LINE **curr_line, int i, int *j,
     }
     else
     {
-        // mvwprintw(win, rps->it_buffer->num_of_lines +
-        // 18, 19, "next *curr_line %s", *curr_line->buf_);
         rps->it_buffer->num_of_lines++;
         rps->it_buffer->current_line->next = *curr_line;
         (*curr_line)->prev = rps->it_buffer->current_line;
@@ -50,8 +52,6 @@ void add_line_break(RIGHT_PANEL_STATE *rps, I_LINE **curr_line, int i, int *j,
     }
 }
 
-// void read_item_into_buffer(WINDOW *win, COURSE_SECTION *c_sec,
-//                            I_TEXT_BUFFER *text_buf)
 void read_item_into_buffer(APP_CONTEXT *ctx)
 {
     for (int i = 0; i < ctx->rp_state->num_of_section_items; i++)
@@ -67,6 +67,34 @@ void read_item_into_buffer(APP_CONTEXT *ctx)
 
         // LINE *prev_line = initialize_line();
         I_LINE *curr_line = initialize_iline();
+
+        if (ctx->rp_state->curr_section > 0 &&
+            i == 0)
+        {
+            curr_line->buf_ = strdup(ctx->rp_state->curr_section_title);
+            curr_line->centered = true;
+            curr_line->style = A_BOLD | A_UNDERLINE;
+            curr_line->line_num = line_number;
+            line_number++;
+
+            ctx->rp_state->it_buffer->num_of_lines++;
+            ctx->rp_state->it_buffer->current_line->next = curr_line;
+            curr_line->prev = ctx->rp_state->it_buffer->current_line;
+            ctx->rp_state->it_buffer->current_line = curr_line;
+            curr_line = initialize_iline();
+
+            curr_line->buf_[k] = '\n';
+            curr_line->line_num = line_number;
+            line_number++;
+
+            ctx->rp_state->it_buffer->num_of_lines++;
+            ctx->rp_state->it_buffer->current_line->next = curr_line;
+            curr_line->prev = ctx->rp_state->it_buffer->current_line;
+            ctx->rp_state->it_buffer->current_line = curr_line;
+            curr_line = initialize_iline();
+            // mvwprintw(ctx->rp_state->right_panel, i + 1, 2, "%i", ctx->rp_state->curr_item);
+            // wrefresh(ctx->rp_state->right_panel);
+        }
 
         if (title_length > 1)
         {
@@ -112,6 +140,7 @@ void read_item_into_buffer(APP_CONTEXT *ctx)
 
                 curr_line = initialize_iline();
                 curr_line->buf_[k] = '\n';
+                curr_line->style = SEPARATOR;
                 ctx->rp_state->it_buffer->num_of_lines++;
                 ctx->rp_state->it_buffer->current_line->next = curr_line;
                 curr_line->prev = ctx->rp_state->it_buffer->current_line;
@@ -147,6 +176,7 @@ void read_item_into_buffer(APP_CONTEXT *ctx)
         if (ctx->rp_state->course_section_data[i].section_id == 0 &&
             ctx->rp_state->course_section_data[i].order_num == 0)
         {
+            // curr_line = initialize_iline();
             curr_line->buf_[k] = '\n';
             curr_line->line_num = line_number;
             line_number++;
@@ -158,7 +188,6 @@ void read_item_into_buffer(APP_CONTEXT *ctx)
             curr_line = initialize_iline();
 
             curr_line->buf_ = ctx->current_course;
-            // curr_line->buf_ = "Current course";
             curr_line->centered = true;
             curr_line->style = A_BOLD | A_UNDERLINE;
             curr_line->line_num = line_number;
@@ -181,7 +210,7 @@ void read_item_into_buffer(APP_CONTEXT *ctx)
 
             curr_line = initialize_iline();
 
-            curr_line->buf_ = ctx->rp_state->curr_section_title;
+            curr_line->buf_ = strdup(ctx->rp_state->curr_section_title);
             curr_line->centered = true;
             curr_line->line_num = line_number;
             line_number++;
@@ -215,7 +244,7 @@ void deallocate_it_buffer(I_TEXT_BUFFER *tbuf)
         return;
 
     I_LINE *current_line = tbuf->first_line;
-    while (current_line->next != NULL)
+    while (current_line != NULL)
     {
         free(current_line->buf_);
         current_line = current_line->next;

@@ -7,7 +7,7 @@
 
 #define START_WINDOW_COUNT 6
 #define COURSE_WINDOW_COUNT 5
-//
+#define SEPARATOR 333
 // #define BOLD 1
 // #define UNDERLINE 2
 // #define CENTERED 4
@@ -115,11 +115,12 @@ typedef struct _right_panel_state
     int intro_width;
     int curr_section;
     int curr_item;
+    int scroll_offset;
+    int num_of_section_items;
     int items_to_print;
     int curr_offset;
-    int pad_start;
-    int scroll_height;
-    int num_of_section_items;
+    int lines_to_print;
+    int lines_excess;
     int y, x;
     char *curr_section_title;
 } RIGHT_PANEL_STATE;

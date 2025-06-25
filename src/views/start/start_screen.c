@@ -160,7 +160,6 @@ WINDOW *create_course_preview_card(int x_position, int *active_win,
 
 WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label)
 {
-    int x, y;
     init_right_panel_state(ctx->rp_state, ctx->course_view_active);
 
     if (ctx->active_window == 5)
@@ -189,16 +188,10 @@ WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label)
     else if (ctx->course_view_active)
     {
         print_course_instructions(ctx);
-        getbegyx(ctx->rp_state->right_panel, y, x);
-        // mvwprintw(ctx->rp_state->right_panel, 1, 2, "%i", y);
-        // mvwprintw(ctx->rp_state->right_panel, 1, 7, "%i", x);
-        pnoutrefresh(ctx->rp_state->inner_win, 0, 0,
-                     y + ctx->rp_state->pad_start, x + 4, LINES - 13,
-                     x + ctx->rp_state->window_width - 6);
+        wnoutrefresh(ctx->rp_state->inner_win);
     }
 
     wnoutrefresh(ctx->rp_state->right_panel);
-    wnoutrefresh(ctx->rp_state->header_win);
     doupdate();
     return ctx->rp_state->right_panel;
 }
@@ -271,7 +264,6 @@ void init_right_panel_state(RIGHT_PANEL_STATE *rp_state,
                                    rp_state->window_width, 0, WU * 7 + 4);
     rp_state->inner_win = derwin(rp_state->right_panel, LINES - 8,
                                  rp_state->window_width - 6, 2, 4);
-    rp_state->pad_start = 7;
 
     rp_state->num_of_section_items = 0;
 }

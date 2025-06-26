@@ -139,12 +139,14 @@ void read_item_into_buffer(APP_CONTEXT *ctx)
                 ctx->rp_state->it_buffer->current_line = curr_line;
 
                 curr_line = initialize_iline();
-                curr_line->buf_[k] = '\n';
+                curr_line->buf_[k] = ' ';
+                curr_line->buf_[k + 1] = '\n';
                 curr_line->style = SEPARATOR;
                 ctx->rp_state->it_buffer->num_of_lines++;
                 ctx->rp_state->it_buffer->current_line->next = curr_line;
                 curr_line->prev = ctx->rp_state->it_buffer->current_line;
                 ctx->rp_state->it_buffer->current_line = curr_line;
+                ctx->rp_state->it_buffer->current_line->next = NULL;
                 break;
             }
             else if (ctx->rp_state->course_section_data[i].content[j] == '\n')
@@ -187,7 +189,7 @@ void read_item_into_buffer(APP_CONTEXT *ctx)
             ctx->rp_state->it_buffer->current_line = curr_line;
             curr_line = initialize_iline();
 
-            curr_line->buf_ = ctx->current_course;
+            curr_line->buf_ = strdup(ctx->current_course);
             curr_line->centered = true;
             curr_line->style = A_BOLD | A_UNDERLINE;
             curr_line->line_num = line_number;
@@ -229,6 +231,7 @@ void read_item_into_buffer(APP_CONTEXT *ctx)
             ctx->rp_state->it_buffer->current_line->next = curr_line;
             curr_line->prev = ctx->rp_state->it_buffer->current_line;
             ctx->rp_state->it_buffer->current_line = curr_line;
+            ctx->rp_state->it_buffer->current_line->next = NULL;
         }
         // mvwprintw(win, text_buf->num_of_lines + 18, 16, "next curr_line %s",
         // text_buf->current_line->buf_); mvwprintw(win, 32 + i, 39, "chars %i",
@@ -246,9 +249,13 @@ void deallocate_it_buffer(I_TEXT_BUFFER *tbuf)
     I_LINE *current_line = tbuf->first_line;
     while (current_line != NULL)
     {
-        free(current_line->buf_);
-        current_line = current_line->next;
-        // free(current_line->prev);
+        I_LINE *next = current_line->next;
+        if (current_line->buf_)
+        {
+            free(current_line->buf_);
+        }
+        free(current_line);
+        current_line = next;
     }
     free(tbuf);
 }

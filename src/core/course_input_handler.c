@@ -146,7 +146,7 @@ void handle_course_input(APP_CONTEXT *ctx)
             case ' ':
                 if (ctx->rp_state->curr_item + 1 <
                     ctx->rp_state->num_of_section_items +
-                        (ctx->rp_state->curr_section == 0 ? 1 : 0))
+                        (ctx->rp_state->curr_section == 0 ? 1 : 1))
                 {
                     ctx->rp_state->curr_item += 1;
                     // mvwprintw(ctx->rp_state->right_panel, 2, 4, "nosi: %i",

@@ -40,6 +40,16 @@ void update_line_numbers(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
         }
     }
     wattroff(*line_num_win, COLOR_PAIR(10));
+
+    if (lines_to_print < LINES - 5)
+    {
+        for (int i = lines_to_print; i < (LINES - 7); i++)
+        {
+            wattron(*line_num_win, COLOR_PAIR(11));
+            mvwprintw(*line_num_win, i, 1, "%s", i % 2 == 0 ? "`" : " ");
+            wattroff(*line_num_win, COLOR_PAIR(11));
+        }
+    }
 }
 
 void compile_patterns(pcre2_code **re, int p_codes_num, char **pattern_str)

@@ -146,8 +146,7 @@ WINDOW *create_course_preview_card(int x_position, int *active_win,
     mvwprintw(course_preview_card_inner, 0,
               (CARD_WIDTH - strlen(course->name)) / 2 - 1, "%s", course->name);
     wrefresh(course_preview_card_inner);
-    int y, x;
-    getmaxyx(description_window, y, x);
+    int x = getmaxx(description_window);
     mvwprintw(description_window, 2, 0, "%s",
               wrap_text(course->short_desc, x - 8));
     if (curr_win_idx == 2)

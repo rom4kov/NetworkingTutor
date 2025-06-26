@@ -49,6 +49,7 @@ int main(void)
     ctx->first_course_draw = true;
     ctx->start_view_active = true;
     ctx->course_view_active = false;
+    ctx->current_course = malloc(64 * sizeof(char));
     ctx->rp_state->curr_section = 0;
     ctx->rp_state->curr_item = 2;
     ctx->rp_state->items_to_print = 1;

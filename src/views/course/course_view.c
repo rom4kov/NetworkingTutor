@@ -38,25 +38,21 @@ void create_course_view(APP_CONTEXT *ctx)
     ctx->edit_window =
         derwin(ctx->course_windows[2], LINES - 7, WU * 5 + (WU / 2) - 30, 2, 5);
 
-    // char c = 122;
     if (ctx->file == NULL)
     {
         wattron(ctx->line_num_win, COLOR_PAIR(11));
-        wattron(ctx->course_windows[2], COLOR_PAIR(10));
         for (int i = 0; i < LINES - 4; ++i)
         {
             mvwprintw(ctx->line_num_win, i, 1, "%s", i % 2 == 0 ? "`" : " ");
-            // touchline(ctx->line_num_win, i, 1);
-            // mvwprintw(ctx->edit_window, i, 1, "%s", "                                                            ");
         }
-        // mvwprintw(ctx->course_windows[2], 1, 1, "");
-        print_no_open_file_msg(&ctx->course_windows[2]);
         wattroff(ctx->line_num_win, COLOR_PAIR(11));
+        wattron(ctx->course_windows[2], COLOR_PAIR(10));
+        print_no_open_file_msg(&ctx->course_windows[2]);
         wattroff(ctx->course_windows[2], COLOR_PAIR(10));
-        // wnoutrefresh(ctx->line_num_win);
     }
 
     wnoutrefresh(ctx->course_windows[2]);
+    wnoutrefresh(ctx->course_windows[4]);
 }
 
 WINDOW *create_editor_window(int *active_window)
@@ -205,7 +201,7 @@ WINDOW *create_progress_window(APP_CONTEXT *ctx)
     mvwprintw(progress_window, 1,
               ctx->rp_state->window_width - strlen(progress_text) - 2, "%s",
               progress_text);
-    // wnoutrefresh(progress_window);
+    wnoutrefresh(progress_window);
     return progress_window;
 }
 

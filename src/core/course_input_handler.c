@@ -192,6 +192,7 @@ void handle_course_input(APP_CONTEXT *ctx)
                 {
                     ctx->rp_state->curr_section += 1;
                     ctx->rp_state->curr_item = 1;
+                    ctx->rp_state->sections_completed++;
                     // mvwprintw(ctx->rp_state->right_panel, 2, 2, "%i",
                     //           ctx->rp_state->curr_section);
                     // wrefresh(ctx->rp_state->right_panel);
@@ -223,6 +224,7 @@ void handle_course_input(APP_CONTEXT *ctx)
                     print_course_instructions(ctx);
                     // mvwprintw(ctx->rp_state->right_panel, 2, 3, "nosi: %i",
                     //           ctx->rp_state->num_of_section_items);
+                    wnoutrefresh(ctx->rp_state->right_panel);
                     wnoutrefresh(ctx->rp_state->inner_win);
                     doupdate();
                 }
@@ -230,9 +232,13 @@ void handle_course_input(APP_CONTEXT *ctx)
             case '<':
                 if (ctx->rp_state->curr_section > 0)
                 {
+                    ctx->rp_state
+                        ->num_of_section_items[ctx->rp_state->curr_section] =
+                        ctx->rp_state->curr_item;
                     ctx->rp_state->curr_section--;
                     ctx->rp_state->curr_item =
-                        ctx->rp_state->num_of_section_items[ctx->rp_state->curr_section];
+                        ctx->rp_state
+                            ->num_of_section_items[ctx->rp_state->curr_section];
                     ctx->rp_state->scroll_offset = 0;
                     ctx->rp_state->lines_excess = 0;
                     wclear(ctx->rp_state->inner_win);
@@ -240,11 +246,41 @@ void handle_course_input(APP_CONTEXT *ctx)
                     ctx->rp_state->it_buffer = initialize_it_buffer();
                     // read_item_into_buffer(ctx);
                     print_course_instructions(ctx);
-                    mvwprintw(ctx->course_windows[2], 3, 3, "%i", ctx->rp_state->scroll_offset);
-                    mvwprintw(ctx->course_windows[2], 4, 3, "%i", ctx->rp_state->lines_to_print);
-                    mvwprintw(ctx->course_windows[2], 5, 3, "%i", ctx->rp_state->lines_excess);
+                    // mvwprintw(ctx->course_windows[2], 3, 3, "%i",
+                    // ctx->rp_state->scroll_offset);
+                    // mvwprintw(ctx->course_windows[2], 4, 3, "%i",
+                    // ctx->rp_state->lines_to_print);
+                    // mvwprintw(ctx->course_windows[2], 5, 3, "%i",
+                    // ctx->rp_state->lines_excess);
+                    // wnoutrefresh(ctx->course_windows[2]);
+                    wnoutrefresh(ctx->rp_state->right_panel);
                     wnoutrefresh(ctx->rp_state->inner_win);
+                    doupdate();
+                }
+                break;
+            case '>':
+                if (ctx->rp_state->curr_section == 0)
+                {
+                    ctx->rp_state->curr_section++;
+                    ctx->rp_state->curr_item =
+                        ctx->rp_state
+                            ->num_of_section_items[ctx->rp_state->curr_section];
+                    ctx->rp_state->scroll_offset = 0;
+                    ctx->rp_state->lines_excess = 0;
+
+                    wclear(ctx->rp_state->inner_win);
+
+                    deallocate_it_buffer(ctx->rp_state->it_buffer);
+                    ctx->rp_state->it_buffer = initialize_it_buffer();
+
+                    print_course_instructions(ctx);
+
+                    wnoutrefresh(ctx->course_windows[1]);
                     wnoutrefresh(ctx->course_windows[2]);
+                    wnoutrefresh(ctx->edit_window);
+                    wnoutrefresh(ctx->line_num_win);
+                    wnoutrefresh(ctx->rp_state->right_panel);
+                    wnoutrefresh(ctx->rp_state->inner_win);
                     doupdate();
                 }
                 break;

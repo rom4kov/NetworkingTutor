@@ -13,13 +13,19 @@ void print_course_instructions(APP_CONTEXT *ctx)
 
     read_item_into_buffer(ctx);
 
-    // ctx->rp_state->curr_item += 1;
     print_next_course_item(ctx->rp_state);
-    // mvwprintw(ctx->rp_state->inner_win, 28, 25, "%i",
-    //           ctx->rp_state->it_buffer->num_of_lines);
-    // mvwprintw(ctx->rp_state->right_panel, 2, 2, "%s",
-    // ctx->rp_state->it_buffer->first_line->buf_);
-    wrefresh(ctx->rp_state->inner_win);
+
+    if (ctx->rp_state->curr_section > 0)
+        mvwprintw(ctx->rp_state->right_panel, LINES - 5, 2, "%s", "<");
+    else
+        mvwprintw(ctx->rp_state->right_panel, LINES - 5, 2, "%s", " ");
+
+    if (ctx->rp_state->curr_section < ctx->rp_state->sections_completed)
+        mvwprintw(ctx->rp_state->right_panel, LINES - 5,
+                  ctx->rp_state->window_width - 3, "%s", ">");
+    else
+        mvwprintw(ctx->rp_state->right_panel, LINES - 5,
+                  ctx->rp_state->window_width - 3, "%s", " ");
 
     char *press_space = "Press SPACE to continue";
     if (ctx->rp_state->curr_section > 0)
@@ -34,15 +40,11 @@ void print_course_instructions(APP_CONTEXT *ctx)
 
 void print_next_course_item(RIGHT_PANEL_STATE *rp_state)
 {
-    // rp_state->it_buffer->current_line = rp_state->it_buffer->first_line;
-    // char *title = rp_state->it_buffer->first_line->buf_;
     I_LINE *current_line = rp_state->it_buffer->first_line;
-    // char *text = rp_state->course_section_data[rp_state->curr_item].content;
     int i, j;
     j = 0;
 
     rp_state->lines_to_print = 0;
-    // mvwprintw(rp_state->inner_win, j, 4, "%s", current_line->next->buf_);
     for (i = 0; i < rp_state->curr_item; i++)
     {
         while (current_line->style != SEPARATOR)
@@ -56,7 +58,6 @@ void print_next_course_item(RIGHT_PANEL_STATE *rp_state)
 
     int offset;
     current_line = rp_state->it_buffer->first_line;
-    // char *text = rp_state->course_section_data[rp_state->curr_item].content;
 
     if (rp_state->lines_to_print > (LINES - 8))
     {
@@ -66,15 +67,12 @@ void print_next_course_item(RIGHT_PANEL_STATE *rp_state)
     for (i = 0; i < (rp_state->lines_excess - rp_state->scroll_offset); i++)
         current_line = current_line->next;
 
-    // mvwprintw(rp_state->inner_win, j, 4, "%s", current_line->next->buf_);
     for (i = 0; i < (rp_state->lines_to_print - rp_state->lines_excess); i++)
     {
-        // while (current_line->style != SEPARATOR)
-        // {
         if (current_line->centered)
-            offset = (rp_state->window_width -
-                (current_line->length < 7 ? 10 : 6) -
-                strlen(current_line->buf_)) /
+            offset =
+                (rp_state->window_width - (current_line->length < 7 ? 10 : 6) -
+                 strlen(current_line->buf_)) /
                 2;
         else
             offset = 0;
@@ -86,9 +84,6 @@ void print_next_course_item(RIGHT_PANEL_STATE *rp_state)
 
         current_line = current_line->next;
         j++;
-        // }
-        // current_line = current_line->next;
-        // j++;
     }
 }
 

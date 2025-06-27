@@ -29,7 +29,7 @@ void create_course_view(APP_CONTEXT *ctx)
     ctx->course_windows[0] =
         create_navigation_window(&ctx->active_window, &ctx->start_menu);
     ctx->course_windows[1] = create_explorer_window(ctx->file_tree);
-    ctx->course_windows[2] = create_editor_window(&ctx->active_window);
+    ctx->course_windows[2] = create_editor_window();
     ctx->course_windows[3] =
         create_right_side_panel(ctx, "Course instructions");
     ctx->course_windows[4] = create_progress_window(ctx);
@@ -55,7 +55,7 @@ void create_course_view(APP_CONTEXT *ctx)
     wnoutrefresh(ctx->course_windows[4]);
 }
 
-WINDOW *create_editor_window(int *active_window)
+WINDOW *create_editor_window()
 {
     WINDOW *editor_window = newwin(LINES - 3, EDITOR_WIDTH, 3, WU + WU / 2);
     draw_border(editor_window, 2, "Editor");

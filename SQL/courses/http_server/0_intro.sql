@@ -137,7 +137,7 @@ VALUES
         1,
         0,
         "",
-        "1. Basics: TCP/IP + HTTP   2. getaddrinfo()   3. socket()   
+        "1. Foundations: TCP/IP + HTTP   2. getaddrinfo()   3. socket()   
 4. bind()   5. listen()   6. accecpt()   7. recv()   8. send()
 9. send an HTTP headers with HTML file",
         6

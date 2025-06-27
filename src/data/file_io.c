@@ -455,10 +455,8 @@ void create_new_file(APP_CONTEXT *ctx, WINDOW **form_window, WINDOW **inner_win,
                 open_new_file(ctx);
 
                 DIR_ENTRY *current_entry = ctx->file_tree->current_entry;
-                DIR_ENTRY *next_entry = current_entry->next;
 
-                create_new_entry_for_file(ctx, current_entry, next_entry,
-                                          new_filename, 8);
+                create_new_entry_for_file(ctx, current_entry, new_filename, 8);
 
                 unpost_form(*new_file_form);
                 free_form(*new_file_form);
@@ -492,8 +490,7 @@ void create_new_file(APP_CONTEXT *ctx, WINDOW **form_window, WINDOW **inner_win,
 }
 
 void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
-                               DIR_ENTRY *next_entry, char *new_filename,
-                               int type)
+                               char *new_filename, int type)
 {
     if (current_entry->state == 'o')
     {
@@ -707,8 +704,7 @@ void delete_file(APP_CONTEXT *ctx, bool *del_file_form_active,
                     // wrefresh(ctx->course_windows[3]);
                     remove(ctx->file_tree->current_entry->path);
 
-                    remove_entry_from_file_tree(ctx->file_tree,
-                                                &ctx->course_windows[0]);
+                    remove_entry_from_file_tree(ctx->file_tree);
 
                     curs_set(0);
                     unpost_form(*new_file_form);
@@ -767,7 +763,7 @@ void delete_file(APP_CONTEXT *ctx, bool *del_file_form_active,
     }
 }
 
-void remove_entry_from_file_tree(FILE_TREE *f_tree, WINDOW **win)
+void remove_entry_from_file_tree(FILE_TREE *f_tree)
 {
     if (f_tree == NULL || f_tree->current_entry == NULL)
     {
@@ -1021,10 +1017,8 @@ void create_directory(APP_CONTEXT *ctx, WINDOW **inner_win,
                 mkdir(new_path, 0777);
 
                 DIR_ENTRY *current_entry = ctx->file_tree->current_entry;
-                DIR_ENTRY *next_entry = current_entry->next;
 
-                create_new_entry_for_file(ctx, current_entry, next_entry,
-                                          new_dirname, 4);
+                create_new_entry_for_file(ctx, current_entry, new_dirname, 4);
 
                 curs_set(0);
                 unpost_form(*new_file_form);

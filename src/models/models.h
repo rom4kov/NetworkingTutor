@@ -117,6 +117,7 @@ typedef struct _right_panel_state
     int curr_item;
     int scroll_offset;
     int num_of_section_items[32];
+    int sections_completed;
     int items_to_print;
     int curr_offset;
     int lines_to_print;

@@ -54,7 +54,7 @@ void add_line_break(RIGHT_PANEL_STATE *rps, I_LINE **curr_line, int i, int *j,
 
 void read_item_into_buffer(APP_CONTEXT *ctx)
 {
-    for (int i = 0; i < ctx->rp_state->num_of_section_items; i++)
+    for (int i = 0; i < ctx->rp_state->num_of_section_items[ctx->rp_state->curr_section]; i++)
     {
         int content_length =
             strlen(ctx->rp_state->course_section_data[i].content);

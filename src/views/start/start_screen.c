@@ -264,5 +264,5 @@ void init_right_panel_state(RIGHT_PANEL_STATE *rp_state,
     rp_state->inner_win = derwin(rp_state->right_panel, LINES - 8,
                                  rp_state->window_width - 6, 2, 4);
 
-    rp_state->num_of_section_items = 0;
+    rp_state->num_of_section_items[rp_state->curr_section] = 0;
 }

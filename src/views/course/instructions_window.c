@@ -7,7 +7,7 @@ void print_course_instructions(APP_CONTEXT *ctx)
 {
     ctx->rp_state->course_section_data = get_course_section_materials(
         ctx->db, ctx->current_course_id, ctx->rp_state->curr_section,
-        &ctx->rp_state->num_of_section_items);
+        &ctx->rp_state->num_of_section_items[ctx->rp_state->curr_section]);
 
     ctx->rp_state->curr_section_title = (char *)get_section_title(ctx);
 

@@ -1,5 +1,6 @@
 #define _POSIX_C_SOURCE 200809L
 
+#include "../models/models.h"
 #include <math.h>
 #include <curses.h>
 #include <stdlib.h>
@@ -47,9 +48,21 @@ void focus_window(WINDOW **window, int color_pair, char *label)
 {
     draw_border(*window, color_pair, label);
     wattron(*window, COLOR_PAIR(3));
-    mvwprintw(*window, 0, 2, "%s", label);
+    mvwprintw(*window, 0, 2, " %s ", label);
     wattroff(*window, COLOR_PAIR(3));
     wnoutrefresh(*window);
+}
+
+void focus_instructions_window(RIGHT_PANEL_STATE *rps, int color_pair, char *label)
+{
+    draw_border(rps->right_panel, color_pair, label);
+    wattron(rps->right_panel, COLOR_PAIR(3));
+    mvwprintw(rps->right_panel, 0, 2, " %s ", label);
+    mvwprintw(rps->right_panel, LINES - 4, 79, " %s %i of %i ",
+              "Section", rps->curr_section + 1, 9);
+    wattroff(rps->right_panel, COLOR_PAIR(3));
+
+    wnoutrefresh(rps->right_panel);
 }
 
 void trim(char **str)

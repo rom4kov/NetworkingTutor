@@ -62,7 +62,7 @@ void create_start_screen(APP_CONTEXT *ctx)
         CARD_WIDTH, &ctx->active_window, 3, &ctx->courses[1]);
     ctx->start_windows[4] = create_course_preview_card(
         CARD_WIDTH * 2, &ctx->active_window, 4, &ctx->courses[2]);
-    ctx->start_windows[5] = create_right_side_panel(ctx, "Details");
+    ctx->start_windows[5] = create_right_side_panel(ctx, " Details ");
 
     wrefresh(ctx->start_windows[5]);
 }
@@ -75,7 +75,7 @@ WINDOW *create_navigation_window(int *active_win, MENU **start_menu)
     *start_menu = create_start_menu(navigation);
 
     wattron(navigation, COLOR_PAIR(3));
-    mvwprintw(navigation, 0, 2, "Navigation");
+    mvwprintw(navigation, 0, 2, " Navigation ");
     wattroff(navigation, COLOR_PAIR(3));
     wrefresh(navigation);
     return navigation;
@@ -127,11 +127,11 @@ WINDOW *create_course_preview_card(int x_position, int *active_win,
     if ((*active_win == 2 || *active_win == 3 || *active_win == 4) &&
         curr_win_idx == *active_win)
     {
-        draw_border(course_preview_card_outer, 3, "Lesson");
+        draw_border(course_preview_card_outer, 3, " Lesson");
     }
     else
     {
-        draw_border(course_preview_card_outer, 2, "Lesson");
+        draw_border(course_preview_card_outer, 2, " Lesson");
         mvwaddch(course_preview_card_outer, 2, 0, ACS_LTEE);
         mvwaddch(course_preview_card_outer, 2, CARD_WIDTH - 1 + remainder,
                  ACS_RTEE);
@@ -140,7 +140,7 @@ WINDOW *create_course_preview_card(int x_position, int *active_win,
     mvwhline(course_preview_card_inner, 1, 0, ACS_HLINE,
              CARD_WIDTH + remainder);
     wattron(course_preview_card_outer, COLOR_PAIR(3));
-    mvwprintw(course_preview_card_outer, 0, 2, "Lesson #%i", course->id);
+    mvwprintw(course_preview_card_outer, 0, 2, " Lesson #%i ", course->id);
     wattroff(course_preview_card_outer, COLOR_PAIR(3));
     wrefresh(course_preview_card_outer);
     mvwprintw(course_preview_card_inner, 0,

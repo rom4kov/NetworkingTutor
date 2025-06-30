@@ -108,7 +108,7 @@ void handle_course_input(APP_CONTEXT *ctx)
             case KEY_RIGHT:
                 ctx->active_window = 3;
                 focus_window(&ctx->course_windows[2], 2, "Editor");
-                focus_window(&ctx->course_windows[3], 3, "Course Instructions");
+                focus_instructions_window(ctx->rp_state, 3, "Course Instructions");
                 wnoutrefresh(ctx->rp_state->inner_win);
                 doupdate();
                 break;
@@ -139,7 +139,7 @@ void handle_course_input(APP_CONTEXT *ctx)
             case KEY_LEFT:
                 ctx->active_window = 2;
                 focus_window(&ctx->course_windows[2], 3, "Editor");
-                focus_window(&ctx->course_windows[3], 2, "Course Instructions");
+                focus_instructions_window(ctx->rp_state, 2, "Course Instructions");
                 wnoutrefresh(ctx->rp_state->inner_win);
                 doupdate();
                 break;
@@ -229,6 +229,24 @@ void handle_course_input(APP_CONTEXT *ctx)
                     doupdate();
                 }
                 break;
+            case KEY_DOWN:
+                if (ctx->rp_state->scroll_offset > 0)
+                {
+                    ctx->rp_state->scroll_offset--;
+                    print_next_course_item(ctx->rp_state);
+                    wnoutrefresh(ctx->rp_state->inner_win);
+                    doupdate();
+                }
+                break;
+            case KEY_UP:
+                if (ctx->rp_state->lines_excess > ctx->rp_state->scroll_offset)
+                {
+                    ctx->rp_state->scroll_offset++;
+                    print_next_course_item(ctx->rp_state);
+                    wnoutrefresh(ctx->rp_state->inner_win);
+                    doupdate();
+                }
+                break;
             case '<':
                 if (ctx->rp_state->curr_section > 0)
                 {
@@ -280,24 +298,6 @@ void handle_course_input(APP_CONTEXT *ctx)
                     wnoutrefresh(ctx->edit_window);
                     wnoutrefresh(ctx->line_num_win);
                     wnoutrefresh(ctx->rp_state->right_panel);
-                    wnoutrefresh(ctx->rp_state->inner_win);
-                    doupdate();
-                }
-                break;
-            case KEY_DOWN:
-                if (ctx->rp_state->scroll_offset > 0)
-                {
-                    ctx->rp_state->scroll_offset--;
-                    print_next_course_item(ctx->rp_state);
-                    wnoutrefresh(ctx->rp_state->inner_win);
-                    doupdate();
-                }
-                break;
-            case KEY_UP:
-                if (ctx->rp_state->lines_excess > ctx->rp_state->scroll_offset)
-                {
-                    ctx->rp_state->scroll_offset++;
-                    print_next_course_item(ctx->rp_state);
                     wnoutrefresh(ctx->rp_state->inner_win);
                     doupdate();
                 }

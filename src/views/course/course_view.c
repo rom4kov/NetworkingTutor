@@ -31,7 +31,7 @@ void create_course_view(APP_CONTEXT *ctx)
     ctx->course_windows[1] = create_explorer_window(ctx->file_tree);
     ctx->course_windows[2] = create_editor_window();
     ctx->course_windows[3] =
-        create_right_side_panel(ctx, "Course instructions");
+        create_right_side_panel(ctx, " Course instructions ");
     ctx->course_windows[4] = create_progress_window(ctx);
 
     ctx->line_num_win = derwin(ctx->course_windows[2], LINES - 6, 3, 2, 1);
@@ -63,7 +63,7 @@ WINDOW *create_editor_window()
     // mvwprintw(editor_window, 0, 2, "%i", *active_window);
 
     wattron(editor_window, COLOR_PAIR(3));
-    mvwprintw(editor_window, 0, 2, "Editor");
+    mvwprintw(editor_window, 0, 2, " Editor ");
     wattroff(editor_window, COLOR_PAIR(3));
     // mvwprintw(editor_window, 9, 2, "COLS: %i", COLS);
     // mvwprintw(editor_window, 10, 2, "Editor width: %i", EDITOR_WIDTH);
@@ -76,10 +76,10 @@ WINDOW *create_editor_window()
 WINDOW *create_explorer_window(FILE_TREE *file_tree)
 {
     WINDOW *explorer_window = newwin(LINES - 3, EXPLORER_WIDTH, 3, 0);
-    draw_border(explorer_window, 2, "Explorer");
+    draw_border(explorer_window, 2, " Explorer ");
 
     wattron(explorer_window, COLOR_PAIR(3));
-    mvwprintw(explorer_window, 0, 2, "Explorer");
+    mvwprintw(explorer_window, 0, 2, " Explorer ");
     wattroff(explorer_window, COLOR_PAIR(3));
 
     create_explorer_menu(&explorer_window, file_tree);
@@ -190,10 +190,10 @@ WINDOW *create_progress_window(APP_CONTEXT *ctx)
 {
     WINDOW *progress_window =
         newwin(3, ctx->rp_state->window_width, LINES - 3, WU * 7 + 4);
-    draw_border(progress_window, 2, "Progress");
+    draw_border(progress_window, 2, " Progress ");
 
     wattron(progress_window, COLOR_PAIR(3));
-    mvwprintw(progress_window, 0, 2, "Status");
+    mvwprintw(progress_window, 0, 2, " Status ");
     wattroff(progress_window, COLOR_PAIR(3));
 
     mvwprintw(progress_window, 1, 2, "Current course: %s", ctx->current_course);

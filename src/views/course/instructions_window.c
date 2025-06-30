@@ -27,6 +27,9 @@ void print_course_instructions(APP_CONTEXT *ctx)
         mvwprintw(ctx->rp_state->right_panel, LINES - 5,
                   ctx->rp_state->window_width - 3, "%s", " ");
 
+    mvwprintw(ctx->rp_state->right_panel, LINES - 4, 79, " %s %i of %i ",
+              "Section", ctx->rp_state->curr_section + 1, 9);
+
     char *press_space = "Press SPACE to continue";
     if (ctx->rp_state->curr_section > 0)
         mvwprintw(

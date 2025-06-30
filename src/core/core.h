@@ -31,6 +31,7 @@ void insert_line(TEXT_BUFFER *tbuf, WINDOW **edit_window, WINDOW **line_num_win,
 char *wrap_text(char *text, int width);
 void draw_border(WINDOW *win, int color_pair, char *label);
 void focus_window(WINDOW **window, int color_pair, char *label);
+void focus_instructions_window(RIGHT_PANEL_STATE *rps, int color_pair, char *label);
 void trim(char **str);
 char *return_trimmed(char *str);
 char *trunc_str(char *str, int win_width, int offset);

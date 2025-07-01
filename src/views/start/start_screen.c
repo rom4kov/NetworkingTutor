@@ -159,6 +159,10 @@ WINDOW *create_course_preview_card(int x_position, int *active_win,
 
 WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label)
 {
+    PROGRESS_DATA *pd = get_progress_data(ctx);
+    ctx->rp_state->sections_completed = pd->sections_completed;
+    ctx->rp_state->items_completed = pd->items_completed;
+
     init_right_panel_state(ctx->rp_state, ctx->course_view_active);
 
     if (ctx->active_window == 5)

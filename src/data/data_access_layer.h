@@ -15,6 +15,10 @@ COURSE_SECTION *get_course_section_materials(sqlite3 *db, int course,
                                        int section, int *num_of_items);
 void update_user(sqlite3 *db, int id, char *name, char *language);
 
+PROGRESS_DATA *get_progress_data(APP_CONTEXT *ctx);
+void set_section_completed(APP_CONTEXT *ctx);
+void set_items_completed(APP_CONTEXT *ctx);
+
 DIR_ENTRY *initialize_dir_entry();
 FILE_TREE *initialize_file_tree();
 TEXT_BUFFER *initialize_buffer();

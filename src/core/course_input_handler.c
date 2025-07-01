@@ -149,7 +149,9 @@ void handle_course_input(APP_CONTEXT *ctx)
                                                             ->curr_section] +
                         (ctx->rp_state->curr_section == 0 ? 1 : 1))
                 {
-                    ctx->rp_state->curr_item += 1;
+                    ctx->rp_state->curr_item++;
+                    ctx->rp_state->items_completed++;
+                    set_items_completed(ctx);
                     // mvwprintw(ctx->rp_state->right_panel, 2, 4, "nosi: %i",
                     //           ctx->rp_state->num_of_section_items);
                     // mvwprintw(ctx->rp_state->right_panel, 3, 4, "cuit: %i",
@@ -193,6 +195,7 @@ void handle_course_input(APP_CONTEXT *ctx)
                     ctx->rp_state->curr_section += 1;
                     ctx->rp_state->curr_item = 1;
                     ctx->rp_state->sections_completed++;
+                    set_section_completed(ctx);
                     // mvwprintw(ctx->rp_state->right_panel, 2, 2, "%i",
                     //           ctx->rp_state->curr_section);
                     // wrefresh(ctx->rp_state->right_panel);

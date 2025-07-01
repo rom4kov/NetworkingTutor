@@ -196,7 +196,7 @@ WINDOW *create_progress_window(APP_CONTEXT *ctx)
     mvwprintw(progress_window, 0, 2, " Status ");
     wattroff(progress_window, COLOR_PAIR(3));
 
-    mvwprintw(progress_window, 1, 2, "Current course: %s", ctx->current_course);
+    mvwprintw(progress_window, 1, 2, "Course: %s", ctx->current_course);
     char *progress_text = "Progress: Courses 0 -- Sections 0";
     mvwprintw(progress_window, 1,
               ctx->rp_state->window_width - strlen(progress_text) - 2, "%s",

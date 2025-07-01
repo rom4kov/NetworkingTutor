@@ -50,7 +50,7 @@ int main(void)
     ctx->start_view_active = true;
     ctx->course_view_active = false;
     ctx->current_course = malloc(64 * sizeof(char));
-    ctx->rp_state->sections_completed = 0;
+    ctx->rp_state->items_completed = 0;
     ctx->rp_state->curr_section = 0;
     ctx->rp_state->curr_item = 2;
     ctx->rp_state->items_to_print = 1;
@@ -69,6 +69,8 @@ int main(void)
     //                   "SQL/courses/http_server/sections.sql");
     // seed_courses_data(ctx->db, welcome_screen,
     //                   "SQL/courses/http_server/1_foundations.sql");
+    // seed_courses_data(ctx->db, welcome_screen,
+    //                   "SQL/create_progress_table.sql");
 
     int rc = wgetch(welcome_screen);
     if (rc == KEY_RESIZE)

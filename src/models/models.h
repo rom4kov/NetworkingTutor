@@ -38,6 +38,15 @@ typedef struct _course_section
     char *content;
 } COURSE_SECTION;
 
+typedef struct _progress_data
+{
+  int id;
+  int user_id;
+  int course_id;
+  int sections_completed;
+  int items_completed;
+} PROGRESS_DATA;
+
 typedef struct _line
 {
     struct _line *prev;
@@ -118,6 +127,7 @@ typedef struct _right_panel_state
     int scroll_offset;
     int num_of_section_items[32];
     int sections_completed;
+    int items_completed;
     int items_to_print;
     int curr_offset;
     int lines_to_print;

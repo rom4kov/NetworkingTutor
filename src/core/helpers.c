@@ -1,11 +1,11 @@
 #define _POSIX_C_SOURCE 200809L
 
 #include "../models/models.h"
-#include <math.h>
-#include <curses.h>
-#include <stdlib.h>
 #include <ctype.h>
+#include <curses.h>
+#include <math.h>
 #include <ncurses.h>
+#include <stdlib.h>
 #include <string.h>
 
 void draw_border(WINDOW *win, int color_pair, char *label)
@@ -47,19 +47,23 @@ void draw_border(WINDOW *win, int color_pair, char *label)
 void focus_window(WINDOW **window, int color_pair, char *label)
 {
     draw_border(*window, color_pair, label);
-    wattron(*window, COLOR_PAIR(3));
-    mvwprintw(*window, 0, 2, " %s ", label);
-    wattroff(*window, COLOR_PAIR(3));
+    if (strcmp(label, "") != 0)
+    {
+        wattron(*window, COLOR_PAIR(3));
+        mvwprintw(*window, 0, 2, " %s ", label);
+        wattroff(*window, COLOR_PAIR(3));
+    }
     wnoutrefresh(*window);
 }
 
-void focus_instructions_window(RIGHT_PANEL_STATE *rps, int color_pair, char *label)
+void focus_instructions_window(RIGHT_PANEL_STATE *rps, int color_pair,
+                               char *label)
 {
     draw_border(rps->right_panel, color_pair, label);
     wattron(rps->right_panel, COLOR_PAIR(3));
     mvwprintw(rps->right_panel, 0, 2, " %s ", label);
-    mvwprintw(rps->right_panel, LINES - 4, 79, " %s %i of %i ",
-              "Section", rps->curr_section + 1, 9);
+    mvwprintw(rps->right_panel, LINES - 4, 79, " %s %i of %i ", "Section",
+              rps->curr_section + 1, 9);
     wattroff(rps->right_panel, COLOR_PAIR(3));
 
     wnoutrefresh(rps->right_panel);
@@ -69,7 +73,8 @@ void trim(char **str)
 {
     char *end;
 
-    while(isspace(*str[0])) *str += 1;
+    while (isspace(*str[0]))
+        *str += 1;
 
     end = *str + strlen(*str) - 1;
     while (end > *str && isspace((unsigned char)*end))
@@ -82,7 +87,8 @@ char *return_trimmed(char *str)
     char *end;
     char *strcop = str;
 
-    while(isspace(strcop[0])) strcop += 1;
+    while (isspace(strcop[0]))
+        strcop += 1;
 
     end = strcop + strlen(strcop) - 1;
     while (end > strcop && isspace((unsigned char)*end))
@@ -138,6 +144,8 @@ char *trunc_str(char *str, int win_width, int offset)
 int c_round(float x)
 {
     float fract = x - floor(x);
-    if (fract <= 0.1) return (int)floor(x);
-    else return (int)ceil(x);
+    if (fract <= 0.1)
+        return (int)floor(x);
+    else
+        return (int)ceil(x);
 }

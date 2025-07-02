@@ -1,6 +1,7 @@
 #include "src/core/core.h"
 #include "src/data/data_access_layer.h"
 #include "src/models/models.h"
+#include "src/views/start/start_menu.h"
 #include "src/views/views.h"
 #include <curses.h>
 #include <locale.h>
@@ -15,6 +16,9 @@
 #define COLOR_ORANGE 17
 #define COLOR_DARKGREY 18
 #define START_WINDOW_COUNT 6
+
+#define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
+#define CTRLD 4
 
 int main(void)
 {
@@ -60,7 +64,7 @@ int main(void)
     int curr_line;
     int curr_col;
 
-    WINDOW *welcome_screen = create_welcome_screen();
+    ctx->greeter_screen = create_greeter_screen(ctx);
 
     // seed_courses_data(ctx->db, welcome_screen,
     //                   "SQL/create_sections_table.sql");
@@ -71,14 +75,20 @@ int main(void)
     // seed_courses_data(ctx->db, welcome_screen,
     //                   "SQL/create_progress_table.sql");
 
-    int rc = wgetch(welcome_screen);
-    if (rc == KEY_RESIZE)
+    keypad(ctx->greeter_screen, TRUE);
+    while ((ctx->key = wgetch(ctx->greeter_screen)) != '\n')
     {
-        wclear(welcome_screen);
-        wrefresh(welcome_screen);
-    }
+        if (ctx->key == KEY_RESIZE)
+        {
+            wclear(ctx->greeter_screen);
+            wrefresh(ctx->greeter_screen);
+        }
 
-    delwin(welcome_screen);
+        wrefresh(ctx->greeter_screen);
+        handle_greeter_input(ctx);
+    }
+    // int rc = wgetch(welcome_screen);
+    delwin(ctx->greeter_screen);
     clear();
     refresh();
 
@@ -232,23 +242,83 @@ void initialize_colors()
     init_pair(11, COLOR_BLACK, -1);
 }
 
-WINDOW *create_welcome_screen()
+char *W_HEADER_TEXT =
+    "    _   __       __                          __    _              \n"
+    "   / | / /___   / /_ _      __ ____   _____ / /__ (_)____   ____ _\n"
+    "  /  |/ // _ \\ / __/| | /| / // __ \\ / ___// //_// // __ \\ / __ `/\n"
+    " / /|  //  __// /_  | |/ |/ // /_/ // /   / ,<  / // / / // /_/ / \n"
+    "/_/ |_/ \\___/ \\__/  |__/|__/ \\____//_/   /_/|_|/_//_/ /_/ \\__, /  \n"
+    "                 ______        __                        /____/   \n"
+    "                /_  __/__  __ / /_ ____   _____ \n"
+    "                 / /  / / / // __// __ \\ / ___/\n"
+    "                / /  / /_/ // /_ / /_/ // /     \n"
+    "               /_/   \\__,_/ \\__/ \\____//_/   \n";
+
+MENU *create_greeter_menu(WINDOW *nav_window)
 {
-    int rows, cols;
-    getmaxyx(stdscr, rows, cols);
+    const char *choices[] = {
+        "   Start new learning path",
+        " Continue where you left off",
+        "     Create new account",
+        "          Progress",
+        "          Settings",
+        "          Shortcuts",
+        (char *)NULL // Last element must be NULL
+    };
 
-    WINDOW *welcome_screen = newwin(rows, cols, 0, 0);
-    draw_border(welcome_screen, 2, 0);
-    wattron(welcome_screen, COLOR_PAIR(3) | A_BOLD);
-    char *msg = "Welcome to NETWORKING TUTOR";
-    char *msg2 = "Press any key to proceed";
-    mvwprintw(welcome_screen, (rows / 2) - 1, (cols - strlen(msg)) / 2, msg,
-              rows, cols);
+    ITEM **menu_items = (ITEM **)calloc(6, sizeof(ITEM *));
 
-    mvwprintw(welcome_screen, (rows / 2), (cols - strlen(msg2)) / 2, msg2, rows,
-              cols);
-    wattroff(welcome_screen, COLOR_PAIR(3) | A_BOLD);
-    wrefresh(welcome_screen);
+    for (int i = 0; choices[i] != NULL; i++)
+    {
+        menu_items[i] = new_item(choices[i], "");
+    }
 
-    return welcome_screen;
+    // Create the menu
+    MENU *menu = new_menu(menu_items);
+    set_menu_format(menu, 12, 1);
+    set_menu_spacing(menu, 0, 12, 1);
+    // mvwprintw(nav_window, 2, 3, "%i", COLS);
+
+    // Set the window for the menu to be displayed inside left_inner_win
+    set_menu_win(menu, nav_window);
+    set_menu_sub(menu, derwin(nav_window, 24, COLS / 6, (LINES / 5) * 2 + 3, (COLS - 35) / 2 + 1));
+    set_menu_fore(menu, A_BOLD | A_ITALIC);
+    set_menu_mark(menu, " > "); // Mark for the selected item
+
+    // Post the menu (make it visible)
+    post_menu(menu);
+
+    // Refresh the left_inner_win window
+    wrefresh(nav_window);
+    return menu;
+}
+
+WINDOW *create_greeter_screen(APP_CONTEXT *ctx)
+{
+    WINDOW *greeter_screen = newwin(LINES, COLS, 0, 0);
+    WINDOW *ascii_logo_window =
+        derwin(greeter_screen, 10, 71, LINES / 5, (COLS - 71) / 2 + 2);
+    draw_border(greeter_screen, 2, 0);
+    wattron(greeter_screen, COLOR_PAIR(3) | A_BOLD);
+    char *msg = "Welcome to";
+    char *msg2 = "󰒍 NetworkingTutor v0.0.01";
+    mvwprintw(greeter_screen, (LINES / 5) - 1, (COLS - strlen(msg)) / 2, "%s",
+              msg);
+    wattron(ascii_logo_window, A_BOLD);
+    mvwprintw(ascii_logo_window, 0, 0, "%s", W_HEADER_TEXT);
+    wattroff(ascii_logo_window, A_BOLD);
+
+    ctx->greeter_menu = create_greeter_menu(greeter_screen);
+
+    wattroff(greeter_screen, COLOR_PAIR(3) | A_BOLD);
+
+    wattron(greeter_screen, COLOR_PAIR(3));
+    mvwprintw(greeter_screen, (LINES / 2) + 10, (COLS - strlen(msg2)) / 2 + 2, msg2,
+              LINES, COLS);
+    wattroff(greeter_screen, COLOR_PAIR(3));
+    wnoutrefresh(greeter_screen);
+    wnoutrefresh(ascii_logo_window);
+    doupdate();
+
+    return greeter_screen;
 }

@@ -255,20 +255,20 @@ void set_section_completed(APP_CONTEXT *ctx)
 
     sqlite3_stmt *res;
 
-    const char *sql = "INSERT OR IGNORE INTO progress (user_id, course_id, "
-                      "sections_completed) VALUES (1, ?, ?)";
+    const char *sql = "UPDATE progress SET user_id = 1, course_id = ?, "
+                          "sections_completed = ?;";
 
     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &res, 0);
 
     if (rc == SQLITE_OK)
     {
-        sqlite3_bind_int(res, 2, ctx->current_course_id);
-        sqlite3_bind_int(res, 3, ctx->rp_state->sections_completed);
+        sqlite3_bind_int(res, 1, ctx->current_course_id);
+        sqlite3_bind_int(res, 2, ctx->rp_state->sections_completed);
     }
     else
     {
-        fprintf(stderr, "Failed to execute statement: %s\n",
-                sqlite3_errmsg(ctx->db));
+        mvwprintw(ctx->course_windows[4], 1, 2, "SQL error: %s\n",
+                  sqlite3_errmsg(ctx->db));
     }
 
     sqlite3_step(res);
@@ -326,34 +326,8 @@ PROGRESS_DATA *get_progress_data(APP_CONTEXT *ctx)
         sqlite3_bind_int(stmt, 1, ctx->current_course_id);
     }
 
-    // int num_steps = 1;
-
-    // while ((rc = sqlite3_step(stmt)) == SQLITE_ROW)
-    // {
-    //     num_steps++;
-    // }
-    // sqlite3_reset(stmt);
-
     PROGRESS_DATA *prog_data = malloc(sizeof(PROGRESS_DATA));
 
-    // int i = 0;
-    // while (sqlite3_step(stmt) == SQLITE_ROW)
-    // {
-    //     const int id = sqlite3_column_int(stmt, 1);
-    //     const int user_id = sqlite3_column_int(stmt, 2);
-    //     const int course_id = sqlite3_column_int(stmt, 3);
-    //     const int sections_completed = sqlite3_column_int(stmt, 4);
-    //     const int items_completed = sqlite3_column_int(stmt, 5);
-    //
-    //     prog_data[i].id = id;
-    //     // prog_data[i].section_title = strdup((const char
-    //     // *)section_title);
-    //     prog_data[i].user_id = user_id;
-    //     prog_data[i].course_id = course_id;
-    //     prog_data[i].sections_completed = sections_completed;
-    //     prog_data[i].items_completed = items_completed;
-    //     i++;
-    // }
     if (sqlite3_step(stmt) == SQLITE_ROW)
     {
         const int id = sqlite3_column_int(stmt, 0);
@@ -363,15 +337,11 @@ PROGRESS_DATA *get_progress_data(APP_CONTEXT *ctx)
         const int items_completed = sqlite3_column_int(stmt, 4);
 
         prog_data->id = id;
-        // prog_data->section_title = strdup((const char
-        // *)section_title);
         prog_data->user_id = user_id;
         prog_data->course_id = course_id;
         prog_data->sections_completed = sections_completed;
         prog_data->items_completed = items_completed;
     }
-
-    // *num_of_items = i;
 
     sqlite3_finalize(stmt);
     return prog_data;

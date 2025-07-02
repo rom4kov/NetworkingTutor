@@ -10,7 +10,7 @@
 #include <sqlite3.h>
 
 void initialize_colors();
-WINDOW *create_welcome_screen();
+WINDOW *create_greeter_screen(APP_CONTEXT *ctx);
 
 void create_start_screen(APP_CONTEXT *ctx);
 WINDOW *create_navigation_window(int *active_win, MENU **start_menu);

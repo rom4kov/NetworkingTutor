@@ -195,9 +195,12 @@ void handle_course_input(APP_CONTEXT *ctx)
                     ctx->rp_state->curr_section += 1;
                     ctx->rp_state->curr_item = 1;
                     ctx->rp_state->sections_completed++;
+                    mvwprintw(ctx->course_windows[2], 5, 3, "sections: %i",
+                              ctx->rp_state->sections_completed);
+                    wnoutrefresh(ctx->course_windows[2]);
                     set_section_completed(ctx);
-                    // mvwprintw(ctx->rp_state->right_panel, 2, 2, "%i",
-                    //           ctx->rp_state->curr_section);
+                    mvwprintw(ctx->course_windows[4], 2, 2, "%i",
+                              ctx->rp_state->curr_section);
                     // wrefresh(ctx->rp_state->right_panel);
                     // ctx->rp_state->curr_offset = 0;
                     // ctx->rp_state->pad_start = 4;

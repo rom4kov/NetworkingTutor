@@ -197,10 +197,12 @@ WINDOW *create_progress_window(APP_CONTEXT *ctx)
     wattroff(progress_window, COLOR_PAIR(3));
 
     mvwprintw(progress_window, 1, 2, "Course: %s", ctx->current_course);
-    char *progress_text = "Progress: Courses 0 -- Sections 0";
-    mvwprintw(progress_window, 1,
-              ctx->rp_state->window_width - strlen(progress_text) - 2, "%s",
-              progress_text);
+    // char *progress_text = "Progress: Courses 0 -- Sections 0";
+    // mvwprintw(progress_window, 1,
+    //           ctx->rp_state->window_width - strlen(progress_text) - 2, "%s",
+    //           progress_text);
+    mvwprintw(progress_window, 1, ctx->rp_state->window_width - 23,
+              "Sections completed: %i", ctx->rp_state->sections_completed);
     wnoutrefresh(progress_window);
     return progress_window;
 }

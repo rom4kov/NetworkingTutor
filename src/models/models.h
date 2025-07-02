@@ -139,12 +139,14 @@ typedef struct _right_panel_state
 typedef struct _app_context
 {
     sqlite3 *db;
+    WINDOW *greeter_screen;
     WINDOW *start_windows[START_WINDOW_COUNT];
     WINDOW *course_windows[COURSE_WINDOW_COUNT];
     WINDOW *line_num_win;
     WINDOW *edit_window;
     RIGHT_PANEL_STATE *rp_state;
     COURSE *courses;
+    MENU *greeter_menu;
     MENU *start_menu;
     MENU *explorer_menu;
     ITEM **menu_items;

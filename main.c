@@ -81,6 +81,8 @@ int main(void)
         if (ctx->key == KEY_RESIZE)
         {
             wclear(ctx->greeter_screen);
+            delwin(ctx->greeter_screen);
+            ctx->greeter_screen = create_greeter_screen(ctx);
             wrefresh(ctx->greeter_screen);
         }
 
@@ -257,12 +259,12 @@ char *W_HEADER_TEXT =
 MENU *create_greeter_menu(WINDOW *nav_window)
 {
     const char *choices[] = {
-        "   Start new learning path",
-        " Continue where you left off",
-        "     Create new account",
-        "          Progress",
-        "          Settings",
-        "          Shortcuts",
+        "   🛫 Start new learning path",
+        " 👉 Continue where you left off",
+        "     👤 Create new account",
+        "          🚀 Progress",
+        "            Settings",
+        "            Shortcuts",
         (char *)NULL // Last element must be NULL
     };
 
@@ -281,7 +283,8 @@ MENU *create_greeter_menu(WINDOW *nav_window)
 
     // Set the window for the menu to be displayed inside left_inner_win
     set_menu_win(menu, nav_window);
-    set_menu_sub(menu, derwin(nav_window, 24, COLS / 6, (LINES / 5) * 2 + 3, (COLS - 35) / 2 + 1));
+    set_menu_sub(menu, derwin(nav_window, 24, COLS / 6, (LINES / 5) * 2 + 3,
+                              (COLS - 35) / 2 - 1));
     set_menu_fore(menu, A_BOLD | A_ITALIC);
     set_menu_mark(menu, " > "); // Mark for the selected item
 
@@ -313,8 +316,8 @@ WINDOW *create_greeter_screen(APP_CONTEXT *ctx)
     wattroff(greeter_screen, COLOR_PAIR(3) | A_BOLD);
 
     wattron(greeter_screen, COLOR_PAIR(3));
-    mvwprintw(greeter_screen, (LINES / 2) + 10, (COLS - strlen(msg2)) / 2 + 2, msg2,
-              LINES, COLS);
+    mvwprintw(greeter_screen, (LINES / 2) + 10, (COLS - strlen(msg2)) / 2 + 2,
+              msg2, LINES, COLS);
     wattroff(greeter_screen, COLOR_PAIR(3));
     wnoutrefresh(greeter_screen);
     wnoutrefresh(ascii_logo_window);

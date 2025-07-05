@@ -363,6 +363,7 @@ void open_file_from_explorer(APP_CONTEXT *ctx, bool *new_file_form_active)
     focus_window(&ctx->course_windows[1], 2, "Explorer");
     focus_window(&ctx->course_windows[2], 3, "Editor");
     curs_set(2);
+    print_line_nr(&ctx->edit_window, ctx->t_buffer);
     wmove(ctx->edit_window, 0, 0);
     wnoutrefresh(ctx->course_windows[1]);
     wnoutrefresh(ctx->line_num_win);

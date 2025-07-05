@@ -4,9 +4,13 @@
 #include <curses.h>
 #include <ncurses.h>
 #include <pcre.h>
+#include <string.h>
+
 #define PCRE2_CODE_UNIT_WIDTH 8
 #include <pcre2.h>
-#include <string.h>
+
+#define WU COLS / 12 // WU for WIDTH_UNIT
+#define EDITOR_WIDTH ((WU * 7 + 4) - (WU + WU / 2))
 
 void update_line_numbers(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
                          int *scroll_offset, int lines_to_print)
@@ -28,7 +32,7 @@ void update_line_numbers(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
         {
             mvwprintw(*line_num_win, i, 1, "%i", i + *scroll_offset + 1);
         }
-        else 
+        else
         {
             mvwprintw(*line_num_win, i, 0, "%i", i + *scroll_offset + 1);
         }
@@ -56,7 +60,7 @@ void compile_patterns(pcre2_code **re, int p_codes_num, char **pattern_str)
 {
     int errcode;
     PCRE2_SIZE erroffset;
-    PCRE2_UCHAR buffer[30];
+    PCRE2_UCHAR buffer[64];
 
     for (int i = 0; i < p_codes_num; i++)
     {
@@ -115,7 +119,8 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
     pcre2_code *re[pattern_num];
     char *patterns[] = {
         ".",
-        "\\b(void|int|char|return|for|while|if|else|break|continue|bool|switch|case|default)\\b",
+        "\\b(void|int|char|return|for|while|if|else|break|continue|bool|switch|"
+        "case|default)\\b",
         "#(include|define)|NULL|=|\\+|\\-|\\*|\\&|<|>|;",
         "(\".*\"|<.*\\.h>)",
         "([a-z0-9_]*)\\(.*\\)",
@@ -154,7 +159,8 @@ void print_line(char *line_buf, int line_num, WINDOW **edit_window)
     pcre2_code *re[pattern_num];
     char *patterns[] = {
         ".",
-        "\\b(void|int|char|return|for|while|if|else|break|continue|bool|switch|case|default)\\b",
+        "\\b(void|int|char|return|for|while|if|else|break|continue|bool|switch|"
+        "case|default)\\b",
         "#(include|define)|NULL|=|\\+|\\-|\\*|\\&|<|>|;",
         "(\".*\"|<.*\\.h>)",
         "([a-z0-9_]*)\\(.*\\)",
@@ -203,9 +209,8 @@ ICON get_file_icon(char *filename)
         ".*\\.c\\b", ".*\\.h",  ".*\\.txt", ".*\\.py",  ".*\\.js",
         ".*\\.ts",   ".*\\.rs", ".*\\.db",  ".*\\.git", "Makefile",
     };
-    char *icons[] = {
-        " ", " ", " ", " ", " ", " ", " ", " ", " ", ""
-    };
+    char *icons[] = {" ", " ", " ", " ", " ",
+                     " ", " ", " ", " ", ""};
 
     ICON matched_icon = {.icon = NULL, .color = 2};
 
@@ -216,7 +221,8 @@ ICON get_file_icon(char *filename)
 
     for (int i = 0; i < pattern_num; i++)
     {
-        matched_icon.icon = match_file_icon(re[i], subj_len, filename, &icons[i]);
+        matched_icon.icon =
+            match_file_icon(re[i], subj_len, filename, &icons[i]);
 
         if (matched_icon.icon != NULL)
         {
@@ -225,4 +231,10 @@ ICON get_file_icon(char *filename)
         }
     }
     return matched_icon;
+}
+
+void print_editor_meta_data(APP_CONTEXT *ctx)
+{
+    mvwprintw(ctx->course_windows[2], LINES - 5, EDITOR_WIDTH, "%i",
+              ctx->t_buffer->curr_line_nr);
 }

@@ -7,15 +7,23 @@
 sqlite3 *create_database();
 char *read_sql_query(char *filename);
 USER_DATA get_user_data(sqlite3 *db);
+
 void seed_courses_data(sqlite3 *db, WINDOW *win, char *query);
+char *get_course_name_by_id(sqlite3 *db, int course_id);
 COURSE *get_course_data(sqlite3 *db);
+COURSE *get_course_by_id(sqlite3 *db, int course_id);
+
 const unsigned char *get_section_title(APP_CONTEXT *ctx);
 int callback(void *NotUsed, int argc, char **argv, char **azColName);
 COURSE_SECTION *get_course_section_materials(sqlite3 *db, int course,
                                        int section, int *num_of_items);
+int *get_total_items_of_sections(sqlite3 *db, int course_id);
+void get_completed_sections(APP_CONTEXT *ctx);
+
 void update_user(sqlite3 *db, int id, char *name, char *language);
 
-PROGRESS_DATA *get_progress_data(APP_CONTEXT *ctx);
+int get_current_course(sqlite3 *db, int user_id);
+int *get_course_progress(APP_CONTEXT *ctx);
 void set_section_completed(APP_CONTEXT *ctx);
 void set_items_completed(APP_CONTEXT *ctx);
 

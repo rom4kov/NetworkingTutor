@@ -21,12 +21,12 @@ VALUES
         1,
         0,
         "",
-        '  _     _   _             ____@
-          | |__ | |_| |_ _ __ _   / / /@
-          | `_ \| __| __| `_ (_) / / / @
-          | | | | |_| |_| |_) | / / /  @
-          |_| |_|\__|\__| .__(_)_/_/   @
-                        |_|            @',
+        ' _     _   _             ____@
+| |__ | |_| |_ _ __ _   / / /@
+| `_ \| __| __| `_ (_) / / / @
+| | | | |_| |_| |_) | / / /  @
+|_| |_|\__|\__| .__(_)_/_/   @
+              |_|            ',
         0
     );
 
@@ -137,9 +137,15 @@ VALUES
         1,
         0,
         "",
-        "1. Foundations: TCP/IP + HTTP   2. getaddrinfo()   3. socket()   
-4. bind()   5. listen()   6. accecpt()   7. recv()   8. send()
-9. send an HTTP headers with HTML file",
+        "1. Foundations: TCP/IP + HTTP - layers, protocols & more@
+2. getaddrinfo() - how to get address information@
+3. socket() - what is a socket and how can it be created?@
+4. bind() - how to bind a socket to and address and port@
+5. listen() - make a socket listen for connection requests@
+6. accept() - accept connection requests@
+7. recv() - receive data on a listenting socket@
+8. send() - send data over a socket@
+9. Send an HTTP header with an HTML body",
         6
     );
 

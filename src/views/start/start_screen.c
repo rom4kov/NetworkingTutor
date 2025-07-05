@@ -159,25 +159,6 @@ WINDOW *create_course_preview_card(int x_position, int *active_win,
 
 WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label)
 {
-    PROGRESS_DATA *pd = get_progress_data(ctx);
-    ctx->rp_state->sections_completed = pd->sections_completed;
-    ctx->rp_state->items_completed = pd->items_completed;
-    ctx->rp_state->curr_section = pd->sections_completed;
-    ctx->rp_state->curr_item = pd->items_completed + 2;
-    // mvwprintw(ctx->course_windows[2], 2, 3, "id: %i",
-    //           pd->id);
-    // mvwprintw(ctx->course_windows[2], 3, 3, "user_id: %i",
-    //           pd->user_id);
-    // mvwprintw(ctx->course_windows[2], 4, 3, "course_id: %i",
-    //           pd->course_id);
-    // mvwprintw(ctx->course_windows[2], 5, 3, "sections: %i",
-    //           pd->sections_completed);
-    // mvwprintw(ctx->course_windows[2], 6, 3, "items: %i",
-    //           pd->items_completed);
-    // mvwprintw(ctx->course_windows[2], 7, 3, "curr_item: %i",
-    //           ctx->rp_state->curr_item);
-    // wnoutrefresh(ctx->course_windows[2]);
-
     init_right_panel_state(ctx->rp_state, ctx->course_view_active);
 
     if (ctx->active_window == 5)

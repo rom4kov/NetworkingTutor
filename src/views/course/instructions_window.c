@@ -20,7 +20,7 @@ void print_course_instructions(APP_CONTEXT *ctx)
     else
         mvwprintw(ctx->rp_state->right_panel, LINES - 5, 2, "%s", " ");
 
-    if (ctx->rp_state->curr_section < ctx->rp_state->sections_completed)
+    if (ctx->rp_state->completed_sections[ctx->rp_state->curr_section])
         mvwprintw(ctx->rp_state->right_panel, LINES - 5,
                   ctx->rp_state->window_width - 3, "%s", ">");
     else
@@ -40,6 +40,10 @@ void print_course_instructions(APP_CONTEXT *ctx)
     mvwprintw(ctx->rp_state->right_panel, LINES - 5,
               (ctx->rp_state->window_width - strlen(press_space)) / 2, "%s",
               press_space);
+    for (int i = 0; i < 32; i++)
+        mvwprintw(ctx->course_windows[2], i + 2, 3, "%i: %i", i,
+                  ctx->rp_state->course_progress[i]);
+    mvwprintw(ctx->course_windows[2], 3, 10, "%i", ctx->rp_state->curr_item);
 }
 
 void print_next_course_item(RIGHT_PANEL_STATE *rp_state)
@@ -74,10 +78,12 @@ void print_next_course_item(RIGHT_PANEL_STATE *rp_state)
     for (i = 0; i < (rp_state->lines_to_print - rp_state->lines_excess); i++)
     {
         if (current_line->centered)
+        {
             offset =
                 (rp_state->window_width - (current_line->length < 7 ? 10 : 6) -
                  strlen(current_line->buf_)) /
                 2;
+        }
         else
             offset = 0;
         if (current_line->style > 0)
@@ -90,34 +96,3 @@ void print_next_course_item(RIGHT_PANEL_STATE *rp_state)
         j++;
     }
 }
-
-// void print_next_course_item(RIGHT_PANEL_STATE *rp_state)
-// {
-//     char *title =
-//         rp_state->course_section_data[rp_state->curr_item].content_title;
-//     char *text = rp_state->course_section_data[rp_state->curr_item].content;
-//
-//     wattron(rp_state->inner_win, A_BOLD);
-//     if (title && strcmp(title, "") != 0)
-//     {
-//         mvwprintw(rp_state->inner_win, rp_state->curr_offset, 0, "%s",
-//                   wrap_text(title, rp_state->window_width - (COLS / 16) +
-//                   1));
-//         rp_state->curr_offset = rp_state->curr_offset + 1;
-//     }
-//     wattroff(rp_state->inner_win, A_BOLD);
-//
-//     char *wr_text = wrap_text(text, rp_state->window_width - (COLS / 16) +
-//     1); mvwprintw(rp_state->inner_win, rp_state->curr_offset, 0, "%s",
-//     wr_text);
-//
-//     for (int i = 0; i < strlen(text); i++)
-//     {
-//         if (wr_text[i] == '\n')
-//         {
-//             rp_state->curr_offset += 1;
-//         }
-//     }
-//     // rp_state->curr_item += 1;
-//     rp_state->curr_offset += 2;
-// }

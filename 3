@@ -61,8 +61,6 @@ int main(void)
     ctx->rp_state->curr_offset = 0;
     ctx->rp_state->scroll_offset = 0;
     ctx->rp_state->it_buffer = initialize_it_buffer();
-    ctx->rp_state->course_progress = (int *)calloc(32, sizeof(int));
-    ctx->rp_state->completed_sections = (bool *)calloc(32, sizeof(bool));
 
     int curr_line;
     int curr_col;
@@ -73,14 +71,10 @@ int main(void)
     //                   "SQL/create_sections_table.sql");
     // seed_courses_data(ctx->db, welcome_screen,
     //                   "SQL/courses/http_server/sections.sql");
-    // seed_courses_data(ctx->db, ctx->greeter_screen,
-    //                   "SQL/courses/http_server/0_intro.sql");
-    // seed_courses_data(ctx->db, ctx->greeter_screen,
+    // seed_courses_data(ctx->db, welcome_screen,
     //                   "SQL/courses/http_server/1_foundations.sql");
-    // seed_courses_data(ctx->db, ctx->greeter_screen,
-    //                   "SQL/create_progress_table.sql");
-    // seed_courses_data(ctx->db, ctx->greeter_screen,
-    //                   "SQL/courses/http_server/update_http_logo.sql");
+    seed_courses_data(ctx->db, ctx->greeter_screen,
+                      "SQL/create_progress_table.sql");
 
     ESCDELAY = 100;
 

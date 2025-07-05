@@ -43,8 +43,7 @@ typedef struct _progress_data
   int id;
   int user_id;
   int course_id;
-  int sections_completed;
-  int items_completed;
+  int *course_progress;
 } PROGRESS_DATA;
 
 typedef struct _line
@@ -120,12 +119,15 @@ typedef struct _right_panel_state
     WINDOW *right_panel;
     WINDOW *header_win;
     WINDOW *inner_win;
+    bool *completed_sections;
+    int *course_progress;
+    int num_of_section_items[32];
+    int total_section_items[32];
     int window_width;
     int intro_width;
     int curr_section;
     int curr_item;
     int scroll_offset;
-    int num_of_section_items[32];
     int sections_completed;
     int items_completed;
     int items_to_print;
@@ -170,6 +172,7 @@ typedef struct _app_context
     bool first_start_draw;
     bool first_course_draw;
     bool course_needs_redraw;
+    bool greeter_view_active;
     bool start_view_active;
     bool course_view_active;
     bool editor_mode;

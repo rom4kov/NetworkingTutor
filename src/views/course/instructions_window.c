@@ -40,10 +40,10 @@ void print_course_instructions(APP_CONTEXT *ctx)
     mvwprintw(ctx->rp_state->right_panel, LINES - 5,
               (ctx->rp_state->window_width - strlen(press_space)) / 2, "%s",
               press_space);
-    for (int i = 0; i < 32; i++)
-        mvwprintw(ctx->course_windows[2], i + 2, 3, "%i: %i", i,
-                  ctx->rp_state->course_progress[i]);
-    mvwprintw(ctx->course_windows[2], 3, 10, "%i", ctx->rp_state->curr_item);
+    // for (int i = 0; i < 32; i++)
+    //     mvwprintw(ctx->course_windows[2], i + 2, 3, "%i: %i", i,
+    //               ctx->rp_state->course_progress[i]);
+    // mvwprintw(ctx->course_windows[2], 3, 10, "%i", ctx->rp_state->curr_item);
 }
 
 void print_next_course_item(RIGHT_PANEL_STATE *rp_state)

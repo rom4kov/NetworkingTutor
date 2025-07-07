@@ -208,13 +208,16 @@ void handle_course_input(APP_CONTEXT *ctx)
                     ctx->rp_state->curr_item = 1;
                     ctx->rp_state->items_completed = 0;
                     ctx->rp_state->curr_section += 1;
+                    ctx->rp_state->lines_to_print = 0;
+                    ctx->rp_state->lines_excess = 0;
+                    ctx->rp_state->scroll_offset = 0;
                     mvwprintw(ctx->course_windows[4], 1,
                               ctx->rp_state->window_width - 3, "%i",
                               ctx->rp_state->curr_section);
                     // wrefresh(ctx->rp_state->right_panel);
                     // ctx->rp_state->curr_offset = 0;
                     // ctx->rp_state->pad_start = 4;
-                    if (ctx->rp_state->curr_section == 1)
+                    if (ctx->rp_state->curr_section > 0)
                     {
                         wclear(ctx->rp_state->inner_win);
                         // delwin(ctx->rp_state->inner_win);
@@ -273,7 +276,8 @@ void handle_course_input(APP_CONTEXT *ctx)
                     ctx->rp_state->curr_section--;
                     ctx->rp_state->curr_item =
                         ctx->rp_state
-                            ->course_progress[ctx->rp_state->curr_section];
+                            ->course_progress[ctx->rp_state->curr_section] +
+                        (ctx->rp_state->curr_section == 0 ? 1 : 0);
                     ctx->rp_state->scroll_offset = 0;
                     ctx->rp_state->lines_excess = 0;
                     mvwprintw(ctx->course_windows[2], 2, 2,

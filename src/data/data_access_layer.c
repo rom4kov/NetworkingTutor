@@ -384,11 +384,14 @@ void get_completed_sections(APP_CONTEXT *ctx)
                   sqlite3_errmsg(ctx->db));
     }
 
+    int sections_completed = 0;
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
         const int section = sqlite3_column_int(stmt, 3);
         ctx->rp_state->completed_sections[section] = true;
+        sections_completed++;
     }
+    ctx->rp_state->sections_completed = sections_completed;
 }
 
 void set_items_completed(APP_CONTEXT *ctx)

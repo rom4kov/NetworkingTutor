@@ -17,7 +17,7 @@ const unsigned char *get_section_title(APP_CONTEXT *ctx);
 int callback(void *NotUsed, int argc, char **argv, char **azColName);
 COURSE_SECTION *get_course_section_materials(sqlite3 *db, int course,
                                        int section, int *num_of_items);
-int *get_total_items_of_sections(sqlite3 *db, int course_id);
+void get_total_items_of_sections(APP_CONTEXT *ctx);
 void get_completed_sections(APP_CONTEXT *ctx);
 
 void update_user(sqlite3 *db, int id, char *name, char *language);

@@ -4,5 +4,6 @@ CREATE TABLE IF NOT EXISTS progress (
   course_id int NOT NULL,
   section_id int,
   section_completed bool,
-  items_completed int
+  items_completed int,
+  UNIQUE(user_id, course_id, section_id)
 )

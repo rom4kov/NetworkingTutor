@@ -53,14 +53,13 @@ void handle_greeter_input(APP_CONTEXT *ctx)
                 ctx->rp_state->curr_item = course_progress[i - 1];
                 ctx->rp_state->items_completed = course_progress[i - 1];
 
-                int *total_section_items = get_total_items_of_sections(
-                    ctx->db, ctx->current_course_id);
-                while (total_section_items[i])
-                {
-                    ctx->rp_state->total_section_items[i] =
-                        total_section_items[i];
-                    i++;
-                }
+                get_total_items_of_sections(ctx);
+                // while (total_section_items[i])
+                // {
+                //     ctx->rp_state->total_section_items[i] =
+                //         total_section_items[i];
+                //     i++;
+                // }
                 get_completed_sections(ctx);
 
                 // int *pd = get_progress_data(ctx);

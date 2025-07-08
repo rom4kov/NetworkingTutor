@@ -71,16 +71,6 @@ void read_item_into_buffer(APP_CONTEXT *ctx)
         if (ctx->rp_state->curr_section > 0 &&
             i == 0)
         {
-            // curr_line->buf_ = strdup(ctx->rp_state->curr_section_title);
-            // curr_line->centered = true;
-            // curr_line->style = A_BOLD | A_UNDERLINE;
-            // curr_line->line_num = line_number;
-            // line_number++;
-            //
-            // ctx->rp_state->it_buffer->num_of_lines++;
-            // ctx->rp_state->it_buffer->current_line->next = curr_line;
-            // curr_line->prev = ctx->rp_state->it_buffer->current_line;
-            // ctx->rp_state->it_buffer->current_line = curr_line;
             ctx->rp_state->it_buffer->first_line->buf_ = strdup(ctx->rp_state->curr_section_title);
             ctx->rp_state->it_buffer->first_line->centered = true;
             ctx->rp_state->it_buffer->first_line->style = A_BOLD | A_UNDERLINE;
@@ -88,9 +78,6 @@ void read_item_into_buffer(APP_CONTEXT *ctx)
             line_number++;
 
             ctx->rp_state->it_buffer->num_of_lines++;
-            // ctx->rp_state->it_buffer->current_line->next = curr_line;
-            // curr_line->prev = ctx->rp_state->it_buffer->current_line;
-            // ctx->rp_state->it_buffer->current_line = curr_line;
             curr_line = initialize_iline();
 
             curr_line->buf_[k] = '\n';
@@ -102,8 +89,6 @@ void read_item_into_buffer(APP_CONTEXT *ctx)
             curr_line->prev = ctx->rp_state->it_buffer->first_line;
             ctx->rp_state->it_buffer->current_line = curr_line;
             curr_line = initialize_iline();
-            // mvwprintw(ctx->rp_state->right_panel, i + 1, 2, "%i", ctx->rp_state->curr_item);
-            // wrefresh(ctx->rp_state->right_panel);
         }
 
         if (title_length > 1)

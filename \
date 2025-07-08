@@ -261,14 +261,14 @@ COURSE_SECTION *get_course_section_materials(sqlite3 *db, int course,
     return course_section_data;
 }
 
-void get_total_items_of_sections(APP_CONTEXT *ctx)
+int *get_total_items_of_sections(sqlite3 *db, int course_id)
 {
     int rc = 0;
 
-    const char *sql = "SELECT COUNT(DISTINCT section_id) FROM materials WHERE course_id = ?;";
+    const char *sql = "SELECT * FROM materials WHERE course_id = ?;";
 
     sqlite3_stmt *stmt;
-    rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
+    rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (rc != SQLITE_OK)
     {
         sqlite3_finalize(stmt);
@@ -276,7 +276,7 @@ void get_total_items_of_sections(APP_CONTEXT *ctx)
 
     if (rc == SQLITE_OK)
     {
-        sqlite3_bind_int(stmt, 1, ctx->current_course_id);
+        sqlite3_bind_int(stmt, 1, course_id);
     }
 
     int sections = 0;
@@ -285,12 +285,12 @@ void get_total_items_of_sections(APP_CONTEXT *ctx)
         sections = sqlite3_column_int(stmt, 0);
     }
 
-    // int *total_items_of_sections = (int *)calloc(32, sizeof(int));
+    int *total_items_of_sections = (int *)calloc(32, sizeof(int));
 
     for (int i = 0; i < sections; i++)
     {
         sql = "SELECT COUNT() FROM materials WHERE section_id = ?;";
-        rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
+        rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
         if (rc != SQLITE_OK)
         {
             sqlite3_finalize(stmt);
@@ -304,11 +304,11 @@ void get_total_items_of_sections(APP_CONTEXT *ctx)
         if (sqlite3_step(stmt) == SQLITE_ROW)
         {
             items = sqlite3_column_int(stmt, 0);
-            ctx->rp_state->total_section_items[i] = items;
+            total_items_of_sections[i] = items;
         }
     }
-    //
-    // return total_items_of_sections;
+
+    return total_items_of_sections;
 }
 
 void update_user(sqlite3 *db, int id, char *name, char *language)
@@ -403,8 +403,11 @@ void set_items_completed(APP_CONTEXT *ctx)
     const char *sql;
 
     int curr_item =
-        ctx->rp_state->curr_item - (ctx->rp_state->curr_section == 0 ? 1 : 0);
+        ctx->rp_state->curr_item - ctx->rp_state->curr_section == 0 ? 2 : 0;
 
+    // if (ctx->rp_state->items_completed == 0)
+    // {
+    // ctx->rp_state->items_completed += 2;
     sql = "INSERT INTO progress (user_id, course_id, "
           "section_id, items_completed) VALUES (1, ?, ?, ?) "
           "ON CONFLICT(user_id, course_id, section_id) DO UPDATE SET "
@@ -417,8 +420,8 @@ void set_items_completed(APP_CONTEXT *ctx)
         sqlite3_bind_int(res, 1, ctx->current_course_id);
         sqlite3_bind_int(res, 2, ctx->rp_state->curr_section);
         sqlite3_bind_int(res, 3, curr_item);
-        mvwprintw(ctx->course_windows[4], 1, 2, "rc: %i\n",
-                  rc);
+        mvwprintw(ctx->course_windows[4], 1, 2, "return code: %i\n",
+                  rc));
     }
     else
     {
@@ -427,13 +430,35 @@ void set_items_completed(APP_CONTEXT *ctx)
         mvwprintw(ctx->course_windows[4], 1, 2, "SQL error: %s\n",
                   sqlite3_errmsg(ctx->db));
     }
+    // }
+    // else if (ctx->rp_state->items_completed > 0)
+    // {
+    //     ctx->rp_state->items_completed++;
+    //     sql = "UPDATE progress SET items_completed = ? "
+    //           "WHERE user_id = 1 AND course_id = ? AND section_id = ?;";
+    //
+    //     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &res, 0);
+    //
+    //     if (rc == SQLITE_OK)
+    //     {
+    //         sqlite3_bind_int(res, 1, ctx->rp_state->items_completed);
+    //         sqlite3_bind_int(res, 2, ctx->current_course_id);
+    //         sqlite3_bind_int(res, 3, ctx->rp_state->curr_section);
+    //     }
+    //     else
+    //     {
+    //         // fprintf(stderr, "Failed to execute statement: %s\n",
+    //         //         sqlite3_errmsg(ctx->db));
+    //         mvwprintw(ctx->course_windows[4], 1, 2, "SQL error: %s\n",
+    //                   sqlite3_errmsg(ctx->db));
+    //     }
+    // }
+    // else
+    //     return;
 
-    rc = sqlite3_step(res);
-    // mvwprintw(ctx->course_windows[4], 1, 25, "rc2: %i\n",
-    //           rc);
-    // mvwprintw(ctx->course_windows[4], 1, 35, "ci: %i\n",
-    //           curr_item);
-    // wrefresh(ctx->course_windows[4]);
+    wrefresh(ctx->course_windows[4]);
+
+    sqlite3_step(res);
 }
 
 int get_current_course(sqlite3 *db, int user_id)

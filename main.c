@@ -63,6 +63,7 @@ int main(void)
     ctx->rp_state->it_buffer = initialize_it_buffer();
     ctx->rp_state->course_progress = (int *)calloc(32, sizeof(int));
     ctx->rp_state->completed_sections = (bool *)calloc(32, sizeof(bool));
+    ctx->rp_state->total_section_items = (int *)calloc(32, sizeof(int));
 
     int curr_line;
     int curr_col;
@@ -71,7 +72,7 @@ int main(void)
 
     // seed_courses_data(ctx->db, welcome_screen,
     //                   "SQL/create_sections_table.sql");
-    // seed_courses_data(ctx->db, welcome_screen,
+    // seed_courses_data(ctx->db, ctx->greeter_screen,
     //                   "SQL/courses/http_server/sections.sql");
     // seed_courses_data(ctx->db, ctx->greeter_screen,
     //                   "SQL/courses/http_server/0_intro.sql");

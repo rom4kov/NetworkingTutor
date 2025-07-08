@@ -8,7 +8,7 @@ INSERT
 VALUES
     (
         1,
-        "Intro",
+        "1. Intro",
         8,
         0
     );
@@ -23,7 +23,7 @@ INSERT
 VALUES
     (
         1,
-        "1. Foundations: TCP/IP and HTTP",
+        "2. Foundations: TCP/IP and HTTP",
         12,
         1
     );
@@ -38,9 +38,9 @@ INSERT
 VALUES
     (
         1,
-        "2. getaddrinfo() - how to get address information",
+        "3. getaddrinfo() - how to get address information",
         12,
-        1
+        2
     );
 
 

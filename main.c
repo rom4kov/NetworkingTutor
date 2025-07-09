@@ -325,7 +325,7 @@ WINDOW *create_greeter_screen(APP_CONTEXT *ctx)
     draw_border(greeter_screen, 2, 0);
     wattron(greeter_screen, COLOR_PAIR(3) | A_BOLD);
     char *msg = "Welcome to";
-    char *msg2 = "󰒍 NetworkingTutor v0.0.01";
+    char *msg2 = "󰒍 NetworkingTutor v0.0.1";
     mvwprintw(greeter_screen, (LINES / 5) - 1, (COLS - strlen(msg)) / 2, "%s",
               msg);
     wattron(ascii_logo_window, A_BOLD);

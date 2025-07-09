@@ -27,8 +27,17 @@ int perform_tests(APP_CONTEXT *ctx)
         mvwprintw(ctx->course_windows[4], 1, 1, "%s", err_msg);
     }
 
-    CU_add_test(sp, "http_server_foundations_01",
+    CU_add_test(sp, "answers file exists",
                 (CU_TestFunc)test_if_answers_file_exists);
+    ec = CU_get_error();
+    if (ec != CUE_SUCCESS)
+    {
+        const char *err_msg = CU_get_error_msg();
+        mvwprintw(ctx->course_windows[4], 1, 1, "%s", err_msg);
+    }
+
+    CU_add_test(sp, "answers file contains correct answers",
+                (CU_TestFunc)test_if_answers_file_contains_correct_answers);
     ec = CU_get_error();
     if (ec != CUE_SUCCESS)
     {
@@ -88,8 +97,6 @@ int perform_tests(APP_CONTEXT *ctx)
                   fail_rec->pTest->pName);
         mvwprintw(ctx->rp_state->inner_win, i + 4, 2, "Suite name: %s",
                   fail_rec->pSuite->pName);
-        mvwprintw(ctx->rp_state->inner_win, i + 5, 2, "Suite name: %p",
-                  fail_rec->pTest->pTestFunc);
         fail_rec = fail_rec->pNext;
         i += 6;
     }

@@ -44,6 +44,8 @@ char *return_trimmed(char *str);
 char *trunc_str(char *str, int win_width, int offset);
 int c_round(float x);
 char *current_datetime();
+int suppress_stdout(void);
+int restore_stdout(int saved_stdout);
 void log_values(WINDOW **edit_window, int scroll_offset, TEXT_BUFFER *tbuf,
                 int lines_to_print, int y, int x);
 void log_course_instr_values(APP_CONTEXT *ctx);

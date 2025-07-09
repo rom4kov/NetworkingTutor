@@ -605,8 +605,8 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
               new_entry->last_in_sub_dir);
     mvwprintw(ctx->course_windows[3], 5, 50, "indent: %i",
               new_entry->indent_level);
-    mvwprintw(ctx->course_windows[3], 6, 50, "parent: %s",
-              new_entry->parent_dir->path);
+    // mvwprintw(ctx->course_windows[3], 6, 50, "parent: %s",
+    //           new_entry->parent_dir->path);
     wrefresh(ctx->course_windows[3]);
 
     new_entry->prev = ctx->file_tree->current_entry;

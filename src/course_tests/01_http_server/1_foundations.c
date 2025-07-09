@@ -14,5 +14,5 @@ int answers_file_exists(char *path)
 
 void test_if_answers_file_exists(void)
 {
-    CU_ASSERT(answers_file_exists("http_server/answers.txt"));
+    CU_ASSERT(answers_file_exists("http_server/answers.txt") == 0);
 }

@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "unistd.h"
+#include "fcntl.h"
 #include <time.h>
 
 void draw_border(WINDOW *win, int color_pair, char *label)
@@ -167,4 +169,16 @@ char *current_datetime()
         return NULL;
     }
     return datetime;
+}
+
+int suppress_stdout(void)
+{
+    int dev_null = open("/dev/null", O_WRONLY);
+    if (dev_null == -1) return -1;
+    return dup2(dev_null, STDOUT_FILENO);
+}
+
+int restore_stdout(int saved_stdout)
+{
+    return dup2(saved_stdout, STDOUT_FILENO);
 }

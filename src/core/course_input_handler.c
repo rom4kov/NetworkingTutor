@@ -3,6 +3,7 @@
 #include "../data/data_access_layer.h"
 #include "../models/models.h"
 #include "../views/views.h"
+#include "../course_tests/tests.h"
 #include <curses.h>
 #include <menu.h>
 #include <ncurses.h>
@@ -290,6 +291,15 @@ void handle_course_input(APP_CONTEXT *ctx)
                     wnoutrefresh(ctx->rp_state->right_panel);
                     wnoutrefresh(ctx->rp_state->inner_win);
                     doupdate();
+                }
+                break;
+            case 't':
+                wclear(ctx->rp_state->inner_win);
+                int trc = perform_tests(ctx);
+                if (trc != 0)
+                {
+                    mvwprintw(ctx->course_windows[4], 1, 1, "%s", "tests did not work");
+                    wrefresh(ctx->course_windows[4]);
                 }
                 break;
         }

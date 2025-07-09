@@ -3,6 +3,11 @@
 #include <ncurses.h>
 
 void handle_greeter_input(APP_CONTEXT *ctx);
+void create_new_user_popup_form(WINDOW **inner_win, WINDOW **form_window,
+                                FORM **new_file_form, FIELD **field,
+                                char *label);
+void create_new_user_popup(APP_CONTEXT *ctx);
+
 void handle_start_input(APP_CONTEXT *ctx);
 void handle_course_input(APP_CONTEXT *ctx);
 
@@ -38,6 +43,7 @@ void trim(char **str);
 char *return_trimmed(char *str);
 char *trunc_str(char *str, int win_width, int offset);
 int c_round(float x);
+char *current_datetime();
 void log_values(WINDOW **edit_window, int scroll_offset, TEXT_BUFFER *tbuf,
                 int lines_to_print, int y, int x);
 void log_course_instr_values(APP_CONTEXT *ctx);

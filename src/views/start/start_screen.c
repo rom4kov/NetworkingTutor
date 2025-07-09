@@ -176,10 +176,10 @@ WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label)
 
     if (ctx->start_view_active)
     {
-        USER_DATA user_data = get_user_data(ctx->db);
+        USER_DATA user_data = get_user_data(ctx->db, ctx->current_user_id);
         mvwprintw(ctx->rp_state->right_panel, 2, 3, "Your name: %s",
                   user_data.name);
-        mvwprintw(ctx->rp_state->right_panel, 3, 3, "Language:  %s",
+        mvwprintw(ctx->rp_state->right_panel, 3, 3, "Created at: %s",
                   user_data.language);
         print_intro(&ctx->rp_state->right_panel, ctx->rp_state->window_width,
                     ctx->rp_state->intro_width);

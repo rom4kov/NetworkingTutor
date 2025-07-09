@@ -1,4 +1,5 @@
 #define _POSIX_C_SOURCE 200809L
+#include "../core/core.h"
 #include "data_access_layer.h"
 #include <ncurses.h>
 #include <sqlite3.h>
@@ -66,19 +67,61 @@ char *read_sql_query(char *filename)
     return query_string;
 }
 
-USER_DATA get_user_data(sqlite3 *db)
+int create_new_user(APP_CONTEXT *ctx, char *username)
 {
+    int rc = 0;
 
-    const char *zSql3 = "SELECT * FROM users WHERE id = 1;";
+    const char *sql = "INSERT INTO users (name, created_at) VALUES (?, ?);";
+
+    sqlite3_stmt *stmt;
+    rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
+    if (rc != SQLITE_OK)
+    {
+        sqlite3_finalize(stmt);
+    }
+
+    if (rc == SQLITE_OK)
+    {
+        char *datetime = current_datetime();
+        sqlite3_bind_text(stmt, 1, username, strlen(username), NULL);
+        sqlite3_bind_text(stmt, 2, datetime, strlen(datetime), NULL);
+    }
+
+    rc = sqlite3_step(stmt);
+    if (rc != SQLITE_DONE)
+    {
+        mvwprintw(ctx->greeter_screen, 6, 2, "Insert failed: %s",
+                  sqlite3_errmsg(ctx->db));
+    }
+    else
+    {
+        mvwprintw(ctx->greeter_screen, 6, 2, "%s", "Insert successful");
+    }
+
+    return (int)sqlite3_last_insert_rowid(ctx->db);
+}
+
+USER_DATA get_user_data(sqlite3 *db, int user_id)
+{
+    const char *zSql = "SELECT * FROM users WHERE id = ?;";
 
     USER_DATA user_data;
 
-    sqlite3_stmt *stmt3;
-    sqlite3_prepare_v2(db, zSql3, -1, &stmt3, NULL);
-    sqlite3_step(stmt3);
+    sqlite3_stmt *stmt;
+    int rc = sqlite3_prepare_v2(db, zSql, -1, &stmt, NULL);
+    if (rc != SQLITE_OK)
+    {
+        sqlite3_finalize(stmt);
+    }
 
-    user_data.name = sqlite3_column_text(stmt3, 1);
-    user_data.language = sqlite3_column_text(stmt3, 2);
+    if (rc == SQLITE_OK)
+    {
+        sqlite3_bind_int(stmt, 1, user_id);
+    }
+    sqlite3_step(stmt);
+
+    user_data.name = sqlite3_column_text(stmt, 1);
+    user_data.language = sqlite3_column_text(stmt, 2);
 
     return user_data;
 }
@@ -265,7 +308,8 @@ void get_total_items_of_sections(APP_CONTEXT *ctx)
 {
     int rc = 0;
 
-    const char *sql = "SELECT COUNT(DISTINCT section_id) FROM materials WHERE course_id = ?;";
+    const char *sql =
+        "SELECT COUNT(DISTINCT section_id) FROM materials WHERE course_id = ?;";
 
     sqlite3_stmt *stmt;
     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
@@ -417,8 +461,7 @@ void set_items_completed(APP_CONTEXT *ctx)
         sqlite3_bind_int(res, 1, ctx->current_course_id);
         sqlite3_bind_int(res, 2, ctx->rp_state->curr_section);
         sqlite3_bind_int(res, 3, curr_item);
-        mvwprintw(ctx->course_windows[4], 1, 2, "rc: %i\n",
-                  rc);
+        mvwprintw(ctx->course_windows[4], 1, 2, "rc: %i\n", rc);
     }
     else
     {
@@ -486,7 +529,7 @@ char *get_course_name_by_id(sqlite3 *db, int course_id)
     return course_name;
 }
 
-int *get_course_progress(APP_CONTEXT *ctx)
+void get_course_progress(APP_CONTEXT *ctx)
 {
     int rc = 0;
 
@@ -505,23 +548,16 @@ int *get_course_progress(APP_CONTEXT *ctx)
         sqlite3_bind_int(stmt, 1, ctx->current_course_id);
     }
 
-    int num_of_sections = 1;
-    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW)
-    {
-        num_of_sections++;
-    }
-    sqlite3_reset(stmt);
-
-    int *prog_data = malloc(sizeof(num_of_sections));
-
+    ctx->rp_state->sections_completed = 0;
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
         const int section_id = sqlite3_column_int(stmt, 3);
         const int items_completed = sqlite3_column_int(stmt, 5);
 
-        prog_data[section_id] = items_completed;
+        ctx->rp_state->course_progress[section_id] = items_completed;
+        ctx->rp_state->sections_completed++;
     }
+    ctx->rp_state->sections_completed--;
 
     sqlite3_finalize(stmt);
-    return prog_data;
 }

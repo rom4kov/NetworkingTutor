@@ -1,3 +1,4 @@
+#include <stddef.h>
 #define _POSIX_C_SOURCE 200809L
 
 #include "../models/models.h"
@@ -5,8 +6,10 @@
 #include <curses.h>
 #include <math.h>
 #include <ncurses.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 void draw_border(WINDOW *win, int color_pair, char *label)
 {
@@ -148,4 +151,20 @@ int c_round(float x)
         return (int)floor(x);
     else
         return (int)ceil(x);
+}
+
+char *current_datetime()
+{
+    time_t t = time(NULL);
+    struct tm *tm_info = localtime(&t);
+    char *datetime = (char *)malloc(32);
+    if (!datetime)
+        return NULL;
+    size_t written = strftime(datetime, 32, "%Y-%m-%d %H:%M:%S", tm_info);
+    if (written == 0)
+    {
+        free(datetime);
+        return NULL;
+    }
+    return datetime;
 }

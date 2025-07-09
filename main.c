@@ -81,6 +81,8 @@ int main(void)
     // seed_courses_data(ctx->db, ctx->greeter_screen,
     //                   "SQL/courses/http_server/2_getaddrinfo.sql");
     // seed_courses_data(ctx->db, ctx->greeter_screen,
+    //                   "SQL/create_users_table.sql");
+    // seed_courses_data(ctx->db, ctx->greeter_screen,
     //                   "SQL/create_progress_table.sql");
     // seed_courses_data(ctx->db, ctx->greeter_screen,
     //                   "SQL/courses/http_server/update_http_logo.sql");

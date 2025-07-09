@@ -161,6 +161,7 @@ typedef struct _app_context
     TEXT_BUFFER *t_buffer;
     int key;
     int active_window;
+    int current_user_id;
     int current_course_id;
     int y, x;
     int scroll_offset;

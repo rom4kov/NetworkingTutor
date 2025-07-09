@@ -247,7 +247,7 @@ void handle_course_input(APP_CONTEXT *ctx)
                     ctx->rp_state->curr_section--;
                     ctx->rp_state->curr_item =
                         ctx->rp_state
-                            ->total_section_items[ctx->rp_state->curr_section];
+                            ->course_progress[ctx->rp_state->curr_section];
                     ctx->rp_state->scroll_offset = 0;
                     ctx->rp_state->lines_excess = 0;
 
@@ -265,12 +265,13 @@ void handle_course_input(APP_CONTEXT *ctx)
                 }
                 break;
             case '>':
-                if (ctx->rp_state->curr_section < 2)
+                if (ctx->rp_state->curr_section <
+                    ctx->rp_state->sections_completed)
                 {
                     ctx->rp_state->curr_section++;
                     ctx->rp_state->curr_item =
                         ctx->rp_state
-                            ->total_section_items[ctx->rp_state->curr_section];
+                            ->course_progress[ctx->rp_state->curr_section];
                     ctx->rp_state->scroll_offset = 0;
                     ctx->rp_state->lines_excess = 0;
 

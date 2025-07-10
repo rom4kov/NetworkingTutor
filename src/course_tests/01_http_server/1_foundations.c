@@ -23,11 +23,11 @@ int answers_file_contains_correct_answers(char *path)
     }
 
     TEXT_BUFFER *text_buf = initialize_buffer();
-    LINE *buf_line = text_buf->first_line;
 
     read_file_into_buffer(answers_file, text_buf);
+    LINE *buf_line = text_buf->first_line;
 
-    if (strstr("Layer 7", buf_line->buf_) == NULL)
+    if (strstr(buf_line->buf_, "Layer 7, Application, HTTP") == NULL)
     {
         return 1;
     }
@@ -45,10 +45,20 @@ int answers_file_contains_correct_answers(char *path)
 
 void test_if_answers_file_exists(void)
 {
-    CU_ASSERT(answers_file_exists("http_server/answers.txt") == 0);
+    bool does_answers_file_exist = false;
+    if (answers_file_exists("http_server/answers.txt") == 0)
+    {
+        does_answers_file_exist = true;
+    }
+    CU_ASSERT(does_answers_file_exist);
 }
 
 void test_if_answers_file_contains_correct_answers(void)
 {
-    CU_ASSERT(answers_file_contains_correct_answers("http_server/answers.txt") == 0);
+    bool does_answers_file_contain_correct_answers = false;
+    if (answers_file_contains_correct_answers("http_server/answers.txt") == 0)
+    {
+        does_answers_file_contain_correct_answers = true;
+    }
+    CU_ASSERT(does_answers_file_contain_correct_answers);
 }

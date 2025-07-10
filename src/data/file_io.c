@@ -184,7 +184,7 @@ void open_file(APP_CONTEXT *ctx)
         {
             prepare_empty_file(&ctx->t_buffer);
         }
-        else if (ctx->t_buffer->first_line->length < 2)
+        else if (file_size > 0)
         {
             read_file_into_buffer(ctx->file, ctx->t_buffer);
         }
@@ -203,6 +203,11 @@ void open_file(APP_CONTEXT *ctx)
         mvwprintw(ctx->edit_window, LINES - 7, EDIT_MAX - 15, "0 : 0");
 
         rewind(ctx->file);
+        // mvwprintw(ctx->rp_state->right_panel, 1, 4, "%s", ctx->t_buffer->first_line->buf_);
+        // mvwprintw(ctx->rp_state->right_panel, 1, 10, "%i", ctx->t_buffer->num_of_lines);
+        // mvwprintw(ctx->rp_state->right_panel, 1, 20, "%i", ctx->t_buffer->first_line->length);
+        // mvwprintw(ctx->rp_state->right_panel, 1, 30, "%i", file_size);
+        // wrefresh(ctx->rp_state->right_panel);
 
         print_buffer_label(ctx);
     }
@@ -255,6 +260,14 @@ void read_file_into_buffer(FILE *file, TEXT_BUFFER *text_buf)
         curr_line->buf_[i] = c;
         curr_line->length++;
         i++;
+    }
+
+    if (text_buf->num_of_lines == 0)
+    {
+        text_buf->num_of_lines = 1;
+        curr_line->buf_[i] = '\n';
+        text_buf->first_line = curr_line;
+        text_buf->current_line = text_buf->first_line;
     }
 }
 

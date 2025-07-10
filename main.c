@@ -262,6 +262,8 @@ void initialize_colors()
 
     init_pair(10, COLOR_DARKGREY, -1);
     init_pair(11, COLOR_BLACK, -1);
+    init_pair(12, COLOR_BLACK, COLOR_RED);
+    init_pair(13, COLOR_BLACK, COLOR_GREEN);
 }
 
 char *W_HEADER_TEXT =

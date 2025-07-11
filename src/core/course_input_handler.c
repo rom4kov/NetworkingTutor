@@ -1,9 +1,9 @@
 #include "../controllers/controllers.h"
 #include "../core/core.h"
+#include "../course_tests/tests.h"
 #include "../data/data_access_layer.h"
 #include "../models/models.h"
 #include "../views/views.h"
-#include "../course_tests/tests.h"
 #include <curses.h>
 #include <menu.h>
 #include <ncurses.h>
@@ -173,7 +173,7 @@ void handle_course_input(APP_CONTEXT *ctx)
                     ctx->rp_state->curr_item++;
                     set_items_completed(ctx);
                     print_next_course_item(ctx->rp_state);
-                    log_course_instr_values(ctx);
+                    // log_course_instr_values(ctx);
 
                     wnoutrefresh(ctx->rp_state->inner_win);
                     wnoutrefresh(ctx->course_windows[2]);
@@ -182,8 +182,10 @@ void handle_course_input(APP_CONTEXT *ctx)
                 break;
             case 10:
                 if (ctx->rp_state->curr_item ==
-                    ctx->rp_state
-                        ->num_of_section_items[ctx->rp_state->curr_section])
+                        ctx->rp_state->num_of_section_items
+                            [ctx->rp_state->curr_section] &&
+                    ctx->rp_state->curr_section ==
+                        ctx->rp_state->sections_completed)
                 {
                     set_section_completed(ctx);
                     get_completed_sections(ctx);
@@ -294,11 +296,44 @@ void handle_course_input(APP_CONTEXT *ctx)
                 }
                 break;
             case 't':
+                if (ctx->rp_state->curr_item ==
+                    ctx->rp_state
+                        ->num_of_section_items[ctx->rp_state->curr_section] && 
+                    ctx->rp_state->s_metadata->has_test)
+                {
+                    wclear(ctx->rp_state->right_panel);
+                    wclear(ctx->rp_state->inner_win);
+                    ctx->rp_state->curr_item = 0;
+                    get_task(ctx);
+                    wattron(ctx->rp_state->inner_win, A_BOLD | A_UNDERLINE);
+                    mvwprintw(ctx->rp_state->inner_win, 0, 0,
+                              "TASK FOR SECTION %i: %s",
+                              ctx->rp_state->curr_section + 1,
+                              ctx->rp_state->s_metadata->title);
+                    wattroff(ctx->rp_state->inner_win, A_BOLD | A_UNDERLINE);
+                    mvwprintw(ctx->rp_state->inner_win, 2, 0, "%s",
+                              wrap_text(ctx->rp_state->current_task,
+                                        ctx->rp_state->window_width - 5));
+
+                    char *press_enter = "Press s to submit your task";
+                    mvwprintw(
+                        ctx->rp_state->right_panel, LINES - 5,
+                        (ctx->rp_state->window_width - strlen(press_enter)) / 2,
+                        "%s", press_enter);
+
+                    focus_window(&ctx->rp_state->right_panel, 3,
+                                 "Course Instructions");
+                    wrefresh(ctx->rp_state->right_panel);
+                    wrefresh(ctx->rp_state->inner_win);
+                }
+                break;
+            case 's':
                 wclear(ctx->rp_state->inner_win);
                 int trc = perform_tests(ctx);
                 if (trc != 0)
                 {
-                    mvwprintw(ctx->course_windows[4], 1, 1, "%s", "tests did not work");
+                    mvwprintw(ctx->course_windows[4], 1, 1, "%s",
+                              "tests did not work");
                     wrefresh(ctx->course_windows[4]);
                 }
                 break;

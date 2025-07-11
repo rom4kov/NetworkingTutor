@@ -1,6 +1,6 @@
 #define _POSIX_C_SOURCE 200809L
-#include "../core/core.h"
 #include "data_access_layer.h"
+#include "../core/core.h"
 #include <ncurses.h>
 #include <sqlite3.h>
 #include <stdio.h>
@@ -121,7 +121,7 @@ USER_DATA get_user_data(sqlite3 *db, int user_id)
     sqlite3_step(stmt);
 
     user_data.name = sqlite3_column_text(stmt, 1);
-    user_data.language = sqlite3_column_text(stmt, 2);
+    user_data.created_at = sqlite3_column_text(stmt, 2);
 
     return user_data;
 }
@@ -216,9 +216,9 @@ COURSE *get_course_by_id(sqlite3 *db, int course_id)
     return course;
 }
 
-const unsigned char *get_section_title(APP_CONTEXT *ctx)
+SECTION_METADATA *get_section_data(APP_CONTEXT *ctx)
 {
-    const unsigned char *section_title = malloc(64 * sizeof(char));
+    SECTION_METADATA *section_metadata = malloc(sizeof(SECTION_METADATA));
 
     int rc = 0;
 
@@ -240,10 +240,11 @@ const unsigned char *get_section_title(APP_CONTEXT *ctx)
 
     if (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        section_title = sqlite3_column_text(stmt, 2);
+        section_metadata->title = (char *)sqlite3_column_text(stmt, 2);
+        section_metadata->has_test = (bool)sqlite3_column_int(stmt, 2);
     }
 
-    return section_title;
+    return section_metadata;
 }
 
 COURSE_SECTION *get_course_section_materials(sqlite3 *db, int course,
@@ -560,4 +561,34 @@ void get_course_progress(APP_CONTEXT *ctx)
     ctx->rp_state->sections_completed--;
 
     sqlite3_finalize(stmt);
+}
+
+void get_task(APP_CONTEXT *ctx)
+{
+    int rc = 0;
+
+    const char *sql =
+        "SELECT task FROM tasks WHERE course_id = ? AND section_id = ?;";
+
+    sqlite3_stmt *stmt;
+    rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
+    if (rc != SQLITE_OK)
+    {
+        sqlite3_finalize(stmt);
+    }
+
+    if (rc == SQLITE_OK)
+    {
+        sqlite3_bind_int(stmt, 1, ctx->current_course_id);
+        sqlite3_bind_int(stmt, 2, ctx->rp_state->curr_section);
+    }
+
+    sqlite3_step(stmt);
+
+    char *task = (char *)sqlite3_column_text(stmt, 0);
+
+    ctx->rp_state->current_task =
+        (char *)malloc((strlen(task) + 1) * sizeof(char));
+
+    ctx->rp_state->current_task = strdup(task);
 }

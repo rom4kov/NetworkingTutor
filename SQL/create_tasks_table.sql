@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS tasks (
+    id INTEGER PRIMARY KEY,
+    course_id INTEGER NOT NULL,
+    section_id INTEGER NOT NULL,
+    task TEXT NOT NULL
+)

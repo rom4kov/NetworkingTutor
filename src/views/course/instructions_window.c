@@ -5,25 +5,32 @@
 
 void print_press_msg(RIGHT_PANEL_STATE *rps)
 {
-    if (rps->curr_item <
-        rps->num_of_section_items[rps->curr_section])
+    if (rps->curr_item < rps->num_of_section_items[rps->curr_section])
     {
         char *press_space = "Press SPACE to continue";
-        mvwprintw(
-            rps->right_panel, LINES - 5,
-            ((rps->window_width - strlen(press_space) + 10) / 2) - 10,
-            "%s", "                                     ");
+        mvwprintw(rps->right_panel, LINES - 5,
+                  ((rps->window_width - strlen(press_space) + 10) / 2) - 10,
+                  "%s", "                                     ");
         mvwprintw(rps->right_panel, LINES - 5,
                   (rps->window_width - strlen(press_space)) / 2, "%s",
                   press_space);
     }
-    else if (rps->curr_item ==
-             rps->num_of_section_items[rps->curr_section])
+    else if (rps->curr_item == rps->num_of_section_items[rps->curr_section])
     {
-        char *press_enter = "Press ENTER to go to next section";
-        mvwprintw(rps->right_panel, LINES - 5,
-                  (rps->window_width - strlen(press_enter)) / 2, "%s",
-                  press_enter);
+        if (rps->s_metadata->has_test)
+        {
+            char *press_enter = "Press t to see your task";
+            mvwprintw(rps->right_panel, LINES - 5,
+                      (rps->window_width - strlen(press_enter)) / 2, "%s",
+                      press_enter);
+        }
+        else
+        {
+            char *press_enter = "Press ENTER to go to next section";
+            mvwprintw(rps->right_panel, LINES - 5,
+                      (rps->window_width - strlen(press_enter)) / 2, "%s",
+                      press_enter);
+        }
         wrefresh(rps->right_panel);
     }
 }
@@ -34,7 +41,7 @@ void print_course_instructions(APP_CONTEXT *ctx)
         ctx->db, ctx->current_course_id, ctx->rp_state->curr_section,
         &ctx->rp_state->num_of_section_items[ctx->rp_state->curr_section]);
 
-    ctx->rp_state->curr_section_title = (char *)get_section_title(ctx);
+    ctx->rp_state->s_metadata = get_section_data(ctx);
 
     read_item_into_buffer(ctx);
     // log_course_instr_values(ctx);

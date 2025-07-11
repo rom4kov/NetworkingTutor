@@ -4,5 +4,6 @@ CREATE TABLE IF NOT EXISTS sections (
     section_title TEXT,
     num_of_items INTERGER NOT NULL,
     order_num INTEGER,
+    has_test bool,
     FOREIGN KEY(course_id) REFERENCES courses(id) UNIQUE(course_id, section_title, order_num)
 );

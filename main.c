@@ -86,6 +86,10 @@ int main(void)
     //                   "SQL/create_progress_table.sql");
     // seed_courses_data(ctx->db, ctx->greeter_screen,
     //                   "SQL/courses/http_server/update_http_logo.sql");
+    // seed_courses_data(ctx->db, ctx->greeter_screen,
+    //                   "SQL/create_tasks_table.sql");
+    // seed_courses_data(ctx->db, ctx->greeter_screen,
+    //                   "SQL/courses/http_server/tasks.sql");
 
     ESCDELAY = 100;
 

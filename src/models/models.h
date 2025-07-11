@@ -17,7 +17,7 @@
 typedef struct _user_data
 {
     const unsigned char *name;
-    const unsigned char *language;
+    const unsigned char *created_at;
 } USER_DATA;
 
 typedef struct _course_data
@@ -33,10 +33,15 @@ typedef struct _course_section
     int course_id;
     int order_num;
     int section_id;
-    char *section_title;
     char *content_title;
     char *content;
 } COURSE_SECTION;
+
+typedef struct _section_metadata
+{
+    char *title;
+    bool has_test;
+} SECTION_METADATA;
 
 typedef struct _progress_data
 {
@@ -116,9 +121,11 @@ typedef struct _right_panel_state
 {
     I_TEXT_BUFFER *it_buffer;
     COURSE_SECTION *course_section_data;
+    SECTION_METADATA *s_metadata;
     WINDOW *right_panel;
     WINDOW *header_win;
     WINDOW *inner_win;
+    char *current_task;
     bool *completed_sections;
     int *course_progress;
     int num_of_section_items[32];
@@ -135,7 +142,6 @@ typedef struct _right_panel_state
     int lines_to_print;
     int lines_excess;
     int y, x;
-    char *curr_section_title;
 } RIGHT_PANEL_STATE;
 
 typedef struct _app_context

@@ -63,23 +63,51 @@ int perform_tests(APP_CONTEXT *ctx)
     CU_pRunSummary run_sum = CU_get_run_summary();
     print_run_summary(ctx, run_sum);
 
+    int offset = 0;
+    int num_of_successes = CU_get_number_of_successes();
+    if (num_of_successes > 0)
+        offset = num_of_successes;
+
+    wattron(ctx->rp_state->inner_win, A_UNDERLINE | A_BOLD);
+    mvwprintw(ctx->rp_state->inner_win, 13, 2, "%s", "Details");
+    wattroff(ctx->rp_state->inner_win, A_UNDERLINE | A_BOLD);
+
     CU_pFailureRecord fail_rec = CU_get_failure_list();
-    print_failure_list(ctx, fail_rec);
+
+    print_failure_list(ctx, fail_rec, offset);
 
     int i = 0;
     CU_pTestRegistry tr = CU_get_registry();
     CU_pSuite suite = CU_get_suite_by_name("http_server_test_suite_01", tr);
     CU_pTest test = suite->pTest;
 
-    while (test != NULL) {
-        // if (strcmp(test->pName, fail_rec->pTest->pName) == 0)
-        // {
-        // }
-        wattron(ctx->rp_state->inner_win, COLOR_PAIR(4) | A_BOLD);
-        mvwprintw(ctx->rp_state->inner_win, 15 + i, 2, "%s", test->pName);
-        wattroff(ctx->rp_state->inner_win, COLOR_PAIR(4) | A_BOLD);
-        test = test->pNext;
-        i++;
+    if (run_sum->nTestsFailed == 0)
+    {
+        while (test != NULL)
+        {
+            wattron(ctx->rp_state->inner_win, COLOR_PAIR(4));
+            mvwprintw(ctx->rp_state->inner_win, 15 + i, 2, "%s PASSED", test->pName);
+            wattroff(ctx->rp_state->inner_win, COLOR_PAIR(4));
+            test = test->pNext;
+            i++;
+        }
+    }
+    else {
+        while (fail_rec)
+        {
+            while (test)
+            {
+                if (strcmp(test->pName, fail_rec->pTest->pName) != 0)
+                {
+                    wattron(ctx->rp_state->inner_win, COLOR_PAIR(4));
+                    mvwprintw(ctx->rp_state->inner_win, 15 + i, 2, "%s PASSED", test->pName);
+                    wattroff(ctx->rp_state->inner_win, COLOR_PAIR(4));
+                }
+                test = test->pNext;
+                i++;
+            }
+            fail_rec = fail_rec->pNext;
+        }
     }
 
     wrefresh(ctx->rp_state->inner_win);
@@ -143,29 +171,25 @@ void print_run_summary(APP_CONTEXT *ctx, CU_pRunSummary run_sum)
     }
 }
 
-void print_failure_list(APP_CONTEXT *ctx, CU_pFailureRecord fail_rec)
+void print_failure_list(APP_CONTEXT *ctx, CU_pFailureRecord fail_rec, int offset)
 {
-    if (fail_rec != NULL)
-    {
-        wattron(ctx->rp_state->inner_win, A_UNDERLINE);
-        mvwprintw(ctx->rp_state->inner_win, 13, 2, "%s", "Failure record");
-        wattroff(ctx->rp_state->inner_win, A_UNDERLINE);
-    }
+    int i = 15 + offset;
 
-    int i = 15;
+    wattron(ctx->rp_state->inner_win, COLOR_PAIR(3));
     while (fail_rec != NULL)
     {
-        mvwprintw(ctx->rp_state->inner_win, i, 2, "Line number: %i",
-                  fail_rec->uiLineNumber);
-        mvwprintw(ctx->rp_state->inner_win, i + 1, 2, "Filename: %s",
-                  fail_rec->strFileName);
-        mvwprintw(ctx->rp_state->inner_win, i + 2, 2, "Condition: %s",
-                  fail_rec->strCondition);
-        mvwprintw(ctx->rp_state->inner_win, i + 3, 2, "Test name: %s",
+        mvwprintw(ctx->rp_state->inner_win, i, 2, "%s FAILED",
                   fail_rec->pTest->pName);
+        mvwprintw(ctx->rp_state->inner_win, i + 1, 2, "Line number: %i",
+                  fail_rec->uiLineNumber);
+        mvwprintw(ctx->rp_state->inner_win, i + 2, 2, "Filename: %s",
+                  fail_rec->strFileName);
+        mvwprintw(ctx->rp_state->inner_win, i + 3, 2, "Condition: %s",
+                  fail_rec->strCondition);
         mvwprintw(ctx->rp_state->inner_win, i + 4, 2, "Suite name: %s",
                   fail_rec->pSuite->pName);
         fail_rec = fail_rec->pNext;
         i += 6;
     }
+    wattroff(ctx->rp_state->inner_win, COLOR_PAIR(3));
 }

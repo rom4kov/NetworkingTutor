@@ -71,7 +71,7 @@ void read_item_into_buffer(APP_CONTEXT *ctx)
         if (ctx->rp_state->curr_section > 0 &&
             i == 0)
         {
-            ctx->rp_state->it_buffer->first_line->buf_ = strdup(ctx->rp_state->curr_section_title);
+            ctx->rp_state->it_buffer->first_line->buf_ = strdup(ctx->rp_state->s_metadata->title);
             ctx->rp_state->it_buffer->first_line->centered = true;
             ctx->rp_state->it_buffer->first_line->style = A_BOLD | A_UNDERLINE;
             ctx->rp_state->it_buffer->first_line->line_num = line_number;
@@ -207,7 +207,7 @@ void read_item_into_buffer(APP_CONTEXT *ctx)
 
             curr_line = initialize_iline();
 
-            curr_line->buf_ = strdup(ctx->rp_state->curr_section_title);
+            curr_line->buf_ = strdup(ctx->rp_state->s_metadata->title);
             curr_line->centered = true;
             curr_line->line_num = line_number;
             line_number++;

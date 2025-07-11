@@ -4,6 +4,11 @@
 #include "ncurses.h"
 #include <sqlite3.h>
 
+
+//////////////
+// DATABASE //
+//////////////
+
 sqlite3 *create_database();
 char *read_sql_query(char *filename);
 int create_new_user(APP_CONTEXT *ctx, char *username);
@@ -14,7 +19,7 @@ char *get_course_name_by_id(sqlite3 *db, int course_id);
 COURSE *get_course_data(sqlite3 *db);
 COURSE *get_course_by_id(sqlite3 *db, int course_id);
 
-const unsigned char *get_section_title(APP_CONTEXT *ctx);
+SECTION_METADATA *get_section_data(APP_CONTEXT *ctx);
 int callback(void *NotUsed, int argc, char **argv, char **azColName);
 COURSE_SECTION *get_course_section_materials(sqlite3 *db, int course,
                                        int section, int *num_of_items);
@@ -27,6 +32,13 @@ int get_current_course(sqlite3 *db, int user_id);
 void get_course_progress(APP_CONTEXT *ctx);
 void set_section_completed(APP_CONTEXT *ctx);
 void set_items_completed(APP_CONTEXT *ctx);
+
+void get_task(APP_CONTEXT *ctx);
+
+
+/////////////
+// FILE IO //
+/////////////
 
 DIR_ENTRY *initialize_dir_entry();
 FILE_TREE *initialize_file_tree();

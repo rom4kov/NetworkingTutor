@@ -19,7 +19,11 @@ WINDOW *create_course_preview_card(int x_position, int *active_win,
                                    int curr_win_idx, COURSE *course);
 WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label);
 // void read_item_into_buffer(COURSE_SECTION *c_sec, TEXT_BUFFER *text_buf);
+void add_line_break(RIGHT_PANEL_STATE *rps, I_LINE **curr_line, int i, int *j,
+                    int *k, int *line_number, int *last_space_pos,
+                    bool overflow);
 void read_item_into_buffer(APP_CONTEXT *ctx);
+void read_task_into_buffer(APP_CONTEXT *ctx);
 void print_course_instructions(APP_CONTEXT *ctx);
 void init_right_panel_state(RIGHT_PANEL_STATE *rp_state,
                             bool course_view_active);

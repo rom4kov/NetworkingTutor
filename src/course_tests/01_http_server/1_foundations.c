@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include "../../data/data_access_layer.h"
 #include <CUnit/CUnit.h>
 #include <stdio.h>
@@ -27,7 +28,7 @@ int answers_file_contains_correct_answers(char *path)
     read_file_into_buffer(answers_file, text_buf);
     LINE *buf_line = text_buf->first_line;
 
-    if (strstr(buf_line->buf_, "Layer 7, Application, HTTP") == NULL)
+    if (strcasestr(buf_line->buf_, "Layer 7, Application, HTTP") == NULL)
     {
         return 1;
     }

@@ -51,8 +51,7 @@ VALUES
         1,
         1,
         "The OSI model",
-        "
-Layer | Name         | Protocols  | PDU     | Purpose@
+        "Layer | Name         | Protocols  | PDU     | Purpose@
 ------+--------------+------------+---------+--------------------------@
     7 | Application  | HTTP, FTP  | Data    | End-user services@
     6 | Presentation | TLS        | Data    | Encode, encrypt, compress@

@@ -31,10 +31,11 @@ typedef struct _course_section
 {
     int id;
     int course_id;
-    int order_num;
     int section_id;
     char *content_title;
     char *content;
+    int order_num;
+    bool syntax_hl;
 } COURSE_SECTION;
 
 typedef struct _section_metadata
@@ -69,6 +70,7 @@ typedef struct _instructions_line
     char *buf_;
     int style;
     bool centered;
+    bool syntax_hl;
 } I_LINE;
 
 typedef struct text_buffer
@@ -127,6 +129,7 @@ typedef struct _right_panel_state
     WINDOW *inner_win;
     char *current_task;
     bool *completed_sections;
+    bool test_mode;
     int *course_progress;
     int num_of_section_items[32];
     int *total_section_items;

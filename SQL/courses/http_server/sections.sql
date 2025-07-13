@@ -3,7 +3,8 @@ INSERT
         course_id,
         section_title,
         num_of_items,
-        order_num
+        order_num,
+        has_test
     )
 VALUES
     (
@@ -19,7 +20,8 @@ INSERT
         course_id,
         section_title,
         num_of_items,
-        order_num
+        order_num,
+        has_test
     )
 VALUES
     (
@@ -27,7 +29,7 @@ VALUES
         "2. Foundations: TCP/IP and HTTP",
         12,
         1,
-        1,
+        1
     );
 
 INSERT
@@ -35,7 +37,8 @@ INSERT
         course_id,
         section_title,
         num_of_items,
-        order_num
+        order_num,
+        has_test
     )
 VALUES
     (

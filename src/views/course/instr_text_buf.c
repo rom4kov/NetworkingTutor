@@ -147,6 +147,8 @@ void read_item_into_buffer(APP_CONTEXT *ctx)
             else if (ctx->rp_state->course_section_data[i].content[j] == '\n')
             {
                 overflow = false;
+                if (ctx->rp_state->course_section_data[i].syntax_hl == true)
+                    curr_line->syntax_hl = true;
                 add_line_break(ctx->rp_state, &curr_line, i, &j, &k,
                                &line_number, &last_space_pos, overflow);
                 continue;

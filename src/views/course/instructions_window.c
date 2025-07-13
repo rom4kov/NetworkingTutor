@@ -1,4 +1,4 @@
-#include "../../core/core.h"
+
 #include "../views.h"
 #include <curses.h>
 #include <string.h>
@@ -17,7 +17,7 @@ void print_press_msg(RIGHT_PANEL_STATE *rps)
     }
     else if (rps->curr_item == rps->num_of_section_items[rps->curr_section])
     {
-        if (rps->s_metadata->has_test)
+        if (rps->s_metadata->has_test == true)
         {
             char *press_enter = "Press t to see your task";
             mvwprintw(rps->right_panel, LINES - 5,
@@ -31,8 +31,8 @@ void print_press_msg(RIGHT_PANEL_STATE *rps)
                       (rps->window_width - strlen(press_enter)) / 2, "%s",
                       press_enter);
         }
-        wrefresh(rps->right_panel);
     }
+    wrefresh(rps->right_panel);
 }
 
 void print_course_instructions(APP_CONTEXT *ctx)
@@ -63,7 +63,6 @@ void print_course_instructions(APP_CONTEXT *ctx)
     mvwprintw(ctx->rp_state->right_panel, LINES - 4,
               ctx->rp_state->window_width - 18, " %s %i of %i ", "Section",
               ctx->rp_state->curr_section + 1, 9);
-
     // for (int i = 0; i < 32; i++)
     //     mvwprintw(ctx->course_windows[2], i + 2, 3, "%i: %i", i,
     //               ctx->rp_state->course_progress[i]);
@@ -78,6 +77,7 @@ void print_course_instructions(APP_CONTEXT *ctx)
 
 void print_next_course_item(RIGHT_PANEL_STATE *rp_state)
 {
+    // wclear(rp_state->inner_win);
     I_LINE *current_line = rp_state->it_buffer->first_line;
     int i, j;
     j = 0;
@@ -117,10 +117,18 @@ void print_next_course_item(RIGHT_PANEL_STATE *rp_state)
         else
             offset = 0;
         if (current_line->style > 0)
+        {
             wattron(rp_state->inner_win, current_line->style);
-        mvwprintw(rp_state->inner_win, j, offset, "%s", current_line->buf_);
-        if (current_line->style > 0)
+            mvwprintw(rp_state->inner_win, j, offset, "%s", current_line->buf_);
             wattroff(rp_state->inner_win, current_line->style);
+        }
+        else if (current_line->style == 0 && current_line->syntax_hl == false) {
+            mvwprintw(rp_state->inner_win, j, offset, "%s", current_line->buf_);
+        }
+        else if (current_line->syntax_hl == true)
+        {
+            print_line(current_line->buf_, j, &rp_state->inner_win);
+        }
 
         current_line = current_line->next;
         j++;

@@ -222,8 +222,8 @@ SECTION_METADATA *get_section_data(APP_CONTEXT *ctx)
 
     int rc = 0;
 
-    const char *sql =
-        "SELECT * FROM sections WHERE course_id = ? AND order_num = ?;";
+    const char *sql = "SELECT section_title, has_test FROM sections WHERE "
+                      "course_id = ? AND order_num = ?;";
 
     sqlite3_stmt *stmt;
     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
@@ -240,8 +240,8 @@ SECTION_METADATA *get_section_data(APP_CONTEXT *ctx)
 
     if (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        section_metadata->title = (char *)sqlite3_column_text(stmt, 2);
-        section_metadata->has_test = (bool)sqlite3_column_int(stmt, 2);
+        section_metadata->title = (char *)sqlite3_column_text(stmt, 0);
+        section_metadata->has_test = (bool)sqlite3_column_int(stmt, 1);
     }
 
     return section_metadata;
@@ -287,6 +287,7 @@ COURSE_SECTION *get_course_section_materials(sqlite3 *db, int course,
         const unsigned char *content_title = sqlite3_column_text(stmt, 3);
         const unsigned char *content = sqlite3_column_text(stmt, 4);
         const int order_num = sqlite3_column_int(stmt, 5);
+        const bool syntax_hl = sqlite3_column_int(stmt, 6);
 
         course_section_data[i].id = id;
         // course_section_data[i].section_title = strdup((const char
@@ -296,6 +297,7 @@ COURSE_SECTION *get_course_section_materials(sqlite3 *db, int course,
             strdup((const char *)content_title);
         course_section_data[i].content = strdup((const char *)content);
         course_section_data[i].order_num = order_num;
+        course_section_data[i].syntax_hl = syntax_hl;
         i++;
     }
 
@@ -462,7 +464,7 @@ void set_items_completed(APP_CONTEXT *ctx)
         sqlite3_bind_int(res, 1, ctx->current_course_id);
         sqlite3_bind_int(res, 2, ctx->rp_state->curr_section);
         sqlite3_bind_int(res, 3, curr_item);
-        mvwprintw(ctx->course_windows[4], 1, 2, "rc: %i\n", rc);
+        mvwprintw(ctx->course_windows[4], 1, 2, "rc: %i", rc);
     }
     else
     {

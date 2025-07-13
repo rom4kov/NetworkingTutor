@@ -99,6 +99,7 @@ I_LINE *initialize_iline()
     line->length = 1;
     line->style = 0;
     line->centered = false;
+    line->syntax_hl = false;
     line->prev = NULL;
     line->next = NULL;
 
@@ -141,6 +142,7 @@ void open_new_file(APP_CONTEXT *ctx)
         printf("Could not open %s.\n", ctx->curr_file_path);
     }
 
+    // mvwprintw(ctx->edit_window, LINES - 9, 15, "check");
     if (ctx->file != NULL)
     {
         prepare_empty_file(&ctx->t_buffer);
@@ -203,9 +205,11 @@ void open_file(APP_CONTEXT *ctx)
         mvwprintw(ctx->edit_window, LINES - 7, EDIT_MAX - 15, "0 : 0");
 
         rewind(ctx->file);
-        // mvwprintw(ctx->rp_state->right_panel, 1, 4, "%s", ctx->t_buffer->first_line->buf_);
-        // mvwprintw(ctx->rp_state->right_panel, 1, 10, "%i", ctx->t_buffer->num_of_lines);
-        // mvwprintw(ctx->rp_state->right_panel, 1, 20, "%i", ctx->t_buffer->first_line->length);
+        // mvwprintw(ctx->rp_state->right_panel, 1, 4, "%s",
+        // ctx->t_buffer->first_line->buf_);
+        // mvwprintw(ctx->rp_state->right_panel, 1, 10, "%i",
+        // ctx->t_buffer->num_of_lines); mvwprintw(ctx->rp_state->right_panel,
+        // 1, 20, "%i", ctx->t_buffer->first_line->length);
         // mvwprintw(ctx->rp_state->right_panel, 1, 30, "%i", file_size);
         // wrefresh(ctx->rp_state->right_panel);
 
@@ -282,6 +286,12 @@ void write_buffer_to_file(TEXT_BUFFER *tbuf, FILE *file, int y)
         file_size += tbuf->current_line->length;
         tbuf->current_line = tbuf->current_line->next;
     }
+
+    // if (tbuf->num_of_lines == 1)
+    // {
+    //     tbuf->current_line->buf_[strlen(tbuf->current_line->buf_) + 1] = '\n';
+    // }
+
     rewind(file);
 
     int fd = fileno(file);
@@ -452,15 +462,6 @@ void create_new_file(APP_CONTEXT *ctx, WINDOW **form_window, WINDOW **inner_win,
                 ctx->explorer_mode = false;
                 ctx->editor_mode = true;
                 ctx->active_window = 2;
-                //
-                // if (ctx->file_tree->current_entry->parent_dir)
-                // {
-                //     mvwprintw(ctx->course_windows[3], 5, 2, "%s",
-                //               ctx->file_tree->current_entry->parent_dir->path);
-                //     mvwprintw(ctx->course_windows[3], 6, 2, "%s",
-                //               ctx->file_tree->current_entry->parent_dir->name);
-                //     wrefresh(ctx->course_windows[3]);
-                // }
 
                 deallocate_buffer(ctx->t_buffer);
                 ctx->t_buffer = initialize_buffer();
@@ -700,8 +701,7 @@ void delete_file(APP_CONTEXT *ctx, bool *del_file_form_active,
                         wclear(ctx->line_num_win);
                         wclear(ctx->course_windows[2]);
                         wclear(ctx->edit_window);
-                        ctx->course_windows[2] =
-                            create_editor_window();
+                        ctx->course_windows[2] = create_editor_window();
 
                         wattron(ctx->course_windows[2], COLOR_PAIR(10));
                         print_no_open_file_msg(&ctx->course_windows[2]);
@@ -728,8 +728,7 @@ void delete_file(APP_CONTEXT *ctx, bool *del_file_form_active,
                     wclear(ctx->course_windows[1]);
                     ctx->course_windows[1] =
                         create_explorer_window(ctx->file_tree);
-                    ctx->course_windows[2] =
-                        create_editor_window();
+                    ctx->course_windows[2] = create_editor_window();
 
                     focus_window(&ctx->course_windows[2], 2, "Editor");
                     focus_window(&ctx->course_windows[1], 3, "Explorer");

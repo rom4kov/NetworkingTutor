@@ -57,11 +57,11 @@ void handle_greeter_input(APP_CONTEXT *ctx)
                 //     i++;
                 // }
                 ctx->rp_state->curr_section =
-                    ctx->rp_state->sections_completed - 1;
+                    ctx->rp_state->sections_completed;
                 ctx->rp_state->curr_item =
                     ctx->rp_state
-                        ->course_progress[ctx->rp_state->sections_completed -
-                                          1];
+                        ->course_progress[ctx->rp_state->sections_completed] +
+                    (ctx->rp_state->curr_section == 0 ? 1 : 0);
                 ctx->rp_state->items_completed =
                     ctx->rp_state
                         ->course_progress[ctx->rp_state->sections_completed -

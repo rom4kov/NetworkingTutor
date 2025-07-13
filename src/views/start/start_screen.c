@@ -258,11 +258,10 @@ void init_right_panel_state(RIGHT_PANEL_STATE *rp_state,
                             bool course_view_active)
 {
     rp_state->window_width = COLS - (WU * 7 + 4);
-
     rp_state->right_panel = newwin(course_view_active ? LINES - 3 : LINES,
                                    rp_state->window_width, 0, WU * 7 + 4);
     rp_state->inner_win = derwin(rp_state->right_panel, LINES - 8,
                                  rp_state->window_width - 6, 2, 4);
-
     rp_state->num_of_section_items[rp_state->curr_section] = 0;
+    rp_state->test_mode = false;
 }

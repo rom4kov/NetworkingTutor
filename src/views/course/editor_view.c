@@ -119,7 +119,7 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
     pcre2_code *re[pattern_num];
     char *patterns[] = {
         ".",
-        "\\b(void|int|char|return|for|while|if|else|break|continue|bool|switch|"
+        "\\b(void|int|char|return|for|while|if|else|break|continue|bool|switch|struct|"
         "case|default)\\b",
         "#(include|define)|NULL|=|\\+|\\-|\\*|\\&|<|>|;",
         "(\".*\"|<.*\\.h>)",
@@ -159,12 +159,13 @@ void print_line(char *line_buf, int line_num, WINDOW **edit_window)
     pcre2_code *re[pattern_num];
     char *patterns[] = {
         ".",
-        "\\b(void|int|char|return|for|while|if|else|break|continue|bool|switch|"
+        "\\b(void|int|char|return|for|while|if|else|break|continue|bool|switch|struct|"
         "case|default)\\b",
         "#(include|define)|NULL|=|\\+|\\-|\\*|\\&|<|>|;",
         "(\".*\"|<.*\\.h>)",
         "([a-z0-9_]*)\\(.*\\)",
         "\\b(?:\\d+(\\.\\d+)?|true|false)\\b",
+        "//.*",
     };
     int colors[] = {1, 8, 6, 4, 7, 9, 10};
     size_t subj_len = strlen(line_buf);

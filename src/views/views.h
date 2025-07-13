@@ -8,6 +8,7 @@
 #include <ncurses.h>
 #include <pcre2.h>
 #include <sqlite3.h>
+#include <CUnit/TestRun.h>
 
 void initialize_colors();
 WINDOW *create_greeter_screen(APP_CONTEXT *ctx);
@@ -56,3 +57,5 @@ void move_to_next_entry(FILE_TREE *f_tree, WINDOW **explorer_window);
 void move_to_prev_entry(FILE_TREE *f_tree, WINDOW **explorer_window);
 void print_no_open_file_msg(WINDOW **editor_window);
 void deallocate_it_buffer(I_TEXT_BUFFER *tbuf);
+
+void print_section_or_task_compl_msg(APP_CONTEXT *ctx, CU_pRunSummary rs);

@@ -252,6 +252,7 @@ void handle_course_input(APP_CONTEXT *ctx)
             case KEY_DOWN:
                 if (ctx->rp_state->scroll_offset > 0)
                 {
+                    werase(ctx->rp_state->inner_win);
                     ctx->rp_state->scroll_offset--;
                     print_next_course_item(ctx->rp_state);
                     wnoutrefresh(ctx->rp_state->inner_win);
@@ -261,6 +262,7 @@ void handle_course_input(APP_CONTEXT *ctx)
             case KEY_UP:
                 if (ctx->rp_state->lines_excess > ctx->rp_state->scroll_offset)
                 {
+                    werase(ctx->rp_state->inner_win);
                     ctx->rp_state->scroll_offset++;
                     print_next_course_item(ctx->rp_state);
                     wnoutrefresh(ctx->rp_state->inner_win);

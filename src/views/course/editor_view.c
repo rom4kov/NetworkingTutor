@@ -4,6 +4,7 @@
 #include <curses.h>
 #include <ncurses.h>
 #include <pcre.h>
+#include <stdbool.h>
 #include <string.h>
 
 #define PCRE2_CODE_UNIT_WIDTH 8
@@ -92,7 +93,9 @@ void print_matches(pcre2_code *re, int i, size_t subject_length, char *line_buf,
 
         wattron(*edit_window, COLOR_PAIR(color));
         for (PCRE2_SIZE k = start; k < end; k++)
+        {
             mvwprintw(*edit_window, i, k, "%c", line_buf[k]);
+        }
         wattroff(*edit_window, COLOR_PAIR(color));
 
         line_len = (int)end > line_len ? (int)end : line_len + 1;
@@ -115,19 +118,22 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
         current_line = current_line->next;
     }
 
-    int pattern_num = 7;
+    int pattern_num = 9;
     pcre2_code *re[pattern_num];
     char *patterns[] = {
         ".",
-        "\\b(void|int|char|return|for|while|if|else|break|continue|bool|switch|struct|"
+        "\\b(void|int|char|return|for|while|if|else|break|continue|bool|switch|"
+        "struct|"
         "case|default)\\b",
         "#(include|define)|NULL|=|\\+|\\-|\\*|\\&|<|>|;",
         "(\".*\"|<.*\\.h>)",
         "([a-z0-9_]*)\\(.*\\)",
         "\\b(?:\\d+(\\.\\d+)?|true|false)\\b",
-        "//.*",
+        "(?<=\\bstruct )\\w+",
+        "(?<=(->|\\.))\\w+\\s",
+        "(//.*|/\\*.*\\*/)",
     };
-    int colors[] = {1, 8, 6, 4, 7, 9, 10};
+    int colors[] = {1, 8, 6, 4, 7, 9, 14, 15, 10};
 
     compile_patterns(re, pattern_num, patterns);
 
@@ -155,19 +161,22 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
 
 void print_line(char *line_buf, int line_num, WINDOW **edit_window)
 {
-    int pattern_num = 7;
+    int pattern_num = 9;
     pcre2_code *re[pattern_num];
     char *patterns[] = {
         ".",
-        "\\b(void|int|char|return|for|while|if|else|break|continue|bool|switch|struct|"
+        "\\b(void|int|char|return|for|while|if|else|break|continue|bool|switch|"
+        "struct|"
         "case|default)\\b",
         "#(include|define)|NULL|=|\\+|\\-|\\*|\\&|<|>|;",
         "(\".*\"|<.*\\.h>)",
         "([a-z0-9_]*)\\(.*\\)",
         "\\b(?:\\d+(\\.\\d+)?|true|false)\\b",
-        "//.*",
+        "(?<=\\bstruct )\\w+",
+        "(?<=(->|\\.))\\w+\\s",
+        "(//.*|/\\*.*\\*/)",
     };
-    int colors[] = {1, 8, 6, 4, 7, 9, 10};
+    int colors[] = {1, 8, 6, 4, 7, 9, 14, 15, 10};
     size_t subj_len = strlen(line_buf);
 
     compile_patterns(re, pattern_num, patterns);

@@ -15,6 +15,9 @@
 #define COLOR_GREY 16
 #define COLOR_ORANGE 17
 #define COLOR_DARKGREY 18
+#define COLOR_TEALGREEN 19
+#define COLOR_BERMUDA 20
+
 #define START_WINDOW_COUNT 6
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
@@ -263,11 +266,17 @@ void initialize_colors()
     init_pair(9, COLOR_ORANGE, -1);
 
     init_color(COLOR_DARKGREY, 500, 500, 500);
-
     init_pair(10, COLOR_DARKGREY, -1);
+
     init_pair(11, COLOR_BLACK, -1);
     init_pair(12, COLOR_BLACK, COLOR_RED);
     init_pair(13, COLOR_BLACK, COLOR_GREEN);
+
+    init_color(COLOR_TEALGREEN, 153, 616, 686);
+    init_pair(14, COLOR_TEALGREEN, -1);
+
+    init_color(COLOR_BERMUDA, 523, 851, 718);
+    init_pair(15, COLOR_BERMUDA, -1);
 }
 
 char *W_HEADER_TEXT =

@@ -5,6 +5,12 @@
 
 void print_press_msg(RIGHT_PANEL_STATE *rps)
 {
+    char blank_line[rps->window_width - 4]; memset(blank_line, 32, sizeof(blank_line));
+    memset(&blank_line[sizeof(blank_line) - 1], '\0', 1);
+
+    mvwprintw(rps->right_panel, LINES - 5, 3, "%s",
+              blank_line);
+
     if (rps->curr_item < rps->num_of_section_items[rps->curr_section])
     {
         char *press_space = "Press SPACE to continue";

@@ -43,6 +43,8 @@ void create_user_form(WINDOW **window, FORM **user_form, FIELD **fields);
 
 void update_line_numbers(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
                          int *scroll_offset, int lines_to_print);
+void print_matches(pcre2_code *re, int i, size_t subject_length, char *line_buf,
+                   int group, WINDOW **edit_window, int color);
 void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
                   WINDOW **line_num_win, int *scroll_offset,
                   int lines_to_print);

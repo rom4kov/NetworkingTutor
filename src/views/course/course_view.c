@@ -34,9 +34,9 @@ void create_course_view(APP_CONTEXT *ctx)
         create_right_side_panel(ctx, " Course instructions ");
     ctx->course_windows[4] = create_progress_window(ctx);
 
-    ctx->line_num_win = derwin(ctx->course_windows[2], LINES - 6, 3, 2, 1);
+    ctx->line_num_win = derwin(ctx->course_windows[2], LINES - 7, 3, 2, 1);
     ctx->edit_window =
-        derwin(ctx->course_windows[2], LINES - 6, WU * 5 + (WU / 2) - 2, 2, 5);
+        derwin(ctx->course_windows[2], LINES - 7, WU * 5 + (WU / 2) - 2, 2, 5);
 
     if (ctx->file == NULL)
     {

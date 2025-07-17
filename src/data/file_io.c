@@ -201,6 +201,10 @@ void open_file(APP_CONTEXT *ctx)
         print_buffer(ctx->t_buffer, &ctx->edit_window, &ctx->line_num_win,
                      &ctx->scroll_offset, ctx->lines_to_print);
 
+        if (file_size < 1000)
+            mvwprintw(ctx->course_windows[2], LINES - 5, 2, "%iB", file_size);
+        else
+            mvwprintw(ctx->course_windows[2], LINES - 5, 2, "%.1fk", (1.0 * file_size / 1000));
         mvwprintw(ctx->edit_window, LINES - 7, EDIT_MAX - 15, "     ");
         mvwprintw(ctx->edit_window, LINES - 7, EDIT_MAX - 15, "0 : 0");
 

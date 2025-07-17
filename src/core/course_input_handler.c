@@ -232,10 +232,10 @@ void handle_course_input(APP_CONTEXT *ctx)
                         char blank_line[ctx->rp_state->window_width - 4]; memset(blank_line, 32, sizeof(blank_line));
                         memset(&blank_line[sizeof(blank_line) - 1], '\0', 1);
 
-                        mvwprintw(ctx->rp_state->right_panel, 9, 3, "%s",
+                        mvwprintw(ctx->rp_state->right_panel, LINES - 5, 3, "%s",
                                   blank_line);
-                        mvwprintw(ctx->rp_state->right_panel, 11, 3, "%s",
-                                  blank_line);
+                        // mvwprintw(ctx->rp_state->right_panel, 9, 3, "%s",
+                        //           blank_line);
                     }
                     deallocate_it_buffer(ctx->rp_state->it_buffer);
                     ctx->rp_state->it_buffer = initialize_it_buffer();
@@ -300,6 +300,7 @@ void handle_course_input(APP_CONTEXT *ctx)
                 if (ctx->rp_state->curr_section <
                     ctx->rp_state->sections_completed)
                 {
+                    ctx->rp_state->test_mode = false;
                     ctx->rp_state->curr_section++;
                     get_course_progress(ctx);
                     ctx->rp_state->curr_item =

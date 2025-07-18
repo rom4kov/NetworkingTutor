@@ -43,12 +43,13 @@ void create_user_form(WINDOW **window, FORM **user_form, FIELD **fields);
 
 void update_line_numbers(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
                          int *scroll_offset, int lines_to_print);
-void print_matches(pcre2_code *re, int i, size_t subject_length, char *line_buf,
-                   int group, WINDOW **edit_window, int color);
+void print_matches(pcre2_code **re, int line_num, int j, size_t subject_length,
+                   LINE *current_line, int group, WINDOW **edit_window,
+                   int color);
 void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
                   WINDOW **line_num_win, int *scroll_offset,
                   int lines_to_print);
-void print_line(char *line_buf, int line_num, WINDOW **edit_window);
+void print_line(LINE *current_line, int line_num, WINDOW **edit_window);
 void print_line_nr(WINDOW **edit_window, TEXT_BUFFER *tbuf);
 char *match_file_icon(pcre2_code *re, int subj_len, char *filename, char *icon,
                     int color);

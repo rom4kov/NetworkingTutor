@@ -75,3 +75,4 @@ void create_directory(APP_CONTEXT *ctx, WINDOW **inner_win,
                       WINDOW **form_window, FORM **new_file_form,
                       FIELD **field);
 void create_keybinds_window(WINDOW **explorer_window);
+void create_keybinds_window(WINDOW **explorer_window);

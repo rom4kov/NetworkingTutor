@@ -1,10 +1,12 @@
-// #include <pcre.h>
+#include "../../data/data_access_layer.h"
 #include "../../models/models.h"
 
 #include <curses.h>
 #include <ncurses.h>
 #include <pcre.h>
 #include <stdbool.h>
+#include <stddef.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define PCRE2_CODE_UNIT_WIDTH 8
@@ -74,15 +76,67 @@ void compile_patterns(pcre2_code **re, int p_codes_num, char **pattern_str)
     }
 }
 
-void print_matches(pcre2_code *re, int i, size_t subject_length, char *line_buf,
-                   int group, WINDOW **edit_window, int color)
+void print_matches(pcre2_code **re, int line_num, int j, size_t subject_length,
+                   LINE *current_line, int group, WINDOW **edit_window,
+                   int color)
 {
-    PCRE2_SPTR subject = (PCRE2_SPTR)line_buf;
-    pcre2_match_data *md = pcre2_match_data_create_from_pattern(re, NULL);
+    PCRE2_SPTR subject = (PCRE2_SPTR)current_line->buf_;
+    pcre2_match_data *md = pcre2_match_data_create_from_pattern(re[j], NULL);
     if (!md)
         return;
 
-    int rc = pcre2_match(re, subject, subject_length, 0, 0, md, NULL);
+    int rc = pcre2_match(re[j], subject, subject_length, 0, 0, md, NULL);
+    if (j == 5 && rc > 0)
+    {
+        char *extended_buf = calloc(500, sizeof(char));
+        LINE *temp_line = initialize_line();
+        temp_line = current_line;
+        // while (temp_line != NULL && i < 5)
+        // {
+        //     strcat(extended_buf, temp_line->buf_);
+        //     temp_line = temp_line->next;
+        //     i++;
+        // }
+        int i = 0;
+        int paren_depth = 0;
+        bool closing_bracket_reached = false;
+        strcat(extended_buf, temp_line->buf_);
+        while (temp_line != NULL && !closing_bracket_reached)
+        {
+            if (temp_line->buf_[i] == '(')
+            {
+                paren_depth++;
+            }
+            else if (temp_line->buf_[i] == '\0')
+            {
+                temp_line = temp_line->next;
+                if (temp_line != NULL)
+                    strcat(extended_buf, temp_line->buf_);
+                i = 0;
+                continue;
+            }
+            else if (temp_line->buf_[i] == ')')
+            {
+                paren_depth--;
+                if (paren_depth == 0)
+                    closing_bracket_reached = true;
+            }
+            i++;
+        }
+        if (!closing_bracket_reached)
+            return;
+        extended_buf[strlen(extended_buf)] = '\0';
+
+        subject_length = strlen(extended_buf);
+
+        subject = (PCRE2_SPTR)extended_buf;
+        md = pcre2_match_data_create_from_pattern(re[4], NULL);
+        if (!md)
+            return;
+        // mvwprintw(*edit_window, 30, 1, "%s", extended_buf);
+        rc = pcre2_match(re[4], subject, subject_length, 0, 0, md, NULL);
+        free(extended_buf);
+    }
     int line_len = 0;
 
     while (rc > 0)
@@ -94,13 +148,14 @@ void print_matches(pcre2_code *re, int i, size_t subject_length, char *line_buf,
         wattron(*edit_window, COLOR_PAIR(color));
         for (PCRE2_SIZE k = start; k < end; k++)
         {
-            mvwprintw(*edit_window, i, k, "%c", line_buf[k]);
+            mvwprintw(*edit_window, line_num, k, "%c", current_line->buf_[k]);
         }
         wattroff(*edit_window, COLOR_PAIR(color));
 
         line_len = (int)end > line_len ? (int)end : line_len + 1;
 
-        rc = pcre2_match(re, subject, subject_length, line_len, 0, md, NULL);
+        rc = pcre2_match(re[j == 5 ? 4 : j], subject, subject_length, line_len,
+                         0, md, NULL);
     }
 
     pcre2_match_data_free(md);
@@ -118,8 +173,10 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
         current_line = current_line->next;
     }
 
-    int pattern_num = 9;
+    int pattern_num = 10;
+
     pcre2_code *re[pattern_num];
+
     char *patterns[] = {
         ".",
         "\\b(void|int|char|return|for|while|if|else|break|continue|bool|switch|"
@@ -127,13 +184,15 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
         "case|default)\\b",
         "#(include|define)|NULL|=|\\+|\\-|\\*|\\&|<|>|;",
         "(\".*\"|<.*\\.h>)",
-        "([a-z0-9_]*)\\(.*\\)",
+        "(?s)\\b([a-z0-9_]*)\\(.*\\)",
+        "([a-z0-9_]*)\\(.*",
         "\\b(?:\\d+(\\.\\d+)?|true|false)\\b",
         "(?<=\\bstruct )\\w+",
         "(?<=(->|\\.))\\w+\\s",
         "(//.*|/\\*.*\\*/)",
     };
-    int colors[] = {1, 8, 6, 4, 7, 9, 14, 15, 10};
+
+    int colors[] = {1, 8, 6, 4, 7, 7, 9, 14, 15, 10};
 
     compile_patterns(re, pattern_num, patterns);
 
@@ -145,8 +204,9 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
 
             for (int j = 0; j < pattern_num; j++)
             {
-                print_matches(re[j], i, subj_len, current_line->buf_,
-                              j == 4 ? 2 : 0, edit_window, colors[j]);
+                print_matches(re, i, j, subj_len, current_line,
+                              (j == 4 || j == 5) ? 2 : 0, edit_window,
+                              colors[j]);
             }
 
             current_line = current_line->next;
@@ -159,9 +219,9 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
     update_line_numbers(tbuf, line_num_win, scroll_offset, lines_to_print);
 }
 
-void print_line(char *line_buf, int line_num, WINDOW **edit_window)
+void print_line(LINE *current_line, int line_num, WINDOW **edit_window)
 {
-    int pattern_num = 9;
+    int pattern_num = 10;
     pcre2_code *re[pattern_num];
     char *patterns[] = {
         ".",
@@ -170,21 +230,22 @@ void print_line(char *line_buf, int line_num, WINDOW **edit_window)
         "case|default)\\b",
         "#(include|define)|NULL|=|\\+|\\-|\\*|\\&|<|>|;",
         "(\".*\"|<.*\\.h>)",
-        "([a-z0-9_]*)\\(.*\\)",
+        "(?s)\\b([a-z0-9_]*)\\(.*\\)",
+        "([a-z0-9_]*)\\(.*",
         "\\b(?:\\d+(\\.\\d+)?|true|false)\\b",
         "(?<=\\bstruct )\\w+",
         "(?<=(->|\\.))\\w+\\s",
         "(//.*|/\\*.*\\*/)",
     };
-    int colors[] = {1, 8, 6, 4, 7, 9, 14, 15, 10};
-    size_t subj_len = strlen(line_buf);
+    int colors[] = {1, 8, 6, 4, 7, 7, 9, 14, 15, 10};
+    size_t subj_len = strlen(current_line->buf_);
 
     compile_patterns(re, pattern_num, patterns);
 
     for (int i = 0; i < pattern_num; i++)
     {
-        print_matches(re[i], line_num, subj_len, line_buf, i == 4 ? 2 : 0,
-                      edit_window, colors[i]);
+        print_matches(re, line_num, i, subj_len, current_line,
+                      (i == 4 || i == 5) ? 2 : 0, edit_window, colors[i]);
     }
 
     for (int i = 0; i < pattern_num; i++)

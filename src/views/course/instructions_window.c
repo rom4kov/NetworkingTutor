@@ -133,7 +133,7 @@ void print_next_course_item(RIGHT_PANEL_STATE *rp_state)
         }
         else if (current_line->syntax_hl == true)
         {
-            print_line(current_line->buf_, j, &rp_state->inner_win);
+            print_line((LINE *)current_line, j, &rp_state->inner_win);
         }
 
         current_line = current_line->next;

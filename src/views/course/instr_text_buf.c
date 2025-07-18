@@ -124,6 +124,8 @@ void read_item_into_buffer(APP_CONTEXT *ctx)
             if (ctx->rp_state->course_section_data[i].content[j] == '\0')
             {
                 curr_line->buf_[k] = '\n';
+                if (ctx->rp_state->course_section_data[i].syntax_hl == true)
+                    curr_line->syntax_hl = true;
                 if (ctx->rp_state->course_section_data[i].section_id == 0 &&
                     ctx->rp_state->course_section_data[i].order_num == 0)
                     curr_line->centered = true;

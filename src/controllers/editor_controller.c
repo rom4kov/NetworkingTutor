@@ -46,7 +46,9 @@ void handle_editor_input(APP_CONTEXT *ctx)
             break;
         case 9:
             insert_tab(ctx->t_buffer, &ctx->edit_window,
-                       &ctx->course_windows[2], ctx->y, ctx->x);
+                       &ctx->course_windows[2], ctx->y, ctx->x,
+                       &ctx->line_num_win, &ctx->lines_to_print,
+                       &ctx->scroll_offset);
             break;
         case 10:
             insert_line(ctx->t_buffer, &ctx->edit_window,
@@ -74,7 +76,8 @@ void handle_editor_input(APP_CONTEXT *ctx)
         default:
             insert_char(ctx->t_buffer, &ctx->edit_window,
                         &ctx->course_windows[2], ctx->scroll_offset, ctx->y,
-                        ctx->x, ctx->key);
+                        ctx->x, ctx->key, &ctx->line_num_win,
+                        &ctx->lines_to_print);
             break;
     }
 }

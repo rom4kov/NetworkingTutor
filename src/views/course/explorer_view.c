@@ -112,6 +112,13 @@ void print_entries(FILE_TREE *f_tree, WINDOW **explorer_window)
         }
         f_tree->current_entry = f_tree->current_entry->next;
     }
+
+    wattron(*explorer_window, COLOR_PAIR(11));
+    for (int i = items; i < LINES - 4; i++)
+    {
+        mvwprintw(*explorer_window, i, 1, "%s", i % 2 == 0 ? "`" : " ");
+    }
+    wattroff(*explorer_window, COLOR_PAIR(11));
 }
 
 void move_to_next_entry(FILE_TREE *f_tree, WINDOW **explorer_window)

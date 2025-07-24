@@ -12,9 +12,10 @@ VALUES
         1,
         2,
         "",
-        'In order to make an HTTP server work the first thing we need to do is
-to tell it what the address and port is on which it should listen for incoming
-connection requests and data.',
+        "Before an HTTP server can listen for incoming connections, it needs
+to know on which address and port to listen. There are two main approaches for
+specifying this information in C: the old manual way and the newer, more
+portable way using getaddrinfo().",
         0,
         0
     );
@@ -32,12 +33,53 @@ VALUES
     (
         1,
         2,
-        "",
-        "There is an old and a new way of achieving this. The old one was to
-manually fill out a struct called 'sockaddr_in', putting in the desired address
-and port number, the version of the IP protocol one wants to use and other
-relevant information:",
+        "The Old Way: Manually Filling a sockaddr_in Struct",
+        "There is an old and a new way of achieving this. Historically,
+programmers manually filled a sockaddr_in struct like this:",
         1,
+        0
+    );
+
+INSERT
+    OR IGNORE INTO materials (
+        course_id,
+        section_id,
+        content_title,
+        content,
+        order_num,
+        syntax_highlighting
+    )
+VALUES
+    (
+        1,
+        2,
+        "",
+        "#include <netinet/in.h>@
+@
+struct sockaddr_in addr;@
+addr.sin_family = AF_INET;@
+addr.sin_port = htons(8080);@
+addr.sin_addr.s_addr = INADDR_ANY;",
+        2,
+        1
+    );
+
+INSERT
+    OR IGNORE INTO materials (
+        course_id,
+        section_id,
+        content_title,
+        content,
+        order_num,
+        syntax_highlighting
+    )
+VALUES
+    (
+        1,
+        2,
+        "",
+        "This approach uses the sockaddr_in struct:",
+        3,
         0
     );
 
@@ -57,18 +99,12 @@ VALUES
         "",
         "// From the man page for `sockaddr_in`:@
 @
-#include <netinet/in.h>@
-@
 struct sockaddr_in {@
-  sa_family_t     sin_family;     /* AF_INET */@
-  in_port_t       sin_port;       /* Port number */@
-  struct in_addr  sin_addr;       /* IPv4 address */@
-};@
-@
-struct in_addr {@
-    uint32_t s_addr;@
+    sa_family_t     sin_family;     /* AF_INET */@
+    in_port_t       sin_port;       /* Port number */@
+    struct in_addr  sin_addr;       /* IPv4 address */@
 };",
-        2,
+        4,
         1
     );
 
@@ -86,10 +122,48 @@ VALUES
         1,
         2,
         "",
-        "This `sockaddr_in` stuct in turn was invented as a variation to
-an older struct called `sockaddr`, to provide a better way to deal specifically
-with internet domain sockets that use IPv4 (therefore the '_in' in its name.):",
-        3,
+        "The sin_addr field is itself a struct:",
+        5,
+        0
+    );
+
+INSERT
+    OR IGNORE INTO materials (
+        course_id,
+        section_id,
+        content_title,
+        content,
+        order_num,
+        syntax_highlighting
+    )
+VALUES
+    (
+        1,
+        2,
+        "",
+        "struct in_addr {@
+    uint32_t s_addr;@
+};",
+        6,
+        1
+    );
+
+INSERT
+    OR IGNORE INTO materials (
+        course_id,
+        section_id,
+        content_title,
+        content,
+        order_num,
+        syntax_highlighting
+    )
+VALUES
+    (
+        1,
+        2,
+        "",
+        "This was introduced as an IPv4-specific alternative to the more generic:",
+        7,
         0
     );
 
@@ -115,97 +189,84 @@ struct sockaddr {@
   sa_family_t     sa_family;      /* Address family */@
   char            sa_data[];      /* Socket address */@
 };",
-        4,
-        1
-    );
-
-INSERT
-    OR IGNORE INTO materials (
-        course_id,
-        section_id,
-        content_title,
-        content,
-        order_num,
-        syntax_highlighting
-    )
-VALUES
-    (
-        1,
-        2,
-        "",
-        "These two structs can be type-cast to each other without problem.
-And this is actually important to remember, since you will have to do exactly
-this later, when you pass the information to structs like bind() and connect().@
-@
-You used the struct like this (and one can still see this in a lot of older and 
-even not-so-old socket code):",
-        5,
-        0
-    );
-
-INSERT
-    OR IGNORE INTO materials (
-        course_id,
-        section_id,
-        content_title,
-        content,
-        order_num,
-        syntax_highlighting
-    )
-VALUES
-    (
-        1,
-        2,
-        "",
-        "struct sockaddr_in addr;@
-addr.sin_family = AF_INET;@
-addr.sin_port = htons(8080);@
-addr.sin_addr.s_addr = INADDR_ANY;",
-        6,
-        1
-    );
-
-INSERT
-    OR IGNORE INTO materials (
-        course_id,
-        section_id,
-        content_title,
-        content,
-        order_num,
-        syntax_highlighting
-    )
-VALUES
-    (
-        1,
-        2,
-        "",
-        "Then later you would pass the struct to the bind() or some other syscall.@
-@
-But what are the all these fields inside the struct and what values do you assign to
-them? Let's go through them one by one.",
-        7,
-        0
-    );
-
-INSERT
-    OR IGNORE INTO materials (
-        course_id,
-        section_id,
-        content_title,
-        content,
-        order_num,
-        syntax_highlighting
-    )
-VALUES
-    (
-        1,
-        2,
-        "",
-        "The field `sin_family` which is of the type `sa_family_t` specifies
-the (socket) address family. In our case you put AF_INET here, which stands for
-Internet Protocol version 4 (IPv4). As you surely remember ;), IP is the main
-protocol of layer 3, the network layer, as we learned in the last section.",
         8,
+        1
+    );
+
+INSERT
+    OR IGNORE INTO materials (
+        course_id,
+        section_id,
+        content_title,
+        content,
+        order_num,
+        syntax_highlighting
+    )
+VALUES
+    (
+        1,
+        2,
+        "",
+        "Both types are compatible, and you’ll often cast a sockaddr_in* to
+sockaddr* when using functions like bind().",
+        9,
+        0
+    );
+
+INSERT
+    OR IGNORE INTO materials (
+        course_id,
+        section_id,
+        content_title,
+        content,
+        order_num,
+        syntax_highlighting
+    )
+VALUES
+    (
+        1,
+        2,
+        'Explanation of the Fields',
+        '• sin_family = AF_INET specifies the IPv4 protocol (Layer 3).@
+@
+• sin_port = htons(8080) sets the port to 8080, converting it to network byte
+order (big endian), which is required by the kernel.@
+@
+• sin_addr.s_addr = INADDR_ANY means "listen on all available interfaces"
+(i.e., 0.0.0.0).@
+@
+To connect to a specific IP instead, you’d use inet_pton() to convert an IP
+address string to binary format.',
+        10,
+        0
+    );
+
+INSERT
+    OR IGNORE INTO materials (
+        course_id,
+        section_id,
+        content_title,
+        content,
+        order_num,
+        syntax_highlighting
+    )
+VALUES
+    (
+        1,
+        2,
+        'The Modern Way: Using getaddrinfo()',
+        'Manually configuring address structs works, but it’s limited:@
+@
+• It only supports IPv4.@
+@
+• It can’t resolve domain names (no DNS support).@
+@
+• It’s less portable across systems.@
+@
+• You can’t use service names like "http".@
+@
+To address these issues, POSIX introduced getaddrinfo():',
+        11,
         0
     );
 
@@ -223,11 +284,66 @@ VALUES
         1,
         2,
         "",
-        "Next comes the field `sin_port` of type `in_port_t`. It allows us
-to define which port we want our server to listen on. But there's a tricky
-part about this: we can't just put a plain old integer here. Since network
-addresses and port numbers are dealt with in binary form in the kernel there
-can be two forms of notation, big endian and little endian.",
+        "#include <sys/types.h>@
+#include <sys/socket.h>@
+#include <netdb.h>@
+@
+int getaddrinfo(const char *restrict node,@
+                const char *restrict service,@
+                const struct addrinfo *restrict hints,@
+                struct addrinfo **restrict res);@
+@
+void freeaddrinfo(struct addrinfo *res);@
+@
+const char *gai_strerror(int errcode);",
+        12,
+        1
+    );
+
+INSERT
+    OR IGNORE INTO materials (
+        course_id,
+        section_id,
+        content_title,
+        content,
+        order_num,
+        syntax_highlighting
+    )
+VALUES
+    (
+        1,
+        2,
+        "",
+        "struct addrinfo hints, *res;@
+@
+memset(&hints, 0, sizeof(hints));@
+@
+hints.ai_family = AF_UNSPEC;@
+hints.ai_socktype = SOCK_STREAM;@
+hints.ai_flags = AI_PASSIVE;",
+        13,
+        1
+    );
+
+INSERT
+    OR IGNORE INTO materials (
+        course_id,
+        section_id,
+        content_title,
+        content,
+        order_num,
+        syntax_highlighting
+    )
+VALUES
+    (
+        1,
+        2,
+        "",
+        "Next comes the field `sin_port` of type `in_port_t`. It allows us to 
+define which port we want our server to listen on, so we're now on layer 4. But
+there's a tricky part about this: we can't just put a plain old integer here.
+Since network addresses and port numbers are dealt with in binary form in the
+kernel there can be two forms of notation, big endian and little endian.",
         9,
         0
     );
@@ -246,7 +362,7 @@ VALUES
         1,
         2,
         "",
-  "And because the network stack uses the big endian notation, but some operating
+        "And because the network stack uses the big endian notation, but some operating
 systems use little endian we have to convert the from one to the other when setting
 the value of this field. There are special functions that do this for us: ntohs()
 converts from network byte order to host byte order and htons() vice versa (h to n,
@@ -333,7 +449,7 @@ VALUES
     (
         1,
         2,
-        "",
+        "The modern way: getaddrinfo()",
         "As you can already see, all this manual configuration amounts to quite
 effort. But apart from that it also has a couple of other drawbacks, especially
 hen a server application becomes more complex and has to scale to meet more
@@ -400,18 +516,91 @@ VALUES
         1,
         2,
         "",
-        "#include <sys/types.h>@
-#include <sys/socket.h>@
-#include <netdb.h>@
+        "To use it you have to pass it four arguments:@
 @
-int getaddrinfo(const char *restrict node,@
-                const char *restrict service,@
-                const struct addrinfo *restrict hints,@
-                struct addrinfo **restrict res);@
+• the Internet host (`node`) - an IP address or a domain name@
+• the port or service you want to use@
+• some 'hints' in the form of a struct `addrinfo`@
+• another struct addrinfo that will be filled out with the@
+  results of the function call (`res` in the prototype)@
 @
-void freeaddrinfo(struct addrinfo *res);@
+This means you first fill out the hints addrinfo struct like this (after
+zeroing it out useing memset):",
+        18,
+        0
+    );
+
+INSERT
+    OR IGNORE INTO materials (
+        course_id,
+        section_id,
+        content_title,
+        content,
+        order_num,
+        syntax_highlighting
+    )
+VALUES
+    (
+        1,
+        2,
+        "",
+        "Here we choose AF_UNSPEC for the ai_family field, which tells
+getaddrinfo to return a address for any address family (either IPv4 or IPv6).
+But you could also put AF_INET for IPv4 or AF_INET6 for IPv6 if getting a
+specific address family is important to you intructions." ,
+        20,
+        0
+    );
+
+INSERT
+    OR IGNORE INTO materials (
+        course_id,
+        section_id,
+        content_title,
+        content,
+        order_num,
+        syntax_highlighting
+    )
+VALUES
+    (
+        1,
+        2,
+        "",
+        "For the socket type we pick SOCK_STREAM which gives us a TCP socket,
+providing a stable and reliable connection (as discussed in the previous section
+of this course). The value AI_PASSIVE for the field `ai_flags` will (if the `node`
+parameter of getaddrinfo is set to NULL) return a 'wildcard address' like 
+INADDR_ANY did in the 'old way' that is suitable to use with later syscalls like
+bind() and and accept() that are needed to build a server." ,
+        21,
+        0
+    );
+
+INSERT
+    OR IGNORE INTO materials (
+        course_id,
+        section_id,
+        content_title,
+        content,
+        order_num,
+        syntax_highlighting
+    )
+VALUES
+    (
+        1,
+        2,
+        "",
+        "The actual implementation of the call to getaddrinfo is your task now.
+To complete this sections's test you have to not only pass it the right parameters
+but also:@
 @
-const char *gai_strerror(int errcode);@",
-        17,
-        1
+• include the necessary header files@
+• declare the hints struct and initialize the three fields we discussed above@
+• handle possible errors by saving the return value in a variable@
+• print the error message with the gai_strerror function to stderr@
+• copy the results struct into a new one that you allocated memory for@
+• free the results addrinfo struct with freeaddrinfo@
+• return the copy of the results struct" ,
+        22,
+        0
     );

@@ -91,12 +91,7 @@ void print_matches(pcre2_code **re, int line_num, int j, size_t subject_length,
         char *extended_buf = calloc(500, sizeof(char));
         LINE *temp_line = initialize_line();
         temp_line = current_line;
-        // while (temp_line != NULL && i < 5)
-        // {
-        //     strcat(extended_buf, temp_line->buf_);
-        //     temp_line = temp_line->next;
-        //     i++;
-        // }
+
         int i = 0;
         int paren_depth = 0;
         bool closing_bracket_reached = false;
@@ -133,7 +128,6 @@ void print_matches(pcre2_code **re, int line_num, int j, size_t subject_length,
         md = pcre2_match_data_create_from_pattern(re[4], NULL);
         if (!md)
             return;
-        // mvwprintw(*edit_window, 30, 1, "%s", extended_buf);
         rc = pcre2_match(re[4], subject, subject_length, 0, 0, md, NULL);
         free(extended_buf);
     }
@@ -188,7 +182,7 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
         "([a-z0-9_]*)\\(.*",
         "\\b(?:\\d+(\\.\\d+)?|true|false)\\b",
         "(?<=\\bstruct )\\w+",
-        "(?<=(->|\\.))\\w+\\s",
+        "(?<=(->|\\.))\\w+(?!(>|\"))",
         "(//.*|/\\*.*\\*/)",
     };
 
@@ -234,7 +228,7 @@ void print_line(LINE *current_line, int line_num, WINDOW **edit_window)
         "([a-z0-9_]*)\\(.*",
         "\\b(?:\\d+(\\.\\d+)?|true|false)\\b",
         "(?<=\\bstruct )\\w+",
-        "(?<=(->|\\.))\\w+\\s",
+        "(?<=(->|\\.))\\w+(?!(>|\"))",
         "(//.*|/\\*.*\\*/)",
     };
     int colors[] = {1, 8, 6, 4, 7, 7, 9, 14, 15, 10};

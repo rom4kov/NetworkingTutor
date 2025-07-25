@@ -49,6 +49,12 @@ void add_line_break(RIGHT_PANEL_STATE *rps, I_LINE **curr_line, int i, int *j,
         (*curr_line)->prev = rps->it_buffer->current_line;
         rps->it_buffer->current_line = *curr_line;
         *curr_line = initialize_iline();
+        if (strstr(rps->it_buffer->current_line->buf_, "•") && overflow)
+        {
+            (*curr_line)->buf_[0] = ' ';
+            (*curr_line)->buf_[1] = ' ';
+            *k += 2;
+        }
     }
 }
 

@@ -178,9 +178,10 @@ void handle_course_input(APP_CONTEXT *ctx)
                         ->num_of_section_items[ctx->rp_state->curr_section])
                 {
                     ctx->rp_state->curr_item++;
+                    werase(ctx->rp_state->inner_win);
                     set_items_completed(ctx);
                     print_next_course_item(ctx->rp_state);
-                    log_course_instr_values(ctx);
+                    // log_course_instr_values(ctx);
 
                     if ((ctx->rp_state->curr_item ==
                         ctx->rp_state->num_of_section_items[ctx->rp_state->curr_section]) &&

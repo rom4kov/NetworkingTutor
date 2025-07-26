@@ -11,37 +11,43 @@
 #include <ncurses.h>
 #include <unistd.h>
 
-int perform_tests(APP_CONTEXT *ctx)
+int initialize_testing(APP_CONTEXT *ctx)
 {
-    bool is_in_failure_list = false;
+    ctx->is_in_failure_list = false;
 
-    CU_ErrorCode ec = CU_initialize_registry();
-    if (ec != CUE_SUCCESS)
+    ctx->ec = CU_initialize_registry();
+    if (ctx->ec != CUE_SUCCESS)
     {
         return 1;
     }
 
-    CU_pSuite sp = CU_add_suite("http_server_test_suite_01", NULL, NULL);
-    ec = CU_get_error();
-    if (ec != CUE_SUCCESS)
+    return 0;
+}
+
+int perform_tests(APP_CONTEXT *ctx)
+{
+
+    ctx->sp = CU_add_suite("http_server_test_suite_01", NULL, NULL);
+    ctx->ec = CU_get_error();
+    if (ctx->ec != CUE_SUCCESS)
     {
         const char *err_msg = CU_get_error_msg();
         mvwprintw(ctx->course_windows[4], 1, 0, "%s", err_msg);
     }
 
-    CU_add_test(sp, "answers file exists",
+    CU_add_test(ctx->sp, "answers file exists",
                 (CU_TestFunc)test_if_answers_file_exists);
-    ec = CU_get_error();
-    if (ec != CUE_SUCCESS)
+    ctx->ec = CU_get_error();
+    if (ctx->ec != CUE_SUCCESS)
     {
         const char *err_msg = CU_get_error_msg();
         mvwprintw(ctx->course_windows[4], 1, 0, "%s", err_msg);
     }
 
-    CU_add_test(sp, "answers file contains correct answers",
+    CU_add_test(ctx->sp, "answers file contains correct answers",
                 (CU_TestFunc)test_if_answers_file_contains_correct_answers);
-    ec = CU_get_error();
-    if (ec != CUE_SUCCESS)
+    ctx->ec = CU_get_error();
+    if (ctx->ec != CUE_SUCCESS)
     {
         const char *err_msg = CU_get_error_msg();
         mvwprintw(ctx->course_windows[4], 1, 0, "%s", err_msg);
@@ -52,11 +58,11 @@ int perform_tests(APP_CONTEXT *ctx)
     int saved_stdout = dup(STDOUT_FILENO);
     suppress_stdout();
 
-    ec = CU_basic_run_tests();
+    ctx->ec = CU_basic_run_tests();
 
     restore_stdout(saved_stdout);
 
-    if (ec != CUE_SUCCESS)
+    if (ctx->ec != CUE_SUCCESS)
     {
         const char *err_msg = CU_get_error_msg();
         mvwprintw(ctx->course_windows[4], 1, 0, "%s", err_msg);
@@ -106,11 +112,11 @@ int perform_tests(APP_CONTEXT *ctx)
             {
                 if (strcmp(test->pName, fail_rec->pTest->pName) == 0)
                 {
-                    is_in_failure_list = true;
+                    ctx->is_in_failure_list = true;
                 }
                 fail_rec = fail_rec->pNext;
             }
-            if (is_in_failure_list == false)
+            if (ctx->is_in_failure_list == false)
             {
                 wattron(ctx->rp_state->inner_win, COLOR_PAIR(4));
                 mvwprintw(ctx->rp_state->inner_win, 15 + i, 0, "%s PASSED",
@@ -118,14 +124,15 @@ int perform_tests(APP_CONTEXT *ctx)
                 wattroff(ctx->rp_state->inner_win, COLOR_PAIR(4));
                 i++;
             }
-            is_in_failure_list = false;
+            ctx->is_in_failure_list = false;
             test = test->pNext;
             fail_rec = first_rec;
         }
     }
 
     wrefresh(ctx->rp_state->inner_win);
-    print_section_or_task_compl_msg(ctx, run_sum);
+    if (run_sum->nTestsFailed == 0)
+        print_section_or_task_compl_msg(ctx, run_sum);
     // wnoutrefresh(ctx->course_windows[4]);
     doupdate();
 

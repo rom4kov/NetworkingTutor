@@ -28,8 +28,13 @@ int answers_file_contains_correct_answers(char *path)
     read_file_into_buffer(answers_file, text_buf);
     LINE *buf_line = text_buf->first_line;
 
-    if (strcasestr(buf_line->buf_, "Layer 7, Application, HTTP") == NULL &&
-        strcasestr(buf_line->next->buf_, "Layer 4, Transport, TCP") == NULL &&
+    if (buf_line->next == NULL)
+    {
+        return 1;
+    }
+
+    if (strcasestr(buf_line->buf_, "Layer 7, Application, HTTP") == NULL ||
+        strcasestr(buf_line->next->buf_, "Layer 4, Transport, TCP") == NULL ||
         strcasestr(buf_line->next->next->buf_, "Layer 3, Network, IP") == NULL)
     {
         return 1;

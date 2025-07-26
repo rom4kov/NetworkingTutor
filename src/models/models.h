@@ -4,6 +4,8 @@
 #include <menu.h>
 #include <ncurses.h>
 #include <sqlite3.h>
+#include <CUnit/Basic.h>
+#include <CUnit/CUError.h>
 
 #define START_WINDOW_COUNT 6
 #define COURSE_WINDOW_COUNT 5
@@ -168,6 +170,8 @@ typedef struct _app_context
     char *curr_file_path;
     char *current_course;
     TEXT_BUFFER *t_buffer;
+    CU_ErrorCode ec; 
+    CU_pSuite sp;
     int key;
     int active_window;
     int current_user_id;
@@ -187,4 +191,5 @@ typedef struct _app_context
     bool course_view_active;
     bool editor_mode;
     bool explorer_mode;
+    bool is_in_failure_list;
 } APP_CONTEXT;

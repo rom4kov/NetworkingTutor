@@ -1,7 +1,9 @@
 #include "../../data/data_access_layer.h"
 #include "../../views/views.h"
 #include "../tests.h"
+#include <CUnit/CUError.h>
 #include <CUnit/CUnit.h>
+#include <CUnit/TestDB.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -35,29 +37,34 @@ int server_c_file_contains_correct_hints_struct_decl(char *path)
     read_file_into_buffer(server_c_file, text_buf);
     LINE *buf_line = text_buf->first_line;
 
-    int pattern_num = 4;
+    int pattern_num = 2;
 
     pcre2_code *re[pattern_num];
 
     char *patterns[] = {
         "^\\s*struct\\s+addrinfo\\s+hints(\\s*=\\s*{[^}]*})?\\s*",
-        "struct|",
-        "case|default)\\b",
-        "#(include|define)|NULL|=|\\+|\\-|\\*|\\&|<|>|;",
+        "hints.ai_family",
+        // "case|default)\\b",
+        // "#(include|define)|NULL|=|\\+|\\-|\\*|\\&|<|>|;",
     };
 
     compile_patterns(re, pattern_num, patterns);
 
     for (int i = 0; i < pattern_num; i++)
     {
+        bool pattern_matched = false;
         while (buf_line)
         {
             rc = check_line_for_matches(buf_line, i, &re[i],
                                         strlen(buf_line->buf_));
-            if (rc < 0)
-                return -1;
-            else
-                buf_line = buf_line->next;
+            if (rc >= 0)
+                pattern_matched = true;
+
+            buf_line = buf_line->next;
+        }
+        if (!pattern_matched)
+        {
+            return 1;
         }
     }
 
@@ -85,4 +92,33 @@ void test_if_server_c_file_contains_hints_struct_decl(void)
         does_server_file_contain_correct_hints_struct_decl = true;
     }
     CU_ASSERT(does_server_file_contain_correct_hints_struct_decl);
+}
+
+void register_section2_tests(APP_CONTEXT *ctx)
+{
+    ctx->sp[1] = CU_add_suite("http_server_02", NULL, NULL);
+    ctx->ec = CU_get_error();
+    if (ctx->ec != CUE_SUCCESS)
+    {
+        const char *err_msg = CU_get_error_msg();
+        mvwprintw(ctx->course_windows[4], 1, 0, "%s", err_msg);
+    }
+
+    CU_add_test(ctx->sp[1], "server.c file exists",
+                (CU_TestFunc)test_if_server_c_file_exists);
+    ctx->ec = CU_get_error();
+    if (ctx->ec != CUE_SUCCESS)
+    {
+        const char *err_msg = CU_get_error_msg();
+        mvwprintw(ctx->course_windows[4], 1, 0, "%s", err_msg);
+    }
+
+    CU_add_test(ctx->sp[1], "server.c file contains hints struct declaration",
+                (CU_TestFunc)test_if_server_c_file_contains_hints_struct_decl);
+    ctx->ec = CU_get_error();
+    if (ctx->ec != CUE_SUCCESS)
+    {
+        const char *err_msg = CU_get_error_msg();
+        mvwprintw(ctx->course_windows[4], 1, 0, "%s", err_msg);
+    }
 }

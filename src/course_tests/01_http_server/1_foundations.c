@@ -64,3 +64,32 @@ void test_if_answers_file_contains_correct_answers(void)
     }
     CU_ASSERT(does_answers_file_contain_correct_answers);
 }
+
+void register_section1_tests(APP_CONTEXT *ctx)
+{
+    ctx->sp[0] = CU_add_suite("http_server_01", NULL, NULL);
+    ctx->ec = CU_get_error();
+    if (ctx->ec != CUE_SUCCESS)
+    {
+        const char *err_msg = CU_get_error_msg();
+        mvwprintw(ctx->course_windows[4], 1, 0, "%s", err_msg);
+    }
+
+    CU_add_test(ctx->sp[0], "answers file exists",
+                (CU_TestFunc)test_if_answers_file_exists);
+    ctx->ec = CU_get_error();
+    if (ctx->ec != CUE_SUCCESS)
+    {
+        const char *err_msg = CU_get_error_msg();
+        mvwprintw(ctx->course_windows[4], 1, 0, "%s", err_msg);
+    }
+
+    CU_add_test(ctx->sp[0], "answers file contains correct answers",
+                (CU_TestFunc)test_if_answers_file_contains_correct_answers);
+    ctx->ec = CU_get_error();
+    if (ctx->ec != CUE_SUCCESS)
+    {
+        const char *err_msg = CU_get_error_msg();
+        mvwprintw(ctx->course_windows[4], 1, 0, "%s", err_msg);
+    }
+}

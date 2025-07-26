@@ -5,6 +5,7 @@
 #include "../../models/models.h"
 #include "../start/start_menu.h"
 #include "../views.h"
+#include "../../course_tests/tests.h"
 #include <curses.h>
 #include <dirent.h>
 #include <form.h>
@@ -53,6 +54,8 @@ void create_course_view(APP_CONTEXT *ctx)
 
     wnoutrefresh(ctx->course_windows[2]);
     wnoutrefresh(ctx->course_windows[4]);
+
+    initialize_testing(ctx);
 }
 
 WINDOW *create_editor_window()

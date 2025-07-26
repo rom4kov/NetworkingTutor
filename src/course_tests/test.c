@@ -21,38 +21,14 @@ int initialize_testing(APP_CONTEXT *ctx)
         return 1;
     }
 
+    register_section1_tests(ctx);
+    register_section2_tests(ctx);
+
     return 0;
 }
 
 int perform_tests(APP_CONTEXT *ctx)
 {
-
-    ctx->sp = CU_add_suite("http_server_test_suite_01", NULL, NULL);
-    ctx->ec = CU_get_error();
-    if (ctx->ec != CUE_SUCCESS)
-    {
-        const char *err_msg = CU_get_error_msg();
-        mvwprintw(ctx->course_windows[4], 1, 0, "%s", err_msg);
-    }
-
-    CU_add_test(ctx->sp, "answers file exists",
-                (CU_TestFunc)test_if_answers_file_exists);
-    ctx->ec = CU_get_error();
-    if (ctx->ec != CUE_SUCCESS)
-    {
-        const char *err_msg = CU_get_error_msg();
-        mvwprintw(ctx->course_windows[4], 1, 0, "%s", err_msg);
-    }
-
-    CU_add_test(ctx->sp, "answers file contains correct answers",
-                (CU_TestFunc)test_if_answers_file_contains_correct_answers);
-    ctx->ec = CU_get_error();
-    if (ctx->ec != CUE_SUCCESS)
-    {
-        const char *err_msg = CU_get_error_msg();
-        mvwprintw(ctx->course_windows[4], 1, 0, "%s", err_msg);
-    }
-
     CU_basic_set_mode(CU_BRM_SILENT);
 
     int saved_stdout = dup(STDOUT_FILENO);

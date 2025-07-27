@@ -184,11 +184,18 @@ void handle_course_input(APP_CONTEXT *ctx)
                     // log_course_instr_values(ctx);
 
                     if ((ctx->rp_state->curr_item ==
-                        ctx->rp_state->num_of_section_items[ctx->rp_state->curr_section]) &&
+                         ctx->rp_state->num_of_section_items
+                             [ctx->rp_state->curr_section]) &&
                         ctx->rp_state->s_metadata->has_test == false)
                     {
                         print_section_or_task_compl_msg(ctx, NULL);
                         wnoutrefresh(ctx->course_windows[4]);
+                    }
+
+                    if (ctx->rp_state->s_metadata->has_test &&
+                        !ctx->rp_state->s_metadata->has_separate_task)
+                    {
+                        ctx->rp_state->test_mode = true;
                     }
 
                     wnoutrefresh(ctx->rp_state->inner_win);
@@ -230,11 +237,12 @@ void handle_course_input(APP_CONTEXT *ctx)
                     if (ctx->rp_state->curr_section > 0)
                     {
                         wclear(ctx->rp_state->inner_win);
-                        char blank_line[ctx->rp_state->window_width - 4]; memset(blank_line, 32, sizeof(blank_line));
+                        char blank_line[ctx->rp_state->window_width - 4];
+                        memset(blank_line, 32, sizeof(blank_line));
                         memset(&blank_line[sizeof(blank_line) - 1], '\0', 1);
 
-                        mvwprintw(ctx->rp_state->right_panel, LINES - 5, 3, "%s",
-                                  blank_line);
+                        mvwprintw(ctx->rp_state->right_panel, LINES - 5, 3,
+                                  "%s", blank_line);
                         // mvwprintw(ctx->rp_state->right_panel, 9, 3, "%s",
                         //           blank_line);
                     }
@@ -333,7 +341,8 @@ void handle_course_input(APP_CONTEXT *ctx)
                 if (ctx->rp_state->curr_item ==
                         ctx->rp_state->num_of_section_items
                             [ctx->rp_state->curr_section] &&
-                    ctx->rp_state->s_metadata->has_test)
+                    ctx->rp_state->s_metadata->has_test &&
+                    ctx->rp_state->s_metadata->has_separate_task)
                 {
                     wclear(ctx->rp_state->right_panel);
                     wclear(ctx->rp_state->inner_win);

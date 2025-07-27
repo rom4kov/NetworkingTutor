@@ -242,6 +242,7 @@ SECTION_METADATA *get_section_data(APP_CONTEXT *ctx)
     {
         section_metadata->title = (char *)sqlite3_column_text(stmt, 0);
         section_metadata->has_test = (bool)sqlite3_column_int(stmt, 1);
+        section_metadata->has_separate_task = (bool)sqlite3_column_int(stmt, 2);
     }
 
     return section_metadata;

@@ -5,11 +5,11 @@
 
 void print_press_msg(RIGHT_PANEL_STATE *rps)
 {
-    char blank_line[rps->window_width - 4]; memset(blank_line, 32, sizeof(blank_line));
+    char blank_line[rps->window_width - 4];
+    memset(blank_line, 32, sizeof(blank_line));
     memset(&blank_line[sizeof(blank_line) - 1], '\0', 1);
 
-    mvwprintw(rps->right_panel, LINES - 5, 3, "%s",
-              blank_line);
+    mvwprintw(rps->right_panel, LINES - 5, 3, "%s", blank_line);
 
     if (rps->curr_item < rps->num_of_section_items[rps->curr_section])
     {
@@ -23,9 +23,17 @@ void print_press_msg(RIGHT_PANEL_STATE *rps)
     }
     else if (rps->curr_item == rps->num_of_section_items[rps->curr_section])
     {
-        if (rps->s_metadata->has_test == true)
+        if (rps->s_metadata->has_test && rps->s_metadata->has_separate_task)
         {
             char *press_enter = "Press t to see your task";
+            mvwprintw(rps->right_panel, LINES - 5,
+                      (rps->window_width - strlen(press_enter)) / 2, "%s",
+                      press_enter);
+        }
+        else if (rps->s_metadata->has_test &&
+                 !rps->s_metadata->has_separate_task)
+        {
+            char *press_enter = "Press s to submit your task";
             mvwprintw(rps->right_panel, LINES - 5,
                       (rps->window_width - strlen(press_enter)) / 2, "%s",
                       press_enter);
@@ -65,6 +73,14 @@ void print_course_instructions(APP_CONTEXT *ctx)
     else
         mvwprintw(ctx->rp_state->right_panel, LINES - 5,
                   ctx->rp_state->window_width - 3, "%s", " ");
+
+    if ((ctx->rp_state->curr_item ==
+         ctx->rp_state->num_of_section_items[ctx->rp_state->curr_section]) &&
+         ctx->rp_state->s_metadata->has_test &&
+         !ctx->rp_state->s_metadata->has_separate_task)
+    {
+        ctx->rp_state->test_mode = true;
+    }
 
     mvwprintw(ctx->rp_state->right_panel, LINES - 4,
               ctx->rp_state->window_width - 18, " %s %i of %i ", "Section",
@@ -128,7 +144,8 @@ void print_next_course_item(RIGHT_PANEL_STATE *rp_state)
             mvwprintw(rp_state->inner_win, j, offset, "%s", current_line->buf_);
             wattroff(rp_state->inner_win, current_line->style);
         }
-        else if (current_line->style == 0 && current_line->syntax_hl == false) {
+        else if (current_line->style == 0 && current_line->syntax_hl == false)
+        {
             mvwprintw(rp_state->inner_win, j, offset, "%s", current_line->buf_);
         }
         else if (current_line->syntax_hl == true)

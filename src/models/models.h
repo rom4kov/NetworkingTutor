@@ -44,6 +44,7 @@ typedef struct _section_metadata
 {
     char *title;
     bool has_test;
+    bool has_separate_task;
 } SECTION_METADATA;
 
 typedef struct _progress_data

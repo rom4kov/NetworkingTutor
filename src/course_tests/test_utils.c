@@ -3,7 +3,7 @@
 #include "pcre2.h"
 
 int check_line_for_matches(LINE *current_line, int j, pcre2_code **re,
-                      int subject_length)
+                      size_t subject_length)
 {
     PCRE2_SPTR subject = (PCRE2_SPTR)current_line->buf_;
     pcre2_match_data *md = pcre2_match_data_create_from_pattern(re[j], NULL);

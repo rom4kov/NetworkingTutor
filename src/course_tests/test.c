@@ -34,7 +34,7 @@ int perform_tests(APP_CONTEXT *ctx)
     int saved_stdout = dup(STDOUT_FILENO);
     suppress_stdout();
 
-    ctx->ec = CU_basic_run_tests();
+    ctx->ec = CU_basic_run_suite(ctx->sp[ctx->rp_state->curr_section - 1]);
 
     restore_stdout(saved_stdout);
 
@@ -62,7 +62,7 @@ int perform_tests(APP_CONTEXT *ctx)
 
     int i = 0;
     CU_pTestRegistry tr = CU_get_registry();
-    CU_pSuite suite = CU_get_suite_by_name("http_server_test_suite_01", tr);
+    CU_pSuite suite = CU_get_suite_by_index(ctx->rp_state->curr_section, tr);
     CU_pTest test = suite->pTest;
 
     if (run_sum->nTestsFailed == 0)

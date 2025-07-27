@@ -4,13 +4,15 @@ INSERT
         section_title,
         num_of_items,
         order_num,
-        has_test
+        has_test,
+        has_separate_task
     )
 VALUES
     (
         1,
         "1. Intro",
         8,
+        0,
         0,
         0
     );
@@ -21,13 +23,15 @@ INSERT
         section_title,
         num_of_items,
         order_num,
-        has_test
+        has_test,
+        has_separate_task
     )
 VALUES
     (
         1,
         "2. Foundations: TCP/IP and HTTP",
         12,
+        1,
         1,
         1
     );
@@ -38,7 +42,8 @@ INSERT
         section_title,
         num_of_items,
         order_num,
-        has_test
+        has_test,
+        has_separate_task
     )
 VALUES
     (
@@ -46,5 +51,6 @@ VALUES
         "3. getaddrinfo() - how to get address information",
         12,
         2,
-        1
+        1,
+        0
     );

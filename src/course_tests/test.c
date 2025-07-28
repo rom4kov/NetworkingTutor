@@ -72,8 +72,12 @@ int perform_tests(APP_CONTEXT *ctx)
         while (test != NULL)
         {
             wattron(ctx->rp_state->inner_win, COLOR_PAIR(4));
-            mvwprintw(ctx->rp_state->inner_win, 15 + i, 0, "%s PASSED",
+            mvwprintw(ctx->rp_state->inner_win, 15 + i, 0, "%s",
                       test->pName);
+            wattron(ctx->rp_state->inner_win, A_BOLD);
+            mvwprintw(ctx->rp_state->inner_win, 15 + i, strlen(test->pName) + 1, "%s",
+                      "PASSED");
+            wattroff(ctx->rp_state->inner_win, A_BOLD);
             wattroff(ctx->rp_state->inner_win, COLOR_PAIR(4));
             test = test->pNext;
             i++;

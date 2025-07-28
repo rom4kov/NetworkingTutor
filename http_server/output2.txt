@@ -1,0 +1,1 @@
+getaddrinfo error: Servname not supported for ai_socktype

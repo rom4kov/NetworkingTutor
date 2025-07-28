@@ -6,8 +6,8 @@
 #include <CUnit/CUnit.h>
 #include <CUnit/TestDB.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #define PCRE2_CODE_UNIT_WIDTH 8
 #include <pcre2.h>
@@ -161,9 +161,106 @@ int server_c_file_compiles_without_errors()
 
 int server_c_file_handles_getaddrinfo_errors()
 {
-    FILE *fp = popen("perl -0777 -pe "
-                     "'s/(getaddrinfo\\([^,]+,\\s*)[^,\\n]+/\\1\\\"error\\\"/"
-                     "g' http_server/server.c > http_server/server_error_test.c",
+    FILE *fp =
+        popen("perl -0777 -pe "
+              "'s/(getaddrinfo\\([^,]+,\\s*)[^,\\n]+/\\1\\\"error\\\"/"
+              "g' http_server/server.c > http_server/server_error_test.c",
+              "r");
+    if (fp == NULL)
+    {
+        perror("popen failed");
+        return 1;
+    }
+
+    pclose(fp);
+
+    FILE *fp2 =
+        popen("gcc http_server/server_error_test.c -o http_server/server_error "
+              "&& ./http_server/server_error 2>&1",
+              "r");
+    if (fp2 == NULL)
+    {
+        perror("popen failed");
+        return 1;
+    }
+
+    char buffer[2000];
+    char c;
+    int i = 0;
+    while (fread(&c, 1, 1, fp2))
+    {
+        buffer[i] = c;
+        i++;
+    }
+    buffer[i] = '\0';
+
+    if (strstr(buffer, "Servname not supported for ai_socktype") == NULL)
+    {
+        pclose(fp2);
+        return 1;
+    }
+
+    remove("http_server/server_error_test.c");
+    remove("http_server/server_error");
+
+    pclose(fp2);
+    return 0;
+}
+
+int server_c_file_returns_correct_results_from_getaddrinfo()
+{
+    FILE *fp = popen(
+        "perl -0777 -pe 's/(freeaddrinfo\\s*\\(\\s*res\\s*\\)\\s*;)/printf(\\\"%i\\\\n\\\", res->ai_family);\\n    \\1/' http_server/server.c > http_server/server_modified.c",
+        //
+        // "perl -0777 -pe \"s/int main\\s*\\([^)]*\\)\\s*\\{(.*?)\\n\\}/int "
+        // "main() {\\1\\n    printf(\\\"%i\\\\\\n\\\", "
+        // "res->ai_family);\\n}/s\" "
+        // "http_server/server.c > http_server/server_modified.c",
+        "r");
+    if (fp == NULL)
+    {
+        perror("popen failed");
+        return 1;
+    }
+
+    pclose(fp);
+
+    FILE *fp2 = popen(
+        "gcc http_server/server_modified.c -o http_server/server_modified "
+        "&& ./http_server/server_modified",
+        "r");
+    if (fp2 == NULL)
+    {
+        perror("popen failed");
+        return 1;
+    }
+
+    char buffer[2000];
+    char c;
+    int i = 0;
+    while (fread(&c, 1, 1, fp2))
+    {
+        buffer[i] = c;
+        i++;
+    }
+    buffer[i] = '\0';
+
+    if (strstr(buffer, "2") == NULL)
+    {
+        pclose(fp2);
+        return 1;
+    }
+
+    remove("http_server/server_modified");
+
+    pclose(fp2);
+    return 0;
+}
+
+int server_c_file_uses_freeaddrinfo_for_results()
+{
+    FILE *fp = popen("gcc http_server/server.c -o http_server/server "
+                     "&& ./http_server/server",
                      "r");
     if (fp == NULL)
     {
@@ -171,11 +268,30 @@ int server_c_file_handles_getaddrinfo_errors()
         return 1;
     }
 
-    return 0;
-}
+    FILE *fp2 = popen("valgrind ./http_server/server 2>&1", "r");
+    if (fp2 == NULL)
+    {
+        perror("popen failed");
+        return 1;
+    }
 
-int server_c_file_returns_correct_results_from_getaddrinfo()
-{
+    char buffer[2000];
+    char c;
+    int i = 0;
+    while (fread(&c, 1, 1, fp2))
+    {
+        buffer[i] = c;
+        i++;
+    }
+    buffer[i] = '\0';
+
+    pclose(fp2);
+
+    if (strstr(buffer, "All heap blocks were freed") == NULL)
+    {
+        return 1;
+    }
+
     return 0;
 }
 
@@ -230,6 +346,26 @@ void test_if_server_c_file_handles_getaddrinfo_errors(void)
     CU_ASSERT(does_server_file_handle_getaddrinfo_errors);
 }
 
+void test_if_server_c_file_returns_correct_results_from_getaddrinfo(void)
+{
+    bool does_server_return_correct_results_from_getaddrinfo = false;
+    if (server_c_file_returns_correct_results_from_getaddrinfo() == 0)
+    {
+        does_server_return_correct_results_from_getaddrinfo = true;
+    }
+    CU_ASSERT(does_server_return_correct_results_from_getaddrinfo);
+}
+
+void test_if_server_c_file_uses_freeaddrinfo_for_results(void)
+{
+    bool does_server_c_file_uses_freeaddrinfo_for_results = false;
+    if (server_c_file_uses_freeaddrinfo_for_results() == 0)
+    {
+        does_server_c_file_uses_freeaddrinfo_for_results = true;
+    }
+    CU_ASSERT(does_server_c_file_uses_freeaddrinfo_for_results);
+}
+
 void register_section2_tests(APP_CONTEXT *ctx)
 {
     ctx->sp[1] = CU_add_suite("http_server_02", NULL, NULL);
@@ -278,6 +414,27 @@ void register_section2_tests(APP_CONTEXT *ctx)
 
     CU_add_test(ctx->sp[1], "server.c file handles getaddrinfo errors",
                 (CU_TestFunc)test_if_server_c_file_handles_getaddrinfo_errors);
+    ctx->ec = CU_get_error();
+    if (ctx->ec != CUE_SUCCESS)
+    {
+        const char *err_msg = CU_get_error_msg();
+        mvwprintw(ctx->course_windows[4], 1, 0, "%s", err_msg);
+    }
+
+    CU_add_test(
+        ctx->sp[1], "server.c file returns correct results from getaddrinfo",
+        (CU_TestFunc)
+            test_if_server_c_file_returns_correct_results_from_getaddrinfo);
+    ctx->ec = CU_get_error();
+    if (ctx->ec != CUE_SUCCESS)
+    {
+        const char *err_msg = CU_get_error_msg();
+        mvwprintw(ctx->course_windows[4], 1, 0, "%s", err_msg);
+    }
+
+    CU_add_test(
+        ctx->sp[1], "server.c file uses freeaddrinfo to free results struct",
+        (CU_TestFunc)test_if_server_c_file_uses_freeaddrinfo_for_results);
     ctx->ec = CU_get_error();
     if (ctx->ec != CUE_SUCCESS)
     {

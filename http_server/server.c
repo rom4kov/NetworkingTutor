@@ -6,7 +6,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
-int main(int argc, char **argv)
+int main(void)
 {
     struct addrinfo hints, *res;
     int status;
@@ -16,11 +16,11 @@ int main(int argc, char **argv)
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
 
-    if ((status = getaddrinfo(NULL, argv[1], &hints, &res)) != 0)
+    if ((status = getaddrinfo(NULL, "8080", &hints, &res)) != 0)
     {
         fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
         exit(1);
     }
 
-    printf("%i\n", res->ai_family);
+    freeaddrinfo(res);
 }

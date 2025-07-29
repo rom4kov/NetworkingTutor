@@ -3,6 +3,7 @@
 #include "src/models/models.h"
 #include "src/views/start/start_menu.h"
 #include "src/views/views.h"
+#include <CUnit/TestDB.h>
 #include <curses.h>
 #include <locale.h>
 #include <menu.h>
@@ -11,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <CUnit/CUnit.h>
 
 #define COLOR_GREY 16
 #define COLOR_ORANGE 17
@@ -75,14 +77,16 @@ int main(void)
 
     // seed_courses_data(ctx->db, welcome_screen,
     //                   "SQL/create_sections_table.sql");
-    // seed_courses_data(ctx->db, ctx->greeter_screen,
-    //                   "SQL/courses/http_server/sections.sql");
+    seed_courses_data(ctx->db, ctx->greeter_screen,
+                      "SQL/courses/http_server/sections.sql");
     // seed_courses_data(ctx->db, ctx->greeter_screen,
     //                   "SQL/courses/http_server/0_intro.sql");
     // seed_courses_data(ctx->db, ctx->greeter_screen,
     //                   "SQL/courses/http_server/1_foundations.sql");
     // seed_courses_data(ctx->db, ctx->greeter_screen,
     //                   "SQL/courses/http_server/2_getaddrinfo.sql");
+    seed_courses_data(ctx->db, ctx->greeter_screen,
+                      "SQL/courses/http_server/3_socket.sql");
     // seed_courses_data(ctx->db, ctx->greeter_screen,
     //                   "SQL/create_users_table.sql");
     // seed_courses_data(ctx->db, ctx->greeter_screen,
@@ -220,6 +224,7 @@ int main(void)
                 }
                 break;
             case 27:
+                CU_cleanup_registry();
                 ctx->running = false;
                 break;
             default:

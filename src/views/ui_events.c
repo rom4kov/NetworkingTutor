@@ -16,6 +16,9 @@ void *print_press_enter_after_sec_compl(void *arg)
     mvwprintw(ctx->rp_state->right_panel, LINES - 5,
               (ctx->rp_state->window_width - strlen(press_enter)) / 2, "%s",
               press_enter);
+
+    mvwprintw(ctx->rp_state->right_panel, LINES - 5, 2, "%s",
+              "< Back to section");
     wrefresh(ctx->rp_state->right_panel);
     return NULL;
 }

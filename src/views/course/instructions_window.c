@@ -21,7 +21,8 @@ void print_press_msg(RIGHT_PANEL_STATE *rps)
                   (rps->window_width - strlen(press_space)) / 2, "%s",
                   press_space);
     }
-    else if (rps->curr_item == rps->num_of_section_items[rps->curr_section])
+    else if (rps->curr_item == rps->num_of_section_items[rps->curr_section] &&
+             rps->curr_section >= rps->sections_completed)
     {
         if (rps->s_metadata->has_test && rps->s_metadata->has_separate_task)
         {
@@ -62,10 +63,18 @@ void print_course_instructions(APP_CONTEXT *ctx)
 
     print_next_course_item(ctx->rp_state);
 
-    if (ctx->rp_state->curr_section > 0)
-        mvwprintw(ctx->rp_state->right_panel, LINES - 5, 2, "%s", "<");
+    if (ctx->rp_state->test_mode)
+    {
+        mvwprintw(ctx->rp_state->right_panel, LINES - 5, 2, "%s",
+                  "< Back to section");
+    }
     else
-        mvwprintw(ctx->rp_state->right_panel, LINES - 5, 2, "%s", " ");
+    {
+        if (ctx->rp_state->curr_section > 0)
+            mvwprintw(ctx->rp_state->right_panel, LINES - 5, 2, "%s", "<");
+        else
+            mvwprintw(ctx->rp_state->right_panel, LINES - 5, 2, "%s", " ");
+    }
 
     if (ctx->rp_state->completed_sections[ctx->rp_state->curr_section])
         mvwprintw(ctx->rp_state->right_panel, LINES - 5,
@@ -73,14 +82,14 @@ void print_course_instructions(APP_CONTEXT *ctx)
     else
         mvwprintw(ctx->rp_state->right_panel, LINES - 5,
                   ctx->rp_state->window_width - 3, "%s", " ");
-
-    if ((ctx->rp_state->curr_item ==
-         ctx->rp_state->num_of_section_items[ctx->rp_state->curr_section]) &&
-         ctx->rp_state->s_metadata->has_test &&
-         !ctx->rp_state->s_metadata->has_separate_task)
-    {
-        ctx->rp_state->test_mode = true;
-    }
+    //
+    // if ((ctx->rp_state->curr_item ==
+    //      ctx->rp_state->num_of_section_items[ctx->rp_state->curr_section]) &&
+    //      ctx->rp_state->s_metadata->has_test &&
+    //      !ctx->rp_state->s_metadata->has_separate_task)
+    // {
+    //     ctx->rp_state->test_mode = true;
+    // }
 
     mvwprintw(ctx->rp_state->right_panel, LINES - 4,
               ctx->rp_state->window_width - 18, " %s %i of %i ", "Section",

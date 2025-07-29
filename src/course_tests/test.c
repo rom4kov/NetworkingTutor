@@ -68,15 +68,14 @@ int perform_tests(APP_CONTEXT *ctx)
     if (run_sum->nTestsFailed == 0)
     {
         ctx->rp_state->sections_completed++;
-        ctx->rp_state->test_mode = false;
+        // ctx->rp_state->test_mode = false;
         while (test != NULL)
         {
             wattron(ctx->rp_state->inner_win, COLOR_PAIR(4));
-            mvwprintw(ctx->rp_state->inner_win, 15 + i, 0, "%s",
-                      test->pName);
+            mvwprintw(ctx->rp_state->inner_win, 15 + i, 0, "%s", test->pName);
             wattron(ctx->rp_state->inner_win, A_BOLD);
-            mvwprintw(ctx->rp_state->inner_win, 15 + i, strlen(test->pName) + 1, "%s",
-                      "PASSED");
+            mvwprintw(ctx->rp_state->inner_win, 15 + i, strlen(test->pName) + 1,
+                      "%s", "PASSED");
             wattroff(ctx->rp_state->inner_win, A_BOLD);
             wattroff(ctx->rp_state->inner_win, COLOR_PAIR(4));
             test = test->pNext;
@@ -112,11 +111,14 @@ int perform_tests(APP_CONTEXT *ctx)
 
     wrefresh(ctx->rp_state->inner_win);
     if (run_sum->nTestsFailed == 0)
+    {
         print_section_or_task_compl_msg(ctx, run_sum);
+        // ctx->rp_state->test_mode = false;
+    }
     // wnoutrefresh(ctx->course_windows[4]);
     doupdate();
 
-    CU_cleanup_registry();
+    // CU_cleanup_registry();
     return 0;
 }
 

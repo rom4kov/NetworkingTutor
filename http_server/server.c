@@ -3,8 +3,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <netdb.h>
-#include <sys/types.h>
-#include <sys/socket.h>
 
 int main(void)
 {

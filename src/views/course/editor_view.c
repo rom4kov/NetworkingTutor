@@ -86,7 +86,7 @@ void print_matches(pcre2_code **re, int line_num, int j, size_t subject_length,
         return;
 
     int rc = pcre2_match(re[j], subject, subject_length, 0, 0, md, NULL);
-    if (j == 5 && rc > 0)
+    if (j == 4 && rc > 0)
     {
         char *extended_buf = calloc(500, sizeof(char));
         LINE *temp_line = initialize_line();
@@ -125,10 +125,10 @@ void print_matches(pcre2_code **re, int line_num, int j, size_t subject_length,
         subject_length = strlen(extended_buf);
 
         subject = (PCRE2_SPTR)extended_buf;
-        md = pcre2_match_data_create_from_pattern(re[4], NULL);
+        md = pcre2_match_data_create_from_pattern(re[3], NULL);
         if (!md)
             return;
-        rc = pcre2_match(re[4], subject, subject_length, 0, 0, md, NULL);
+        rc = pcre2_match(re[3], subject, subject_length, 0, 0, md, NULL);
         free(extended_buf);
     }
     int line_len = 0;
@@ -148,7 +148,7 @@ void print_matches(pcre2_code **re, int line_num, int j, size_t subject_length,
 
         line_len = (int)end > line_len ? (int)end : line_len + 1;
 
-        rc = pcre2_match(re[j == 5 ? 4 : j], subject, subject_length, line_len,
+        rc = pcre2_match(re[j == 4 ? 3 : j], subject, subject_length, line_len,
                          0, md, NULL);
     }
 
@@ -177,16 +177,16 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
         "struct|"
         "case|default)\\b",
         "#(include|define)|NULL|=|\\+|\\-|\\*|\\&|<|>|;",
-        "(\".*\"|<.*\\.h>)",
         "(?s)\\b([a-z0-9_]*)\\(.*\\)",
         "([a-z0-9_]*)\\(.*",
         "\\b(?:\\d+(\\.\\d+)?|true|false)\\b",
+        "(\".*\"|<.*\\.h>)",
         "(?<=\\bstruct )\\w+",
         "(?<=(->|\\.))\\w+(?!(>|\"))",
         "(//.*|/\\*.*\\*/)",
     };
 
-    int colors[] = {1, 8, 6, 4, 7, 7, 9, 14, 15, 10};
+    int colors[] = {1, 8, 6, 7, 7, 9, 4, 14, 15, 10};
 
     compile_patterns(re, pattern_num, patterns);
 
@@ -199,7 +199,7 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
             for (int j = 0; j < pattern_num; j++)
             {
                 print_matches(re, i, j, subj_len, current_line,
-                              (j == 4 || j == 5) ? 2 : 0, edit_window,
+                              (j == 3 || j == 4) ? 2 : 0, edit_window,
                               colors[j]);
             }
 
@@ -223,15 +223,15 @@ void print_line(LINE *current_line, int line_num, WINDOW **edit_window)
         "struct|"
         "case|default)\\b",
         "#(include|define)|NULL|=|\\+|\\-|\\*|\\&|<|>|;",
-        "(\".*\"|<.*\\.h>)",
         "(?s)\\b([a-z0-9_]*)\\(.*\\)",
         "([a-z0-9_]*)\\(.*",
         "\\b(?:\\d+(\\.\\d+)?|true|false)\\b",
+        "(\".*\"|<.*\\.h>)",
         "(?<=\\bstruct )\\w+",
         "(?<=(->|\\.))\\w+(?!(>|\"))",
         "(//.*|/\\*.*\\*/)",
     };
-    int colors[] = {1, 8, 6, 4, 7, 7, 9, 14, 15, 10};
+    int colors[] = {1, 8, 6, 7, 7, 9, 4, 14, 15, 10};
     size_t subj_len = strlen(current_line->buf_);
 
     compile_patterns(re, pattern_num, patterns);
@@ -239,7 +239,7 @@ void print_line(LINE *current_line, int line_num, WINDOW **edit_window)
     for (int i = 0; i < pattern_num; i++)
     {
         print_matches(re, line_num, i, subj_len, current_line,
-                      (i == 4 || i == 5) ? 2 : 0, edit_window, colors[i]);
+                      (i == 3 || i == 4) ? 2 : 0, edit_window, colors[i]);
     }
 
     for (int i = 0; i < pattern_num; i++)

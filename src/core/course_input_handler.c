@@ -179,19 +179,19 @@ void handle_course_input(APP_CONTEXT *ctx)
                 doupdate();
                 break;
             case ' ':
-                if (ctx->rp_state->curr_item ==
-                    ctx->rp_state
-                        ->num_of_section_items[ctx->rp_state->curr_section])
-                {
-                    if ((ctx->rp_state->curr_item ==
-                         ctx->rp_state->num_of_section_items
-                             [ctx->rp_state->curr_section]) &&
-                        ctx->rp_state->s_metadata->has_test &&
-                        !ctx->rp_state->s_metadata->has_separate_task)
-                    {
-                        ctx->rp_state->test_mode = true;
-                    }
-                }
+                // if (ctx->rp_state->curr_item ==
+                //     ctx->rp_state
+                //         ->num_of_section_items[ctx->rp_state->curr_section])
+                // {
+                //     if ((ctx->rp_state->curr_item ==
+                //          ctx->rp_state->num_of_section_items
+                //              [ctx->rp_state->curr_section]) &&
+                //         ctx->rp_state->s_metadata->has_test &&
+                //         !ctx->rp_state->s_metadata->has_separate_task)
+                //     {
+                //         ctx->rp_state->test_mode = true;
+                //     }
+                // }
 
                 if (ctx->rp_state->curr_item <
                     ctx->rp_state
@@ -231,53 +231,21 @@ void handle_course_input(APP_CONTEXT *ctx)
                 // wrefresh(ctx->course_windows[2]);
                 // log_course_instr_values(ctx);
                 // wrefresh(ctx->course_windows[2]);
-                if ((ctx->rp_state->curr_item ==
+                if (ctx->rp_state->curr_item ==
                          ctx->rp_state->num_of_section_items
                              [ctx->rp_state->curr_section] &&
-                     !ctx->rp_state->s_metadata->has_test &&
-                      ctx->rp_state->curr_section + 1 ==
-                        ctx->rp_state->sections_completed) ||
-                    ctx->rp_state->curr_section + 1 ==
-                        ctx->rp_state->sections_completed)
+                    ctx->rp_state->curr_section ==
+                            ctx->rp_state->sections_completed)
                 {
-                    set_section_completed(ctx);
-                    get_completed_sections(ctx);
-                    ctx->rp_state->curr_item = 1;
-                    // ctx->rp_state->items_completed = 0;
-                    ctx->rp_state->curr_section += 1;
-                    // set_items_completed(ctx);
-                    set_items_completed(ctx);
-                    ctx->rp_state->lines_to_print = 0;
-                    ctx->rp_state->lines_excess = 0;
-                    ctx->rp_state->scroll_offset = 0;
-                    wclear(ctx->course_windows[4]);
-                    delwin(ctx->course_windows[4]);
-                    ctx->course_windows[4] = create_progress_window(ctx);
-                    mvwprintw(ctx->course_windows[4], 1,
-                              ctx->rp_state->window_width - 3, "%i",
-                              ctx->rp_state->curr_section);
-                    if (ctx->rp_state->curr_section > 0)
+                    if (!ctx->rp_state->s_metadata->has_test)
                     {
-                        wclear(ctx->rp_state->inner_win);
-                        char blank_line[ctx->rp_state->window_width - 4];
-                        memset(blank_line, 32, sizeof(blank_line));
-                        memset(&blank_line[sizeof(blank_line) - 1], '\0', 1);
-
-                        mvwprintw(ctx->rp_state->right_panel, LINES - 5, 3,
-                                  "%s", blank_line);
-                        // mvwprintw(ctx->rp_state->right_panel, 9, 3, "%s",
-                        //           blank_line);
+                        complete_section(ctx);
                     }
-                    deallocate_it_buffer(ctx->rp_state->it_buffer);
-                    ctx->rp_state->it_buffer = initialize_it_buffer();
-                    print_course_instructions(ctx);
-                    log_course_instr_values(ctx);
-
-                    wnoutrefresh(ctx->rp_state->right_panel);
-                    wnoutrefresh(ctx->rp_state->inner_win);
-                    wnoutrefresh(ctx->course_windows[2]);
-                    wnoutrefresh(ctx->course_windows[4]);
-                    doupdate();
+                    else if (ctx->run_sum && ctx->run_sum->nTestsFailed == 0)
+                    {
+                        ctx->run_sum = NULL;
+                        complete_section(ctx);
+                    }
                 }
                 break;
             case KEY_DOWN:

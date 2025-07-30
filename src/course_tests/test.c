@@ -21,6 +21,8 @@ int initialize_testing(APP_CONTEXT *ctx)
         return 1;
     }
 
+    ctx->run_sum = NULL;
+
     register_section1_tests(ctx);
     register_section2_tests(ctx);
 
@@ -44,8 +46,8 @@ int perform_tests(APP_CONTEXT *ctx)
         mvwprintw(ctx->course_windows[4], 1, 0, "%s", err_msg);
     }
 
-    CU_pRunSummary run_sum = CU_get_run_summary();
-    print_run_summary(ctx, run_sum);
+    ctx->run_sum = CU_get_run_summary();
+    print_run_summary(ctx, ctx->run_sum);
 
     int offset = 0;
     int num_of_successes = CU_get_number_of_successes();
@@ -65,9 +67,9 @@ int perform_tests(APP_CONTEXT *ctx)
     CU_pSuite suite = CU_get_suite_by_index(ctx->rp_state->curr_section, tr);
     CU_pTest test = suite->pTest;
 
-    if (run_sum->nTestsFailed == 0)
+    if (ctx->run_sum->nTestsFailed == 0)
     {
-        ctx->rp_state->sections_completed++;
+        // ctx->rp_state->sections_completed++;
         // ctx->rp_state->test_mode = false;
         while (test != NULL)
         {
@@ -110,9 +112,9 @@ int perform_tests(APP_CONTEXT *ctx)
     }
 
     wrefresh(ctx->rp_state->inner_win);
-    if (run_sum->nTestsFailed == 0)
+    if (ctx->run_sum->nTestsFailed == 0)
     {
-        print_section_or_task_compl_msg(ctx, run_sum);
+        print_section_or_task_compl_msg(ctx, ctx->run_sum);
         // ctx->rp_state->test_mode = false;
     }
     // wnoutrefresh(ctx->course_windows[4]);

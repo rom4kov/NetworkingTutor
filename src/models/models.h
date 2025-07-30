@@ -173,6 +173,7 @@ typedef struct _app_context
     TEXT_BUFFER *t_buffer;
     CU_ErrorCode ec; 
     CU_pSuite sp[15];
+    CU_pRunSummary run_sum;
     int key;
     int active_window;
     int current_user_id;

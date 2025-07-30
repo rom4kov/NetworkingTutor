@@ -11,6 +11,7 @@ void create_new_user_popup(APP_CONTEXT *ctx);
 void handle_start_input(APP_CONTEXT *ctx);
 void handle_course_input(APP_CONTEXT *ctx);
 
+// editor functions
 void move_down(TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **edit_window, WINDOW **editor_window,
                int y, int x, int *scroll_offset, int lines_to_print);
 void move_up(TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **edit_window, WINDOW **editor_window,
@@ -37,6 +38,9 @@ void bs_delete_char_or_line(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
                             int *scroll_offset, int *lines_to_print);
 void insert_line(TEXT_BUFFER *tbuf, WINDOW **edit_window, WINDOW **editor_window, WINDOW **line_num_win,
                  int y, int x, int *scroll_offset, int *lines_to_print);
+
+// course instructions functions
+void complete_section(APP_CONTEXT *ctx);
 
 char *wrap_text(char *text, int width);
 void draw_border(WINDOW *win, int color_pair, char *label);

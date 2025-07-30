@@ -38,6 +38,7 @@ WINDOW *create_explorer_window(FILE_TREE *file_tree);
 void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree);
 WINDOW *create_progress_window(APP_CONTEXT *ctx);
 void print_no_open_file_msg(WINDOW **editor_window);
+void log_course_instr_values(APP_CONTEXT *ctx);
 
 void create_user_form(WINDOW **window, FORM **user_form, FIELD **fields);
 

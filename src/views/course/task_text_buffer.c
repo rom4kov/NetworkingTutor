@@ -8,17 +8,18 @@
 
 void read_task_into_buffer(APP_CONTEXT *ctx)
 {
-    int content_length =
-        strlen(ctx->rp_state->current_task);
+    int content_length = strlen(ctx->rp_state->current_task);
     int j, k, last_space_pos;
     j = k = last_space_pos = 0;
     int line_number = 0;
     bool overflow = false;
+    bool bl_point = false;
 
     I_LINE *curr_line = initialize_iline();
 
     // TASK TITLE
-    ctx->rp_state->it_buffer->first_line->buf_ = strdup(ctx->rp_state->s_metadata->title);
+    ctx->rp_state->it_buffer->first_line->buf_ =
+        strdup(ctx->rp_state->s_metadata->title);
     ctx->rp_state->it_buffer->first_line->centered = true;
     ctx->rp_state->it_buffer->first_line->style = A_BOLD | A_UNDERLINE;
     ctx->rp_state->it_buffer->first_line->line_num = line_number;
@@ -64,15 +65,16 @@ void read_task_into_buffer(APP_CONTEXT *ctx)
         else if (ctx->rp_state->current_task[j] == '\n')
         {
             overflow = false;
-            add_line_break(ctx->rp_state, &curr_line, -1, &j, &k,
-                           &line_number, &last_space_pos, overflow);
+            bl_point = false;
+            add_line_break(ctx->rp_state, &curr_line, -1, &j, &k, &line_number,
+                           &last_space_pos, overflow, &bl_point);
             continue;
         }
         else if (k > ctx->rp_state->window_width - 10)
         {
             overflow = true;
-            add_line_break(ctx->rp_state, &curr_line, -1, &j, &k,
-                           &line_number, &last_space_pos, overflow);
+            add_line_break(ctx->rp_state, &curr_line, -1, &j, &k, &line_number,
+                           &last_space_pos, overflow, &bl_point);
             continue;
         }
         else if (ctx->rp_state->current_task[j] == ' ')
@@ -80,8 +82,7 @@ void read_task_into_buffer(APP_CONTEXT *ctx)
             last_space_pos = k;
         }
 
-        curr_line->buf_[k] =
-            ctx->rp_state->current_task[j];
+        curr_line->buf_[k] = ctx->rp_state->current_task[j];
         curr_line->length++;
         j++;
         k++;

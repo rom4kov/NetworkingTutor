@@ -209,14 +209,11 @@ int server_c_file_handles_getaddrinfo_errors()
 
 int server_c_file_returns_correct_results_from_getaddrinfo()
 {
-    FILE *fp = popen(
-        "perl -0777 -pe 's/(freeaddrinfo\\s*\\(\\s*res\\s*\\)\\s*;)/printf(\\\"%i\\\\n\\\", res->ai_family);\\n    \\1/' http_server/server.c > http_server/server_modified.c",
-        //
-        // "perl -0777 -pe \"s/int main\\s*\\([^)]*\\)\\s*\\{(.*?)\\n\\}/int "
-        // "main() {\\1\\n    printf(\\\"%i\\\\\\n\\\", "
-        // "res->ai_family);\\n}/s\" "
-        // "http_server/server.c > http_server/server_modified.c",
-        "r");
+    FILE *fp = popen("perl -0777 -pe "
+                     "'s/(freeaddrinfo\\s*\\(\\s*res\\s*\\)\\s*;)/"
+                     "printf(\\\"%i\\\\n\\\", res->ai_family);\\n    \\1/' "
+                     "http_server/server.c > http_server/server_modified.c",
+                     "r");
     if (fp == NULL)
     {
         perror("popen failed");

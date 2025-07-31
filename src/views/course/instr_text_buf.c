@@ -12,7 +12,7 @@
 
 void add_line_break(RIGHT_PANEL_STATE *rps, I_LINE **curr_line, int i, int *j,
                     int *k, int *line_number, int *last_space_pos,
-                    bool overflow)
+                    bool overflow, bool *bl_point)
 {
     if (overflow)
     {
@@ -49,8 +49,10 @@ void add_line_break(RIGHT_PANEL_STATE *rps, I_LINE **curr_line, int i, int *j,
         (*curr_line)->prev = rps->it_buffer->current_line;
         rps->it_buffer->current_line = *curr_line;
         *curr_line = initialize_iline();
-        if (strstr(rps->it_buffer->current_line->buf_, "•") && overflow)
+        if ((strstr(rps->it_buffer->current_line->buf_, "•") && overflow) ||
+            *bl_point)
         {
+            *bl_point = true;
             (*curr_line)->buf_[0] = ' ';
             (*curr_line)->buf_[1] = ' ';
             *k += 2;
@@ -60,7 +62,9 @@ void add_line_break(RIGHT_PANEL_STATE *rps, I_LINE **curr_line, int i, int *j,
 
 void read_item_into_buffer(APP_CONTEXT *ctx)
 {
-    for (int i = 0; i < ctx->rp_state->num_of_section_items[ctx->rp_state->curr_section]; i++)
+    for (int i = 0;
+         i < ctx->rp_state->num_of_section_items[ctx->rp_state->curr_section];
+         i++)
     {
         int content_length =
             strlen(ctx->rp_state->course_section_data[i].content);
@@ -70,14 +74,15 @@ void read_item_into_buffer(APP_CONTEXT *ctx)
         j = k = last_space_pos = 0;
         int line_number = 0;
         bool overflow = false;
+        bool bl_point = false;
 
         // LINE *prev_line = initialize_line();
         I_LINE *curr_line = initialize_iline();
 
-        if (ctx->rp_state->curr_section > 0 &&
-            i == 0)
+        if (ctx->rp_state->curr_section > 0 && i == 0)
         {
-            ctx->rp_state->it_buffer->first_line->buf_ = strdup(ctx->rp_state->s_metadata->title);
+            ctx->rp_state->it_buffer->first_line->buf_ =
+                strdup(ctx->rp_state->s_metadata->title);
             ctx->rp_state->it_buffer->first_line->centered = true;
             ctx->rp_state->it_buffer->first_line->style = A_BOLD | A_UNDERLINE;
             ctx->rp_state->it_buffer->first_line->line_num = line_number;
@@ -155,17 +160,20 @@ void read_item_into_buffer(APP_CONTEXT *ctx)
             else if (ctx->rp_state->course_section_data[i].content[j] == '\n')
             {
                 overflow = false;
+                bl_point = false;
                 if (ctx->rp_state->course_section_data[i].syntax_hl == true)
                     curr_line->syntax_hl = true;
                 add_line_break(ctx->rp_state, &curr_line, i, &j, &k,
-                               &line_number, &last_space_pos, overflow);
+                               &line_number, &last_space_pos, overflow,
+                               &bl_point);
                 continue;
             }
             else if (k > ctx->rp_state->window_width - 10)
             {
                 overflow = true;
                 add_line_break(ctx->rp_state, &curr_line, i, &j, &k,
-                               &line_number, &last_space_pos, overflow);
+                               &line_number, &last_space_pos, overflow,
+                               &bl_point);
                 continue;
             }
             else if (ctx->rp_state->course_section_data[i].content[j] == ' ')

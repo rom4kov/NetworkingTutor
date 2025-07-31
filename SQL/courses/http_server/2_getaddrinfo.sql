@@ -34,7 +34,7 @@ VALUES
         1,
         2,
         "The Old Way: Manually Filling a sockaddr_in Struct",
-        "@There is an old and a new way of achieving this. Historically,
+        "There is an old and a new way of achieving this. Historically,
 programmers manually filled a sockaddr_in struct like this:",
         1,
         0

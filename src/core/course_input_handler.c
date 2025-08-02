@@ -385,6 +385,8 @@ void handle_course_input(APP_CONTEXT *ctx)
                 }
                 break;
             case 's':
+                // log_course_instr_values(ctx);
+                // wrefresh(ctx->course_windows[2]);
                 if (ctx->rp_state->test_mode)
                 {
                     wclear(ctx->rp_state->inner_win);

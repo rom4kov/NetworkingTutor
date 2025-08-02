@@ -3,11 +3,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include <netdb.h>
+#include <errno.h>
 
 int main(void)
 {
     struct addrinfo hints, *res;
-    int status;
+    int status, sockfd;
 
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_UNSPEC;
@@ -20,6 +21,11 @@ int main(void)
         exit(1);
     }
 
-    printf("%i\n", res->ai_family);
+    if ((sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) == -1)
+    {
+        fprintf(stderr, "%s", strerror(errno));
+    }
+
+    printf("%i\n", sockfd);
     freeaddrinfo(res);
 }

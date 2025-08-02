@@ -34,6 +34,7 @@ void print_press_msg(RIGHT_PANEL_STATE *rps)
         else if (rps->s_metadata->has_test &&
                  !rps->s_metadata->has_separate_task)
         {
+            rps->test_mode = true;
             char *press_enter = "Press s to submit your task";
             mvwprintw(rps->right_panel, LINES - 5,
                       (rps->window_width - strlen(press_enter)) / 2, "%s",

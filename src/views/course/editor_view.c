@@ -173,9 +173,7 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
 
     char *patterns[] = {
         ".",
-        "\\b(void|int|char|return|for|while|if|else|break|continue|bool|switch|"
-        "struct|"
-        "case|default)\\b",
+        "\\b(void|int|char|return|for|while|if|else|break|continue|bool|switch|struct|case|default)\\b",
         "#(include|define)|NULL|=|\\+|\\-|\\*|\\&|<|>|;",
         "(?s)\\b([a-z0-9_]*)\\(.*\\)",
         "([a-z0-9_]*)\\(.*",

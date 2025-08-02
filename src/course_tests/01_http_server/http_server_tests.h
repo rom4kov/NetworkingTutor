@@ -9,4 +9,11 @@ void test_if_answers_file_contains_correct_answers(void);
 void register_section1_tests(APP_CONTEXT *ctx);
 
 // 2_getaddrinfo section
+int server_c_file_exists(char *path);
+void test_if_server_c_file_exists(void);
+int server_c_file_compiles_without_errors();
+void test_if_server_c_file_compiles_without_errors(void);
 void register_section2_tests(APP_CONTEXT *ctx);
+
+// 3_socket section
+void register_section3_tests(APP_CONTEXT *ctx);

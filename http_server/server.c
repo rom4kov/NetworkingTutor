@@ -23,7 +23,7 @@ int main(void)
 
     if ((sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) == -1)
     {
-        fprintf(stderr, "%s", strerror(errno));
+        fprintf(stderr, "socket error: %s\n", strerror(errno));
     }
 
     freeaddrinfo(res);

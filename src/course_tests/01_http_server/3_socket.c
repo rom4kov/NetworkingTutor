@@ -13,7 +13,7 @@
 #define PCRE2_CODE_UNIT_WIDTH 8
 #include <pcre2.h>
 
-int test_if_socket_call_is_present(char *path)
+int socket_call_is_present(char *path)
 {
     int rc;
 
@@ -62,7 +62,7 @@ int test_if_socket_call_is_present(char *path)
     return 0;
 }
 
-int test_if_socket_syscall_worked()
+int socket_syscall_works()
 {
     FILE *fp = popen("perl -nE 'say $1 if /\\b(\\w+)\\s*=\\s*socket\\s*\\(/' "
                      "http_server/server.c",
@@ -99,13 +99,65 @@ int test_if_socket_syscall_worked()
         return 1;
     }
 
+    FILE *fp3 =
+        popen("gcc http_server/server_modified.c -o "
+              "http_server/server_modified && ./http_server/server_modified",
+              "r");
+    if (fp3 == NULL)
+    {
+        perror("popen failed");
+        return 1;
+    }
+
+    int sockfd;
+    fread(&sockfd, 1, 1, fp3);
+    if (sockfd == -1)
+    {
+        return 1;
+    }
+
+    return 0;
+}
+
+int socket_syscall_error_handling_works(void)
+{
+    system("perl -0777 -pe 's/(\\n.*\\s*=\\s*socket)/    res->ai_family = "
+           "111;\\1/' http_server/server.c > http_server/server_modified.c");
+
+    FILE *fp2 = popen(
+        "/usr/bin/gcc http_server/server_modified.c -o "
+        "http_server/server_modified && ./http_server/server_modified 2>&1",
+        "r");
+    if (fp2 == NULL)
+    {
+        perror("popen failed");
+        return 1;
+    }
+
+    char buffer[128];
+    char c;
+    int i = 0;
+    while (fread(&c, 1, 1, fp2))
+    {
+        buffer[i] = c;
+        i++;
+    }
+    buffer[i] = '\0';
+
+    if (strstr(buffer, "Address family not supported by protocol") == NULL)
+    {
+        pclose(fp2);
+        return 1;
+    }
+    pclose(fp2);
+
     return 0;
 }
 
 void test_if_server_c_contains_socket_syscall(void)
 {
     bool is_socket_call_is_present = false;
-    if (test_if_socket_call_is_present("http_server/server.c") == 0)
+    if (socket_call_is_present("http_server/server.c") == 0)
     {
         is_socket_call_is_present = true;
     }
@@ -114,8 +166,18 @@ void test_if_server_c_contains_socket_syscall(void)
 
 void test_if_socket_syscall_worked_in_server_c(void)
 {
+    bool did_socket_syscall_work = false;
+    if (socket_syscall_error_handling_works() == 0)
+    {
+        did_socket_syscall_work = true;
+    }
+    CU_ASSERT(did_socket_syscall_work);
+}
+
+void test_if_socket_syscall_error_handling_works(void)
+{
     bool is_socket_call_is_present = false;
-    if (test_if_socket_syscall_worked() == 0)
+    if (socket_syscall_error_handling_works() == 0)
     {
         is_socket_call_is_present = true;
     }
@@ -153,6 +215,16 @@ void register_section3_tests(APP_CONTEXT *ctx)
 
     CU_add_test(ctx->sp[2], "server.c file compiles without errors",
                 (CU_TestFunc)test_if_server_c_file_compiles_without_errors);
+    ctx->ec = CU_get_error();
+    if (ctx->ec != CUE_SUCCESS)
+    {
+        const char *err_msg = CU_get_error_msg();
+        mvwprintw(ctx->course_windows[4], 1, 0, "%s", err_msg);
+    }
+
+    CU_add_test(ctx->sp[2],
+                "socket syscall error handling in server.c file works",
+                (CU_TestFunc)test_if_socket_syscall_error_handling_works);
     ctx->ec = CU_get_error();
     if (ctx->ec != CUE_SUCCESS)
     {

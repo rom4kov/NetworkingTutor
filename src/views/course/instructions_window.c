@@ -13,6 +13,7 @@ void print_press_msg(RIGHT_PANEL_STATE *rps)
 
     if (rps->curr_item < rps->num_of_section_items[rps->curr_section])
     {
+        rps->ready_to_test = false;
         char *press_space = "Press SPACE to continue";
         mvwprintw(rps->right_panel, LINES - 5,
                   ((rps->window_width - strlen(press_space) + 10) / 2) - 10,
@@ -34,7 +35,7 @@ void print_press_msg(RIGHT_PANEL_STATE *rps)
         else if (rps->s_metadata->has_test &&
                  !rps->s_metadata->has_separate_task)
         {
-            rps->test_mode = true;
+            rps->ready_to_test = true;
             char *press_enter = "Press s to submit your task";
             mvwprintw(rps->right_panel, LINES - 5,
                       (rps->window_width - strlen(press_enter)) / 2, "%s",
@@ -60,11 +61,11 @@ void print_course_instructions(APP_CONTEXT *ctx)
     ctx->rp_state->s_metadata = get_section_data(ctx);
 
     read_item_into_buffer(ctx);
-    // log_course_instr_values(ctx);
+    log_course_instr_values(ctx);
 
     print_next_course_item(ctx->rp_state);
 
-    if (ctx->rp_state->test_mode)
+    if (ctx->rp_state->showing_test_results)
     {
         mvwprintw(ctx->rp_state->right_panel, LINES - 5, 2, "%s",
                   "< Back to section");

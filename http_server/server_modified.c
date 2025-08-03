@@ -20,12 +20,11 @@ int main(void)
         fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
         exit(1);
     }
-
+    res->ai_family = 111;
     if ((sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) == -1)
     {
-        fprintf(stderr, "%s", strerror(errno));
+        fprintf(stderr, "socket error: %s\n", strerror(errno));
     }
 
-    printf("%i\n", sockfd);
     freeaddrinfo(res);
 }

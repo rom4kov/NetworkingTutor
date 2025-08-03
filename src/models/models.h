@@ -132,7 +132,8 @@ typedef struct _right_panel_state
     WINDOW *inner_win;
     char *current_task;
     bool *completed_sections;
-    bool test_mode;
+    bool ready_to_test;
+    bool showing_test_results;
     int *course_progress;
     int num_of_section_items[32];
     int *total_section_items;

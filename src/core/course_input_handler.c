@@ -41,7 +41,7 @@ void log_course_instr_values(APP_CONTEXT *ctx)
     mvwprintw(ctx->course_windows[2], 8, 3, "has_test %i",
               ctx->rp_state->s_metadata->has_test);
     mvwprintw(ctx->course_windows[2], 9, 3, "test_mode: %i",
-              ctx->rp_state->test_mode);
+              ctx->rp_state->showing_test_results);
     mvwprintw(ctx->course_windows[2], 10, 3, "sections completed: %i",
               ctx->rp_state->sections_completed);
 }
@@ -215,7 +215,7 @@ void handle_course_input(APP_CONTEXT *ctx)
                     if (ctx->rp_state->s_metadata->has_test &&
                         !ctx->rp_state->s_metadata->has_separate_task)
                     {
-                        ctx->rp_state->test_mode = true;
+                        ctx->rp_state->showing_test_results = true;
                     }
 
                     wnoutrefresh(ctx->rp_state->inner_win);
@@ -232,10 +232,10 @@ void handle_course_input(APP_CONTEXT *ctx)
                 // log_course_instr_values(ctx);
                 // wrefresh(ctx->course_windows[2]);
                 if (ctx->rp_state->curr_item ==
-                         ctx->rp_state->num_of_section_items
-                             [ctx->rp_state->curr_section] &&
+                        ctx->rp_state->num_of_section_items
+                            [ctx->rp_state->curr_section] &&
                     ctx->rp_state->curr_section ==
-                            ctx->rp_state->sections_completed)
+                        ctx->rp_state->sections_completed)
                 {
                     if (!ctx->rp_state->s_metadata->has_test)
                     {
@@ -269,14 +269,18 @@ void handle_course_input(APP_CONTEXT *ctx)
                 }
                 break;
             case '<':
-                if (ctx->rp_state->test_mode)
+                mvwprintw(ctx->course_windows[2], 31, 3, "test mode1: %i",
+                          ctx->rp_state->showing_test_results);
+                if (ctx->rp_state->showing_test_results)
                 {
-                    ctx->rp_state->test_mode = false;
+                    mvwprintw(ctx->course_windows[2], 32, 3, "test mode1: %i",
+                              ctx->rp_state->showing_test_results);
                     wclear(ctx->rp_state->inner_win);
                     deallocate_it_buffer(ctx->rp_state->it_buffer);
                     ctx->rp_state->it_buffer = initialize_it_buffer();
                     // read_item_into_buffer(ctx);
                     print_course_instructions(ctx);
+                    ctx->rp_state->showing_test_results = false;
                     // log_course_instr_values(ctx);
 
                     // wnoutrefresh(ctx->course_windows[2]);
@@ -285,8 +289,10 @@ void handle_course_input(APP_CONTEXT *ctx)
                     doupdate();
                 }
                 else if (ctx->rp_state->curr_section > 0 &&
-                    ctx->rp_state->test_mode == false)
+                         ctx->rp_state->showing_test_results == false)
                 {
+                    mvwprintw(ctx->course_windows[2], 33, 3, "test mode2: %i",
+                              ctx->rp_state->showing_test_results);
                     ctx->rp_state
                         ->num_of_section_items[ctx->rp_state->curr_section] =
                         ctx->rp_state->curr_item;
@@ -318,7 +324,7 @@ void handle_course_input(APP_CONTEXT *ctx)
                 if (ctx->rp_state->curr_section <
                     ctx->rp_state->sections_completed)
                 {
-                    ctx->rp_state->test_mode = false;
+                    ctx->rp_state->showing_test_results = false;
                     ctx->rp_state->curr_section++;
                     get_course_progress(ctx);
                     ctx->rp_state->curr_item =
@@ -355,7 +361,7 @@ void handle_course_input(APP_CONTEXT *ctx)
                 {
                     wclear(ctx->rp_state->right_panel);
                     wclear(ctx->rp_state->inner_win);
-                    ctx->rp_state->test_mode = true;
+                    ctx->rp_state->showing_test_results = true;
                     ctx->rp_state->curr_item = 0;
                     get_task(ctx);
                     wattron(ctx->rp_state->inner_win, A_BOLD | A_UNDERLINE);
@@ -387,7 +393,7 @@ void handle_course_input(APP_CONTEXT *ctx)
             case 's':
                 // log_course_instr_values(ctx);
                 // wrefresh(ctx->course_windows[2]);
-                if (ctx->rp_state->test_mode)
+                if (ctx->rp_state->ready_to_test)
                 {
                     wclear(ctx->rp_state->inner_win);
                     int trc = perform_tests(ctx);

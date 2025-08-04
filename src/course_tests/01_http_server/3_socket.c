@@ -116,17 +116,20 @@ int socket_syscall_works()
         return 1;
     }
 
+    remove("http_server/server_modified.c");
+    remove("http_server/server_modified");
+
     return 0;
 }
 
 int socket_syscall_error_handling_works(void)
 {
     system("perl -0777 -pe 's/(\\n.*\\s*=\\s*socket)/    res->ai_family = "
-           "111;\\1/' http_server/server.c > http_server/server_modified.c");
+           "111;\\1/' http_server/server.c > http_server/server_modified2.c");
 
     FILE *fp2 = popen(
-        "/usr/bin/gcc http_server/server_modified.c -o "
-        "http_server/server_modified && ./http_server/server_modified 2>&1",
+        "/usr/bin/gcc http_server/server_modified2.c -o "
+        "http_server/server_modified2 && ./http_server/server_modified2 2>&1",
         "r");
     if (fp2 == NULL)
     {
@@ -151,7 +154,10 @@ int socket_syscall_error_handling_works(void)
     }
     pclose(fp2);
 
-    return 0;
+    remove("http_server/server_modified2.c");
+    remove("http_server/server_modified2");
+
+    return 1;
 }
 
 void test_if_server_c_contains_socket_syscall(void)
@@ -167,7 +173,7 @@ void test_if_server_c_contains_socket_syscall(void)
 void test_if_socket_syscall_worked_in_server_c(void)
 {
     bool did_socket_syscall_work = false;
-    if (socket_syscall_error_handling_works() == 0)
+    if (socket_syscall_works() == 0)
     {
         did_socket_syscall_work = true;
     }
@@ -176,12 +182,12 @@ void test_if_socket_syscall_worked_in_server_c(void)
 
 void test_if_socket_syscall_error_handling_works(void)
 {
-    bool is_socket_call_is_present = false;
+    bool does_socket_error_handling_work = false;
     if (socket_syscall_error_handling_works() == 0)
     {
-        is_socket_call_is_present = true;
+        does_socket_error_handling_work = true;
     }
-    CU_ASSERT(is_socket_call_is_present);
+    CU_ASSERT(does_socket_error_handling_work);
 }
 
 void register_section3_tests(APP_CONTEXT *ctx)
@@ -222,9 +228,8 @@ void register_section3_tests(APP_CONTEXT *ctx)
         mvwprintw(ctx->course_windows[4], 1, 0, "%s", err_msg);
     }
 
-    CU_add_test(ctx->sp[2],
-                "socket syscall error handling in server.c file works",
-                (CU_TestFunc)test_if_socket_syscall_error_handling_works);
+    CU_add_test(ctx->sp[2], "socket syscall in server.c file works",
+                (CU_TestFunc)test_if_socket_syscall_worked_in_server_c);
     ctx->ec = CU_get_error();
     if (ctx->ec != CUE_SUCCESS)
     {
@@ -232,8 +237,9 @@ void register_section3_tests(APP_CONTEXT *ctx)
         mvwprintw(ctx->course_windows[4], 1, 0, "%s", err_msg);
     }
 
-    CU_add_test(ctx->sp[2], "socket syscall in server.c file works",
-                (CU_TestFunc)test_if_socket_syscall_worked_in_server_c);
+    CU_add_test(ctx->sp[2],
+                "socket syscall error handling in server.c file works",
+                (CU_TestFunc)test_if_socket_syscall_error_handling_works);
     ctx->ec = CU_get_error();
     if (ctx->ec != CUE_SUCCESS)
     {

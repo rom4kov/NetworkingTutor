@@ -56,7 +56,7 @@ VALUES
         1,
         3,
         "History of the socket API",
-        "@The socket() syscall is part of the socket API, introduced in 1983
+        "@The socket() syscall is part of the socket API, introduced in 1983 
 with BSD Unix as a unified way to perform network communication. Before this,
 network programming was platform-specific and fragmented.",
         2,

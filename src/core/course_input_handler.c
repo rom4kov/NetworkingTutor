@@ -269,12 +269,15 @@ void handle_course_input(APP_CONTEXT *ctx)
                 }
                 break;
             case '<':
-                mvwprintw(ctx->course_windows[2], 31, 3, "test mode1: %i",
-                          ctx->rp_state->showing_test_results);
+                // mvwprintw(ctx->course_windows[2], 31, 3, "test mode1: %i",
+                //           ctx->rp_state->showing_test_results);
                 if (ctx->rp_state->showing_test_results)
                 {
-                    mvwprintw(ctx->course_windows[2], 32, 3, "test mode1: %i",
-                              ctx->rp_state->showing_test_results);
+                    // mvwprintw(ctx->course_windows[2], 32, 3, "test mode1: %i",
+                    //           ctx->rp_state->showing_test_results);
+                    ctx->rp_state->showing_test_results = false;
+                    mvwprintw(ctx->rp_state->right_panel, LINES - 5, 2, "%s",
+                              "<                ");
                     wclear(ctx->rp_state->inner_win);
                     deallocate_it_buffer(ctx->rp_state->it_buffer);
                     ctx->rp_state->it_buffer = initialize_it_buffer();
@@ -396,6 +399,10 @@ void handle_course_input(APP_CONTEXT *ctx)
                 if (ctx->rp_state->ready_to_test)
                 {
                     wclear(ctx->rp_state->inner_win);
+                    ctx->rp_state->showing_test_results = true;
+                    mvwprintw(ctx->rp_state->right_panel, LINES - 5, 2, "%s",
+                              "< Back to section");
+                    wrefresh(ctx->rp_state->right_panel);
                     int trc = perform_tests(ctx);
                     // mvwprintw(ctx->rp_state->right_panel, LINES - 5, 2, "%s",
                     //           "< Back to section");

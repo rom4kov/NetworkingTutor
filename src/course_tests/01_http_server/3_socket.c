@@ -157,7 +157,7 @@ int socket_syscall_error_handling_works(void)
     remove("http_server/server_modified2.c");
     remove("http_server/server_modified2");
 
-    return 1;
+    return 0;
 }
 
 void test_if_server_c_contains_socket_syscall(void)

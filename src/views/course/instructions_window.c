@@ -5,7 +5,7 @@
 
 void print_press_msg(RIGHT_PANEL_STATE *rps)
 {
-    char blank_line[rps->window_width - 4];
+    char blank_line[rps->window_width - 8];
     memset(blank_line, 32, sizeof(blank_line));
     memset(&blank_line[sizeof(blank_line) - 1], '\0', 1);
 
@@ -78,7 +78,7 @@ void print_course_instructions(APP_CONTEXT *ctx)
             mvwprintw(ctx->rp_state->right_panel, LINES - 5, 2, "%s", " ");
     }
 
-    if (ctx->rp_state->completed_sections[ctx->rp_state->curr_section])
+    if (ctx->rp_state->curr_section < ctx->rp_state->sections_completed)
         mvwprintw(ctx->rp_state->right_panel, LINES - 5,
                   ctx->rp_state->window_width - 3, "%s", ">");
     else

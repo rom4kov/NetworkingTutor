@@ -13,7 +13,11 @@ int server_c_file_exists(char *path);
 void test_if_server_c_file_exists(void);
 int server_c_file_compiles_without_errors();
 void test_if_server_c_file_compiles_without_errors(void);
+void test_if_socket_syscall_worked_in_server_c(void);
 void register_section2_tests(APP_CONTEXT *ctx);
 
 // 3_socket section
 void register_section3_tests(APP_CONTEXT *ctx);
+
+// 4_bind section
+void register_section4_tests(APP_CONTEXT *ctx);

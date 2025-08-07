@@ -83,6 +83,8 @@ int socket_syscall_works()
     }
     buffer[i - 1] = '\0';
 
+    pclose(fp);
+
     char perl_command[512];
 
     snprintf(perl_command, sizeof(perl_command),
@@ -101,7 +103,7 @@ int socket_syscall_works()
 
     FILE *fp3 =
         popen("gcc http_server/server_modified.c -o "
-              "http_server/server_modified && ./http_server/server_modified",
+              "http_server/server_modified && ./http_server/server_modified 2>&1",
               "r");
     if (fp3 == NULL)
     {
@@ -109,13 +111,24 @@ int socket_syscall_works()
         return 1;
     }
 
-    int sockfd;
-    fread(&sockfd, 1, 1, fp3);
-    if (sockfd == -1)
+    char buffer2[256];
+    i = 0;
+    while (fread(&c, 1, 1, fp3))
     {
+        buffer2[i] = c;
+        i++;
+    }
+    buffer2[i - 1] = '\0';
+
+    if (strstr(buffer2, "-1") != NULL ||
+        strstr(buffer2, "Address family not supported by protocol") != NULL)
+    {
+        pclose(fp3);
         return 1;
     }
 
+    pclose(fp2);
+    pclose(fp3);
     remove("http_server/server_modified.c");
     remove("http_server/server_modified");
 

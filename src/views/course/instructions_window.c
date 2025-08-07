@@ -61,7 +61,7 @@ void print_course_instructions(APP_CONTEXT *ctx)
     ctx->rp_state->s_metadata = get_section_data(ctx);
 
     read_item_into_buffer(ctx);
-    log_course_instr_values(ctx);
+    // log_course_instr_values(ctx);
 
     print_next_course_item(ctx->rp_state);
 

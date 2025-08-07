@@ -55,5 +55,7 @@ int main(void)
         close(sockfd);
     }
 
+    printf("%i\n", status
+);
     freeaddrinfo(res);
 }

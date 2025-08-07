@@ -26,34 +26,35 @@ int main(void)
 
     for (p = res; p != NULL; p = p->ai_next)
     {
-        if ((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) ==
-            -1)
+        if ((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1)
         {
             fprintf(stderr, "socket error: %s\n", strerror(errno));
-            close(sockfd);
             continue;
         }
 
-        if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes,
-                       sizeof(yes)))
+        if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)))
         {
-            perror("setsockopt");
+            fprintf(stderr, "setsockopt error: %s\n", strerror(errno));
             close(sockfd);
             continue;
         }
 
         if ((status = bind(sockfd, p->ai_addr, p->ai_addrlen)) != 0)
         {
-            perror("bind");
-            exit(EXIT_FAILURE);
-        }
-        else
-        {
-            break;
+            fprintf(stderr, "bind error: %s\n", strerror(errno));
+            close(sockfd);
+            continue;
         }
 
-        close(sockfd);
+        break;
+    }
+
+    if (p == NULL)
+    {
+        fprintf(stderr, "Failed to bind socket\n");
+        exit(EXIT_FAILURE);
     }
 
     freeaddrinfo(res);
+    close(sockfd);
 }

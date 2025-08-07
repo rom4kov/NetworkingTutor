@@ -325,11 +325,34 @@ VALUES
         1,
         4,
         "",
-        "The standard pattern is to use a for loop where you iterate through
-the linked list in of addresses in the addrinfo struct by putting something
-like `addr = addr->ai_next` in the increment expression of the for loop.
-Inside the for loop you call socket(), setsockopt() and bind() each with the
-values of the current node in the linked list.@",
+        "The standard pattern is to use a for loop to iterate through the
+linked list of addresses in the addrinfo struct, using something like addr
+= addr->ai_next in the increment expression of the loop. Inside the loop, you
+typically call socket(), setsockopt(), and bind() with the appropriate
+arguments.@",
+        12,
+        0
+    );
+
+INSERT
+    OR IGNORE INTO materials (
+        course_id,
+        section_id,
+        content_title,
+        content,
+        order_num,
+        syntax_highlighting
+    )
+VALUES
+    (
+        1,
+        4,
+        "",
+  "It's common practice to include a continue statement at the end of the
+error-handling block for each of these functions, so that the loop immediately
+proceeds to the next address if one of the functions fails. A break statement
+is usually placed at the end of the loop to exit it as soon as a working address
+struct has been found.",
         12,
         0
     );

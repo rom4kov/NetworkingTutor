@@ -345,9 +345,6 @@ void close_sub_directory(DIR_ENTRY *dir_to_close, int entries_in_dir,
         entries_iterator = entries_iterator->parent_dir;
     }
 
-    // if (dir_to_close->parent_dir != NULL)
-    //     dir_to_close->parent_dir->num_of_entries -=
-    //         dir_to_close->num_of_entries;
     dir_to_close->num_of_entries -= entries_in_dir;
 }
 

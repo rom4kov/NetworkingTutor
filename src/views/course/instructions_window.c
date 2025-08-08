@@ -84,28 +84,10 @@ void print_course_instructions(APP_CONTEXT *ctx)
     else
         mvwprintw(ctx->rp_state->right_panel, LINES - 5,
                   ctx->rp_state->window_width - 3, "%s", " ");
-    //
-    // if ((ctx->rp_state->curr_item ==
-    //      ctx->rp_state->num_of_section_items[ctx->rp_state->curr_section]) &&
-    //      ctx->rp_state->s_metadata->has_test &&
-    //      !ctx->rp_state->s_metadata->has_separate_task)
-    // {
-    //     ctx->rp_state->test_mode = true;
-    // }
 
     mvwprintw(ctx->rp_state->right_panel, LINES - 4,
               ctx->rp_state->window_width - 18, " %s %i of %i ", "Section",
               ctx->rp_state->curr_section + 1, 9);
-    // for (int i = 0; i < 32; i++)
-    //     mvwprintw(ctx->course_windows[2], i + 2, 3, "%i: %i", i,
-    //               ctx->rp_state->course_progress[i]);
-    // mvwprintw(ctx->course_windows[2], 20, 10, "ci %i",
-    //           ctx->rp_state->curr_item);
-    // mvwprintw(ctx->course_windows[2], 21, 10, "cs %i",
-    //           ctx->rp_state->curr_section);
-    // mvwprintw(ctx->course_windows[2], 22, 10, "nosi %i",
-    //           ctx->rp_state->num_of_section_items[ctx->rp_state->curr_section]);
-    // wrefresh(ctx->course_windows[2]);
 }
 
 void print_next_course_item(RIGHT_PANEL_STATE *rp_state)

@@ -49,12 +49,6 @@ int main(void)
         break;
     }
 
-    if (p == NULL)
-    {
-        fprintf(stderr, "Failed to bind socket\n");
-        exit(EXIT_FAILURE);
-    }
-
     freeaddrinfo(res);
     close(sockfd);
 }

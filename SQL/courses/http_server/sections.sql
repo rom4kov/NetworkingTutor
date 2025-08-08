@@ -92,3 +92,22 @@ VALUES
         1,
         0
     );
+
+INSERT
+    OR IGNORE INTO sections (
+        course_id,
+        section_title,
+        num_of_items,
+        order_num,
+        has_test,
+        has_separate_task
+    )
+VALUES
+    (
+        1,
+        "5. Handle connection requests: listen() and accept()",
+        12,
+        5,
+        1,
+        0
+    );

@@ -109,7 +109,7 @@ int server_c_contains_setsockopt_call(char *path)
     return 0;
 }
 
-int server_c_contains_fprintf_or_perror(char *path)
+int server_c_contains_fprintf_or_perror(char *path, int num)
 {
     int rc;
 
@@ -150,7 +150,7 @@ int server_c_contains_fprintf_or_perror(char *path)
 
     fclose(server_c_file);
 
-    if (pattern_matched == 4)
+    if (pattern_matched == num)
         return 0;
     else
         return 1;
@@ -175,13 +175,6 @@ int server_c_has_working_for_loop_for_picking_addr()
     buffer[len] = '\0';
 
     pclose(fp);
-
-    FILE *output_file = fopen("http_server/output5.txt", "w");
-    if (output_file)
-    {
-        fwrite(buffer, 1, len, output_file);
-        fclose(output_file);
-    }
 
     return strstr(buffer, "inside") ? 0 : 1;
 }
@@ -242,8 +235,8 @@ int bind_syscall_works()
         return 1;
     }
 
-    remove("http_server/server_modified.c");
-    remove("http_server/server_modified");
+    remove("http_server/server_modified2.c");
+    remove("http_server/server_modified2");
 
     return 0;
 }
@@ -258,10 +251,10 @@ void test_if_server_c_contains_bind_syscall(void)
     CU_ASSERT(is_socket_call_is_present);
 }
 
-void test_if_server_c_contains_fprintf_or_perror(void)
+void test_if_server_c_contains_fprintf_or_perror()
 {
     bool is_socket_call_is_present = false;
-    if (server_c_contains_fprintf_or_perror("http_server/server.c") == 0)
+    if (server_c_contains_fprintf_or_perror("http_server/server.c", 4) == 0)
     {
         is_socket_call_is_present = true;
     }

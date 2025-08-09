@@ -20,4 +20,8 @@ void register_section2_tests(APP_CONTEXT *ctx);
 void register_section3_tests(APP_CONTEXT *ctx);
 
 // 4_bind section
+int server_c_contains_fprintf_or_perror(char *path, int num);
 void register_section4_tests(APP_CONTEXT *ctx);
+
+// 5_listen_and_accept section
+void register_section5_tests(APP_CONTEXT *ctx);

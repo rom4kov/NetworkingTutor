@@ -28,12 +28,11 @@ int socket_call_is_present(char *path)
     read_file_into_buffer(server_c_file, text_buf);
     LINE *buf_line = text_buf->first_line;
 
-    int pattern_num = 2;
+    int pattern_num = 1;
 
     pcre2_code *re[pattern_num];
 
-    char *patterns[] = {"\\bsocket\\s*\\(\\s*[^,]+,\\s*[^,]+,\\s*[^)]+\\)",
-                        "\\bfprintf\\s*\\(\\s*[^,]+,\\s*[^,]+,\\s*[^)]+\\)"};
+    char *patterns[] = {"\\bsocket\\s*\\(\\s*[^,]+,\\s*[^,]+,\\s*[^)]+\\)"};
 
     compile_patterns(re, pattern_num, patterns);
 
@@ -223,7 +222,7 @@ void register_section3_tests(APP_CONTEXT *ctx)
     }
 
     CU_add_test(ctx->sp[2],
-                "server.c contains socket syscall and fprintf function",
+                "server.c contains socket syscall function",
                 (CU_TestFunc)test_if_server_c_contains_socket_syscall);
     ctx->ec = CU_get_error();
     if (ctx->ec != CUE_SUCCESS)

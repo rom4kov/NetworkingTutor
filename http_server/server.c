@@ -10,7 +10,9 @@
 int main(void)
 {
     struct addrinfo hints, *res, *p;
-    int status, sockfd;
+    struct sockaddr_storage their_addr;
+    socklen_t addr_size;
+    int status, sockfd, new_fd;
     int yes = 1;
 
     memset(&hints, 0, sizeof(hints));
@@ -47,6 +49,25 @@ int main(void)
         }
 
         break;
+    }
+
+    if (p == NULL)
+    {
+        fprintf(stderr, "Failed to bind socket\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if ((status = listen(sockfd, 10)) != 0)
+    {
+        fprintf(stderr, "listen error: %s\n", gai_strerror(status));
+        exit(EXIT_FAILURE);
+    }
+
+    addr_size = sizeof(their_addr);
+    if ((new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &addr_size)) == 0)
+    {
+        fprintf(stderr, "listen error: %s\n", gai_strerror(status));
+        exit(EXIT_FAILURE);
     }
 
     freeaddrinfo(res);

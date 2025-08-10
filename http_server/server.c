@@ -59,14 +59,14 @@ int main(void)
 
     if ((status = listen(sockfd, 10)) != 0)
     {
-        fprintf(stderr, "listen error: %s\n", gai_strerror(status));
+        fprintf(stderr, "listen error: %s\n", strerror(errno));
         exit(EXIT_FAILURE);
     }
 
     addr_size = sizeof(their_addr);
-    if ((new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &addr_size)) == 0)
+    if ((new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &addr_size)) <= 0)
     {
-        fprintf(stderr, "listen error: %s\n", gai_strerror(status));
+        fprintf(stderr, "accept error: %s, new_fd: %i\n", strerror(errno), new_fd);
         exit(EXIT_FAILURE);
     }
 

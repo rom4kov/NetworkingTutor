@@ -1,4 +1,4 @@
-#define _POSIX_C_SOURCE 2
+#define _POSIX_C_SOURCE 200809L
 #include "../../data/data_access_layer.h"
 #include "../../views/views.h"
 #include "../tests.h"
@@ -6,11 +6,12 @@
 #include <CUnit/CUError.h>
 #include <CUnit/CUnit.h>
 #include <CUnit/TestDB.h>
+#include <arpa/inet.h>
+#include <pthread.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <pthread.h>
-// #include <stdlib.h>
 
 #define PCRE2_CODE_UNIT_WIDTH 8
 #include <pcre2.h>
@@ -111,20 +112,39 @@ int server_c_contains_accept_syscall(char *path)
     return 0;
 }
 
-void *kill_server_modified()
+void *connect_to_server(void *arg)
 {
-    sleep(1);
+    int *port = (int *)arg;
+    napms(500);
 
-    system("killall server_modified2");
+    struct sockaddr_in addr = {0};
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(*port);
+    if (inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr) <= 0)
+    {
+        perror("inet_pton");
+        return NULL;
+    }
 
-    return NULL;
-}
+    for (int attempt = 0; attempt < 30; attempt++)
+    {
+        int sock = socket(AF_INET, SOCK_STREAM, 0);
+        if (sock < 0)
+        {
+            perror("socket");
+            return NULL;
+        }
 
-void *kill_server_modified2()
-{
-    sleep(1);
+        if (connect(sock, (struct sockaddr *)&addr, sizeof(addr)) == 0)
+        {
+            close(sock);
+            return NULL;
+        }
 
-    system("killall server_modified3");
+        close(sock);
+        napms(100);
+    }
+    fprintf(stderr, "connect timeout, port: %i\n", *port);
 
     return NULL;
 }
@@ -152,6 +172,8 @@ int listen_syscall_works()
     if (i < 2)
         return 1;
 
+    pclose(fp);
+
     char perl_command[512];
 
     snprintf(perl_command, sizeof(perl_command),
@@ -161,43 +183,82 @@ int listen_syscall_works()
              "http_server/server.c > http_server/server_modified2.c",
              buffer);
 
-    FILE *fp2 = popen(perl_command, "r");
+    FILE *fp1 = popen(perl_command, "r");
+    if (fp1 == NULL)
+    {
+        perror("popen failed");
+        return 1;
+    }
+
+    pclose(fp1);
+
+    FILE *fp2 = popen("perl -0777 -nE "
+                      "'say $1 if /getaddrinfo\\([^,]+,\\s*\"([^,\\n]+)\"/' "
+                      "http_server/server.c",
+                      "r");
     if (fp2 == NULL)
     {
         perror("popen failed");
         return 1;
     }
 
-    pthread_t kill_server;
-    pthread_create(&kill_server, NULL, kill_server_modified, NULL);
+    char port_num[16];
+    i = 0;
+    while (fread(&c, 1, 1, fp2))
+    {
+        port_num[i] = c;
+        i++;
+    }
+    port_num[i - 1] = '\0';
+    char *port_copy = strdup(port_num);
+    int *port_int = (int *)malloc(sizeof(int));
+    *port_int = atoi(port_copy);
 
-    FILE *fp3 =
-        popen("gcc http_server/server_modified2.c -o "
-              "http_server/server_modified2 && ./http_server/server_modified2",
-              "r");
+    pthread_t unblock_server;
+    pthread_create(&unblock_server, NULL, connect_to_server, port_int);
+
+    FILE *fp3 = popen(
+        "gcc http_server/server_modified2.c -o "
+        "http_server/server_modified2 && ./http_server/server_modified2 2>&1",
+        "r");
     if (fp3 == NULL)
     {
         perror("popen failed");
         return 1;
     }
 
-    int rc;
-    fread(&rc, 1, 1, fp3);
-    if (!(rc >= 0))
+    pthread_detach(unblock_server);
+
+    // sleep(1);
+
+    char rc[16];
+    while (fread(&c, 1, 1, fp2))
     {
+        rc[i] = c;
+        i++;
+    }
+    rc[i - 1] = '\0';
+    // fprintf(stderr, "rc: %s\n", rc);
+    int rc_int = atoi(rc);
+    if (rc_int < 0)
+    {
+        pclose(fp3);
+        remove("http_server/server_modified2.c");
+        remove("http_server/server_modified2");
         return 1;
     }
 
+    pclose(fp3);
+
     remove("http_server/server_modified2.c");
     remove("http_server/server_modified2");
-
-    pthread_detach(kill_server);
 
     return 0;
 }
 
 int accept_syscall_works()
 {
+    sleep(1);
     FILE *fp = popen("perl -nE 'say $1 if /\\b(\\w+)\\s*=\\s*accept\\s*\\(/' "
                      "http_server/server.c",
                      "r");
@@ -215,9 +276,11 @@ int accept_syscall_works()
         buffer[i] = c;
         i++;
     }
-    buffer[i] = '\0';
+    buffer[i - 1] = '\0';
     if (i < 2)
         return 1;
+
+    pclose(fp);
 
     char perl_command[512];
 
@@ -228,51 +291,90 @@ int accept_syscall_works()
              "http_server/server.c > http_server/server_modified3.c",
              buffer);
 
-    FILE *fp2 = popen(perl_command, "r");
+    FILE *fp1 = popen(perl_command, "r");
+    if (fp1 == NULL)
+    {
+        perror("popen failed");
+        return 1;
+    }
+
+    pclose(fp1);
+
+    FILE *fp2 = popen("perl -0777 -nE "
+                      "'say $1 if /getaddrinfo\\([^,]+,\\s*\"([^,\\n]+)\"/' "
+                      "http_server/server.c",
+                      "r");
     if (fp2 == NULL)
     {
         perror("popen failed");
         return 1;
     }
 
-    pthread_t kill_server;
-    pthread_create(&kill_server, NULL, kill_server_modified2, NULL);
+    char port_num[16];
+    i = 0;
+    while (fread(&c, 1, 1, fp2))
+    {
+        port_num[i] = c;
+        i++;
+    }
+    port_num[i - 1] = '\0';
+    char *port_copy = strdup(port_num);
+    char perl_command2[512];
+    int *port_int = (int *)malloc(sizeof(int));
+    *port_int = atoi(port_copy) + 1;
 
-    FILE *fp3 =
-        popen("gcc http_server/server_modified3.c -o "
-              "http_server/server_modified3 && ./http_server/server_modified3",
-              "r");
+    snprintf(
+        perl_command2, sizeof(perl_command2),
+        "perl -0777 -pi -e 's/\"%i\"/\"%i\"/' http_server/server_modified3.c",
+        *port_int - 1, *port_int);
+
+    system(perl_command2);
+
+    pthread_t unblock_server;
+    pthread_create(&unblock_server, NULL, connect_to_server, port_int);
+
+    FILE *fp3 = popen(
+        "gcc http_server/server_modified3.c -o "
+        "http_server/server_modified3 && ./http_server/server_modified3 2>&1",
+        "r");
     if (fp3 == NULL)
     {
         perror("popen failed");
         return 1;
     }
 
-    int rc;
-    fread(&rc, 1, 1, fp3);
-    if (!(rc >= 0))
+    char rc[16];
+    while (fread(&c, 1, 1, fp2))
     {
+        rc[i] = c;
+        i++;
+    }
+    rc[i - 1] = '\0';
+    // fprintf(stderr, "rc: %s\n", rc);
+    int rc_int = atoi(rc);
+    if (rc_int < 0)
+    {
+        pclose(fp3);
+        remove("http_server/server_modified3.c");
+        remove("http_server/server_modified3");
         return 1;
     }
 
+    pthread_join(unblock_server, NULL);
+
+    pclose(fp3);
+
     remove("http_server/server_modified3.c");
     remove("http_server/server_modified3");
-
-    pthread_detach(kill_server);
 
     return 0;
 }
 
 int syscall_error_handling_works(char *syscall)
 {
-    char perl_command[256];
-
-    snprintf(perl_command, sizeof(perl_command),
-             "perl -nE 'say $1 if /\\b(\\w+)\\s*=\\s*%s\\s*\\(/' "
-             "http_server/server.c",
-             syscall);
-
-    FILE *fp = popen(perl_command, "r");
+    FILE *fp = popen("perl -nE 'say $1 if /\\b(\\w+)\\s*=\\s*socket\\s*\\(/' "
+                     "http_server/server.c",
+                     "r");
     if (fp == NULL)
     {
         perror("popen failed");
@@ -287,23 +389,71 @@ int syscall_error_handling_works(char *syscall)
         buffer[i] = c;
         i++;
     }
-    buffer[i] = '\0';
+    buffer[i - 1] = '\0';
 
     pclose(fp);
 
-    char perl_command2[512];
+    int serv_identifier = 4;
+    if (strcmp(syscall, "accept") == 0)
+    {
+        serv_identifier = 5;
+    }
 
+    char perl_command2[512];
     snprintf(perl_command2, sizeof(perl_command2),
              "perl -0777 -pe 's/(\\n.*\\s*=\\s*%s)/    %s = "
-             "111;\\1/' http_server/server.c > http_server/server_modified4.c",
-             syscall, buffer);
+             "-1;\\1/' http_server/server.c > http_server/server_modified%i.c",
+             syscall, buffer, serv_identifier);
 
     system(perl_command2);
 
-    FILE *fp2 = popen(
-        "/usr/bin/gcc http_server/server_modified4.c -o "
-        "http_server/server_modified4 && ./http_server/server_modified4 2>&1",
-        "r");
+    FILE *fp1 = popen("perl -0777 -nE "
+                      "'say $1 if /getaddrinfo\\([^,]+,\\s*\"([^,\\n]+)\"/' "
+                      "http_server/server.c",
+                      "r");
+    if (fp1 == NULL)
+    {
+        perror("popen failed");
+        return 1;
+    }
+
+    char port_num[16];
+    i = 0;
+    while (fread(&c, 1, 1, fp1))
+    {
+        port_num[i] = c;
+        i++;
+    }
+    port_num[i - 1] = '\0';
+    char *port_copy = strdup(port_num);
+    int *port_int = (int *)malloc(sizeof(int));
+    *port_int = atoi(port_copy);
+
+    char compile_and_run_cmd[128];
+
+    if (strcmp(syscall, "listen") == 0)
+    {
+        snprintf(compile_and_run_cmd, sizeof(compile_and_run_cmd), "%s",
+                 "/usr/bin/gcc http_server/server_modified4.c -o "
+                 "http_server/server_modified4 && "
+                 "./http_server/server_modified4 2>&1");
+    }
+    else if (strcmp(syscall, "accept") == 0)
+    {
+        snprintf(compile_and_run_cmd, sizeof(compile_and_run_cmd), "%s",
+                 "/usr/bin/gcc http_server/server_modified5.c -o "
+                 "http_server/server_modified5 && "
+                 "./http_server/server_modified5 2>&1");
+        *port_int += 1;
+    }
+
+    pthread_t unblock_server;
+    if (strcmp(syscall, "accept") == 0)
+    {
+        pthread_create(&unblock_server, NULL, connect_to_server, port_int);
+    }
+
+    FILE *fp2 = popen(compile_and_run_cmd, "r");
     if (fp2 == NULL)
     {
         perror("popen failed");
@@ -319,15 +469,29 @@ int syscall_error_handling_works(char *syscall)
     }
     buffer2[i] = '\0';
 
-    if (strstr(buffer2, "Address family not supported by protocol") == NULL)
+    if (strstr(buffer2, "Bad file descriptor") == NULL)
     {
         pclose(fp2);
         return 1;
     }
+
     pclose(fp2);
 
-    remove("http_server/server_modified4.c");
-    remove("http_server/server_modified4");
+    if (strcmp(syscall, "listen") == 0)
+    {
+        // remove("http_server/server_modified4.c");
+        // remove("http_server/server_modified4");
+    }
+    else if (strcmp(syscall, "accept") == 0)
+    {
+        // remove("http_server/server_modified5.c");
+        // remove("http_server/server_modified5");
+    }
+
+    if (strcmp(syscall, "accept") == 0)
+    {
+        pthread_join(unblock_server, NULL);
+    }
 
     return 0;
 }
@@ -475,22 +639,22 @@ void register_section5_tests(APP_CONTEXT *ctx)
         const char *err_msg = CU_get_error_msg();
         mvwprintw(ctx->course_windows[4], 1, 1, "%s", err_msg);
     }
-    //
-    // CU_add_test(ctx->sp[4], "listen error handling in server.c file works",
-    //             (CU_TestFunc)test_if_listen_error_handling_works);
-    // ctx->ec = CU_get_error();
-    // if (ctx->ec != CUE_SUCCESS)
-    // {
-    //     const char *err_msg = CU_get_error_msg();
-    //     mvwprintw(ctx->course_windows[4], 1, 1, "%s", err_msg);
-    // }
-    //
-    // CU_add_test(ctx->sp[4], "accept error handling in server.c file works",
-    //             (CU_TestFunc)test_if_accept_error_handling_works);
-    // ctx->ec = CU_get_error();
-    // if (ctx->ec != CUE_SUCCESS)
-    // {
-    //     const char *err_msg = CU_get_error_msg();
-    //     mvwprintw(ctx->course_windows[4], 1, 1, "%s", err_msg);
-    // }
+
+    CU_add_test(ctx->sp[4], "listen error handling in server.c file works",
+                (CU_TestFunc)test_if_listen_error_handling_works);
+    ctx->ec = CU_get_error();
+    if (ctx->ec != CUE_SUCCESS)
+    {
+        const char *err_msg = CU_get_error_msg();
+        mvwprintw(ctx->course_windows[4], 1, 1, "%s", err_msg);
+    }
+
+    CU_add_test(ctx->sp[4], "accept error handling in server.c file works",
+                (CU_TestFunc)test_if_accept_error_handling_works);
+    ctx->ec = CU_get_error();
+    if (ctx->ec != CUE_SUCCESS)
+    {
+        const char *err_msg = CU_get_error_msg();
+        mvwprintw(ctx->course_windows[4], 1, 1, "%s", err_msg);
+    }
 }

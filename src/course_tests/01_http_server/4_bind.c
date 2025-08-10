@@ -228,15 +228,15 @@ int bind_syscall_works()
         return 1;
     }
 
+    remove("http_server/server_modified2.c");
+    remove("http_server/server_modified2");
+
     int rc;
     fread(&rc, 1, 1, fp3);
     if (!(rc >= 0))
     {
         return 1;
     }
-
-    remove("http_server/server_modified2.c");
-    remove("http_server/server_modified2");
 
     return 0;
 }

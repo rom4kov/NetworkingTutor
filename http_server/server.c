@@ -14,13 +14,15 @@ int main(void)
     socklen_t addr_size;
     int status, sockfd, new_fd;
     int yes = 1;
+    char *buf = calloc(3000, 1);
+
 
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
 
-    if ((status = getaddrinfo(NULL, "8080", &hints, &res)) != 0)
+    if ((status = getaddrinfo(NULL, "8090", &hints, &res)) != 0)
     {
         fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
         exit(EXIT_FAILURE);
@@ -28,7 +30,8 @@ int main(void)
 
     for (p = res; p != NULL; p = p->ai_next)
     {
-        if ((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1)
+        if ((sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) ==
+            -1)
         {
             fprintf(stderr, "socket error: %s\n", strerror(errno));
             continue;
@@ -63,13 +66,35 @@ int main(void)
         exit(EXIT_FAILURE);
     }
 
-    addr_size = sizeof(their_addr);
-    if ((new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &addr_size)) <= 0)
-    {
-        fprintf(stderr, "accept error: %s, new_fd: %i\n", strerror(errno), new_fd);
-        exit(EXIT_FAILURE);
+    while (1) {
+        addr_size = sizeof(their_addr);
+        if ((new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &addr_size)) <=
+            0)
+        {
+            fprintf(stderr, "accept error: %s, new_fd: %i\n", strerror(errno),
+                    new_fd);
+            exit(EXIT_FAILURE);
+        }
+
+        int received = recv(new_fd, buf, 3000, 0);
+
+        if (received != -1)
+        {
+            buf[received] = '\0';
+
+            printf("bytes received: %i\n", received);
+            printf("%s\n", buf);
+
+            send(new_fd,
+                 "HTTP/1.1 200 OK\n"
+                 "Content-Length: 64\n"
+                 "\n"
+                 "<!doctype html><html><body><h1>FREE PALESTINE</h1></body></html>",
+                 250, 0);
+        }
     }
 
+    free(buf);
     freeaddrinfo(res);
     close(sockfd);
 }

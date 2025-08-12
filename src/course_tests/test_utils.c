@@ -1,6 +1,10 @@
 #define PCRE2_CODE_UNIT_WIDTH 8
 #include "../models/models.h"
 #include "pcre2.h"
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <unistd.h>
 
 int check_line_for_matches(LINE *current_line, int j, pcre2_code **re,
                       size_t subject_length)
@@ -11,4 +15,41 @@ int check_line_for_matches(LINE *current_line, int j, pcre2_code **re,
         return -1;
 
     return pcre2_match(re[j], subject, subject_length, 0, 0, md, NULL);
+}
+
+void *connect_to_server(void *arg)
+{
+    int *port = (int *)arg;
+    napms(500);
+
+    struct sockaddr_in addr = {0};
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(*port);
+    if (inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr) <= 0)
+    {
+        perror("inet_pton");
+        return NULL;
+    }
+
+    for (int attempt = 0; attempt < 30; attempt++)
+    {
+        int sock = socket(AF_INET, SOCK_STREAM, 0);
+        if (sock < 0)
+        {
+            perror("socket");
+            return NULL;
+        }
+
+        if (connect(sock, (struct sockaddr *)&addr, sizeof(addr)) == 0)
+        {
+            close(sock);
+            return NULL;
+        }
+
+        close(sock);
+        napms(100);
+    }
+    fprintf(stderr, "connect timeout, port: %i\n", *port);
+
+    return NULL;
 }

@@ -173,7 +173,7 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
 
     char *patterns[] = {
         ".",
-        "\\b(void|int|char|return|for|while|if|else|break|continue|bool|switch|struct|case|default)\\b",
+        "\\b(void|int|ssize_t|size_t|socklen_t|char|return|for|while|if|else|break|continue|bool|switch|struct|case|default)\\b",
         "#(include|define)|NULL|=|\\+|\\-|\\*|\\&|<|>|;",
         "(?s)\\b([a-z0-9_]*)\\(.*\\)",
         "([a-z0-9_]*)\\(.*",
@@ -217,9 +217,7 @@ void print_line(LINE *current_line, int line_num, WINDOW **edit_window)
     pcre2_code *re[pattern_num];
     char *patterns[] = {
         ".",
-        "\\b(void|int|char|return|for|while|if|else|break|continue|bool|switch|"
-        "struct|"
-        "case|default)\\b",
+        "\\b(void|int|ssize_t|size_t|socklen_t|char|return|for|while|if|else|break|continue|bool|switch|struct|case|default)\\b",
         "#(include|define)|NULL|=|\\+|\\-|\\*|\\&|<|>|;",
         "(?s)\\b([a-z0-9_]*)\\(.*\\)",
         "([a-z0-9_]*)\\(.*",

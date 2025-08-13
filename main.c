@@ -77,8 +77,8 @@ int main(void)
 
     // seed_courses_data(ctx->db, welcome_screen,
     //                   "SQL/create_sections_table.sql");
-    seed_courses_data(ctx->db, ctx->greeter_screen,
-                      "SQL/courses/http_server/sections.sql");
+    // seed_courses_data(ctx->db, ctx->greeter_screen,
+    //                   "SQL/courses/http_server/sections.sql");
     // seed_courses_data(ctx->db, ctx->greeter_screen,
     //                   "SQL/courses/http_server/0_intro.sql");
     // seed_courses_data(ctx->db, ctx->greeter_screen,
@@ -91,8 +91,8 @@ int main(void)
     //                   "SQL/courses/http_server/4_bind.sql");
     // seed_courses_data(ctx->db, ctx->greeter_screen,
     //                   "SQL/courses/http_server/5_listen_and_accept.sql");
-    seed_courses_data(ctx->db, ctx->greeter_screen,
-                      "SQL/courses/http_server/6_recv_and_send.sql");
+    // seed_courses_data(ctx->db, ctx->greeter_screen,
+    //                   "SQL/courses/http_server/6_recv_and_send.sql");
     // seed_courses_data(ctx->db, ctx->greeter_screen,
     //                   "SQL/create_users_table.sql");
     // seed_courses_data(ctx->db, ctx->greeter_screen,

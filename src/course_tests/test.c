@@ -29,6 +29,7 @@ int initialize_testing(APP_CONTEXT *ctx)
     register_section3_tests(ctx);
     register_section4_tests(ctx);
     register_section5_tests(ctx);
+    register_section6_tests(ctx);
 
     return 0;
 }

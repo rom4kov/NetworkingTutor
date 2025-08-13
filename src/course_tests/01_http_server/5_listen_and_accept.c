@@ -112,43 +112,6 @@ int server_c_contains_accept_syscall(char *path)
     return 0;
 }
 
-// void *connect_to_server(void *arg)
-// {
-//     int *port = (int *)arg;
-//     napms(500);
-//
-//     struct sockaddr_in addr = {0};
-//     addr.sin_family = AF_INET;
-//     addr.sin_port = htons(*port);
-//     if (inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr) <= 0)
-//     {
-//         perror("inet_pton");
-//         return NULL;
-//     }
-//
-//     for (int attempt = 0; attempt < 30; attempt++)
-//     {
-//         int sock = socket(AF_INET, SOCK_STREAM, 0);
-//         if (sock < 0)
-//         {
-//             perror("socket");
-//             return NULL;
-//         }
-//
-//         if (connect(sock, (struct sockaddr *)&addr, sizeof(addr)) == 0)
-//         {
-//             close(sock);
-//             return NULL;
-//         }
-//
-//         close(sock);
-//         napms(100);
-//     }
-//     fprintf(stderr, "connect timeout, port: %i\n", *port);
-//
-//     return NULL;
-// }
-
 int listen_syscall_works()
 {
     FILE *fp = popen("perl -nE 'say $1 if /\\b(\\w+)\\s*=\\s*listen\\s*\\(/' "

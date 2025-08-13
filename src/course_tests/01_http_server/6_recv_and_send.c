@@ -85,7 +85,7 @@ int server_c_contains_send_function(char *path)
     pcre2_code *re[pattern_num];
 
     char *patterns[] = {
-        "\\bsend\\s*\\(\\s*[^,]+,\\s*[^,]+\\s*)"};
+        "\\bsend\\s*\\(\\s*[^,]+,\\s*[^,]+,\\s*[^,]+\\s*,\\s*[^,]+\\s*\\)"};
 
     compile_patterns(re, pattern_num, patterns);
 
@@ -196,16 +196,15 @@ int recv_function_works()
 
     // sleep(1);
 
-    char rc[16];
+    char http_request[512];
     while (fread(&c, 1, 1, fp2))
     {
-        rc[i] = c;
+        http_request[i] = c;
         i++;
     }
-    rc[i - 1] = '\0';
+    http_request[i - 1] = '\0';
     // fprintf(stderr, "rc: %s\n", rc);
-    int rc_int = atoi(rc);
-    if (rc_int < 0)
+    if (strncmp(http_request, "GET /", 5) == 0)
     {
         pclose(fp3);
         remove("http_server/server_modified2.c");
@@ -223,6 +222,7 @@ int recv_function_works()
 
 int send_function_works()
 {
+    bool *res;
     sleep(1);
     FILE *fp = popen("perl -nE 'say $1 if /\\b(\\w+)\\s*=\\s*send\\s*\\(/' "
                      "http_server/server.c",
@@ -296,7 +296,8 @@ int send_function_works()
     system(perl_command2);
 
     pthread_t unblock_server;
-    pthread_create(&unblock_server, NULL, connect_to_server, port_int);
+    pthread_create(&unblock_server, NULL, connect_to_server_and_check_response,
+                   port_int);
 
     FILE *fp3 = popen(
         "gcc http_server/server_modified3.c -o "
@@ -308,31 +309,33 @@ int send_function_works()
         return 1;
     }
 
-    char rc[16];
-    while (fread(&c, 1, 1, fp2))
-    {
-        rc[i] = c;
-        i++;
-    }
-    rc[i - 1] = '\0';
+    pthread_join(unblock_server, (void **)&res);
+
+    // char rc[16];
+    // while (fread(&c, 1, 1, fp2))
+    // {
+    //     rc[i] = c;
+    //     i++;
+    // }
+    // rc[i - 1] = '\0';
     // fprintf(stderr, "rc: %s\n", rc);
-    int rc_int = atoi(rc);
-    if (rc_int < 0)
+    // int rc_int = atoi(rc);
+    if (*res == true)
     {
         pclose(fp3);
         remove("http_server/server_modified3.c");
         remove("http_server/server_modified3");
-        return 1;
+        free(res);
+        return 0;
     }
-
-    pthread_join(unblock_server, NULL);
 
     pclose(fp3);
 
     remove("http_server/server_modified3.c");
     remove("http_server/server_modified3");
+    free(res);
 
-    return 0;
+    return 1;
 }
 
 void test_if_server_c_contains_recv_function(void)
@@ -355,7 +358,27 @@ void test_if_server_c_contains_send_function(void)
     CU_ASSERT(is_socket_call_is_present);
 }
 
-void register_section5_tests(APP_CONTEXT *ctx)
+void test_if_recv_works_in_server_c_file(void)
+{
+    bool is_socket_call_is_present = false;
+    if (recv_function_works() == 0)
+    {
+        is_socket_call_is_present = true;
+    }
+    CU_ASSERT(is_socket_call_is_present);
+}
+
+void test_if_send_works_in_server_c_file(void)
+{
+    bool is_socket_call_is_present = false;
+    if (send_function_works() == 0)
+    {
+        is_socket_call_is_present = true;
+    }
+    CU_ASSERT(is_socket_call_is_present);
+}
+
+void register_section6_tests(APP_CONTEXT *ctx)
 {
     ctx->sp[5] = CU_add_suite("http_server_06", NULL, NULL);
     ctx->ec = CU_get_error();
@@ -383,7 +406,7 @@ void register_section5_tests(APP_CONTEXT *ctx)
         mvwprintw(ctx->course_windows[4], 1, 1, "%s", err_msg);
     }
 
-    CU_add_test(ctx->sp[4], "server.c contains recv function",
+    CU_add_test(ctx->sp[5], "server.c contains recv function",
                 (CU_TestFunc)test_if_server_c_contains_recv_function);
     ctx->ec = CU_get_error();
     if (ctx->ec != CUE_SUCCESS)
@@ -392,7 +415,7 @@ void register_section5_tests(APP_CONTEXT *ctx)
         mvwprintw(ctx->course_windows[4], 1, 1, "%s", err_msg);
     }
 
-    CU_add_test(ctx->sp[4], "server.c contains send function",
+    CU_add_test(ctx->sp[5], "server.c contains send function",
                 (CU_TestFunc)test_if_server_c_contains_send_function);
     ctx->ec = CU_get_error();
     if (ctx->ec != CUE_SUCCESS)
@@ -400,8 +423,8 @@ void register_section5_tests(APP_CONTEXT *ctx)
         const char *err_msg = CU_get_error_msg();
         mvwprintw(ctx->course_windows[4], 1, 1, "%s", err_msg);
     }
-    //
-    // CU_add_test(ctx->sp[4],
+
+    // CU_add_test(ctx->sp[5],
     //             "server.c contains fprintf or perror where necessary",
     //             (CU_TestFunc)test_if_server_c_contains_fprintf_or_perror2);
     // ctx->ec = CU_get_error();
@@ -410,26 +433,26 @@ void register_section5_tests(APP_CONTEXT *ctx)
     //     const char *err_msg = CU_get_error_msg();
     //     mvwprintw(ctx->course_windows[4], 1, 1, "%s", err_msg);
     // }
-    //
-    // CU_add_test(ctx->sp[4], "listen syscall in server.c file works",
-    //             (CU_TestFunc)test_if_listen_syscall_in_server_c_works);
-    // ctx->ec = CU_get_error();
-    // if (ctx->ec != CUE_SUCCESS)
-    // {
-    //     const char *err_msg = CU_get_error_msg();
-    //     mvwprintw(ctx->course_windows[4], 1, 1, "%s", err_msg);
-    // }
 
-    // CU_add_test(ctx->sp[4], "accept syscall in server.c file works",
-    //             (CU_TestFunc)test_if_accept_syscall_in_server_c_works);
-    // ctx->ec = CU_get_error();
-    // if (ctx->ec != CUE_SUCCESS)
-    // {
-    //     const char *err_msg = CU_get_error_msg();
-    //     mvwprintw(ctx->course_windows[4], 1, 1, "%s", err_msg);
-    // }
+    CU_add_test(ctx->sp[5], "recv function in server.c file works",
+                (CU_TestFunc)test_if_recv_works_in_server_c_file);
+    ctx->ec = CU_get_error();
+    if (ctx->ec != CUE_SUCCESS)
+    {
+        const char *err_msg = CU_get_error_msg();
+        mvwprintw(ctx->course_windows[4], 1, 1, "%s", err_msg);
+    }
+
+    CU_add_test(ctx->sp[5], "send function in server.c file works",
+                (CU_TestFunc)test_if_send_works_in_server_c_file);
+    ctx->ec = CU_get_error();
+    if (ctx->ec != CUE_SUCCESS)
+    {
+        const char *err_msg = CU_get_error_msg();
+        mvwprintw(ctx->course_windows[4], 1, 1, "%s", err_msg);
+    }
     //
-    // CU_add_test(ctx->sp[4], "listen error handling in server.c file works",
+    // CU_add_test(ctx->sp[5], "listen error handling in server.c file works",
     //             (CU_TestFunc)test_if_listen_error_handling_works);
     // ctx->ec = CU_get_error();
     // if (ctx->ec != CUE_SUCCESS)
@@ -438,7 +461,7 @@ void register_section5_tests(APP_CONTEXT *ctx)
     //     mvwprintw(ctx->course_windows[4], 1, 1, "%s", err_msg);
     // }
     //
-    // CU_add_test(ctx->sp[4], "accept error handling in server.c file works",
+    // CU_add_test(ctx->sp[5], "accept error handling in server.c file works",
     //             (CU_TestFunc)test_if_accept_error_handling_works);
     // ctx->ec = CU_get_error();
     // if (ctx->ec != CUE_SUCCESS)

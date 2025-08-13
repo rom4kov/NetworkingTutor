@@ -25,3 +25,6 @@ void register_section4_tests(APP_CONTEXT *ctx);
 
 // 5_listen_and_accept section
 void register_section5_tests(APP_CONTEXT *ctx);
+
+// 6_recv_and_send section
+void register_section6_tests(APP_CONTEXT *ctx);

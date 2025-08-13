@@ -66,8 +66,7 @@ int main(void)
     }
 
     addr_size = sizeof(their_addr);
-    if ((new_fd = accept(sockfd, (struct sockaddr *)&their_addr,
-                         &addr_size)) <= 0)
+    if ((new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &addr_size)) <= 0)
     {
         fprintf(stderr, "accept error: %s, new_fd: %i\n", strerror(errno),
                 new_fd);
@@ -80,7 +79,7 @@ int main(void)
     {
         buf[received] = '\0';
 
-        printf("bytes received: %i\n", received);
+        // printf("bytes received: %i\n", received);
         printf("%s\n", buf);
 
         const char *response = "HTTP/1.1 200 OK\r\n"

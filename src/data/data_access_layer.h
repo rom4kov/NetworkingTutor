@@ -19,11 +19,11 @@ char *get_course_name_by_id(sqlite3 *db, int course_id);
 COURSE *get_course_data(sqlite3 *db);
 COURSE *get_course_by_id(sqlite3 *db, int course_id);
 
-SECTION_METADATA *get_section_data(APP_CONTEXT *ctx);
+SECTION_METADATA *get_section_metadata(APP_CONTEXT *ctx);
 int callback(void *NotUsed, int argc, char **argv, char **azColName);
 COURSE_SECTION *get_course_section_materials(sqlite3 *db, int course,
                                        int section, int *num_of_items);
-void get_total_items_of_sections(APP_CONTEXT *ctx);
+void get_total_course_sections(APP_CONTEXT *ctx);
 void get_completed_sections(APP_CONTEXT *ctx);
 
 void update_user(sqlite3 *db, int id, char *name, char *language);

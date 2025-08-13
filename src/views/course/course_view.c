@@ -25,6 +25,8 @@
 
 void create_course_view(APP_CONTEXT *ctx)
 {
+    get_total_course_sections(ctx);
+
     ctx->active_window = 0;
 
     ctx->course_windows[0] =

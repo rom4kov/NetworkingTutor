@@ -311,15 +311,6 @@ int send_function_works()
 
     pthread_join(unblock_server, (void **)&res);
 
-    // char rc[16];
-    // while (fread(&c, 1, 1, fp2))
-    // {
-    //     rc[i] = c;
-    //     i++;
-    // }
-    // rc[i - 1] = '\0';
-    // fprintf(stderr, "rc: %s\n", rc);
-    // int rc_int = atoi(rc);
     if (*res == true)
     {
         pclose(fp3);

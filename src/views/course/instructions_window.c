@@ -1,56 +1,7 @@
-
+#include "../../core/core.h"
 #include "../views.h"
 #include <curses.h>
 #include <string.h>
-
-void print_press_msg(RIGHT_PANEL_STATE *rps)
-{
-    char blank_line[rps->window_width - 8];
-    memset(blank_line, 32, sizeof(blank_line));
-    memset(&blank_line[sizeof(blank_line) - 1], '\0', 1);
-
-    mvwprintw(rps->right_panel, LINES - 5, 3, "%s", blank_line);
-
-    if (rps->curr_item < rps->num_of_section_items[rps->curr_section])
-    {
-        rps->ready_to_test = false;
-        char *press_space = "Press SPACE to continue";
-        mvwprintw(rps->right_panel, LINES - 5,
-                  ((rps->window_width - strlen(press_space) + 10) / 2) - 10,
-                  "%s", "                                     ");
-        mvwprintw(rps->right_panel, LINES - 5,
-                  (rps->window_width - strlen(press_space)) / 2, "%s",
-                  press_space);
-    }
-    else if (rps->curr_item == rps->num_of_section_items[rps->curr_section] &&
-             rps->curr_section >= rps->sections_completed)
-    {
-        if (rps->s_metadata->has_test && rps->s_metadata->has_separate_task)
-        {
-            char *press_enter = "Press t to see your task";
-            mvwprintw(rps->right_panel, LINES - 5,
-                      (rps->window_width - strlen(press_enter)) / 2, "%s",
-                      press_enter);
-        }
-        else if (rps->s_metadata->has_test &&
-                 !rps->s_metadata->has_separate_task)
-        {
-            rps->ready_to_test = true;
-            char *press_enter = "Press s to submit your task";
-            mvwprintw(rps->right_panel, LINES - 5,
-                      (rps->window_width - strlen(press_enter)) / 2, "%s",
-                      press_enter);
-        }
-        else
-        {
-            char *press_enter = "Press ENTER to go to next section";
-            mvwprintw(rps->right_panel, LINES - 5,
-                      (rps->window_width - strlen(press_enter)) / 2, "%s",
-                      press_enter);
-        }
-    }
-    wrefresh(rps->right_panel);
-}
 
 void print_course_instructions(APP_CONTEXT *ctx)
 {
@@ -58,7 +9,7 @@ void print_course_instructions(APP_CONTEXT *ctx)
         ctx->db, ctx->current_course_id, ctx->rp_state->curr_section,
         &ctx->rp_state->num_of_section_items[ctx->rp_state->curr_section]);
 
-    ctx->rp_state->s_metadata = get_section_data(ctx);
+    ctx->rp_state->s_metadata = get_section_metadata(ctx);
 
     read_item_into_buffer(ctx);
     // log_course_instr_values(ctx);
@@ -87,7 +38,8 @@ void print_course_instructions(APP_CONTEXT *ctx)
 
     mvwprintw(ctx->rp_state->right_panel, LINES - 4,
               ctx->rp_state->window_width - 18, " %s %i of %i ", "Section",
-              ctx->rp_state->curr_section + 1, 9);
+              ctx->rp_state->curr_section + 1,
+              ctx->rp_state->total_course_sections);
 }
 
 void print_next_course_item(RIGHT_PANEL_STATE *rp_state)
@@ -151,4 +103,83 @@ void print_next_course_item(RIGHT_PANEL_STATE *rp_state)
     }
 
     print_press_msg(rp_state);
+}
+
+void print_press_msg(RIGHT_PANEL_STATE *rps)
+{
+    char blank_line[rps->window_width - 8];
+    memset(blank_line, 32, sizeof(blank_line));
+    memset(&blank_line[sizeof(blank_line) - 1], '\0', 1);
+
+    mvwprintw(rps->right_panel, LINES - 5, 3, "%s", blank_line);
+
+    if (rps->curr_item < rps->num_of_section_items[rps->curr_section])
+    {
+        rps->ready_to_test = false;
+        char *press_space = "Press SPACE to continue";
+        mvwprintw(rps->right_panel, LINES - 5,
+                  ((rps->window_width - strlen(press_space) + 10) / 2) - 10,
+                  "%s", "                                     ");
+        mvwprintw(rps->right_panel, LINES - 5,
+                  (rps->window_width - strlen(press_space)) / 2, "%s",
+                  press_space);
+    }
+    else if (rps->curr_item == rps->num_of_section_items[rps->curr_section] &&
+             rps->curr_section >= rps->sections_completed)
+    {
+        if (rps->s_metadata->has_test && rps->s_metadata->has_separate_task)
+        {
+            char *press_enter = "Press t to see your task";
+            mvwprintw(rps->right_panel, LINES - 5,
+                      (rps->window_width - strlen(press_enter)) / 2, "%s",
+                      press_enter);
+        }
+        else if (rps->s_metadata->has_test &&
+                 !rps->s_metadata->has_separate_task)
+        {
+            rps->ready_to_test = true;
+            char *press_enter = "Press s to submit your task";
+            mvwprintw(rps->right_panel, LINES - 5,
+                      (rps->window_width - strlen(press_enter)) / 2, "%s",
+                      press_enter);
+        }
+        else
+        {
+            char *press_enter = "Press ENTER to go to next section";
+            mvwprintw(rps->right_panel, LINES - 5,
+                      (rps->window_width - strlen(press_enter)) / 2, "%s",
+                      press_enter);
+        }
+    }
+    wrefresh(rps->right_panel);
+}
+
+char *congrats = "_____                             __        __  \n"
+                 " / ___/___   ___  ___ _ ____ ___ _ / /_ ___  / /  \n"
+                 "/ /__ / _ \\/ / _ \\/ _ `// __// _ `// __/(_-< /_/ \n  "
+                 "\\/___/ \\___//_//_/\\_, //_/   \\_,_/ \\__//___/(_)\n    "
+                 "/___/                             \n"
+                 "__  __               _            __        \n"
+                 "\\/ \\/ /___  __ __    (_)__ __ ___ / /_     \n  "
+                 "\\/  // _ \\/ // /   / // // /(_-</ __/      \n "
+                 "/_/ \\/___/\\_,_/ __/ / \\_,_//___/\\__/      \n  "
+                 "|___/                        \n"
+                 "___ _        _       __           __        \n"
+                 "/ _/(_)___   (_)___  / /  ___  ___/ /        \n"
+                 "/ _// // _ \\/ / /(_-< / _ \\/ -_)/ _  /       \n  "
+                 "/_/ /_//_//_//_//___//_//_/\\/__/ \\_,_/         \n "
+                 " \n"
+                 "__   __                                       _ \n"
+                 "/ /_ / /  ___   ____ ___  __ __ ____ ___ ___  (_)\n"
+                 "/ __// _ \\// -_) / __// _ \\/ // // __/(_-</ -_)_   \n"
+                 "\\/__//_//_/\\__/  \\__/ \\___/\\_,_//_/  /___/\\__/(_)\n";
+
+void print_course_complete(RIGHT_PANEL_STATE *rps)
+{
+    werase(rps->inner_win);
+    werase(rps->right_panel);
+
+    focus_window(&rps->right_panel, 3, "Course instructions");
+    mvwprintw(rps->right_panel, 10, 10, "%s", congrats);
+    wrefresh(rps->right_panel);
 }

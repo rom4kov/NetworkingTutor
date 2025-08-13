@@ -2,6 +2,8 @@
 #define _POSIX_C_SOURCE 200809L
 
 #include "../models/models.h"
+#include "fcntl.h"
+#include "unistd.h"
 #include <ctype.h>
 #include <curses.h>
 #include <math.h>
@@ -9,8 +11,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "unistd.h"
-#include "fcntl.h"
 #include <time.h>
 
 void draw_border(WINDOW *win, int color_pair, char *label)
@@ -68,7 +68,8 @@ void focus_instructions_window(RIGHT_PANEL_STATE *rps, int color_pair,
     wattron(rps->right_panel, COLOR_PAIR(3));
     mvwprintw(rps->right_panel, 0, 2, " %s ", label);
     mvwprintw(rps->right_panel, LINES - 4, rps->window_width - 18,
-              " %s %i of %i ", "Section", rps->curr_section + 1, 9);
+              " %s %i of %i ", "Section", rps->curr_section + 1,
+              rps->total_course_sections);
     wattroff(rps->right_panel, COLOR_PAIR(3));
 
     wnoutrefresh(rps->right_panel);
@@ -174,7 +175,8 @@ char *current_datetime()
 int suppress_stdout(void)
 {
     int dev_null = open("/dev/null", O_WRONLY);
-    if (dev_null == -1) return -1;
+    if (dev_null == -1)
+        return -1;
     return dup2(dev_null, STDOUT_FILENO);
 }
 

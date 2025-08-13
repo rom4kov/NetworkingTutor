@@ -31,6 +31,8 @@ void init_right_panel_state(RIGHT_PANEL_STATE *rp_state,
 void print_next_course_item(RIGHT_PANEL_STATE *rp_state);
 
 void print_intro(WINDOW **right_panel, int window_width, int intro_width);
+void print_press_msg(RIGHT_PANEL_STATE *rps);
+void print_course_complete(RIGHT_PANEL_STATE *rps);
 
 void create_course_view(APP_CONTEXT *ctx);
 WINDOW *create_editor_window();

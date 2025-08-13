@@ -137,6 +137,7 @@ typedef struct _right_panel_state
     int *course_progress;
     int num_of_section_items[32];
     int *total_section_items;
+    int total_course_sections;
     int window_width;
     int intro_width;
     int curr_section;

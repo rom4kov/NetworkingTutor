@@ -216,7 +216,7 @@ COURSE *get_course_by_id(sqlite3 *db, int course_id)
     return course;
 }
 
-SECTION_METADATA *get_section_data(APP_CONTEXT *ctx)
+SECTION_METADATA *get_section_metadata(APP_CONTEXT *ctx)
 {
     SECTION_METADATA *section_metadata = malloc(sizeof(SECTION_METADATA));
 
@@ -308,7 +308,7 @@ COURSE_SECTION *get_course_section_materials(sqlite3 *db, int course,
     return course_section_data;
 }
 
-void get_total_items_of_sections(APP_CONTEXT *ctx)
+void get_total_course_sections(APP_CONTEXT *ctx)
 {
     int rc = 0;
 
@@ -335,28 +335,28 @@ void get_total_items_of_sections(APP_CONTEXT *ctx)
 
     // int *total_items_of_sections = (int *)calloc(32, sizeof(int));
 
-    for (int i = 0; i < sections; i++)
-    {
-        sql = "SELECT COUNT() FROM materials WHERE section_id = ?;";
-        rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
-        if (rc != SQLITE_OK)
-        {
-            sqlite3_finalize(stmt);
-        }
-
-        if (rc == SQLITE_OK)
-        {
-            sqlite3_bind_int(stmt, 1, i);
-        }
-        int items;
-        if (sqlite3_step(stmt) == SQLITE_ROW)
-        {
-            items = sqlite3_column_int(stmt, 0);
-            ctx->rp_state->total_section_items[i] = items;
-        }
-    }
+    // for (int i = 0; i < sections; i++)
+    // {
+    //     sql = "SELECT COUNT() FROM materials WHERE section_id = ?;";
+    //     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
+    //     if (rc != SQLITE_OK)
+    //     {
+    //         sqlite3_finalize(stmt);
+    //     }
     //
-    // return total_items_of_sections;
+    //     if (rc == SQLITE_OK)
+    //     {
+    //         sqlite3_bind_int(stmt, 1, i);
+    //     }
+    //     int items;
+    //     if (sqlite3_step(stmt) == SQLITE_ROW)
+    //     {
+    //         items = sqlite3_column_int(stmt, 0);
+    //         ctx->rp_state->total_section_items[i] = items;
+    //     }
+    // }
+
+    ctx->rp_state->total_course_sections = sections;
 }
 
 void update_user(sqlite3 *db, int id, char *name, char *language)

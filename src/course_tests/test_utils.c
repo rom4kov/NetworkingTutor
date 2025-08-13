@@ -88,7 +88,7 @@ void *connect_to_server_and_check_response(void *arg)
             send(sock, "GET / HTTP/1.1\r\n", 16, 0);
             recv(sock, buf, 512, 0);
             fprintf(stdout, "Response: %s", buf);
-            if (strncmp(buf, "HTTP/", 5) == 0)
+            if (strncmp(buf, "HTTP/1.1", 8) == 0)
             {
                 *response_ok = true;
                 close(sock);

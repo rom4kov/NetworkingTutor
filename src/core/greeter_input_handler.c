@@ -66,10 +66,8 @@ void handle_greeter_input(APP_CONTEXT *ctx)
                     ctx->rp_state
                         ->course_progress[ctx->rp_state->sections_completed -
                                           1];
-
-                get_total_items_of_sections(ctx);
-
                 get_completed_sections(ctx);
+
             }
             else if (item_index(curr_item) == 6)
             {

@@ -12,10 +12,20 @@ void *print_press_enter_after_sec_compl(void *arg)
     sleep(3);
     APP_CONTEXT *ctx = (APP_CONTEXT *)arg;
     create_progress_window(ctx);
-    char *press_enter = "Press ENTER to go to next section";
-    mvwprintw(ctx->rp_state->right_panel, LINES - 5,
-              (ctx->rp_state->window_width - strlen(press_enter)) / 2, "%s",
-              press_enter);
+    if (ctx->rp_state->curr_section + 1 < ctx->rp_state->total_course_sections)
+    {
+        char *press_enter = "Press ENTER to go to next section";
+        mvwprintw(ctx->rp_state->right_panel, LINES - 5,
+                  (ctx->rp_state->window_width - strlen(press_enter)) / 2, "%s",
+                  press_enter);
+    }
+    else
+{
+        char *press_enter = "Press ENTER to finish the course";
+        mvwprintw(ctx->rp_state->right_panel, LINES - 5,
+                  (ctx->rp_state->window_width - strlen(press_enter)) / 2, "%s",
+                  press_enter);
+    }
 
     mvwprintw(ctx->rp_state->right_panel, LINES - 5, 2, "%s",
               "< Back to section");

@@ -66,15 +66,17 @@ void read_task_into_buffer(APP_CONTEXT *ctx)
         {
             overflow = false;
             bl_point = false;
-            add_line_break(ctx->rp_state, &curr_line, -1, &j, &k, &line_number,
-                           &last_space_pos, overflow, &bl_point);
+            add_line_break(ctx->rp_state->course_section_data,
+                           ctx->rp_state->it_buffer, &curr_line, -1, &j, &k,
+                           &line_number, &last_space_pos, overflow, &bl_point);
             continue;
         }
         else if (k > ctx->rp_state->window_width - 10)
         {
             overflow = true;
-            add_line_break(ctx->rp_state, &curr_line, -1, &j, &k, &line_number,
-                           &last_space_pos, overflow, &bl_point);
+            add_line_break(ctx->rp_state->course_section_data,
+                           ctx->rp_state->it_buffer, &curr_line, -1, &j, &k,
+                           &line_number, &last_space_pos, overflow, &bl_point);
             continue;
         }
         else if (ctx->rp_state->current_task[j] == ' ')

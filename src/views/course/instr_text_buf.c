@@ -1,5 +1,4 @@
 #ifdef __STDC_ALLOC_LIB__
-#define __STDC_WANT_LIB_EXT2__ 1
 #else
 #define _POSIX_C_SOURCE 200809L
 #endif
@@ -10,9 +9,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-void add_line_break(RIGHT_PANEL_STATE *rps, I_LINE **curr_line, int i, int *j,
-                    int *k, int *line_number, int *last_space_pos,
-                    bool overflow, bool *bl_point)
+void add_line_break(COURSE_SECTION *c_sec_data, I_TEXT_BUFFER *tbuf,
+                    I_LINE **curr_line, int i, int *j, int *k, int *line_number,
+                    int *last_space_pos, bool overflow, bool *bl_point)
 {
     if (overflow)
     {
@@ -30,30 +29,28 @@ void add_line_break(RIGHT_PANEL_STATE *rps, I_LINE **curr_line, int i, int *j,
 
     if (i >= 0)
     {
-        if (rps->course_section_data[i].section_id == 0 &&
-            rps->course_section_data[i].order_num == 0)
+        if (c_sec_data[i].section_id == 0 && c_sec_data[i].order_num == 0)
             (*curr_line)->centered = true;
     }
 
     *k = 0;
 
-    if (rps->it_buffer->num_of_lines == 0)
+    if (tbuf->num_of_lines == 0)
     {
-        rps->it_buffer->num_of_lines++;
+        tbuf->num_of_lines++;
 
-        rps->it_buffer->first_line = *curr_line;
-        rps->it_buffer->current_line = rps->it_buffer->first_line;
+        tbuf->first_line = *curr_line;
+        tbuf->current_line = tbuf->first_line;
         *curr_line = initialize_iline();
     }
     else
     {
-        rps->it_buffer->num_of_lines++;
-        rps->it_buffer->current_line->next = *curr_line;
-        (*curr_line)->prev = rps->it_buffer->current_line;
-        rps->it_buffer->current_line = *curr_line;
+        tbuf->num_of_lines++;
+        tbuf->current_line->next = *curr_line;
+        (*curr_line)->prev = tbuf->current_line;
+        tbuf->current_line = *curr_line;
         *curr_line = initialize_iline();
-        if ((strstr(rps->it_buffer->current_line->buf_, "•") && overflow) ||
-            *bl_point)
+        if ((strstr(tbuf->current_line->buf_, "•") && overflow) || *bl_point)
         {
             *bl_point = true;
             (*curr_line)->buf_[0] = ' ';
@@ -166,7 +163,8 @@ void read_item_into_buffer(APP_CONTEXT *ctx)
                 bl_point = false;
                 if (ctx->rp_state->course_section_data[i].syntax_hl == true)
                     curr_line->syntax_hl = true;
-                add_line_break(ctx->rp_state, &curr_line, i, &j, &k,
+                add_line_break(ctx->rp_state->course_section_data,
+                               ctx->rp_state->it_buffer, &curr_line, i, &j, &k,
                                &line_number, &last_space_pos, overflow,
                                &bl_point);
                 continue;
@@ -174,7 +172,8 @@ void read_item_into_buffer(APP_CONTEXT *ctx)
             else if (k > ctx->rp_state->window_width - 10)
             {
                 overflow = true;
-                add_line_break(ctx->rp_state, &curr_line, i, &j, &k,
+                add_line_break(ctx->rp_state->course_section_data,
+                               ctx->rp_state->it_buffer, &curr_line, i, &j, &k,
                                &line_number, &last_space_pos, overflow,
                                &bl_point);
                 continue;
@@ -261,15 +260,16 @@ void read_end_of_course_page_into_buffer(APP_CONTEXT *ctx)
         get_end_of_course_msg(ctx->db, ctx->current_course_id);
     int msg_len = strlen(end_of_course_msg);
 
-        // literal lengths
-    const size_t nl2 = 2;  // "\n\n"
-    const size_t nl3 = 3;  // "\n\n\n"
+    // literal lengths
+    const size_t nl2 = 2; // "\n\n"
+    const size_t nl3 = 3; // "\n\n\n"
 
     // +1 for terminating NUL
     int total = ascii_len + nl2 + course_len + nl3 + msg_len + 1;
 
     char *end_of_course_page_str = malloc(total);
-    if (!end_of_course_page_str) return;
+    if (!end_of_course_page_str)
+        return;
     end_of_course_page_str[0] = '\0';
 
     strncat(end_of_course_page_str, end_of_course_ascii, ascii_len);
@@ -327,8 +327,9 @@ void read_end_of_course_page_into_buffer(APP_CONTEXT *ctx)
                 curr_line->centered = true;
                 curr_line->style = A_UNDERLINE | A_BOLD;
             }
-            add_line_break(ctx->rp_state, &curr_line, -1, &i, &j, &line_number,
-                           &last_space_pos, overflow, &bl_point);
+            add_line_break(NULL, ctx->rp_state->it_buffer, &curr_line, -1, &i,
+                           &j, &line_number, &last_space_pos, overflow,
+                           &bl_point);
             continue;
         }
         else if (j > ctx->rp_state->window_width - 10)
@@ -339,8 +340,9 @@ void read_end_of_course_page_into_buffer(APP_CONTEXT *ctx)
             curr_line->centered = false;
             //     curr_line->style = COLOR_PAIR(4) | A_BOLD;
             // }
-            add_line_break(ctx->rp_state, &curr_line, -1, &i, &j, &line_number,
-                           &last_space_pos, overflow, &bl_point);
+            add_line_break(NULL, ctx->rp_state->it_buffer, &curr_line, -1, &i,
+                           &j, &line_number, &last_space_pos, overflow,
+                           &bl_point);
             continue;
         }
         else if (end_of_course_page_str[i] == ' ')
@@ -349,6 +351,112 @@ void read_end_of_course_page_into_buffer(APP_CONTEXT *ctx)
         }
 
         curr_line->buf_[j] = end_of_course_page_str[i];
+        curr_line->length++;
+        i++;
+        j++;
+    }
+
+    wrefresh(ctx->course_windows[2]);
+}
+
+char *PROGRAMM_DESC =
+    "Welcome to NetworkingTutor!\n\n"
+    "NetworkingTutor is an interactive learning tool that aims to teach you "
+    "the basics of networking.\n"
+    "Start by creating a simple HTTP server while learning about "
+    "sockets, HTTP, and low-level\n"
+    "networking concepts. Each section presents "
+    "challenges, a built-in text editor, and instant\n"
+    "feedback to reinforce your learning. "
+    "Gamification keeps you engaged as you progress.\n"
+    "Expand your knowledge step by step and master "
+    "networking fundamentals—one challenge at a time.\nReady to begin? 🚀";
+
+void read_logo_and_header_text_into_buffer(APP_CONTEXT *ctx,
+                                           I_TEXT_BUFFER *header_tbuf,
+                                           int win_width)
+{
+    char *logo_ascii = get_ascii_art(ctx->db, "logo");
+    int logo_len = strlen(logo_ascii);
+
+    char *end_of_course_msg = PROGRAMM_DESC;
+    int msg_len = strlen(end_of_course_msg);
+
+    // literal lengths
+    const size_t nl2 = 2; // "\n\n"
+
+    // +1 for terminating NUL
+    int total = logo_len + nl2 + msg_len + 1;
+
+    char *logo_and_header_str = malloc(total);
+    if (!logo_and_header_str)
+        return;
+    logo_and_header_str[0] = '\0';
+
+    strncat(logo_and_header_str, logo_ascii, logo_len);
+    strncat(logo_and_header_str, "\n\n", nl2);
+    strncat(logo_and_header_str, end_of_course_msg, msg_len);
+    logo_and_header_str[total - 1] = '\0';
+
+    int i, j, last_space_pos, k;
+    i = j = last_space_pos = k = 0;
+    int line_number = 0;
+    bool overflow = false;
+    bool bl_point = false;
+    I_LINE *curr_line = initialize_iline();
+
+    while (i < total + 1)
+    {
+        if (i > 0 && logo_and_header_str[i] == '\0')
+        {
+            curr_line->buf_[j] = '\n';
+            curr_line->line_num = line_number;
+            header_tbuf->num_of_lines++;
+            header_tbuf->current_line->next = curr_line;
+            curr_line->prev = header_tbuf->current_line;
+            header_tbuf->current_line = curr_line;
+
+            curr_line = initialize_iline();
+            curr_line->buf_[j] = ' ';
+            curr_line->buf_[j + 1] = '\n';
+            curr_line->style = SEPARATOR;
+            header_tbuf->num_of_lines++;
+            header_tbuf->current_line->next = curr_line;
+            curr_line->prev = header_tbuf->current_line;
+            header_tbuf->current_line = curr_line;
+            header_tbuf->current_line->next = NULL;
+            break;
+        }
+        else if (logo_and_header_str[i] == '\n')
+        {
+            overflow = false;
+            bl_point = false;
+            curr_line->centered = true;
+            // curr_line->style = COLOR_PAIR(4) | A_BOLD;
+            add_line_break(NULL, header_tbuf, &curr_line, -1, &i, &j,
+                           &line_number, &last_space_pos, overflow, &bl_point);
+            curr_line->centered = true;
+            continue;
+        }
+        else if (j > win_width - (win_width / 8))
+        {
+            overflow = true;
+            // if (i < (ascii_len + 1))
+            // {
+            curr_line->centered = true;
+            //     curr_line->style = COLOR_PAIR(4) | A_BOLD;
+            // }
+            add_line_break(NULL, header_tbuf, &curr_line, -1, &i, &j,
+                           &line_number, &last_space_pos, overflow, &bl_point);
+            curr_line->centered = true;
+            continue;
+        }
+        else if (logo_and_header_str[i] == ' ')
+        {
+            last_space_pos = j;
+        }
+
+        curr_line->buf_[j] = logo_and_header_str[i];
         curr_line->length++;
         i++;
         j++;

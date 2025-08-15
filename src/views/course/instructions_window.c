@@ -14,37 +14,45 @@ void print_course_instructions(APP_CONTEXT *ctx)
     read_item_into_buffer(ctx);
     // log_course_instr_values(ctx);
 
-    print_next_course_item(ctx->rp_state);
+    if (ctx->rp_state->curr_section < ctx->rp_state->total_course_sections)
+    {
+        print_next_course_item(ctx->rp_state);
 
-    if (ctx->rp_state->showing_test_results)
-    {
-        mvwprintw(ctx->rp_state->right_panel, LINES - 5, 2, "%s",
-                  "< Back to section");
-    }
-    else
-    {
-        if (ctx->rp_state->curr_section > 0)
-            mvwprintw(ctx->rp_state->right_panel, LINES - 5, 2, "%s", "<");
+        if (ctx->rp_state->showing_test_results)
+        {
+            mvwprintw(ctx->rp_state->right_panel, LINES - 5, 2, "%s",
+                      "< Back to section");
+        }
         else
-            mvwprintw(ctx->rp_state->right_panel, LINES - 5, 2, "%s", " ");
+        {
+            if (ctx->rp_state->curr_section > 0)
+                mvwprintw(ctx->rp_state->right_panel, LINES - 5, 2, "%s", "<");
+            else
+                mvwprintw(ctx->rp_state->right_panel, LINES - 5, 2, "%s", " ");
+        }
+
+        if (ctx->rp_state->curr_section < ctx->rp_state->sections_completed)
+            mvwprintw(ctx->rp_state->right_panel, LINES - 5,
+                      ctx->rp_state->window_width - 3, "%s", ">");
+        else
+            mvwprintw(ctx->rp_state->right_panel, LINES - 5,
+                      ctx->rp_state->window_width - 3, "%s", " ");
+
+        mvwprintw(ctx->rp_state->right_panel, LINES - 4,
+                  ctx->rp_state->window_width - 18, " %s %i of %i ", "Section",
+                  ctx->rp_state->curr_section + 1,
+                  ctx->rp_state->total_course_sections);
     }
-
-    if (ctx->rp_state->curr_section < ctx->rp_state->sections_completed)
-        mvwprintw(ctx->rp_state->right_panel, LINES - 5,
-                  ctx->rp_state->window_width - 3, "%s", ">");
     else
-        mvwprintw(ctx->rp_state->right_panel, LINES - 5,
-                  ctx->rp_state->window_width - 3, "%s", " ");
-
-    mvwprintw(ctx->rp_state->right_panel, LINES - 4,
-              ctx->rp_state->window_width - 18, " %s %i of %i ", "Section",
-              ctx->rp_state->curr_section + 1,
-              ctx->rp_state->total_course_sections);
+    {
+        ctx->rp_state->showing_end_of_course_page = true;
+        print_course_complete(ctx);
+        // log_course_instr_values(ctx);
+    }
 }
 
 void print_next_course_item(RIGHT_PANEL_STATE *rp_state)
 {
-    // wclear(rp_state->inner_win);
     I_LINE *current_line = rp_state->it_buffer->first_line;
     int i, j;
     j = 0;
@@ -61,7 +69,7 @@ void print_next_course_item(RIGHT_PANEL_STATE *rp_state)
         rp_state->lines_to_print++;
     }
 
-    int offset;
+    int offset = 0;
     current_line = rp_state->it_buffer->first_line;
 
     if (rp_state->lines_to_print > (LINES - 8))
@@ -102,7 +110,8 @@ void print_next_course_item(RIGHT_PANEL_STATE *rp_state)
         j++;
     }
 
-    print_press_msg(rp_state);
+    if (rp_state->curr_section < rp_state->total_course_sections)
+        print_press_msg(rp_state);
 }
 
 void print_press_msg(RIGHT_PANEL_STATE *rps)
@@ -154,32 +163,23 @@ void print_press_msg(RIGHT_PANEL_STATE *rps)
     wrefresh(rps->right_panel);
 }
 
-char *congrats = "_____                             __        __  \n"
-                 " / ___/___   ___  ___ _ ____ ___ _ / /_ ___  / /  \n"
-                 "/ /__ / _ \\/ / _ \\/ _ `// __// _ `// __/(_-< /_/ \n  "
-                 "\\/___/ \\___//_//_/\\_, //_/   \\_,_/ \\__//___/(_)\n    "
-                 "/___/                             \n"
-                 "__  __               _            __        \n"
-                 "\\/ \\/ /___  __ __    (_)__ __ ___ / /_     \n  "
-                 "\\/  // _ \\/ // /   / // // /(_-</ __/      \n "
-                 "/_/ \\/___/\\_,_/ __/ / \\_,_//___/\\__/      \n  "
-                 "|___/                        \n"
-                 "___ _        _       __           __        \n"
-                 "/ _/(_)___   (_)___  / /  ___  ___/ /        \n"
-                 "/ _// // _ \\/ / /(_-< / _ \\/ -_)/ _  /       \n  "
-                 "/_/ /_//_//_//_//___//_//_/\\/__/ \\_,_/         \n "
-                 " \n"
-                 "__   __                                       _ \n"
-                 "/ /_ / /  ___   ____ ___  __ __ ____ ___ ___  (_)\n"
-                 "/ __// _ \\// -_) / __// _ \\/ // // __/(_-</ -_)_   \n"
-                 "\\/__//_//_/\\__/  \\__/ \\___/\\_,_//_/  /___/\\__/(_)\n";
-
-void print_course_complete(RIGHT_PANEL_STATE *rps)
+void print_course_complete(APP_CONTEXT *ctx)
 {
-    werase(rps->inner_win);
-    werase(rps->right_panel);
+    werase(ctx->rp_state->inner_win);
+    werase(ctx->rp_state->right_panel);
 
-    focus_window(&rps->right_panel, 3, "Course instructions");
-    mvwprintw(rps->right_panel, 10, 10, "%s", congrats);
-    wrefresh(rps->right_panel);
+    focus_window(&ctx->rp_state->right_panel, ctx->active_window == 3 ? 3 : 2,
+                 "Course instructions");
+
+    ctx->rp_state->lines_excess = 0;
+
+    read_end_of_course_page_into_buffer(ctx);
+
+    ctx->rp_state->curr_item = 1;
+
+    print_next_course_item(ctx->rp_state);
+
+    wnoutrefresh(ctx->rp_state->right_panel);
+    wnoutrefresh(ctx->rp_state->inner_win);
+    doupdate();
 }

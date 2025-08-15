@@ -15,7 +15,7 @@ WINDOW *create_greeter_screen(APP_CONTEXT *ctx);
 
 void create_start_screen(APP_CONTEXT *ctx);
 WINDOW *create_navigation_window(int *active_win, MENU **start_menu);
-WINDOW *create_header_section(int *active_win);
+WINDOW *create_header_section(int active_win, sqlite3 *db);
 WINDOW *create_course_preview_card(int x_position, int *active_win,
                                    int curr_win_idx, COURSE *course);
 WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label);
@@ -25,6 +25,8 @@ void add_line_break(RIGHT_PANEL_STATE *rps, I_LINE **curr_line, int i, int *j,
                     bool overflow, bool *bl_point);
 void read_item_into_buffer(APP_CONTEXT *ctx);
 void read_task_into_buffer(APP_CONTEXT *ctx);
+void read_end_of_course_page_into_buffer(APP_CONTEXT *ctx);
+
 void print_course_instructions(APP_CONTEXT *ctx);
 void init_right_panel_state(RIGHT_PANEL_STATE *rp_state,
                             bool course_view_active);
@@ -32,7 +34,7 @@ void print_next_course_item(RIGHT_PANEL_STATE *rp_state);
 
 void print_intro(WINDOW **right_panel, int window_width, int intro_width);
 void print_press_msg(RIGHT_PANEL_STATE *rps);
-void print_course_complete(RIGHT_PANEL_STATE *rps);
+void print_course_complete(APP_CONTEXT *ctx);
 
 void create_course_view(APP_CONTEXT *ctx);
 WINDOW *create_editor_window();

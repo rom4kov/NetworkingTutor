@@ -77,9 +77,11 @@ int main(void)
     ctx->greeter_screen = create_greeter_screen(ctx);
 
     // seed_courses_data(ctx->db, ctx->greeter_screen,
+    //                   "SQL/create_courses_table.sql");
+    // seed_courses_data(ctx->db, ctx->greeter_screen,
     //                   "SQL/create_sections_table.sql");
-    seed_courses_data(ctx->db, ctx->greeter_screen,
-                      "SQL/create_ascii_art_table.sql");
+    // seed_courses_data(ctx->db, ctx->greeter_screen,
+    //                   "SQL/create_ascii_art_table.sql");
     // seed_courses_data(ctx->db, ctx->greeter_screen,
     //                   "SQL/courses/http_server/sections.sql");
     // seed_courses_data(ctx->db, ctx->greeter_screen,
@@ -128,7 +130,6 @@ int main(void)
         handle_greeter_input(ctx);
         wrefresh(ctx->greeter_screen);
     }
-    // int rc = wgetch(welcome_screen);
     delwin(ctx->greeter_screen);
     clear();
     refresh();
@@ -162,8 +163,6 @@ int main(void)
                 else
                     ctx->rp_state->items_to_print =
                         ctx->rp_state->curr_item - 1;
-
-                // ctx->rp_state->curr_item = 0;
 
                 ctx->rp_state->it_buffer = initialize_it_buffer();
 
@@ -293,18 +292,6 @@ void initialize_colors()
     init_pair(15, COLOR_BERMUDA, -1);
 }
 
-char *W_HEADER_TEXT =
-    "    _   __       __                          __    _              \n"
-    "   / | / /___   / /_ _      __ ____   _____ / /__ (_)____   ____ _\n"
-    "  /  |/ // _ \\ / __/| | /| / // __ \\ / ___// //_// // __ \\ / __ `/\n"
-    " / /|  //  __// /_  | |/ |/ // /_/ // /   / ,<  / // / / // /_/ / \n"
-    "/_/ |_/ \\___/ \\__/  |__/|__/ \\____//_/   /_/|_|/_//_/ /_/ \\__, /  \n"
-    "                 ______        __                        /____/   \n"
-    "                /_  __/__  __ / /_ ____   _____ \n"
-    "                 / /  / / / // __// __ \\ / ___/\n"
-    "                / /  / /_/ // /_ / /_/ // /     \n"
-    "               /_/   \\__,_/ \\__/ \\____//_/   \n";
-
 MENU *create_greeter_menu(WINDOW *nav_window)
 {
     const char *choices[] = {
@@ -358,7 +345,7 @@ WINDOW *create_greeter_screen(APP_CONTEXT *ctx)
     mvwprintw(greeter_screen, (LINES / 5) - 1, (COLS - strlen(msg)) / 2, "%s",
               msg);
     wattron(ascii_logo_window, A_BOLD);
-    mvwprintw(ascii_logo_window, 0, 0, "%s", W_HEADER_TEXT);
+    mvwprintw(ascii_logo_window, 0, 0, "%s", get_ascii_art(ctx->db, "logo"));
     wattroff(ascii_logo_window, A_BOLD);
 
     ctx->greeter_menu = create_greeter_menu(greeter_screen);

@@ -34,6 +34,8 @@ void set_section_completed(APP_CONTEXT *ctx);
 void set_items_completed(APP_CONTEXT *ctx);
 
 void get_task(APP_CONTEXT *ctx);
+char *get_ascii_art(sqlite3 *db, char *ascii_art);
+char *get_end_of_course_msg(sqlite3 *db, int course_id);
 
 
 /////////////

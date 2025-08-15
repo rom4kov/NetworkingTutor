@@ -55,7 +55,7 @@ void create_start_screen(APP_CONTEXT *ctx)
 {
     ctx->start_windows[0] =
         create_navigation_window(&ctx->active_window, &ctx->start_menu);
-    ctx->start_windows[1] = create_header_section(&ctx->active_window);
+    ctx->start_windows[1] = create_header_section(ctx->active_window, ctx->db);
     ctx->start_windows[2] =
         create_course_preview_card(0, &ctx->active_window, 2, &ctx->courses[0]);
     ctx->start_windows[3] = create_course_preview_card(
@@ -81,21 +81,23 @@ WINDOW *create_navigation_window(int *active_win, MENU **start_menu)
     return navigation;
 }
 
-WINDOW *create_header_section(int *active_win)
+WINDOW *create_header_section(int active_win, sqlite3 *db)
 {
-    WINDOW *header_outer = newwin(LINES / 2 + 1, WU * 7 + 4, 3, 0);
+    int header_height = LINES / 2 + 1;
+    int header_width = WU * 7 + 4;
+    WINDOW *header_outer = newwin(header_height, header_width, 3, 0);
     WINDOW *header_inner =
-        derwin(header_outer, LINES / 2 - 1, CARD_WIDTH * 3 - 4, 0, 3);
-    if (*active_win == 1)
+        derwin(header_outer, header_height - 6, header_width - 30, 2, 18);
+    if (active_win == 1)
     {
         wattron(header_outer, COLOR_PAIR(1) | A_BOLD);
     }
     draw_border(header_outer, 2, "Header");
     wattron(header_inner, A_BOLD);
-    mvwprintw(header_inner, 1, 0, "%s", HEADER_TEXT);
+    mvwprintw(header_inner, 1, 0, "%s", get_ascii_art(db, "logo"));
     wattroff(header_inner, A_BOLD);
     mvwprintw(header_inner, 13, 0, "%s", PROGRAMM_DESC);
-    if (*active_win == 1)
+    if (active_win == 1)
     {
         wattroff(header_inner, COLOR_PAIR(1) | A_BOLD);
     }
@@ -202,7 +204,7 @@ MENU *create_start_menu(WINDOW *nav_window)
         (char *)NULL // Last element must be NULL
     };
 
-    ITEM **menu_items = (ITEM **)calloc(6, sizeof(ITEM *));
+    ITEM **menu_items = (ITEM **)calloc(7, sizeof(ITEM *));
 
     for (int i = 0; choices[i] != NULL; i++)
     {
@@ -264,4 +266,5 @@ void init_right_panel_state(RIGHT_PANEL_STATE *rp_state,
                                  rp_state->window_width - 6, 2, 4);
     rp_state->num_of_section_items[rp_state->curr_section] = 0;
     rp_state->showing_test_results = false;
+    rp_state->showing_end_of_course_page = false;
 }

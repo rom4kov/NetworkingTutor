@@ -41,6 +41,7 @@ void insert_line(TEXT_BUFFER *tbuf, WINDOW **edit_window, WINDOW **editor_window
 
 // course instructions functions
 void complete_section(APP_CONTEXT *ctx);
+void complete_course(APP_CONTEXT *ctx);
 
 char *wrap_text(char *text, int width);
 void draw_border(WINDOW *win, int color_pair, char *label);

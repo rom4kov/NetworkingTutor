@@ -67,9 +67,12 @@ void focus_instructions_window(RIGHT_PANEL_STATE *rps, int color_pair,
     draw_border(rps->right_panel, color_pair, label);
     wattron(rps->right_panel, COLOR_PAIR(3));
     mvwprintw(rps->right_panel, 0, 2, " %s ", label);
-    mvwprintw(rps->right_panel, LINES - 4, rps->window_width - 18,
-              " %s %i of %i ", "Section", rps->curr_section + 1,
-              rps->total_course_sections);
+    if (!rps->showing_end_of_course_page)
+    {
+        mvwprintw(rps->right_panel, LINES - 4, rps->window_width - 18,
+                  " %s %i of %i ", "Section", rps->curr_section + 1,
+                  rps->total_course_sections);
+    }
     wattroff(rps->right_panel, COLOR_PAIR(3));
 
     wnoutrefresh(rps->right_panel);

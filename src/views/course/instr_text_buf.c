@@ -28,9 +28,12 @@ void add_line_break(RIGHT_PANEL_STATE *rps, I_LINE **curr_line, int i, int *j,
     (*curr_line)->line_num = *line_number;
     *line_number += 1;
 
-    if (rps->course_section_data[i].section_id == 0 &&
-        rps->course_section_data[i].order_num == 0)
-        (*curr_line)->centered = true;
+    if (i >= 0)
+    {
+        if (rps->course_section_data[i].section_id == 0 &&
+            rps->course_section_data[i].order_num == 0)
+            (*curr_line)->centered = true;
+    }
 
     *k = 0;
 
@@ -191,7 +194,6 @@ void read_item_into_buffer(APP_CONTEXT *ctx)
         if (ctx->rp_state->course_section_data[i].section_id == 0 &&
             ctx->rp_state->course_section_data[i].order_num == 0)
         {
-            // curr_line = initialize_iline();
             curr_line->buf_[k] = '\n';
             curr_line->line_num = line_number;
             line_number++;
@@ -246,12 +248,113 @@ void read_item_into_buffer(APP_CONTEXT *ctx)
             ctx->rp_state->it_buffer->current_line = curr_line;
             ctx->rp_state->it_buffer->current_line->next = NULL;
         }
-        // mvwprintw(win, text_buf->num_of_lines + 18, 16, "next curr_line %s",
-        // text_buf->current_line->buf_); mvwprintw(win, 32 + i, 39, "chars %i",
-        // i);
     }
-    // mvwprintw(ctx->course_windows[2], 2, 3, "%s", ctx->current_course);
-    // wrefresh(ctx->course_windows[2]);
+}
+
+void read_end_of_course_page_into_buffer(APP_CONTEXT *ctx)
+{
+    char *end_of_course_ascii = get_ascii_art(ctx->db, "course_finished_msg");
+    int ascii_len = strlen(end_of_course_ascii);
+    int course_len = strlen(ctx->current_course);
+
+    char *end_of_course_msg =
+        get_end_of_course_msg(ctx->db, ctx->current_course_id);
+    int msg_len = strlen(end_of_course_msg);
+
+        // literal lengths
+    const size_t nl2 = 2;  // "\n\n"
+    const size_t nl3 = 3;  // "\n\n\n"
+
+    // +1 for terminating NUL
+    int total = ascii_len + nl2 + course_len + nl3 + msg_len + 1;
+
+    char *end_of_course_page_str = malloc(total);
+    if (!end_of_course_page_str) return;
+    end_of_course_page_str[0] = '\0';
+
+    strncat(end_of_course_page_str, end_of_course_ascii, ascii_len);
+    strncat(end_of_course_page_str, "\n\n", nl2);
+    strncat(end_of_course_page_str, ctx->current_course, course_len);
+    strncat(end_of_course_page_str, "\n\n\n", nl3);
+    strncat(end_of_course_page_str, end_of_course_msg, msg_len);
+    end_of_course_page_str[total - 1] = '\0';
+
+    int i, j, last_space_pos, k;
+    i = j = last_space_pos = k = 0;
+    int line_number = 0;
+    bool overflow = false;
+    bool bl_point = false;
+    I_LINE *curr_line = initialize_iline();
+
+    while (i < total + 1)
+    {
+        if (i > 0 && end_of_course_page_str[i] == '\0')
+        {
+            curr_line->buf_[j] = '\n';
+            if (i < (ascii_len + 1))
+            {
+                curr_line->centered = true;
+                curr_line->style = COLOR_PAIR(4) | A_BOLD;
+            }
+            curr_line->line_num = line_number;
+            ctx->rp_state->it_buffer->num_of_lines++;
+            ctx->rp_state->it_buffer->current_line->next = curr_line;
+            curr_line->prev = ctx->rp_state->it_buffer->current_line;
+            ctx->rp_state->it_buffer->current_line = curr_line;
+
+            curr_line = initialize_iline();
+            curr_line->buf_[j] = ' ';
+            curr_line->buf_[j + 1] = '\n';
+            curr_line->style = SEPARATOR;
+            ctx->rp_state->it_buffer->num_of_lines++;
+            ctx->rp_state->it_buffer->current_line->next = curr_line;
+            curr_line->prev = ctx->rp_state->it_buffer->current_line;
+            ctx->rp_state->it_buffer->current_line = curr_line;
+            ctx->rp_state->it_buffer->current_line->next = NULL;
+            break;
+        }
+        else if (end_of_course_page_str[i] == '\n')
+        {
+            overflow = false;
+            bl_point = false;
+            if (i < (ascii_len + 20))
+            {
+                curr_line->centered = true;
+                curr_line->style = COLOR_PAIR(4) | A_BOLD;
+            }
+            else if (strcmp(curr_line->buf_, ctx->current_course) == 0)
+            {
+                curr_line->centered = true;
+                curr_line->style = A_UNDERLINE | A_BOLD;
+            }
+            add_line_break(ctx->rp_state, &curr_line, -1, &i, &j, &line_number,
+                           &last_space_pos, overflow, &bl_point);
+            continue;
+        }
+        else if (j > ctx->rp_state->window_width - 10)
+        {
+            overflow = true;
+            // if (i < (ascii_len + 1))
+            // {
+            curr_line->centered = false;
+            //     curr_line->style = COLOR_PAIR(4) | A_BOLD;
+            // }
+            add_line_break(ctx->rp_state, &curr_line, -1, &i, &j, &line_number,
+                           &last_space_pos, overflow, &bl_point);
+            continue;
+        }
+        else if (end_of_course_page_str[i] == ' ')
+        {
+            last_space_pos = j;
+        }
+
+        curr_line->buf_[j] = end_of_course_page_str[i];
+        curr_line->length++;
+        i++;
+        j++;
+    }
+
+    wrefresh(ctx->course_windows[2]);
 }
 
 void deallocate_it_buffer(I_TEXT_BUFFER *tbuf)
@@ -260,7 +363,7 @@ void deallocate_it_buffer(I_TEXT_BUFFER *tbuf)
         return;
 
     I_LINE *current_line = tbuf->first_line;
-    while (current_line != NULL)
+    while (current_line != NULL && current_line->next != NULL)
     {
         I_LINE *next = current_line->next;
         if (current_line->buf_)

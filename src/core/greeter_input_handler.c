@@ -50,12 +50,8 @@ void handle_greeter_input(APP_CONTEXT *ctx)
                 ctx->current_course =
                     get_course_name_by_id(ctx->db, ctx->current_course_id);
                 get_course_progress(ctx);
-                // int i = 0;
-                // while (course_progress[i])
-                // {
-                //     ctx->rp_state->course_progress[i] = course_progress[i];
-                //     i++;
-                // }
+
+                get_completed_sections(ctx);
                 ctx->rp_state->curr_section =
                     ctx->rp_state->sections_completed;
                 ctx->rp_state->curr_item =
@@ -66,7 +62,6 @@ void handle_greeter_input(APP_CONTEXT *ctx)
                     ctx->rp_state
                         ->course_progress[ctx->rp_state->sections_completed -
                                           1];
-                get_completed_sections(ctx);
 
             }
             else if (item_index(curr_item) == 6)

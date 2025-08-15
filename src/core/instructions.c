@@ -35,11 +35,22 @@ void complete_section(APP_CONTEXT *ctx)
     deallocate_it_buffer(ctx->rp_state->it_buffer);
     ctx->rp_state->it_buffer = initialize_it_buffer();
     print_course_instructions(ctx);
-    log_course_instr_values(ctx);
+    // log_course_instr_values(ctx);
 
     wnoutrefresh(ctx->rp_state->right_panel);
     wnoutrefresh(ctx->rp_state->inner_win);
     wnoutrefresh(ctx->course_windows[2]);
     wnoutrefresh(ctx->course_windows[4]);
     doupdate();
+}
+
+void complete_course(APP_CONTEXT *ctx)
+{
+    set_section_completed(ctx);
+    get_completed_sections(ctx);
+    ctx->rp_state->curr_section += 1;
+    ctx->rp_state->showing_test_results = false;
+    ctx->course_windows[4] = create_progress_window(ctx);
+
+    print_course_complete(ctx);
 }

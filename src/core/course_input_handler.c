@@ -52,52 +52,7 @@ void handle_course_input(APP_CONTEXT *ctx)
 {
     if (ctx->active_window == 0)
     {
-        switch (ctx->key)
-        {
-            case KEY_LEFT:
-                menu_driver(ctx->start_menu, REQ_PREV_ITEM);
-                wnoutrefresh(ctx->course_windows[0]);
-                doupdate();
-                break;
-            case KEY_RIGHT:
-                menu_driver(ctx->start_menu, REQ_NEXT_ITEM);
-                wnoutrefresh(ctx->course_windows[0]);
-                doupdate();
-                break;
-            case 9:
-            case KEY_DOWN:
-                ctx->active_window = 2;
-                focus_window(&ctx->course_windows[0], 2, "Navigation");
-                focus_window(&ctx->course_windows[2], 3, "Editor");
-                doupdate();
-                break;
-            case '\n':
-                ctx->curr_item = current_item(ctx->start_menu);
-                if (item_index(ctx->curr_item) == 0)
-                {
-                    ctx->course_view_active = false;
-                    ctx->start_view_active = true;
-                    for (int i = 0; i < WINDOW_COUNT; ++i)
-                    {
-                        wclear(ctx->course_windows[i]);
-                    }
-                    ctx->course_view_active = false;
-                    ctx->start_view_active = true;
-                    ctx->start_needs_redraw = true;
-                    break;
-                }
-                else if (item_index(ctx->curr_item) == 2)
-                {
-                    focus_window(&ctx->start_windows[0], 2, "Navigation");
-                    focus_window(&ctx->start_windows[5], 3, "Details");
-                    ctx->active_window = 5;
-                    focus_window(&ctx->start_windows[5], 3, "Details");
-                    wmove(ctx->start_windows[5], 4, 14);
-                    wnoutrefresh(ctx->start_windows[5]);
-                    doupdate();
-                }
-                break;
-        }
+        handle_nav_input(ctx);
     }
     else if (ctx->active_window == 1 && ctx->explorer_mode)
     {

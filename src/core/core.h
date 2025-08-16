@@ -10,6 +10,8 @@ void create_new_user_popup(APP_CONTEXT *ctx);
 
 void handle_start_input(APP_CONTEXT *ctx);
 void handle_course_input(APP_CONTEXT *ctx);
+void handle_progress_input(APP_CONTEXT *ctx);
+void handle_nav_input(APP_CONTEXT *ctx);
 
 // editor functions
 void move_down(TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **edit_window, WINDOW **editor_window,
@@ -45,6 +47,7 @@ void complete_course(APP_CONTEXT *ctx);
 
 char *wrap_text(char *text, int width);
 void draw_border(WINDOW *win, int color_pair, char *label);
+void draw_progress_border(WINDOW *win, int color_pair, char *label);
 void focus_window(WINDOW **window, int color_pair, char *label);
 void focus_instructions_window(RIGHT_PANEL_STATE *rps, int color_pair, char *label);
 void trim(char **str);

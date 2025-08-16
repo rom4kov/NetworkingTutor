@@ -46,6 +46,8 @@ void handle_greeter_input(APP_CONTEXT *ctx)
                 ctx->first_course_draw = true;
                 ctx->course_needs_redraw = true;
 
+                ctx->current_user_id = 1;
+                ctx->user_data = get_user_data(ctx->db, ctx->current_user_id);
                 ctx->current_course_id = get_current_course(ctx->db, 1);
                 ctx->current_course =
                     get_course_name_by_id(ctx->db, ctx->current_course_id);

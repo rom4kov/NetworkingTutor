@@ -1,0 +1,107 @@
+#include "../core/core.h"
+#include "../models/models.h"
+#include <menu.h>
+#include <ncurses.h>
+
+
+void handle_nav_input(APP_CONTEXT *ctx)
+{
+    switch (ctx->key)
+    {
+        case KEY_LEFT:
+            menu_driver(ctx->start_menu, REQ_PREV_ITEM);
+            if (ctx->start_view_active)
+            {
+                wnoutrefresh(ctx->start_windows[0]);
+            }
+            else if (ctx->course_view_active) {
+                wnoutrefresh(ctx->course_windows[0]);
+            }
+            else if (ctx->progress_view_active) {
+                wnoutrefresh(ctx->progress_windows[0]);
+            }
+            doupdate();
+            break;
+        case KEY_RIGHT:
+            menu_driver(ctx->start_menu, REQ_NEXT_ITEM);
+            if (ctx->start_view_active)
+            {
+                wnoutrefresh(ctx->start_windows[0]);
+            }
+            else if (ctx->course_view_active) {
+                wnoutrefresh(ctx->course_windows[0]);
+            }
+            else if (ctx->progress_view_active) {
+                wnoutrefresh(ctx->progress_windows[0]);
+            }
+            doupdate();
+            break;
+        case 9:
+        case KEY_DOWN:
+            if (ctx->start_view_active)
+            {
+                ctx->active_window = 1;
+                focus_window(&ctx->start_windows[0], 2, "Navigation");
+                focus_window(&ctx->start_windows[1], 3, "");
+            }
+            else if (ctx->course_view_active) {
+                ctx->active_window = 2;
+                focus_window(&ctx->course_windows[0], 2, "Navigation");
+                focus_window(&ctx->course_windows[2], 3, "Editor");
+            }
+            else if (ctx->progress_view_active) {
+                ctx->active_window = 1;
+                focus_window(&ctx->progress_windows[0], 2, "Navigation");
+                draw_progress_border(ctx->progress_windows[1], 3, "");
+            }
+            doupdate();
+            break;
+        case '\n':
+            ctx->curr_item = current_item(ctx->start_menu);
+            if (item_index(ctx->curr_item) == 0)
+            {
+                ctx->course_view_active = false;
+                ctx->start_view_active = true;
+                for (int i = 0; i < COURSE_WINDOW_COUNT; ++i)
+                {
+                    wclear(ctx->course_windows[i]);
+                }
+                ctx->course_view_active = false;
+                ctx->start_view_active = true;
+                ctx->start_needs_redraw = true;
+            }
+            else if (item_index(ctx->curr_item) == 2)
+            {
+                focus_window(&ctx->start_windows[0], 2, "Navigation");
+                focus_window(&ctx->start_windows[5], 3, "Details");
+                ctx->active_window = 5;
+                focus_window(&ctx->start_windows[5], 3, "Details");
+                wmove(ctx->start_windows[5], 4, 14);
+                wnoutrefresh(ctx->start_windows[5]);
+                doupdate();
+            }
+            else if (item_index(ctx->curr_item) == 3) {
+                ctx->active_window = 0;
+                if (ctx->start_view_active)
+                {
+                    for (int i = 0; i < START_WINDOW_COUNT; ++i)
+                    {
+                        wclear(ctx->start_windows[i]);
+                    }
+                    ctx->start_view_active = false;
+                    ctx->progress_view_active = true;
+                    ctx->progress_needs_redraw = true;
+                }
+                else if (ctx->course_view_active) {
+                    for (int i = 0; i < COURSE_WINDOW_COUNT; ++i)
+                    {
+                        wclear(ctx->course_windows[i]);
+                    }
+                    ctx->course_view_active = false;
+                    ctx->progress_view_active = true;
+                    ctx->progress_needs_redraw = true;
+                }
+            }
+            break;
+    }
+}

@@ -73,3 +73,7 @@ void print_no_open_file_msg(WINDOW **editor_window);
 void deallocate_it_buffer(I_TEXT_BUFFER *tbuf);
 
 void print_section_or_task_compl_msg(APP_CONTEXT *ctx, CU_pRunSummary rs);
+
+// progress view
+void create_progress_view(APP_CONTEXT *ctx);
+WINDOW *create_progress_screen(APP_CONTEXT *ctx);

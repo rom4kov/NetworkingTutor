@@ -52,13 +52,21 @@ int main(void)
     ctx->filename = (char *)calloc(30, sizeof(char));
     ctx->curr_file_path = (char *)calloc(30, sizeof(char));
     ctx->running = true;
+    ctx->user_data = malloc(sizeof(USER_DATA));
+
+    ctx->greeter_needs_redraw = true;
     ctx->start_needs_redraw = true;
     ctx->course_needs_redraw = false;
+    ctx->progress_needs_redraw = false;
+
     ctx->first_start_draw = true;
     ctx->first_course_draw = true;
+
     ctx->greeter_view_active = true;
     ctx->start_view_active = true;
     ctx->course_view_active = false;
+    ctx->progress_view_active = false;
+
     ctx->current_course = malloc(64 * sizeof(char));
     ctx->rp_state->curr_section = 0;
     ctx->rp_state->curr_item = 2;
@@ -80,6 +88,8 @@ int main(void)
     //                   "SQL/create_courses_table.sql");
     // seed_courses_data(ctx->db, ctx->greeter_screen,
     //                   "SQL/create_sections_table.sql");
+    // seed_courses_data(ctx->db, ctx->greeter_screen,
+    //                   "SQL/create_completed_courses_table.sql");
     // seed_courses_data(ctx->db, ctx->greeter_screen,
     //                   "SQL/create_ascii_art_table.sql");
     // seed_courses_data(ctx->db, ctx->greeter_screen,
@@ -216,6 +226,11 @@ int main(void)
             ctx->course_needs_redraw = false;
             ctx->first_course_draw = false;
         }
+        else if (ctx->progress_needs_redraw) {
+            create_progress_view(ctx);
+            ctx->progress_needs_redraw = false;
+            ctx->first_progress_draw = false;
+        }
 
         ctx->key = getch();
 
@@ -243,6 +258,9 @@ int main(void)
                 else if (ctx->course_view_active)
                 {
                     handle_course_input(ctx);
+                }
+                else if (ctx->progress_view_active) {
+                    handle_progress_input(ctx);
                 }
         }
     }

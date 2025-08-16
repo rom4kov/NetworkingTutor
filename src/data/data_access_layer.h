@@ -12,7 +12,7 @@
 sqlite3 *create_database();
 char *read_sql_query(char *filename);
 int create_new_user(APP_CONTEXT *ctx, char *username);
-USER_DATA get_user_data(sqlite3 *db, int user_id);
+USER_DATA *get_user_data(sqlite3 *db, int user_id);
 
 void seed_courses_data(sqlite3 *db, WINDOW *win, char *query);
 char *get_course_name_by_id(sqlite3 *db, int course_id);
@@ -30,8 +30,12 @@ void update_user(sqlite3 *db, int id, char *name, char *language);
 
 int get_current_course(sqlite3 *db, int user_id);
 void get_course_progress(APP_CONTEXT *ctx);
-void set_section_completed(APP_CONTEXT *ctx);
 void set_items_completed(APP_CONTEXT *ctx);
+int get_total_completed_items(APP_CONTEXT *ctx);
+void set_section_completed(APP_CONTEXT *ctx);
+void set_course_completed(APP_CONTEXT *ctx);
+int get_completed_courses(APP_CONTEXT *ctx);
+int get_total_completed_sections(APP_CONTEXT *ctx);
 
 void get_task(APP_CONTEXT *ctx);
 char *get_ascii_art(sqlite3 *db, char *ascii_art);

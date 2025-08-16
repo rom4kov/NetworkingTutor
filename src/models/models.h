@@ -9,6 +9,7 @@
 
 #define START_WINDOW_COUNT 6
 #define COURSE_WINDOW_COUNT 5
+#define PROGRESS_WINDOW_COUNT 4
 #define SEPARATOR 333
 // #define BOLD 1
 // #define UNDERLINE 2
@@ -159,8 +160,10 @@ typedef struct _app_context
     WINDOW *greeter_screen;
     WINDOW *start_windows[START_WINDOW_COUNT];
     WINDOW *course_windows[COURSE_WINDOW_COUNT];
+    WINDOW *progress_windows[PROGRESS_WINDOW_COUNT];
     WINDOW *line_num_win;
     WINDOW *edit_window;
+    USER_DATA *user_data;
     RIGHT_PANEL_STATE *rp_state;
     COURSE *courses;
     MENU *greeter_menu;
@@ -187,13 +190,17 @@ typedef struct _app_context
     int curr_line;
     int curr_col;
     bool running;
+    bool greeter_needs_redraw;
     bool start_needs_redraw;
-    bool first_start_draw;
-    bool first_course_draw;
     bool course_needs_redraw;
+    bool progress_needs_redraw;
     bool greeter_view_active;
     bool start_view_active;
     bool course_view_active;
+    bool progress_view_active;
+    bool first_start_draw;
+    bool first_course_draw;
+    bool first_progress_draw;
     bool editor_mode;
     bool explorer_mode;
     bool is_in_failure_list;

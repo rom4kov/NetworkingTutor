@@ -48,6 +48,7 @@ void complete_course(APP_CONTEXT *ctx)
 {
     set_section_completed(ctx);
     get_completed_sections(ctx);
+    set_course_completed(ctx);
     ctx->rp_state->curr_section += 1;
     ctx->rp_state->showing_test_results = false;
     ctx->course_windows[4] = create_progress_window(ctx);

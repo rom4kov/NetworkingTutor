@@ -101,11 +101,11 @@ int create_new_user(APP_CONTEXT *ctx, char *username)
     return (int)sqlite3_last_insert_rowid(ctx->db);
 }
 
-USER_DATA get_user_data(sqlite3 *db, int user_id)
+USER_DATA *get_user_data(sqlite3 *db, int user_id)
 {
     const char *zSql = "SELECT * FROM users WHERE id = ?;";
 
-    USER_DATA user_data;
+    USER_DATA *user_data = malloc(sizeof(USER_DATA));
 
     sqlite3_stmt *stmt;
     int rc = sqlite3_prepare_v2(db, zSql, -1, &stmt, NULL);
@@ -120,8 +120,10 @@ USER_DATA get_user_data(sqlite3 *db, int user_id)
     }
     sqlite3_step(stmt);
 
-    user_data.name = sqlite3_column_text(stmt, 1);
-    user_data.created_at = sqlite3_column_text(stmt, 2);
+    user_data->name = sqlite3_column_text(stmt, 1);
+    user_data->created_at = sqlite3_column_text(stmt, 2);
+
+    // sqlite3_finalize(stmt);
 
     return user_data;
 }
@@ -291,8 +293,6 @@ COURSE_SECTION *get_course_section_materials(sqlite3 *db, int course,
         const bool syntax_hl = sqlite3_column_int(stmt, 6);
 
         course_section_data[i].id = id;
-        // course_section_data[i].section_title = strdup((const char
-        // *)section_title);
         course_section_data[i].section_id = section_id;
         course_section_data[i].content_title =
             strdup((const char *)content_title);
@@ -394,14 +394,15 @@ void get_completed_sections(APP_CONTEXT *ctx)
 
     sqlite3_stmt *stmt;
 
-    const char *sql =
-        "SELECT COUNT(*) FROM progress WHERE course_id = ? AND section_completed = 1;";
+    const char *sql = "SELECT COUNT(*) FROM progress WHERE user_id = ? AND "
+                      "course_id = ? AND section_completed = 1;";
 
     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
 
     if (rc == SQLITE_OK)
     {
-        sqlite3_bind_int(stmt, 1, ctx->current_course_id);
+        sqlite3_bind_int(stmt, 1, ctx->current_user_id);
+        sqlite3_bind_int(stmt, 2, ctx->current_course_id);
     }
     else
     {
@@ -413,6 +414,34 @@ void get_completed_sections(APP_CONTEXT *ctx)
     {
         ctx->rp_state->sections_completed = sqlite3_column_int(stmt, 0);
     }
+}
+
+int get_total_completed_sections(APP_CONTEXT *ctx)
+{
+    int rc = 0;
+
+    sqlite3_stmt *stmt;
+
+    const char *sql = "SELECT COUNT(*) FROM progress WHERE user_id = ? AND "
+                      "section_completed = 1;";
+
+    rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
+
+    if (rc == SQLITE_OK)
+    {
+        sqlite3_bind_int(stmt, 1, ctx->current_user_id);
+    }
+    else
+    {
+        mvwprintw(ctx->course_windows[4], 1, 2, "SQL error: %s\n",
+                  sqlite3_errmsg(ctx->db));
+    }
+
+    if (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        return sqlite3_column_int(stmt, 0);
+    }
+    return 0;
 }
 
 void set_items_completed(APP_CONTEXT *ctx)
@@ -447,6 +476,40 @@ void set_items_completed(APP_CONTEXT *ctx)
     }
 
     rc = sqlite3_step(res);
+}
+
+int get_total_completed_items(APP_CONTEXT *ctx)
+{
+    int rc = 0;
+    int total_items = 0;
+
+    sqlite3_stmt *stmt;
+
+    const char *sql = "SELECT items_completed FROM progress WHERE user_id = ?;";
+
+    rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
+
+    if (rc == SQLITE_OK)
+    {
+        sqlite3_bind_int(stmt, 1, ctx->current_user_id);
+    }
+    else
+    {
+        mvwprintw(ctx->course_windows[4], 1, 2, "SQL error: %s\n",
+                  sqlite3_errmsg(ctx->db));
+    }
+
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        total_items += sqlite3_column_int(stmt, 0);
+    }
+    return total_items;
+}
+
+int get_current_streak(APP_CONTEXT *ctx)
+{
+
+    return 0;
 }
 
 int get_current_course(sqlite3 *db, int user_id)
@@ -499,12 +562,40 @@ char *get_course_name_by_id(sqlite3 *db, int course_id)
     return course_name;
 }
 
+void set_course_completed(APP_CONTEXT *ctx)
+{
+    int rc = 0;
+
+    sqlite3_stmt *res;
+
+    const char *sql =
+        "INSERT INTO completed_courses (user_id, course_id, completed_at) "
+        "VALUES (?, ?, ?);";
+
+    rc = sqlite3_prepare_v2(ctx->db, sql, -1, &res, 0);
+
+    if (rc == SQLITE_OK)
+    {
+        char *datetime = current_datetime();
+        sqlite3_bind_int(res, 1, ctx->current_user_id);
+        sqlite3_bind_int(res, 2, ctx->current_course_id);
+        sqlite3_bind_text(res, 3, datetime, strlen(datetime), NULL);
+    }
+    else
+    {
+        mvwprintw(ctx->course_windows[4], 1, 2, "SQL error: %s\n",
+                  sqlite3_errmsg(ctx->db));
+    }
+
+    sqlite3_step(res);
+}
+
 void get_course_progress(APP_CONTEXT *ctx)
 {
     int rc = 0;
 
-    const char *sql =
-        "SELECT section_id, items_completed FROM progress WHERE user_id = 1 AND course_id = ?";
+    const char *sql = "SELECT section_id, items_completed FROM progress WHERE "
+                      "user_id = 1 AND course_id = ?";
 
     sqlite3_stmt *stmt;
     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
@@ -518,16 +609,13 @@ void get_course_progress(APP_CONTEXT *ctx)
         sqlite3_bind_int(stmt, 1, ctx->current_course_id);
     }
 
-    // ctx->rp_state->sections_completed = 0;
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
         const int section_id = sqlite3_column_int(stmt, 0);
         const int items_completed = sqlite3_column_int(stmt, 1);
 
         ctx->rp_state->course_progress[section_id] = items_completed;
-        // ctx->rp_state->sections_completed++;
     }
-    // ctx->rp_state->sections_completed--;
 
     sqlite3_finalize(stmt);
 }
@@ -595,8 +683,7 @@ char *get_end_of_course_msg(sqlite3 *db, int course_id)
 
     int rc = 0;
 
-    const char *sql =
-        "SELECT end_of_course_msg FROM courses WHERE id = ?;";
+    const char *sql = "SELECT end_of_course_msg FROM courses WHERE id = ?;";
 
     sqlite3_stmt *stmt;
     rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
@@ -615,4 +702,27 @@ char *get_end_of_course_msg(sqlite3 *db, int course_id)
     end_of_course_msg = sqlite3_column_text(stmt, 0);
 
     return (char *)end_of_course_msg;
+}
+
+int get_completed_courses(APP_CONTEXT *ctx)
+{
+    int rc = 0;
+
+    const char *sql = "SELECT COUNT(*) FROM completed_courses WHERE user_id = ?;";
+
+    sqlite3_stmt *stmt;
+    rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
+    if (rc != SQLITE_OK)
+    {
+        sqlite3_finalize(stmt);
+    }
+
+    if (rc == SQLITE_OK)
+    {
+        sqlite3_bind_int(stmt, 1, ctx->current_user_id);
+    }
+
+    sqlite3_step(stmt);
+
+    return sqlite3_column_int(stmt, 0);
 }

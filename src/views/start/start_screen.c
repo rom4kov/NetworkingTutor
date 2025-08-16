@@ -19,24 +19,19 @@
 #define CARD_WIDTH (((WU * 7) / 3) + 1)
 #define REMAINDER (WU * 7 + 4) % CARD_WIDTH
 
-char *HEADER_TEXT =
-    "    _   __       __                          __    _              \n"
-    "   / | / /___   / /_ _      __ ____   _____ / /__ (_)____   ____ _\n"
-    "  /  |/ // _ \\ / __/| | /| / // __ \\ / ___// //_// // __ \\ / __ `/\n"
-    " / /|  //  __// /_  | |/ |/ // /_/ // /   / ,<  / // / / // /_/ / \n"
-    "/_/ |_/ \\___/ \\__/  |__/|__/ \\____//_/   /_/|_|/_//_/ /_/ \\__, /  \n"
-    "  ______        __                                       /____/   \n"
-    " /_  __/__  __ / /_ ____   _____                                  \n"
-    "  / /  / / / // __// __ \\ / ___/                                  \n"
-    " / /  / /_/ // /_ / /_/ // /                                      \n"
-    "/_/   \\__,_/ \\__/ \\____//_/                                       \n";
-
 char *HTTP = " _     _   _             ____\n"
              "| |__ | |_| |_ _ __ _   / / /\n"
              "| '_ \\| __| __| '_ (_) / / /\n"
              "| | | | |_| |_| |_) | / / / \n"
              "|_| |_|\\__|\\__| .__(_)_/_/  \n"
              "              |_|           \n";
+
+char *MULTI_CLIENT = "      ┌─────┐        ┌──────┐\n"
+                     "CLIENT│[═══]│<──┐    │≡≡  oo│\n"
+                     "      └─────┘   └───>│──────│\n"
+                     "      ┌─────┐   ┌───>│≡≡  oo│\n"
+                     "CLIENT│[═══]│<──┘    └──────┘\n"
+                     "      └─────┘         SERVER ";
 
 void create_start_screen(APP_CONTEXT *ctx)
 {
@@ -147,6 +142,10 @@ WINDOW *create_course_preview_card(int x_position, int *active_win,
     {
         mvwprintw(description_window, 9, 0, "%s", HTTP);
     }
+    else if (curr_win_idx == 3)
+    {
+        mvwprintw(description_window, 9, 0, "%s", MULTI_CLIENT);
+    }
     wrefresh(description_window);
     return course_preview_card_outer;
 }
@@ -170,11 +169,12 @@ WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label)
 
     if (ctx->start_view_active)
     {
-        USER_DATA user_data = get_user_data(ctx->db, ctx->current_user_id);
+        ctx->user_data = get_user_data(ctx->db, ctx->current_user_id);
         mvwprintw(ctx->rp_state->right_panel, 2, 3, "Your name: %s",
-                  user_data.name);
+                  ctx->user_data->name);
         mvwprintw(ctx->rp_state->right_panel, 3, 3, "Created at: %s",
-                  user_data.created_at);
+                  ctx->user_data->created_at);
+        mvwprintw(ctx->rp_state->right_panel, 4, 3, "%i", ctx->current_user_id);
         print_intro(&ctx->rp_state->right_panel, ctx->rp_state->window_width,
                     ctx->rp_state->intro_width);
     }
@@ -261,8 +261,8 @@ void init_right_panel_state(RIGHT_PANEL_STATE *rp_state,
     rp_state->showing_end_of_course_page = false;
 }
 
-void print_logo_and_welcome_text(I_TEXT_BUFFER *header_tbuf,
-                                 WINDOW *win, int win_width)
+void print_logo_and_welcome_text(I_TEXT_BUFFER *header_tbuf, WINDOW *win,
+                                 int win_width)
 {
     I_LINE *current_line = header_tbuf->first_line;
 
@@ -273,10 +273,9 @@ void print_logo_and_welcome_text(I_TEXT_BUFFER *header_tbuf,
     {
         if (current_line->centered)
         {
-            offset =
-                (win_width - (current_line->length < 7 ? 10 : 6) -
-                 strlen(current_line->buf_)) /
-                2;
+            offset = (win_width - (current_line->length < 7 ? 10 : 6) -
+                      strlen(current_line->buf_)) /
+                     2;
         }
         else
             offset = 0;

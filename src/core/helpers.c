@@ -215,6 +215,17 @@ char *current_datetime()
     return datetime;
 }
 
+int get_diff_time_in_days(char *time1, char *time2)
+{
+    int time_diff_in_days = 0;
+    struct tm start_date;
+    struct tm end_date;
+    start_date.tm_year = 2025;
+    end_date.tm_year = 2025;
+
+    return time_diff_in_days;
+}
+
 int suppress_stdout(void)
 {
     int dev_null = open("/dev/null", O_WRONLY);

@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 sqlite3 *create_database()
 {
@@ -508,7 +509,35 @@ int get_total_completed_items(APP_CONTEXT *ctx)
 
 int get_current_streak(APP_CONTEXT *ctx)
 {
+    int rc, i;
+    rc = i = 0;
 
+    char dates_of_completion[32];
+
+    sqlite3_stmt *stmt = NULL;
+
+    const char *sql =
+        "SELECT section_completed_at FROM progress WHERE user_id = ?;";
+
+    rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
+
+    if (rc == SQLITE_OK)
+    {
+        sqlite3_bind_int(stmt, 1, ctx->current_user_id);
+    }
+    else
+    {
+        mvwprintw(ctx->course_windows[4], 1, 2, "SQL error: %s\n",
+                  sqlite3_errmsg(ctx->db));
+    }
+
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        dates_of_completion[i] += sqlite3_column_int(stmt, 0);
+        i++;
+    }
+
+    difftime(tm, tm2);
     return 0;
 }
 
@@ -708,7 +737,8 @@ int get_completed_courses(APP_CONTEXT *ctx)
 {
     int rc = 0;
 
-    const char *sql = "SELECT COUNT(*) FROM completed_courses WHERE user_id = ?;";
+    const char *sql =
+        "SELECT COUNT(*) FROM completed_courses WHERE user_id = ?;";
 
     sqlite3_stmt *stmt;
     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);

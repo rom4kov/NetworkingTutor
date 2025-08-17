@@ -77,3 +77,4 @@ void print_section_or_task_compl_msg(APP_CONTEXT *ctx, CU_pRunSummary rs);
 // progress view
 void create_progress_view(APP_CONTEXT *ctx);
 WINDOW *create_progress_screen(APP_CONTEXT *ctx);
+void print_progress_stats(APP_CONTEXT *ctx);

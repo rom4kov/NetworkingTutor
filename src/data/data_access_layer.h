@@ -36,6 +36,7 @@ void set_section_completed(APP_CONTEXT *ctx);
 void set_course_completed(APP_CONTEXT *ctx);
 int get_completed_courses(APP_CONTEXT *ctx);
 int get_total_completed_sections(APP_CONTEXT *ctx);
+int get_current_streak(APP_CONTEXT *ctx);
 
 void get_task(APP_CONTEXT *ctx);
 char *get_ascii_art(sqlite3 *db, char *ascii_art);

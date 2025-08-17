@@ -1,5 +1,5 @@
-#include <stddef.h>
 #define _POSIX_C_SOURCE 200809L
+#define _DEFAULT_SOURCE 1
 
 #include "../models/models.h"
 #include "fcntl.h"
@@ -8,6 +8,7 @@
 #include <curses.h>
 #include <math.h>
 #include <ncurses.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -215,15 +216,58 @@ char *current_datetime()
     return datetime;
 }
 
-int get_diff_time_in_days(char *time1, char *time2)
+int get_diff_time_in_days(WINDOW *win, char date1[], char date2[])
 {
-    int time_diff_in_days = 0;
+    char *time1 = malloc(20);
+    char *time2 = malloc(20);
+    strcpy(time1, date1);
+    strcpy(time2, date2);
+
+    double time_diff_in_seconds = 0;
+    int diff_in_days = 0;
     struct tm start_date;
     struct tm end_date;
-    start_date.tm_year = 2025;
-    end_date.tm_year = 2025;
+    time_t start_time, end_time;
 
-    return time_diff_in_days;
+    char delim[] = "-";
+
+    start_date.tm_year = atoi(strsep(&time1, delim)) - 1900;
+    start_date.tm_mon = atoi(strsep(&time1, delim)) - 1;
+    start_date.tm_mday = atoi(strsep(&time1, delim));
+    start_date.tm_hour = 0;
+    start_date.tm_min = 0;
+    start_date.tm_sec = 0;
+
+    end_date.tm_year = atoi(strsep(&time2, delim)) - 1900;
+    end_date.tm_mon = atoi(strsep(&time2, delim)) - 1;
+    end_date.tm_mday = atoi(strsep(&time2, delim));
+    end_date.tm_hour = 0;
+    end_date.tm_min = 0;
+    end_date.tm_sec = 0;
+
+    // mvwprintw(win, 40, 10, "%i", start_date.tm_year);
+    // mvwprintw(win, 41, 10, "%i", start_date.tm_mon);
+    // mvwprintw(win, 42, 10, "%i", start_date.tm_mday);
+    //
+    // mvwprintw(win, 44, 10, "%i", end_date.tm_year);
+    // mvwprintw(win, 45, 10, "%i", end_date.tm_mon);
+    // mvwprintw(win, 46, 10, "%i", end_date.tm_mday);
+
+    start_time = mktime(&start_date);
+    end_time = mktime(&end_date);
+
+    // mvwprintw(win, 40, 20, "start_time: %ld", start_time / (3600 * 24));
+    // mvwprintw(win, 41, 20, "end_time: %ld", end_time / (3600 * 24));
+
+    time_diff_in_seconds = difftime(end_time, start_time);
+
+    // mvwprintw(win, 42, 20, "time diff in days: %.f",
+    //           time_diff_in_seconds / (3600 * 24));
+
+    diff_in_days = (int)time_diff_in_seconds / (3600 * 24);
+    free(time1);
+    free(time2);
+    return diff_in_days;
 }
 
 int suppress_stdout(void)

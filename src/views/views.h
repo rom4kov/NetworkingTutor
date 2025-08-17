@@ -17,7 +17,9 @@ void create_start_screen(APP_CONTEXT *ctx);
 WINDOW *create_navigation_window(int *active_win, MENU **start_menu);
 WINDOW *create_header_section(APP_CONTEXT *ctx);
 WINDOW *create_course_preview_card(int x_position, int *active_win,
-                                   int curr_win_idx, COURSE *course);
+                                   int curr_win_idx, COURSE *course,
+                                   bool start_view_active,
+                                   bool progress_view_active);
 WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label);
 // void read_item_into_buffer(COURSE_SECTION *c_sec, TEXT_BUFFER *text_buf);
 void add_line_break(COURSE_SECTION *c_sec_data, I_TEXT_BUFFER *tbuf,

@@ -91,6 +91,8 @@ int main(void)
     // seed_courses_data(ctx->db, ctx->greeter_screen,
     //                   "SQL/create_completed_courses_table.sql");
     // seed_courses_data(ctx->db, ctx->greeter_screen,
+    //                   "SQL/create_streaks_table.sql");
+    // seed_courses_data(ctx->db, ctx->greeter_screen,
     //                   "SQL/create_ascii_art_table.sql");
     // seed_courses_data(ctx->db, ctx->greeter_screen,
     //                   "SQL/courses/http_server/sections.sql");

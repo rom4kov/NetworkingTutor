@@ -1,4 +1,5 @@
 #define _POSIX_C_SOURCE 200809L
+#define _DEFAULT_SOURCE 1
 #include "data_access_layer.h"
 #include "../core/core.h"
 #include <ncurses.h>
@@ -366,19 +367,22 @@ void update_user(sqlite3 *db, int id, char *name, char *language)
 void set_section_completed(APP_CONTEXT *ctx)
 {
     int rc = 0;
+    char *curr_datetime = current_datetime();
 
     sqlite3_stmt *res;
 
-    const char *sql = "UPDATE progress SET section_completed = 1 "
-                      "WHERE user_id = 1 AND course_id = ? "
-                      "AND section_id = ?;";
+    const char *sql =
+        "UPDATE progress SET section_completed = 1, section_completed_at = ? "
+        "WHERE user_id = 1 AND course_id = ? "
+        "AND section_id = ?;";
 
     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &res, 0);
 
     if (rc == SQLITE_OK)
     {
-        sqlite3_bind_int(res, 1, ctx->current_course_id);
-        sqlite3_bind_int(res, 2, ctx->rp_state->curr_section);
+        sqlite3_bind_text(res, 1, curr_datetime, strlen(curr_datetime), NULL);
+        sqlite3_bind_int(res, 2, ctx->current_course_id);
+        sqlite3_bind_int(res, 3, ctx->rp_state->curr_section);
     }
     else
     {
@@ -386,7 +390,13 @@ void set_section_completed(APP_CONTEXT *ctx)
                   sqlite3_errmsg(ctx->db));
     }
 
-    sqlite3_step(res);
+    rc = sqlite3_step(res);
+    if (rc == SQLITE_DONE)
+    {
+        mvwprintw(ctx->course_windows[2], 1, 2, "rc: %i\n", rc);
+        wrefresh(ctx->course_windows[2]);
+        set_current_streak(ctx);
+    }
 }
 
 void get_completed_sections(APP_CONTEXT *ctx)
@@ -505,55 +515,6 @@ int get_total_completed_items(APP_CONTEXT *ctx)
         total_items += sqlite3_column_int(stmt, 0);
     }
     return total_items;
-}
-
-int get_current_streak(APP_CONTEXT *ctx)
-{
-    int rc, i, streak_length, diff;
-    rc = i = streak_length = diff = 0;
-
-    char *c_date = malloc(20);
-    char *cmp_date = malloc(20);
-
-    sqlite3_stmt *stmt = NULL;
-
-    const char *sql =
-        "SELECT section_completed_at FROM progress WHERE user_id = ? "
-        "ORDER BY section_completed_at DESC;";
-
-    rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
-
-    if (rc == SQLITE_OK)
-    {
-        sqlite3_bind_int(stmt, 1, ctx->current_user_id);
-    }
-    else
-    {
-        mvwprintw(ctx->course_windows[4], 1, 2, "SQL error: %s\n",
-                  sqlite3_errmsg(ctx->db));
-    }
-
-    char *current_date = current_datetime();
-    strcpy(c_date, current_date);
-
-    while (sqlite3_step(stmt) == SQLITE_ROW)
-    {
-        const char *tmp_date = (const char *)sqlite3_column_text(stmt, 0);
-        if (tmp_date == NULL)
-            break;
-        strcpy(cmp_date, tmp_date);
-        if ((diff = get_diff_time_in_days(ctx->course_windows[2], cmp_date,
-                                          c_date)) > 1)
-        {
-            break;
-        }
-        strcpy(c_date, tmp_date);
-        streak_length++;
-        i++;
-    }
-
-    wrefresh(ctx->progress_windows[1]);
-    return streak_length;
 }
 
 int get_current_course(sqlite3 *db, int user_id)
@@ -775,8 +736,14 @@ int get_completed_courses(APP_CONTEXT *ctx)
 void set_current_streak(APP_CONTEXT *ctx)
 {
     int current_streak = get_current_streak(ctx);
-    char *current_date = current_datetime();
+    char *current_date_time = malloc(20);
+    current_date_time = current_datetime();
+    char *current_date = strsep(&current_date_time, " ");
     int rc = 0;
+
+    mvwprintw(ctx->course_windows[2], 30, 5, "%i", current_streak);
+    mvwprintw(ctx->course_windows[2], 31, 5, "%s", current_date_time);
+    mvwprintw(ctx->course_windows[2], 32, 5, "%s", current_date);
 
     const char *sql = "INSERT OR IGNORE INTO streaks (user_id, streak, "
                       "achieved_at) VALUES (?, ?, ?);";
@@ -792,10 +759,60 @@ void set_current_streak(APP_CONTEXT *ctx)
     {
         sqlite3_bind_int(stmt, 1, ctx->current_user_id);
         sqlite3_bind_int(stmt, 2, current_streak);
-        sqlite3_bind_text(stmt, 2, current_date, strlen(current_date), NULL);
+        sqlite3_bind_text(stmt, 3, current_date, strlen(current_date), NULL);
     }
 
     sqlite3_step(stmt);
+    wrefresh(ctx->course_windows[2]);
+}
+
+int get_current_streak(APP_CONTEXT *ctx)
+{
+    int rc, i, streak_length, diff;
+    rc = i = streak_length = diff = 0;
+
+    char *c_date = malloc(20);
+    char *cmp_date = malloc(20);
+
+    sqlite3_stmt *stmt = NULL;
+
+    const char *sql =
+        "SELECT section_completed_at FROM progress WHERE user_id = ? "
+        "ORDER BY section_completed_at DESC;";
+
+    rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
+
+    if (rc == SQLITE_OK)
+    {
+        sqlite3_bind_int(stmt, 1, ctx->current_user_id);
+    }
+    else
+    {
+        mvwprintw(ctx->course_windows[4], 1, 2, "SQL error: %s\n",
+                  sqlite3_errmsg(ctx->db));
+    }
+
+    char *current_date = current_datetime();
+    strcpy(c_date, current_date);
+
+    while (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        const char *tmp_date = (const char *)sqlite3_column_text(stmt, 0);
+        if (tmp_date == NULL || strcmp(tmp_date, "") == 0)
+            break;
+        strcpy(cmp_date, tmp_date);
+        if ((diff = get_diff_time_in_days(ctx->course_windows[2], cmp_date,
+                                          c_date)) > 1)
+        {
+            break;
+        }
+        strcpy(c_date, tmp_date);
+        streak_length++;
+        i++;
+    }
+
+    wrefresh(ctx->progress_windows[1]);
+    return streak_length;
 }
 
 int get_longest_streak(APP_CONTEXT *ctx)
@@ -819,5 +836,6 @@ int get_longest_streak(APP_CONTEXT *ctx)
 
     sqlite3_step(stmt);
 
+    longest_streak = sqlite3_column_int(stmt, 0);
     return longest_streak;
 }

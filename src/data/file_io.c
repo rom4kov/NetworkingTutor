@@ -93,7 +93,7 @@ I_LINE *initialize_iline()
 {
     I_LINE *line = malloc(sizeof(I_LINE));
 
-    line->buf_ = calloc(100, sizeof(char));
+    line->buf_ = calloc(100, sizeof(wchar_t));
     line->buf_[0] = '\n';
     line->line_num = 0;
     line->length = 1;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <curses.h>
+#include <form.h>
 #include <menu.h>
 #include <ncurses.h>
 #include <sqlite3.h>
@@ -28,6 +29,7 @@ typedef struct _course_data
     int id;
     char *name;
     char *short_desc;
+    char *ascii_logo;
 } COURSE;
 
 typedef struct _course_section
@@ -171,12 +173,15 @@ typedef struct _app_context
     MENU *explorer_menu;
     ITEM **menu_items;
     ITEM *curr_item;
+    FORM *user_form;
+    FIELD *user_form_fields;
     FILE_TREE *file_tree;
     FILE *file;
     char *filename;
     char *curr_file_path;
     char *current_course;
     TEXT_BUFFER *t_buffer;
+    I_TEXT_BUFFER *card_buffers[10];
     CU_ErrorCode ec; 
     CU_pSuite sp[15];
     CU_pRunSummary run_sum;
@@ -204,4 +209,5 @@ typedef struct _app_context
     bool editor_mode;
     bool explorer_mode;
     bool is_in_failure_list;
+    bool user_form_active;
 } APP_CONTEXT;

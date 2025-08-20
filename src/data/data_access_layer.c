@@ -178,9 +178,11 @@ COURSE *get_course_data(sqlite3 *db)
         const int id = sqlite3_column_int(stmt, 0);
         const unsigned char *name = sqlite3_column_text(stmt, 1);
         const unsigned char *description = sqlite3_column_text(stmt, 2);
+        const unsigned char *ascii_logo = sqlite3_column_text(stmt, 3);
         course_data[i].id = id;
         course_data[i].name = strdup((const char *)name);
         course_data[i].short_desc = strdup((const char *)description);
+        course_data[i].ascii_logo = strdup((const char *)ascii_logo);
         i++;
     }
 
@@ -218,6 +220,80 @@ COURSE *get_course_by_id(sqlite3 *db, int course_id)
     }
 
     return course;
+}
+
+char *get_course_ascii_art(sqlite3 *db, int course_id)
+{
+    const unsigned char *ascii = malloc(256);
+
+    int rc = 0;
+
+    const char *sql = "SELECT content FROM materials WHERE course_id = ? AND "
+                      "section_id = 0 AND order_num = 0;";
+
+    sqlite3_stmt *stmt;
+    rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+    if (rc != SQLITE_OK)
+    {
+        sqlite3_finalize(stmt);
+    }
+
+    if (rc == SQLITE_OK)
+    {
+        sqlite3_bind_int(stmt, 1, course_id);
+    }
+
+    sqlite3_step(stmt);
+
+    ascii = sqlite3_column_text(stmt, 0);
+
+    return (char *)ascii;
+}
+
+COURSE *get_completed_courses(APP_CONTEXT *ctx, int *num_courses)
+{
+    int rc = 0;
+
+    const char *sql = "SELECT * FROM courses WHERE id IN (SELECT course_id FROM "
+                      "completed_courses WHERE user_id = ?);";
+
+    sqlite3_stmt *stmt;
+    rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
+
+    if (rc != SQLITE_OK)
+    {
+        sqlite3_finalize(stmt);
+    }
+
+    if (rc == SQLITE_OK)
+    {
+        sqlite3_bind_int(stmt, 1, ctx->current_user_id);
+    }
+
+    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW)
+    {
+        *num_courses += 1;
+    }
+    sqlite3_reset(stmt);
+
+    COURSE *completed_courses = malloc(sizeof(COURSE) * *num_courses);
+
+    int i = 0;
+    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW)
+    {
+        const int id = sqlite3_column_int(stmt, 0);
+        const unsigned char *name = sqlite3_column_text(stmt, 1);
+        const unsigned char *description = sqlite3_column_text(stmt, 2);
+        const unsigned char *ascii_logo = sqlite3_column_text(stmt, 3);
+        completed_courses[i].id = id;
+        completed_courses[i].name = strdup((const char *)name);
+        completed_courses[i].short_desc = strdup((const char *)description);
+        completed_courses[i].ascii_logo = strdup((const char *)ascii_logo);
+        i++;
+    }
+
+    sqlite3_finalize(stmt);
+    return completed_courses;
 }
 
 SECTION_METADATA *get_section_metadata(APP_CONTEXT *ctx)
@@ -709,7 +785,7 @@ char *get_end_of_course_msg(sqlite3 *db, int course_id)
     return (char *)end_of_course_msg;
 }
 
-int get_completed_courses(APP_CONTEXT *ctx)
+int get_num_of_completed_courses(APP_CONTEXT *ctx)
 {
     int rc = 0;
 

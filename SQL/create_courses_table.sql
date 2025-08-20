@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS courses (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     short_desc TEXT,
+    ascii_logo TEXT,
     end_of_course_msg TEXT
 );
 
@@ -9,13 +10,20 @@ INSERT
     OR IGNORE INTO courses (
         name,
         short_desc,
+        ascii_logo,
         end_of_course_msg
     )
 VALUES
     (
         'Build an HTTP Server in C',
-        'In this first and short project you will learn how to build a simple HTTP server in C,
-  using the very basic version 1.0 of the HTTP protocol.',
+        'In this first and short project you will learn how to build a simple
+HTTP server in C, using the very basic version 1.1 of the HTTP protocol.',
+        ' _     _   _             ____@
+| |__ | |_| |_ _ __ _   / / /@
+| `_ \| __| __| `_ (_) / / / @
+| | | | |_| |_| |_) | / / /  @
+|_| |_|\__|\__| .__(_)_/_/   @
+              |_|            ',
         'Well done! You’ve taken your first real steps into the world of network programming. Along the way,
 you’ve:@
 @
@@ -35,13 +43,21 @@ INSERT
     OR IGNORE INTO courses (
         name,
         short_desc,
+        ascii_logo,
         end_of_course_msg
     )
 VALUES
     (
-        'Handling multiple clients',
-        'In the second project you will learn how to build a simple HTTP server in C,
-  using the very basic version 1.0 of the HTTP protocol.',
+        'Parsing HTTP for Your C Server',
+        'Learn to build an HTTP parser in C to enhance your HTTP server,
+dissecting messages into components for robust request handling in this
+follow-up course.',
+        "     _  _ _____ _____ ___ @
+    | || |_   _|_   _| _ \@
+ ___| __ | | |   | | |  _/@
+| _ \_||_|_|_|___|_| |_|  @
+|  _/ _` | '_(_-/ -_| '_| @
+|_| \__,_|_| /__\___|_|   ",
         ''
     );
 
@@ -49,12 +65,42 @@ INSERT
     OR IGNORE INTO courses (
         name,
         short_desc,
+        ascii_logo,
+        end_of_course_msg
+    )
+VALUES
+    (
+        'Handling multiple clients',
+        'Master managing multiple clients in your HTTP server, implementing
+concurrent connections using techniques like threading to boost performance
+and scalability in this follow-up course. ',
+        '[CLIENT]\  +----+  /[CLIENT]@
+         \ |=  o| /         @
+          \|----|/          @
+          /|=  o|\          @
+         / +----+ \         @
+[CLIENT]/  SERVER  \[CLIENT]',
+        ''
+    );
+
+INSERT
+    OR IGNORE INTO courses (
+        name,
+        short_desc,
+        ascii_logo,
         end_of_course_msg
     )
 VALUES
     (
         'Secure communication with SSL',
-        'In the second project you will learn how to build a simple HTTP server in C,
-  using the very basic version 1.0 of the HTTP protocol.',
+        'Learn to secure your server with SSL/TLS, implementing encrypted
+communication to protect data transfers and ensure secure client-server
+interactions in this follow-up course.',
+        '   _____     ____ ____  _     @
+  /     \   / ___/ ___|| |    @
++---------+ \___ \___ \| |    @
+|    0    |  ___) ___) | |___ @
+|    |    | |____|____/|_____|@
++---------+     ENCRYPTION    ',
         ''
     );

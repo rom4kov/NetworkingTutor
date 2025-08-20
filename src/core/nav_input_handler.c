@@ -1,5 +1,6 @@
 #include "../core/core.h"
 #include "../models/models.h"
+#include "../views/views.h"
 #include <menu.h>
 #include <ncurses.h>
 
@@ -52,7 +53,10 @@ void handle_nav_input(APP_CONTEXT *ctx)
             else if (ctx->progress_view_active) {
                 ctx->active_window = 1;
                 focus_window(&ctx->progress_windows[0], 2, "Navigation");
-                draw_progress_border(ctx->progress_windows[1], 3, "");
+                focus_window(&ctx->progress_windows[1], 3, "");
+                // FORM *user_form = NULL;
+                // FIELD *fields[3];
+                // create_user_form(ctx->progress_windows[1], &user_form, fields);
             }
             doupdate();
             break;

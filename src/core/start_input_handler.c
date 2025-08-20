@@ -1,5 +1,4 @@
 #define _POSIX_C_SOURCE 200809L
-#include "../views/start/user_form.h"
 #include "../views/views.h"
 #include "core.h"
 #include <curses.h>
@@ -30,10 +29,9 @@ void handle_start_input(APP_CONTEXT *ctx)
             case KEY_DOWN:
                 ctx->active_window = 2;
                 draw_border(ctx->start_windows[1], 2, "Header");
-                ctx->start_windows[2] = create_course_preview_card(
-                    CARD_WIDTH * (ctx->active_window - 2), &ctx->active_window,
-                    ctx->active_window, &ctx->courses[0],
-                    ctx->course_view_active, ctx->progress_view_active);
+                ctx->start_windows[2] = create_course_preview_card(ctx,
+                    CARD_WIDTH * (ctx->active_window - 2), 
+                    ctx->active_window, &ctx->courses[0]);
                 doupdate();
                 break;
             case KEY_UP:
@@ -58,30 +56,26 @@ void handle_start_input(APP_CONTEXT *ctx)
             case KEY_RIGHT:
                 ctx->active_window = (ctx->active_window + 1) % WINDOW_COUNT;
                 ctx->start_windows[ctx->active_window - 1] =
-                    create_course_preview_card(
+                    create_course_preview_card(ctx,
                         CARD_WIDTH * (ctx->active_window - 3),
-                        &ctx->active_window, ctx->active_window - 1,
-                        &ctx->courses[ctx->active_window - 3],
-                        ctx->course_view_active, ctx->progress_view_active);
+                        ctx->active_window - 1,
+                        &ctx->courses[ctx->active_window - 3]);
                 doupdate();
                 ctx->start_windows[ctx->active_window] =
-                    create_course_preview_card(
+                    create_course_preview_card(ctx,
                         CARD_WIDTH * (ctx->active_window - 2),
-                        &ctx->active_window, ctx->active_window,
-                        &ctx->courses[ctx->active_window - 2],
-                        ctx->course_view_active, ctx->progress_view_active);
+                        ctx->active_window,
+                        &ctx->courses[ctx->active_window - 2]);
                 doupdate();
                 break;
             case KEY_LEFT:
                 if (ctx->active_window == 3)
                 {
                     ctx->active_window = 2;
-                    ctx->start_windows[2] = create_course_preview_card(
-                        0, &ctx->active_window, 2, &ctx->courses[0],
-                        ctx->course_view_active, ctx->progress_view_active);
-                    ctx->start_windows[3] = create_course_preview_card(
-                        CARD_WIDTH, &ctx->active_window, 3, &ctx->courses[1],
-                        ctx->course_view_active, ctx->progress_view_active);
+                    ctx->start_windows[2] = create_course_preview_card(ctx,
+                        0, 2, &ctx->courses[0]);
+                    ctx->start_windows[3] = create_course_preview_card(ctx,
+                        CARD_WIDTH, 3, &ctx->courses[1]);
                     doupdate();
                 }
                 break;
@@ -89,10 +83,9 @@ void handle_start_input(APP_CONTEXT *ctx)
                 this_win = ctx->active_window;
                 ctx->active_window = 1;
                 focus_window(&ctx->start_windows[1], 3, "");
-                ctx->start_windows[this_win] = create_course_preview_card(
-                    CARD_WIDTH * (this_win - 2), &ctx->active_window, this_win,
-                    &ctx->courses[this_win - 2], ctx->course_view_active,
-                    ctx->progress_view_active);
+                ctx->start_windows[this_win] = create_course_preview_card(ctx,
+                    CARD_WIDTH * (this_win - 2), this_win,
+                    &ctx->courses[this_win - 2]);
                 doupdate();
                 break;
             case 10: // Enter / Return key
@@ -124,32 +117,28 @@ void handle_start_input(APP_CONTEXT *ctx)
             case KEY_RIGHT:
                 ctx->active_window = (ctx->active_window + 1) % WINDOW_COUNT;
                 ctx->start_windows[ctx->active_window - 1] =
-                    create_course_preview_card(
+                    create_course_preview_card(ctx,
                         CARD_WIDTH * (ctx->active_window - 3),
-                        &ctx->active_window, ctx->active_window - 1,
-                        &ctx->courses[2], ctx->course_view_active,
-                        ctx->progress_view_active);
+                        ctx->active_window - 1,
+                        &ctx->courses[2]);
                 focus_window(&ctx->start_windows[5], 3, "Details");
                 doupdate();
                 break;
             case KEY_LEFT:
                 ctx->active_window = 3;
-                ctx->start_windows[3] = create_course_preview_card(
-                    CARD_WIDTH, &ctx->active_window, 3, &ctx->courses[1],
-                    ctx->course_view_active, ctx->progress_view_active);
-                ctx->start_windows[4] = create_course_preview_card(
-                    CARD_WIDTH * 2, &ctx->active_window, 4, &ctx->courses[2],
-                    ctx->course_view_active, ctx->progress_view_active);
+                ctx->start_windows[3] = create_course_preview_card(ctx,
+                    CARD_WIDTH, 3, &ctx->courses[1]);
+                ctx->start_windows[4] = create_course_preview_card(ctx,
+                    CARD_WIDTH * 2, 4, &ctx->courses[2]);
                 doupdate();
                 break;
             case KEY_UP:
                 this_win = ctx->active_window;
                 ctx->active_window = 1;
                 focus_window(&ctx->start_windows[1], 3, "");
-                ctx->start_windows[this_win] = create_course_preview_card(
-                    CARD_WIDTH * 2, &ctx->active_window, this_win,
-                    &ctx->courses[2], ctx->course_view_active,
-                    ctx->progress_view_active);
+                ctx->start_windows[this_win] = create_course_preview_card(ctx,
+                    CARD_WIDTH * 2, this_win,
+                    &ctx->courses[2]);
                 doupdate();
                 break;
         }

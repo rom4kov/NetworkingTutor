@@ -79,6 +79,8 @@ int main(void)
     ctx->rp_state->total_section_items = (int *)calloc(32, sizeof(int));
     ctx->rp_state->total_course_sections = 0;
 
+    ctx->user_form_fields = false;
+
     int curr_line;
     int curr_col;
 
@@ -229,6 +231,22 @@ int main(void)
             ctx->first_course_draw = false;
         }
         else if (ctx->progress_needs_redraw) {
+            if (!ctx->first_progress_draw)
+            {
+
+                endwin();
+                refresh();
+                for (int i = 0; i < 3; i++)
+                {
+                    if (ctx->progress_windows[i] != NULL)
+                    {
+                        delwin(ctx->progress_windows[i]);
+                        // delwin(ctx->edit_window);
+                        // delwin(ctx->line_num_win);
+                        // delwin(ctx->rp_state->inner_win);
+                    }
+                }
+            }
             create_progress_view(ctx);
             ctx->progress_needs_redraw = false;
             ctx->first_progress_draw = false;
@@ -246,6 +264,10 @@ int main(void)
                 else if (ctx->course_view_active)
                 {
                     ctx->course_needs_redraw = true;
+                }
+                else if (ctx->progress_view_active)
+                {
+                    ctx->progress_needs_redraw = true;
                 }
                 break;
             case 27:

@@ -1,6 +1,6 @@
 #include "../../core/core.h"
 #include "../views.h"
-#include <curses.h>
+#include <ncurses.h>
 #include <string.h>
 
 void print_course_instructions(APP_CONTEXT *ctx)

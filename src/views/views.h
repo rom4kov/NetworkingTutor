@@ -16,10 +16,8 @@ WINDOW *create_greeter_screen(APP_CONTEXT *ctx);
 void create_start_screen(APP_CONTEXT *ctx);
 WINDOW *create_navigation_window(int *active_win, MENU **start_menu);
 WINDOW *create_header_section(APP_CONTEXT *ctx);
-WINDOW *create_course_preview_card(int x_position, int *active_win,
-                                   int curr_win_idx, COURSE *course,
-                                   bool start_view_active,
-                                   bool progress_view_active);
+WINDOW *create_course_preview_card(APP_CONTEXT *ctx, int x_position,
+                                   int curr_win_idx, COURSE *course);
 WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label);
 // void read_item_into_buffer(COURSE_SECTION *c_sec, TEXT_BUFFER *text_buf);
 void add_line_break(COURSE_SECTION *c_sec_data, I_TEXT_BUFFER *tbuf,
@@ -30,14 +28,17 @@ void read_task_into_buffer(APP_CONTEXT *ctx);
 void read_end_of_course_page_into_buffer(APP_CONTEXT *ctx);
 void read_logo_and_header_text_into_buffer(APP_CONTEXT *ctx,
                                            I_TEXT_BUFFER *header_tbuf,
-                                           int win_width);
+                                           int win_width, int win,
+                                           int course_id);
+void read_in_buf_str(char *buf_str, int total, I_TEXT_BUFFER *header_tbuf,
+                     int win_width);
 
 void print_course_instructions(APP_CONTEXT *ctx);
 void init_right_panel_state(RIGHT_PANEL_STATE *rp_state,
                             bool course_view_active);
 void print_next_course_item(RIGHT_PANEL_STATE *rp_state);
-void print_logo_and_welcome_text(I_TEXT_BUFFER *header_tbuf, WINDOW *win,
-                                 int win_width);
+void print_window_content(I_TEXT_BUFFER *header_tbuf, WINDOW *win,
+                          int win_width);
 
 void print_intro(WINDOW **right_panel, int window_width, int intro_width);
 void print_press_msg(RIGHT_PANEL_STATE *rps);
@@ -51,7 +52,7 @@ WINDOW *create_progress_window(APP_CONTEXT *ctx);
 void print_no_open_file_msg(WINDOW **editor_window);
 void log_course_instr_values(APP_CONTEXT *ctx);
 
-void create_user_form(WINDOW **window, FORM **user_form, FIELD **fields);
+void create_user_form(WINDOW *window, FORM **user_form, FIELD **fields);
 
 void update_line_numbers(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
                          int *scroll_offset, int lines_to_print);
@@ -78,5 +79,9 @@ void print_section_or_task_compl_msg(APP_CONTEXT *ctx, CU_pRunSummary rs);
 
 // progress view
 void create_progress_view(APP_CONTEXT *ctx);
+WINDOW *create_account_window(APP_CONTEXT *ctx);
 WINDOW *create_progress_screen(APP_CONTEXT *ctx);
-void print_progress_stats(APP_CONTEXT *ctx);
+WINDOW *create_your_courses_window(APP_CONTEXT *ctx);
+WINDOW *create_progress_stats_window(APP_CONTEXT *ctx);
+void print_completed_courses(APP_CONTEXT *ctx);
+void print_your_courses_title(APP_CONTEXT *ctx);

@@ -4,7 +4,6 @@
 #include "../../models/models.h"
 #include "../views.h"
 #include "start_menu.h"
-#include "user_form.h"
 #include <curses.h>
 #include <form.h>
 #include <menu.h>
@@ -19,34 +18,17 @@
 #define CARD_WIDTH (((WU * 7) / 3) + 1)
 #define REMAINDER (WU * 7 + 4) % CARD_WIDTH
 
-char *HTTP = " _     _   _             ____\n"
-             "| |__ | |_| |_ _ __ _   / / /\n"
-             "| '_ \\| __| __| '_ (_) / / /\n"
-             "| | | | |_| |_| |_) | / / / \n"
-             "|_| |_|\\__|\\__| .__(_)_/_/  \n"
-             "              |_|           \n";
-
-char *MULTI_CLIENT = "      ┌─────┐        ┌──────┐\n"
-                     "CLIENT│[═══]│<──┐    │≡≡  oo│\n"
-                     "      └─────┘   └───>│──────│\n"
-                     "      ┌─────┐   ┌───>│≡≡  oo│\n"
-                     "CLIENT│[═══]│<──┘    └──────┘\n"
-                     "      └─────┘         SERVER ";
-
 void create_start_screen(APP_CONTEXT *ctx)
 {
     ctx->start_windows[0] =
         create_navigation_window(&ctx->active_window, &ctx->start_menu);
     ctx->start_windows[1] = create_header_section(ctx);
-    ctx->start_windows[2] = create_course_preview_card(
-        0, &ctx->active_window, 2, &ctx->courses[0], ctx->start_view_active,
-        ctx->progress_view_active);
-    ctx->start_windows[3] = create_course_preview_card(
-        CARD_WIDTH, &ctx->active_window, 3, &ctx->courses[1],
-        ctx->start_view_active, ctx->progress_view_active);
-    ctx->start_windows[4] = create_course_preview_card(
-        CARD_WIDTH * 2, &ctx->active_window, 4, &ctx->courses[2],
-        ctx->start_view_active, ctx->progress_view_active);
+    ctx->start_windows[2] =
+        create_course_preview_card(ctx, 0, 2, &ctx->courses[0]);
+    ctx->start_windows[3] =
+        create_course_preview_card(ctx, CARD_WIDTH, 3, &ctx->courses[1]);
+    ctx->start_windows[4] =
+        create_course_preview_card(ctx, CARD_WIDTH * 2, 4, &ctx->courses[2]);
     ctx->start_windows[5] = create_right_side_panel(ctx, " Details ");
 
     wrefresh(ctx->start_windows[5]);
@@ -79,10 +61,10 @@ WINDOW *create_header_section(APP_CONTEXT *ctx)
     }
 
     I_TEXT_BUFFER *header_tbuf = initialize_it_buffer();
-    read_logo_and_header_text_into_buffer(ctx, header_tbuf, header_width);
+    read_logo_and_header_text_into_buffer(ctx, header_tbuf, header_width, 0, 0);
 
     wattron(header_inner, A_BOLD);
-    print_logo_and_welcome_text(header_tbuf, header_inner, header_width - 2);
+    print_window_content(header_tbuf, header_inner, header_width - 2);
     wattroff(header_inner, A_BOLD);
     // mvwprintw(header_inner, 13, 0, "%s", PROGRAMM_DESC);
     if (ctx->active_window == 1)
@@ -96,10 +78,8 @@ WINDOW *create_header_section(APP_CONTEXT *ctx)
     return header_window;
 }
 
-WINDOW *create_course_preview_card(int x_position, int *active_win,
-                                   int curr_win_idx, COURSE *course,
-                                   bool start_view_active,
-                                   bool progress_view_active)
+WINDOW *create_course_preview_card(APP_CONTEXT *ctx, int x_position,
+                                   int curr_win_idx, COURSE *course)
 {
     int remainder = 0;
     if (curr_win_idx == 4)
@@ -107,27 +87,33 @@ WINDOW *create_course_preview_card(int x_position, int *active_win,
         remainder = REMAINDER;
     }
 
-    int height = LINES % 2 == 0 ? LINES / 2 - 4 : LINES / 2 - 3;
+    int height = 0;
+    int width = 0;
     int y_position = 0;
-    if (start_view_active)
+    int x_add = 0;
+    if (ctx->start_view_active)
     {
         y_position = LINES / 2 + 4;
+        height = LINES % 2 == 0 ? LINES / 2 - 4 : LINES / 2 - 3;
+        width = CARD_WIDTH;
     }
-    else if (progress_view_active) {
-        y_position = LINES / 2 + 2;
+    else if (ctx->progress_view_active)
+    {
+        y_position = 12;
+        x_add = 80;
+        height = LINES / 3 + 2;
+        width = CARD_WIDTH - 2;
     }
     WINDOW *course_preview_card_outer =
-        newwin(height, CARD_WIDTH + remainder, y_position, x_position);
-    WINDOW *course_preview_card_inner =
-        derwin(course_preview_card_outer, height - 2,
-               CARD_WIDTH - 2 + remainder, 1, 1);
-    WINDOW *description_window =
-        derwin(course_preview_card_inner, height - 4, CARD_WIDTH - 4, 1, 2);
-    mvwprintw(description_window, 12, 2, "a: %i c: %i", *active_win,
-              curr_win_idx);
+        newwin(height, width + remainder, y_position, x_position + x_add);
+    WINDOW *course_preview_card_inner = derwin(
+        course_preview_card_outer, height - 3, width - 2 + remainder, 2, 1);
+    // WINDOW *description_window =
+    //     derwin(course_preview_card_inner, height - 4, CARD_WIDTH - 4, 1, 1);
 
-    if ((*active_win == 2 || *active_win == 3 || *active_win == 4) &&
-        curr_win_idx == *active_win)
+    if ((ctx->active_window == 2 || ctx->active_window == 3 ||
+         ctx->active_window == 4) &&
+        curr_win_idx == ctx->active_window && ctx->start_view_active)
     {
         draw_border(course_preview_card_outer, 3, " Course");
     }
@@ -135,31 +121,30 @@ WINDOW *create_course_preview_card(int x_position, int *active_win,
     {
         draw_border(course_preview_card_outer, 2, " Course");
         mvwaddch(course_preview_card_outer, 2, 0, ACS_LTEE);
-        mvwaddch(course_preview_card_outer, 2, CARD_WIDTH - 1 + remainder,
-                 ACS_RTEE);
+        mvwaddch(course_preview_card_outer, 2, width - 1 + remainder, ACS_RTEE);
     }
 
-    mvwhline(course_preview_card_inner, 1, 0, ACS_HLINE,
-             CARD_WIDTH + remainder);
+    mvwhline(course_preview_card_outer, 2, 1, ACS_HLINE, width - 2 + remainder);
     wattron(course_preview_card_outer, COLOR_PAIR(3));
     mvwprintw(course_preview_card_outer, 0, 2, " Course #%i ", course->id);
     wattroff(course_preview_card_outer, COLOR_PAIR(3));
-    wrefresh(course_preview_card_outer);
-    mvwprintw(course_preview_card_inner, 0,
-              (CARD_WIDTH - strlen(course->name)) / 2 - 1, "%s", course->name);
-    wrefresh(course_preview_card_inner);
-    int x = getmaxx(description_window);
-    mvwprintw(description_window, 2, 0, "%s",
-              wrap_text(course->short_desc, x - 8));
-    if (curr_win_idx == 2)
-    {
-        mvwprintw(description_window, 9, 0, "%s", HTTP);
-    }
-    else if (curr_win_idx == 3)
-    {
-        mvwprintw(description_window, 9, 0, "%s", MULTI_CLIENT);
-    }
-    wrefresh(description_window);
+
+    // wrefresh(course_preview_card_outer);
+    mvwprintw(course_preview_card_outer, 1,
+              (width - strlen(course->name)) / 2 - 1, "%s", course->name);
+
+    ctx->card_buffers[curr_win_idx - 2] = initialize_it_buffer();
+    read_logo_and_header_text_into_buffer(
+        ctx, ctx->card_buffers[curr_win_idx - 2], width - 2 + remainder, 1,
+        curr_win_idx - 2);
+
+    print_window_content(ctx->card_buffers[curr_win_idx - 2],
+                         course_preview_card_inner, width - 2 + remainder);
+
+    wnoutrefresh(course_preview_card_outer);
+    wnoutrefresh(course_preview_card_inner);
+    // wnoutrefresh(description_window);
+    doupdate();
     return course_preview_card_outer;
 }
 
@@ -274,8 +259,8 @@ void init_right_panel_state(RIGHT_PANEL_STATE *rp_state,
     rp_state->showing_end_of_course_page = false;
 }
 
-void print_logo_and_welcome_text(I_TEXT_BUFFER *header_tbuf, WINDOW *win,
-                                 int win_width)
+void print_window_content(I_TEXT_BUFFER *header_tbuf, WINDOW *win,
+                          int win_width)
 {
     I_LINE *current_line = header_tbuf->first_line;
 
@@ -286,9 +271,7 @@ void print_logo_and_welcome_text(I_TEXT_BUFFER *header_tbuf, WINDOW *win,
     {
         if (current_line->centered)
         {
-            offset = (win_width - (current_line->length < 7 ? 10 : 6) -
-                      strlen(current_line->buf_)) /
-                     2;
+            offset = (win_width - current_line->length - 1) / 2;
         }
         else
             offset = 0;
@@ -301,12 +284,20 @@ void print_logo_and_welcome_text(I_TEXT_BUFFER *header_tbuf, WINDOW *win,
         else if (current_line->style == 0 && current_line->syntax_hl == false)
         {
             mvwprintw(win, i, offset, "%s", current_line->buf_);
+            // mvwprintw(win, i, offset, "%i %i %i %i %li", offset,
+            // current_line->length,
+            //           win_width, CARD_WIDTH, strlen(current_line->buf_));
         }
         else if (current_line->syntax_hl == true)
         {
             print_line((LINE *)current_line, i, &win);
         }
-
+        // else
+        // {
+        //     // mvwprintw(win, i, offset, "%s", current_line->buf_);
+        //     // mvwprintw(win, i, 2, "%s", current_line->buf_);
+        // }
+        //
         current_line = current_line->next;
     }
 }

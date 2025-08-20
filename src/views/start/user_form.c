@@ -1,14 +1,17 @@
+#include "../../core/core.h"
 #include <form.h>
-#include <curses.h>
 #include <ncurses.h>
 
 #define WU COLS / 12 // WU for WIDTH_UNIT
 
-void create_user_form(WINDOW **window, FORM **user_form, FIELD **fields)
+void create_user_form(WINDOW *window, FORM **user_form, FIELD **fields)
 {
     int rows, cols;
-    WINDOW *inner_win = derwin(*window, LINES - 2, COLS - (WU * 7 + 4) - 2, 1, 1);
-    wclear(*window);
+    // rows = 10;
+    // cols = 15;
+    WINDOW *inner_win = derwin(window, 7, 40, 9, 8);
+    // wclear(window);
+    draw_border(inner_win, 2, "");
 
     fields[0] = new_field(1, 20, 0, 1, 0, 0);
     fields[1] = new_field(1, 20, 2, 1, 0, 0);
@@ -26,15 +29,10 @@ void create_user_form(WINDOW **window, FORM **user_form, FIELD **fields)
 
     scale_form(*user_form, &rows, &cols);
 
-    WINDOW *form_win = derwin(inner_win, rows, cols, 3, 12);
+    WINDOW *form_win = derwin(inner_win, rows, cols, 2, 14);
 
-    wattron(inner_win, A_BOLD);
-    mvwprintw(inner_win, 1, 2, "ACCOUNT");
-    wattroff(inner_win, A_BOLD);
-    mvwprintw(inner_win, 3, 2, "Your name: ");
-    mvwprintw(inner_win, 5, 2, "Language:  ");
-    // mvwprintw(inner_win, 27, 2, "LINES: %i", LINES);
-    // mvwprintw(inner_win, 28, 2, "COLS: %i", COLS);
+    mvwprintw(inner_win, 2, 4, "Your name: ");
+    mvwprintw(inner_win, 4, 4, "Language:  ");
 
     set_form_win(*user_form, inner_win);
     set_form_sub(*user_form, form_win);
@@ -42,8 +40,7 @@ void create_user_form(WINDOW **window, FORM **user_form, FIELD **fields)
     curs_set(1);
     set_current_field(*user_form, fields[0]);
     post_form(*user_form);
-
-    // wrefresh(*window);
-    // mvwprintw(inner_win, 38, 2, "Inner win string");
-    wrefresh(inner_win);
+    
+    wnoutrefresh(inner_win);
+    wnoutrefresh(form_win);
 }

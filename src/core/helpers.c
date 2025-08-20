@@ -2,6 +2,7 @@
 #define _DEFAULT_SOURCE 1
 
 #include "../models/models.h"
+#include "../views/views.h"
 #include "fcntl.h"
 #include "unistd.h"
 #include <ctype.h>
@@ -60,7 +61,7 @@ void draw_progress_border(WINDOW *win, int color_pair, char *label)
     wattron(win, COLOR_PAIR(color_pair));
 
     // Draw top and bottom borders
-    for (int i = 1; i < max_x - 1; i++)
+    for (int i = 80; i < max_x - 1; i++)
     {
         mvwaddch(win, i < (WU * 7 + 5) ? 3 : 0, i, ACS_HLINE);
         mvwaddch(win, max_y - 1, i, ACS_HLINE);
@@ -69,14 +70,14 @@ void draw_progress_border(WINDOW *win, int color_pair, char *label)
     // Draw left and right borders
     for (int i = 1; i < max_y - 1; i++)
     {
-        mvwaddch(win, i, i < 4 ? (WU * 7 + 5) : 0, ACS_VLINE);
+        mvwaddch(win, i, i < 4 ? (WU * 7 + 5) : 80, ACS_VLINE);
         mvwaddch(win, i, max_x - 1, ACS_VLINE);
     }
 
-    mvwprintw(win, 3, 0, "╭");
+    mvwprintw(win, 3, 80, "╭");
     mvwprintw(win, 0, WU * 7 + 5, "╭");
     mvwprintw(win, 0, max_x - 1, "╮");
-    mvwprintw(win, max_y - 1, 0, "╰");
+    mvwprintw(win, max_y - 1, 80, "╰");
     mvwprintw(win, 3, WU * 7 + 5, "╯");
     mvwprintw(win, max_y - 1, max_x - 1, "╯");
 
@@ -118,6 +119,12 @@ void focus_instructions_window(RIGHT_PANEL_STATE *rps, int color_pair,
 
     wnoutrefresh(rps->right_panel);
 }
+//
+// void focus_progress_window(APP_CONTEXT *ctx, int color_pair)
+// {
+//     draw_progress_border(ctx->progress_windows[3], color_pair, "");
+//     print_completed_courses(ctx);
+// }
 
 void trim(char **str)
 {

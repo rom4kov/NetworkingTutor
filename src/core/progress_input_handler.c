@@ -44,20 +44,21 @@ void handle_progress_input(APP_CONTEXT *ctx)
             case '\n':
                 form_driver(ctx->user_form, REQ_VALIDATION);
                 char *buf1 = field_buffer(&ctx->user_form_fields[0], 0);
-                char *buf2 = field_buffer(&ctx->user_form_fields[1], 0);
-                update_user(ctx->db, 1, buf1, buf2);
+                trim(&buf1);
+                update_user(ctx->db, 1, buf1);
                 curs_set(0);
-                ctx->progress_windows[1] = create_right_side_panel(ctx, "Details");
-                wrefresh(ctx->progress_windows[1]);
-                ctx->start_view_active = false;
-                ctx->start_needs_redraw = true;
-                unpost_form(ctx->user_form);
+                ctx->progress_view_active = true;
+                ctx->progress_needs_redraw = true;
+                ctx->user_form_active = false;
+                // unpost_form(ctx->user_form);
                 free_form(ctx->user_form);
                 free_field(&ctx->user_form_fields[0]);
                 free_field(&ctx->user_form_fields[1]);
                 break;
-            case 27:
+            case KEY_F(1):
+                mvwprintw(ctx->progress_windows[1], 1, 1, "%s", "F1 pressed");
                 ctx->user_form_active = false;
+                wrefresh(ctx->progress_windows[1]);
                 break;
             default:
                 form_driver(ctx->user_form, ctx->key);

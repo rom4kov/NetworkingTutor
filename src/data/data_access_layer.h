@@ -29,8 +29,9 @@ COURSE_SECTION *get_course_section_materials(sqlite3 *db, int course,
                                        int section, int *num_of_items);
 void get_total_course_sections(APP_CONTEXT *ctx);
 void get_completed_sections(APP_CONTEXT *ctx);
+int get_course_completion_percentage(APP_CONTEXT *ctx, int course_id);
 
-void update_user(sqlite3 *db, int id, char *name, char *language);
+void update_user(sqlite3 *db, int id, char *name);
 
 void set_items_completed(APP_CONTEXT *ctx);
 int get_total_completed_items(APP_CONTEXT *ctx);

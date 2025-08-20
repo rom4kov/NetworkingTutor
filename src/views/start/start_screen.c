@@ -1,3 +1,4 @@
+#include <stdio.h>
 #define _XOPEN_SOURCE_EXTENDED 1
 
 #include "../../core/core.h"
@@ -69,8 +70,12 @@ WINDOW *create_header_section(APP_CONTEXT *ctx)
     // mvwprintw(header_inner, 13, 0, "%s", PROGRAMM_DESC);
     if (ctx->active_window == 1)
     {
-        wattroff(header_inner, COLOR_PAIR(1) | A_BOLD);
+        wattroff(header_inner, COLOR_PAIR(1));
     }
+
+    mvwprintw(header_inner, 14,
+              (header_width - (strlen((char *)ctx->user_data->name) + 10)) / 2,
+              "Hello %s!", ctx->user_data->name);
 
     draw_border(header_window, 2, "Header");
     wrefresh(header_window);
@@ -140,6 +145,20 @@ WINDOW *create_course_preview_card(APP_CONTEXT *ctx, int x_position,
 
     print_window_content(ctx->card_buffers[curr_win_idx - 2],
                          course_preview_card_inner, width - 2 + remainder);
+
+    if (ctx->progress_view_active)
+    {
+        int start_x = 14;
+        int comp_percent = get_course_completion_percentage(ctx, course->id);
+
+        if (comp_percent < 10) start_x = 12;
+        else if (comp_percent < 100) start_x = 13;
+
+        wattron(course_preview_card_outer, COLOR_PAIR(4));
+        mvwprintw(course_preview_card_outer, height - 1, start_x, " %i%% complete ",
+                  comp_percent);
+        wattroff(course_preview_card_outer, COLOR_PAIR(4));
+    }
 
     wnoutrefresh(course_preview_card_outer);
     wnoutrefresh(course_preview_card_inner);
@@ -292,12 +311,7 @@ void print_window_content(I_TEXT_BUFFER *header_tbuf, WINDOW *win,
         {
             print_line((LINE *)current_line, i, &win);
         }
-        // else
-        // {
-        //     // mvwprintw(win, i, offset, "%s", current_line->buf_);
-        //     // mvwprintw(win, i, 2, "%s", current_line->buf_);
-        // }
-        //
+
         current_line = current_line->next;
     }
 }

@@ -13,8 +13,8 @@
 
 void handle_start_input(APP_CONTEXT *ctx)
 {
-    FORM *user_form = NULL;
-    FIELD *fields[3];
+    // FORM *user_form = NULL;
+    // FIELD *fields[3];
     int this_win;
 
     if (ctx->active_window == 0)
@@ -143,58 +143,58 @@ void handle_start_input(APP_CONTEXT *ctx)
                 break;
         }
     }
-    else if (ctx->active_window == 5 && user_form)
-    {
-        switch (ctx->key)
-        {
-            case KEY_DOWN:
-                form_driver(user_form, REQ_DOWN_FIELD);
-                form_driver(user_form, REQ_END_LINE);
-                wnoutrefresh(ctx->start_windows[5]);
-                doupdate();
-                break;
-            case KEY_UP:
-                form_driver(user_form, REQ_UP_FIELD);
-                form_driver(user_form, REQ_END_LINE);
-                wnoutrefresh(ctx->start_windows[5]);
-                doupdate();
-                break;
-            case 9:
-                form_driver(user_form, REQ_NEXT_FIELD);
-                wrefresh(ctx->start_windows[5]);
-                break;
-            case 263: // Backspace
-                form_driver(user_form, REQ_VALIDATION);
-                FIELD *current = current_field(user_form);
-                char *buf = field_buffer(current, 0);
-                trim(&buf);
-                if (buf && strlen(buf) > 0)
-                {
-                    form_driver(user_form, REQ_DEL_PREV);
-                    wrefresh(ctx->start_windows[5]);
-                }
-                break;
-            case '\n':
-                form_driver(user_form, REQ_VALIDATION);
-                char *buf1 = field_buffer(fields[0], 0);
-                char *buf2 = field_buffer(fields[1], 0);
-                update_user(ctx->db, 1, buf1, buf2);
-                curs_set(0);
-                ctx->start_windows[5] = create_right_side_panel(ctx, "Details");
-                wrefresh(ctx->start_windows[5]);
-                ctx->start_view_active = false;
-                ctx->start_needs_redraw = true;
-                unpost_form(user_form);
-                free_form(user_form);
-                free_field(fields[0]);
-                free_field(fields[1]);
-                break;
-            default:
-                form_driver(user_form, ctx->key);
-                wrefresh(ctx->start_windows[5]);
-                break;
-        }
-    }
+    // else if (ctx->active_window == 5 && user_form)
+    // {
+    //     switch (ctx->key)
+    //     {
+    //         case KEY_DOWN:
+    //             form_driver(user_form, REQ_DOWN_FIELD);
+    //             form_driver(user_form, REQ_END_LINE);
+    //             wnoutrefresh(ctx->start_windows[5]);
+    //             doupdate();
+    //             break;
+    //         case KEY_UP:
+    //             form_driver(user_form, REQ_UP_FIELD);
+    //             form_driver(user_form, REQ_END_LINE);
+    //             wnoutrefresh(ctx->start_windows[5]);
+    //             doupdate();
+    //             break;
+    //         case 9:
+    //             form_driver(user_form, REQ_NEXT_FIELD);
+    //             wrefresh(ctx->start_windows[5]);
+    //             break;
+    //         case 263: // Backspace
+    //             form_driver(user_form, REQ_VALIDATION);
+    //             FIELD *current = current_field(user_form);
+    //             char *buf = field_buffer(current, 0);
+    //             trim(&buf);
+    //             if (buf && strlen(buf) > 0)
+    //             {
+    //                 form_driver(user_form, REQ_DEL_PREV);
+    //                 wrefresh(ctx->start_windows[5]);
+    //             }
+    //             break;
+    //         case '\n':
+    //             form_driver(user_form, REQ_VALIDATION);
+    //             char *buf1 = field_buffer(fields[0], 0);
+    //             char *buf2 = field_buffer(fields[1], 0);
+    //             update_user(ctx->db, 1, buf1, buf2);
+    //             curs_set(0);
+    //             ctx->start_windows[5] = create_right_side_panel(ctx, "Details");
+    //             wrefresh(ctx->start_windows[5]);
+    //             ctx->start_view_active = false;
+    //             ctx->start_needs_redraw = true;
+    //             unpost_form(user_form);
+    //             free_form(user_form);
+    //             free_field(fields[0]);
+    //             free_field(fields[1]);
+    //             break;
+    //         default:
+    //             form_driver(user_form, ctx->key);
+    //             wrefresh(ctx->start_windows[5]);
+    //             break;
+    //     }
+    // }
     else if (ctx->active_window == 5)
     {
         switch (ctx->key)

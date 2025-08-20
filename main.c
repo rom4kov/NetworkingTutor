@@ -250,6 +250,9 @@ int main(void)
             create_progress_view(ctx);
             ctx->progress_needs_redraw = false;
             ctx->first_progress_draw = false;
+            for (int i = 0; i < 3; i++)
+                wnoutrefresh(ctx->progress_windows[i]);
+            doupdate();
         }
 
         ctx->key = getch();

@@ -56,6 +56,7 @@ void handle_progress_input(APP_CONTEXT *ctx)
                 free_field(&ctx->user_form_fields[1]);
                 break;
             case KEY_F(1):
+                curs_set(0);
                 mvwprintw(ctx->progress_windows[1], 1, 1, "%s", "F1 pressed");
                 ctx->user_form_active = false;
                 wrefresh(ctx->progress_windows[1]);
@@ -95,6 +96,7 @@ void handle_progress_input(APP_CONTEXT *ctx)
                 break;
             case '\n':
                 ctx->user_form_active = true;
+                curs_set(1);
                 break;
         }
     }

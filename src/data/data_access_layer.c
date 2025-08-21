@@ -130,6 +130,7 @@ USER_DATA *get_user_data(sqlite3 *db, int user_id)
     return user_data;
 }
 
+
 void seed_courses_data(sqlite3 *db, WINDOW *win, char *query)
 {
     const char *course_details = read_sql_query(query);
@@ -256,7 +257,7 @@ COURSE *get_completed_courses(APP_CONTEXT *ctx, int *num_courses)
 
     const char *sql =
         "SELECT * FROM courses WHERE id IN (SELECT course_id FROM "
-        "completed_courses WHERE user_id = ?);";
+        "progress WHERE user_id = ?);";
 
     sqlite3_stmt *stmt;
     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
@@ -942,10 +943,12 @@ int get_course_completion_percentage(APP_CONTEXT *ctx, int course_id)
         course_total_items = (int)sqlite3_column_int(stmt, 0) - 1;
     }
 
+    if (course_total_items == -1) return 0;
+
     mvwprintw(ctx->progress_windows[3], 44, 6, "%i", course_total_items);
 
     const char *sql2 =
-        "SELECT items_completed FROM progress WHERE user_id = ? AND course_id;";
+        "SELECT items_completed FROM progress WHERE user_id = ? AND course_id = ?;";
 
     sqlite3_stmt *stmt2;
     rc = sqlite3_prepare_v2(ctx->db, sql2, -1, &stmt2, NULL);

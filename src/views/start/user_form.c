@@ -37,7 +37,6 @@ void create_user_form(WINDOW *window, FORM **user_form, FIELD **fields)
     set_form_win(*user_form, inner_win);
     set_form_sub(*user_form, form_win);
 
-    curs_set(1);
     set_current_field(*user_form, fields[0]);
     post_form(*user_form);
     

@@ -65,12 +65,11 @@ void handle_nav_input(APP_CONTEXT *ctx)
             if (item_index(ctx->curr_item) == 0)
             {
                 ctx->course_view_active = false;
-                ctx->start_view_active = true;
+                ctx->progress_view_active = false;
                 for (int i = 0; i < COURSE_WINDOW_COUNT; ++i)
                 {
                     wclear(ctx->course_windows[i]);
                 }
-                ctx->course_view_active = false;
                 ctx->start_view_active = true;
                 ctx->start_needs_redraw = true;
             }

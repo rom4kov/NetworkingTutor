@@ -151,8 +151,8 @@ WINDOW *create_course_preview_card(APP_CONTEXT *ctx, int x_position,
         int start_x = 14;
         int comp_percent = get_course_completion_percentage(ctx, course->id);
 
-        if (comp_percent < 10) start_x = 12;
-        else if (comp_percent < 100) start_x = 13;
+        // if (comp_percent < 10) start_x = 15;
+        // else if (comp_percent < 100) start_x = 15;
 
         wattron(course_preview_card_outer, COLOR_PAIR(4));
         mvwprintw(course_preview_card_outer, height - 1, start_x, " %i%% complete ",

@@ -7,6 +7,8 @@
 #include <menu.h>
 #include <ncurses.h>
 
+#define WU COLS / 12 // WU for WIDTH_UNIT
+
 void create_progress_view(APP_CONTEXT *ctx)
 {
     ctx->progress_windows[3] = create_progress_screen(ctx);
@@ -14,31 +16,25 @@ void create_progress_view(APP_CONTEXT *ctx)
         create_navigation_window(&ctx->active_window, &ctx->start_menu);
     ctx->progress_windows[1] = create_account_window(ctx);
     ctx->progress_windows[2] = create_progress_stats_window(ctx);
-    // ctx->progress_windows[3] = create_course_preview_card(
-    //     10, &ctx->active_window, 0, &ctx->courses[0],
-    //     ctx->course_view_active, ctx->progress_view_active);
 
-    create_user_form(ctx->progress_windows[1], &ctx->user_form, &ctx->user_form_fields);
+    create_user_form(ctx->progress_windows[1], &ctx->user_form,
+                     &ctx->user_form_fields);
 
     wnoutrefresh(ctx->progress_windows[0]);
     wnoutrefresh(ctx->progress_windows[2]);
     wnoutrefresh(ctx->progress_windows[1]);
     wnoutrefresh(ctx->progress_windows[3]);
+    wnoutrefresh(ctx->progress_windows[4]);
     doupdate();
+    print_completed_courses(ctx);
 }
 
 WINDOW *create_progress_screen(APP_CONTEXT *ctx)
 {
-    WINDOW *progress_screen = newwin(LINES, COLS, 0, 0);
-
-    wattron(progress_screen, A_BOLD);
-    mvwprintw(progress_screen, 0, 0, "%s",
-              get_ascii_art(ctx->db, "your_courses"));
-    wattroff(progress_screen, A_BOLD);
+    WINDOW *progress_screen = newwin(LINES, COLS - 80, 0, 80);
 
     draw_progress_border(progress_screen, 2, "");
-    create_your_courses_window(ctx);
-    print_completed_courses(ctx);
+    create_your_courses_window(ctx, progress_screen);
 
     return progress_screen;
 }
@@ -56,20 +52,16 @@ WINDOW *create_account_window(APP_CONTEXT *ctx)
     return account_window;
 }
 
-WINDOW *create_your_courses_window(APP_CONTEXT *ctx)
+void create_your_courses_window(APP_CONTEXT *ctx, WINDOW *win)
 {
-    WINDOW *your_courses_window =
-        newwin(LINES - 9, (COLS / 5) * 3 + 3, 6, (COLS / 5) * 2 - 3);
+    ctx->progress_windows[4] =
+        derwin(win, 45, WU * 7 + 4, 6, 8);
 
-    wattron(your_courses_window, A_BOLD);
-    mvwprintw(your_courses_window, 0, 0, "%s",
+    wattron(ctx->progress_windows[4], A_BOLD);
+    mvwprintw(ctx->progress_windows[4], 0, 0, "%s",
               get_ascii_art(ctx->db, "your_courses"));
-    wattroff(your_courses_window, A_BOLD);
-
-    // draw_border(your_courses_window, 2, "");
-    wnoutrefresh(your_courses_window);
-
-    return your_courses_window;
+    wattroff(ctx->progress_windows[4], A_BOLD);
+    // wrefresh(ctx->progress_windows[4]);
 }
 
 WINDOW *create_progress_stats_window(APP_CONTEXT *ctx)
@@ -117,10 +109,20 @@ void print_completed_courses(APP_CONTEXT *ctx)
     int number = 0;
     COURSE *completed_courses = get_completed_courses(ctx, &number);
 
-    for (int i = 0; i < number; i++)
+    if (number > 0)
     {
-        create_course_preview_card(ctx, 10 + (i * 46), 2 + i,
-                                   &completed_courses[i]);
+        for (int i = 0; i < number; i++)
+        {
+            create_course_preview_card(ctx, 10 + (i * 46), 2 + i,
+                                       &completed_courses[i]);
+        }
+    }
+    else
+    {
+        char *msg = "You have not started any courses yet.";
+        mvwprintw(ctx->progress_windows[3], LINES / 2,
+                  ((COLS - 80) - strlen(msg)) / 2, "%s", msg);
+        wrefresh(ctx->progress_windows[3]);
     }
 }
 

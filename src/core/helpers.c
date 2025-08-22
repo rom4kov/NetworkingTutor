@@ -61,24 +61,24 @@ void draw_progress_border(WINDOW *win, int color_pair, char *label)
     wattron(win, COLOR_PAIR(color_pair));
 
     // Draw top and bottom borders
-    for (int i = 80; i < max_x - 1; i++)
+    for (int i = 0; i < max_x - 1; i++)
     {
-        mvwaddch(win, i < (WU * 7 + 5) ? 3 : 0, i, ACS_HLINE);
+        mvwaddch(win, i < (WU * 7 - 75) ? 3 : 0, i, ACS_HLINE);
         mvwaddch(win, max_y - 1, i, ACS_HLINE);
     }
 
     // Draw left and right borders
     for (int i = 1; i < max_y - 1; i++)
     {
-        mvwaddch(win, i, i < 4 ? (WU * 7 + 5) : 80, ACS_VLINE);
+        mvwaddch(win, i, i < 4 ? (WU * 7 - 75) : 0, ACS_VLINE);
         mvwaddch(win, i, max_x - 1, ACS_VLINE);
     }
 
-    mvwprintw(win, 3, 80, "╭");
-    mvwprintw(win, 0, WU * 7 + 5, "╭");
+    mvwprintw(win, 3, 0, "╭");
+    mvwprintw(win, 0, WU * 7 - 75, "╭");
     mvwprintw(win, 0, max_x - 1, "╮");
-    mvwprintw(win, max_y - 1, 80, "╰");
-    mvwprintw(win, 3, WU * 7 + 5, "╯");
+    mvwprintw(win, max_y - 1, 0, "╰");
+    mvwprintw(win, 3, WU * 7 - 75, "╯");
     mvwprintw(win, max_y - 1, max_x - 1, "╯");
 
     if (NULL != label && strcmp(label, "Lesson") == 0)

@@ -42,7 +42,6 @@ void print_window_content(I_TEXT_BUFFER *header_tbuf, WINDOW *win,
 
 void print_intro(WINDOW **right_panel, int window_width, int intro_width);
 void print_press_msg(RIGHT_PANEL_STATE *rps);
-void print_course_complete(APP_CONTEXT *ctx);
 
 void create_course_view(APP_CONTEXT *ctx);
 WINDOW *create_editor_window();
@@ -74,6 +73,7 @@ void move_to_next_entry(FILE_TREE *f_tree, WINDOW **explorer_window);
 void move_to_prev_entry(FILE_TREE *f_tree, WINDOW **explorer_window);
 void print_no_open_file_msg(WINDOW **editor_window);
 void deallocate_it_buffer(I_TEXT_BUFFER *tbuf);
+void print_course_complete(APP_CONTEXT *ctx);
 
 void print_section_or_task_compl_msg(APP_CONTEXT *ctx, CU_pRunSummary rs);
 
@@ -81,7 +81,8 @@ void print_section_or_task_compl_msg(APP_CONTEXT *ctx, CU_pRunSummary rs);
 void create_progress_view(APP_CONTEXT *ctx);
 WINDOW *create_account_window(APP_CONTEXT *ctx);
 WINDOW *create_progress_screen(APP_CONTEXT *ctx);
-WINDOW *create_your_courses_window(APP_CONTEXT *ctx);
+void create_your_courses_window(APP_CONTEXT *ctx, WINDOW *win);
 WINDOW *create_progress_stats_window(APP_CONTEXT *ctx);
 void print_completed_courses(APP_CONTEXT *ctx);
 void print_your_courses_title(APP_CONTEXT *ctx);
+void print_no_courses_started_msg(WINDOW *win, int height, int width);

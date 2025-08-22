@@ -1,6 +1,7 @@
 #include "../core/core.h"
 #include "../models/models.h"
 #include "../views/views.h"
+#include <curses.h>
 #include <menu.h>
 #include <ncurses.h>
 
@@ -90,7 +91,9 @@ void handle_nav_input(APP_CONTEXT *ctx)
                     for (int i = 0; i < START_WINDOW_COUNT; ++i)
                     {
                         wclear(ctx->start_windows[i]);
+                        wnoutrefresh(ctx->start_windows[i]);
                     }
+                    doupdate();
                     ctx->start_view_active = false;
                     ctx->progress_view_active = true;
                     ctx->progress_needs_redraw = true;
@@ -99,7 +102,9 @@ void handle_nav_input(APP_CONTEXT *ctx)
                     for (int i = 0; i < COURSE_WINDOW_COUNT; ++i)
                     {
                         wclear(ctx->course_windows[i]);
+                        wnoutrefresh(ctx->course_windows[i]);
                     }
+                    doupdate();
                     ctx->course_view_active = false;
                     ctx->progress_view_active = true;
                     ctx->progress_needs_redraw = true;

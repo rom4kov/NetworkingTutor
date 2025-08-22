@@ -29,7 +29,6 @@ COURSE_SECTION *get_course_section_materials(sqlite3 *db, int course,
                                        int section, int *num_of_items);
 void get_total_course_sections(APP_CONTEXT *ctx);
 void get_completed_sections(APP_CONTEXT *ctx);
-int get_course_completion_percentage(APP_CONTEXT *ctx, int course_id);
 
 void update_user(sqlite3 *db, int id, char *name);
 
@@ -41,6 +40,7 @@ void set_course_completed(APP_CONTEXT *ctx);
 
 int get_num_of_completed_courses(APP_CONTEXT *ctx);
 int get_total_completed_sections(APP_CONTEXT *ctx);
+int get_course_completion_percentage(APP_CONTEXT *ctx, int course_id);
 
 void set_current_streak(APP_CONTEXT *ctx);
 int get_current_streak(APP_CONTEXT *ctx);

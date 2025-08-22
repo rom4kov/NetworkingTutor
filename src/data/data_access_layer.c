@@ -122,9 +122,8 @@ USER_DATA *get_user_data(sqlite3 *db, int user_id)
     }
     sqlite3_step(stmt);
 
-    user_data->name = sqlite3_column_text(stmt, 1);
-    user_data->created_at = sqlite3_column_text(stmt, 2);
-
+    user_data->name = (const unsigned char *)strdup((const char *)sqlite3_column_text(stmt, 1));
+    user_data->created_at = (const unsigned char *)strdup((const char *)sqlite3_column_text(stmt, 2));
     // sqlite3_finalize(stmt);
 
     return user_data;
@@ -322,7 +321,7 @@ SECTION_METADATA *get_section_metadata(APP_CONTEXT *ctx)
 
     if (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        section_metadata->title = (char *)sqlite3_column_text(stmt, 0);
+        section_metadata->title = (char *)strdup((const char *)sqlite3_column_text(stmt, 0));
         section_metadata->has_test = (bool)sqlite3_column_int(stmt, 1);
         section_metadata->has_separate_task = (bool)sqlite3_column_int(stmt, 2);
     }
@@ -639,7 +638,7 @@ char *get_course_name_by_id(sqlite3 *db, int course_id)
 
     sqlite3_step(stmt);
 
-    char *course_name = (char *)sqlite3_column_text(stmt, 0);
+    char *course_name = strdup((char *)sqlite3_column_text(stmt, 0));
 
     return course_name;
 }
@@ -724,7 +723,7 @@ void get_task(APP_CONTEXT *ctx)
 
     sqlite3_step(stmt);
 
-    char *task = (char *)sqlite3_column_text(stmt, 0);
+    char *task = strdup((char *)sqlite3_column_text(stmt, 0));
 
     ctx->rp_state->current_task =
         (char *)malloc((strlen(task) + 1) * sizeof(char));
@@ -732,32 +731,32 @@ void get_task(APP_CONTEXT *ctx)
     ctx->rp_state->current_task = strdup(task);
 }
 
-char *get_ascii_art(sqlite3 *db, char *ascii_art)
+char *get_ascii_art(sqlite3 *db, char *ascii_art_name)
 {
-    const unsigned char *ascii = malloc(2048);
-
-    int rc = 0;
-
     const char *sql = "SELECT content FROM ascii_art WHERE name = ?;";
+    sqlite3_stmt *stmt = NULL;
+    char *result = NULL;
 
-    sqlite3_stmt *stmt;
-    rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
-    if (rc != SQLITE_OK)
-    {
-        sqlite3_finalize(stmt);
+    int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(db));
+        return NULL;
     }
 
-    if (rc == SQLITE_OK)
-    {
-        sqlite3_bind_text(stmt, 1, ascii_art, strlen(ascii_art), NULL);
+    sqlite3_bind_text(stmt, 1, ascii_art_name, strlen(ascii_art_name), NULL);
+
+    rc = sqlite3_step(stmt);   // <-- must store this
+    if (rc == SQLITE_ROW) {
+        const unsigned char *ascii = (const unsigned char*)strdup((char *)sqlite3_column_text(stmt, 0));
+        if (ascii) {
+            result = strdup((const char *)ascii);
+        }
     }
 
-    sqlite3_step(stmt);
-
-    ascii = sqlite3_column_text(stmt, 0);
-
-    return (char *)ascii;
+    sqlite3_finalize(stmt);  // <-- always finalize!
+    return result;           // caller must free()
 }
+
 
 char *get_end_of_course_msg(sqlite3 *db, int course_id)
 {
@@ -781,7 +780,7 @@ char *get_end_of_course_msg(sqlite3 *db, int course_id)
 
     sqlite3_step(stmt);
 
-    end_of_course_msg = sqlite3_column_text(stmt, 0);
+    end_of_course_msg = (const unsigned char *)strdup((char *)sqlite3_column_text(stmt, 0));
 
     return (char *)end_of_course_msg;
 }
@@ -874,11 +873,11 @@ int get_current_streak(APP_CONTEXT *ctx)
 
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        const char *tmp_date = (const char *)sqlite3_column_text(stmt, 0);
+        const char *tmp_date = (const char *)strdup((char *)sqlite3_column_text(stmt, 0));
         if (tmp_date == NULL || strcmp(tmp_date, "") == 0)
             break;
         strcpy(cmp_date, tmp_date);
-        if ((diff = get_diff_time_in_days(ctx->course_windows[2], cmp_date,
+        if ((diff = get_diff_time_in_days(ctx, cmp_date,
                                           c_date)) > 1)
         {
             break;
@@ -894,28 +893,67 @@ int get_current_streak(APP_CONTEXT *ctx)
 
 int get_longest_streak(APP_CONTEXT *ctx)
 {
-    int longest_streak = 0;
-    int rc = 0;
+    if (!ctx || !ctx->db) return 0;
 
     const char *sql = "SELECT MAX(streak) FROM streaks WHERE user_id = ?;";
+    sqlite3_stmt *stmt = NULL;
+    int longest_streak = 0;
 
-    sqlite3_stmt *stmt;
-    rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
-    if (rc != SQLITE_OK)
-    {
+    // Prepare the statement
+    int rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "sqlite3_prepare_v2 failed: %s\n", sqlite3_errmsg(ctx->db));
+        return 0;
+    }
+
+    // Bind the user_id
+    rc = sqlite3_bind_int(stmt, 1, ctx->current_user_id);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "sqlite3_bind_int failed: %s\n", sqlite3_errmsg(ctx->db));
         sqlite3_finalize(stmt);
+        return 0;
     }
 
-    if (rc == SQLITE_OK)
-    {
-        sqlite3_bind_int(stmt, 1, ctx->current_user_id);
+    // Execute the statement
+    rc = sqlite3_step(stmt);
+    if (rc == SQLITE_ROW) {
+        longest_streak = sqlite3_column_int(stmt, 0);
+    } else if (rc != SQLITE_DONE) {
+        fprintf(stderr, "sqlite3_step failed: %s\n", sqlite3_errmsg(ctx->db));
     }
 
-    sqlite3_step(stmt);
+    // Finalize the statement (always)
+    sqlite3_finalize(stmt);
 
-    longest_streak = sqlite3_column_int(stmt, 0);
     return longest_streak;
 }
+
+
+// int get_longest_streak(APP_CONTEXT *ctx)
+// {
+//     int longest_streak = 0;
+//     int rc = 0;
+//
+//     const char *sql = "SELECT MAX(streak) FROM streaks WHERE user_id = ?;";
+//
+//     sqlite3_stmt *stmt;
+//     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
+//     // if (rc != SQLITE_OK)
+//     // {
+//     //     sqlite3_finalize(stmt);
+//     // }
+//
+//     if (rc == SQLITE_OK)
+//     {
+//         sqlite3_bind_int(stmt, 1, ctx->current_user_id);
+//     }
+//
+//     sqlite3_step(stmt);
+//
+//     longest_streak = sqlite3_column_int(stmt, 0);
+//     sqlite3_finalize(stmt);
+//     return longest_streak;
+// }
 
 int get_course_completion_percentage(APP_CONTEXT *ctx, int course_id)
 {
@@ -970,9 +1008,6 @@ int get_course_completion_percentage(APP_CONTEXT *ctx, int course_id)
     }
 
     completion_percentage = (course_total_items / total_items_completed) * 100;
-    mvwprintw(ctx->progress_windows[3], 45, 4, "%i", total_items_completed);
-    mvwprintw(ctx->progress_windows[3], 46, 7, "%i", completion_percentage);
-    wrefresh(ctx->progress_windows[3]);
 
     return completion_percentage;
 }

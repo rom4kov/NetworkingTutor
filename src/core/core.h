@@ -55,7 +55,7 @@ char *return_trimmed(char *str);
 char *trunc_str(char *str, int win_width, int offset);
 int c_round(float x);
 char *current_datetime();
-int get_diff_time_in_days(WINDOW *win, char time1[], char time2[]);
+int get_diff_time_in_days(APP_CONTEXT *ctx, char time1[], char time2[]);
 int suppress_stdout(void);
 int restore_stdout(int saved_stdout);
 void log_values(WINDOW **edit_window, int scroll_offset, TEXT_BUFFER *tbuf,

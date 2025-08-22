@@ -315,7 +315,7 @@ void handle_course_input(APP_CONTEXT *ctx)
                         ctx->rp_state->showing_end_of_course_page = true;
                         deallocate_it_buffer(ctx->rp_state->it_buffer);
                         ctx->rp_state->it_buffer = initialize_it_buffer();
-                        print_course_complete(ctx);
+                        // print_course_complete(ctx);
                     }
                 }
                 // log_course_instr_values(ctx);

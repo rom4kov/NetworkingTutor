@@ -13,65 +13,82 @@
 
 void handle_start_input(APP_CONTEXT *ctx)
 {
-    // FORM *user_form = NULL;
-    // FIELD *fields[3];
     int this_win;
 
-    if (ctx->active_window == 0)
+    if (ctx->active_window_idx == 0)
     {
         handle_nav_input(ctx);
     }
-    else if (ctx->active_window == 1)
+    else if (ctx->active_window_idx == 1)
     {
         switch (ctx->key)
         {
             case 9:
             case KEY_DOWN:
-                ctx->active_window = 2;
+                ctx->active_window_idx = 2;
+                ctx->active_window = ctx->start_windows[2];
                 draw_border(ctx->start_windows[1], 2, "Header");
                 ctx->start_windows[2] = create_course_preview_card(ctx,
-                    CARD_WIDTH * (ctx->active_window - 2), 
-                    ctx->active_window, &ctx->courses[0]);
+                    CARD_WIDTH * (ctx->active_window_idx - 2), 
+                    ctx->active_window_idx, &ctx->courses[0]);
                 doupdate();
                 break;
             case KEY_UP:
-                ctx->active_window = 0;
+                ctx->active_window_idx = 0;
+                ctx->active_window = ctx->start_windows[0];
                 focus_window(&ctx->start_windows[0], 3, "Navigation");
                 focus_window(&ctx->start_windows[1], 2, "");
                 doupdate();
                 break;
             case KEY_RIGHT:
-                ctx->active_window = 5;
+                ctx->active_window_idx = 5;
+                ctx->active_window = ctx->start_windows[5];
                 focus_window(&ctx->start_windows[1], 2, "");
                 focus_window(&ctx->start_windows[5], 3, "Details");
                 doupdate();
                 break;
+            case '\n':
+                ctx->active_window_idx = 0;
+                ctx->start_view_active = false;
+                ctx->start_needs_redraw = false;
+                // for (int i = 0; i < START_WINDOW_COUNT; i++)
+                // {
+                //     wclear(ctx->start_windows[i]);
+                //     wnoutrefresh(ctx->start_windows[i]);
+                //     delwin(ctx->start_windows[i]);
+                // }
+                // doupdate();
+                ctx->greeter_needs_redraw = true;
+                ctx->greeter_view_active = true;
+                break;
         }
     }
-    else if (ctx->active_window == 2 || ctx->active_window == 3)
+    else if (ctx->active_window_idx == 2 || ctx->active_window_idx == 3)
     {
         switch (ctx->key)
         {
             case 9:
             case KEY_RIGHT:
-                ctx->active_window = (ctx->active_window + 1) % WINDOW_COUNT;
-                ctx->start_windows[ctx->active_window - 1] =
+                ctx->active_window_idx = (ctx->active_window_idx + 1) % WINDOW_COUNT;
+                ctx->active_window = ctx->start_windows[ctx->active_window_idx];
+                ctx->start_windows[ctx->active_window_idx - 1] =
                     create_course_preview_card(ctx,
-                        CARD_WIDTH * (ctx->active_window - 3),
-                        ctx->active_window - 1,
-                        &ctx->courses[ctx->active_window - 3]);
+                        CARD_WIDTH * (ctx->active_window_idx - 3),
+                        ctx->active_window_idx - 1,
+                        &ctx->courses[ctx->active_window_idx - 3]);
                 doupdate();
-                ctx->start_windows[ctx->active_window] =
+                ctx->start_windows[ctx->active_window_idx] =
                     create_course_preview_card(ctx,
-                        CARD_WIDTH * (ctx->active_window - 2),
-                        ctx->active_window,
-                        &ctx->courses[ctx->active_window - 2]);
+                        CARD_WIDTH * (ctx->active_window_idx - 2),
+                        ctx->active_window_idx,
+                        &ctx->courses[ctx->active_window_idx - 2]);
                 doupdate();
                 break;
             case KEY_LEFT:
-                if (ctx->active_window == 3)
+                if (ctx->active_window_idx == 3)
                 {
-                    ctx->active_window = 2;
+                    ctx->active_window_idx = 2;
+                    ctx->active_window = ctx->start_windows[2];
                     ctx->start_windows[2] = create_course_preview_card(ctx,
                         0, 2, &ctx->courses[0]);
                     ctx->start_windows[3] = create_course_preview_card(ctx,
@@ -80,8 +97,9 @@ void handle_start_input(APP_CONTEXT *ctx)
                 }
                 break;
             case KEY_UP:
-                this_win = ctx->active_window;
-                ctx->active_window = 1;
+                this_win = ctx->active_window_idx;
+                ctx->active_window_idx = 1;
+                ctx->active_window = ctx->start_windows[1];
                 focus_window(&ctx->start_windows[1], 3, "");
                 ctx->start_windows[this_win] = create_course_preview_card(ctx,
                     CARD_WIDTH * (this_win - 2), this_win,
@@ -89,7 +107,7 @@ void handle_start_input(APP_CONTEXT *ctx)
                 doupdate();
                 break;
             case 10: // Enter / Return key
-                this_win = ctx->active_window;
+                this_win = ctx->active_window_idx;
                 ctx->start_view_active = false;
                 for (int i = 0; i < WINDOW_COUNT; i++)
                 {
@@ -109,23 +127,25 @@ void handle_start_input(APP_CONTEXT *ctx)
                 break;
         }
     }
-    else if (ctx->active_window == 4)
+    else if (ctx->active_window_idx == 4)
     {
         switch (ctx->key)
         {
             case 9:
             case KEY_RIGHT:
-                ctx->active_window = (ctx->active_window + 1) % WINDOW_COUNT;
-                ctx->start_windows[ctx->active_window - 1] =
+                ctx->active_window_idx = (ctx->active_window_idx + 1) % WINDOW_COUNT;
+                ctx->active_window = ctx->start_windows[ctx->active_window_idx];
+                ctx->start_windows[ctx->active_window_idx - 1] =
                     create_course_preview_card(ctx,
-                        CARD_WIDTH * (ctx->active_window - 3),
-                        ctx->active_window - 1,
+                        CARD_WIDTH * (ctx->active_window_idx - 3),
+                        ctx->active_window_idx - 1,
                         &ctx->courses[2]);
                 focus_window(&ctx->start_windows[5], 3, "Details");
                 doupdate();
                 break;
             case KEY_LEFT:
-                ctx->active_window = 3;
+                ctx->active_window_idx = 3;
+                ctx->active_window = ctx->start_windows[3];
                 ctx->start_windows[3] = create_course_preview_card(ctx,
                     CARD_WIDTH, 3, &ctx->courses[1]);
                 ctx->start_windows[4] = create_course_preview_card(ctx,
@@ -133,8 +153,9 @@ void handle_start_input(APP_CONTEXT *ctx)
                 doupdate();
                 break;
             case KEY_UP:
-                this_win = ctx->active_window;
-                ctx->active_window = 1;
+                this_win = ctx->active_window_idx;
+                ctx->active_window_idx = 1;
+                ctx->active_window = ctx->start_windows[1];
                 focus_window(&ctx->start_windows[1], 3, "");
                 ctx->start_windows[this_win] = create_course_preview_card(ctx,
                     CARD_WIDTH * 2, this_win,
@@ -143,65 +164,14 @@ void handle_start_input(APP_CONTEXT *ctx)
                 break;
         }
     }
-    // else if (ctx->active_window == 5 && user_form)
-    // {
-    //     switch (ctx->key)
-    //     {
-    //         case KEY_DOWN:
-    //             form_driver(user_form, REQ_DOWN_FIELD);
-    //             form_driver(user_form, REQ_END_LINE);
-    //             wnoutrefresh(ctx->start_windows[5]);
-    //             doupdate();
-    //             break;
-    //         case KEY_UP:
-    //             form_driver(user_form, REQ_UP_FIELD);
-    //             form_driver(user_form, REQ_END_LINE);
-    //             wnoutrefresh(ctx->start_windows[5]);
-    //             doupdate();
-    //             break;
-    //         case 9:
-    //             form_driver(user_form, REQ_NEXT_FIELD);
-    //             wrefresh(ctx->start_windows[5]);
-    //             break;
-    //         case 263: // Backspace
-    //             form_driver(user_form, REQ_VALIDATION);
-    //             FIELD *current = current_field(user_form);
-    //             char *buf = field_buffer(current, 0);
-    //             trim(&buf);
-    //             if (buf && strlen(buf) > 0)
-    //             {
-    //                 form_driver(user_form, REQ_DEL_PREV);
-    //                 wrefresh(ctx->start_windows[5]);
-    //             }
-    //             break;
-    //         case '\n':
-    //             form_driver(user_form, REQ_VALIDATION);
-    //             char *buf1 = field_buffer(fields[0], 0);
-    //             char *buf2 = field_buffer(fields[1], 0);
-    //             update_user(ctx->db, 1, buf1, buf2);
-    //             curs_set(0);
-    //             ctx->start_windows[5] = create_right_side_panel(ctx, "Details");
-    //             wrefresh(ctx->start_windows[5]);
-    //             ctx->start_view_active = false;
-    //             ctx->start_needs_redraw = true;
-    //             unpost_form(user_form);
-    //             free_form(user_form);
-    //             free_field(fields[0]);
-    //             free_field(fields[1]);
-    //             break;
-    //         default:
-    //             form_driver(user_form, ctx->key);
-    //             wrefresh(ctx->start_windows[5]);
-    //             break;
-    //     }
-    // }
-    else if (ctx->active_window == 5)
+    else if (ctx->active_window_idx == 5)
     {
         switch (ctx->key)
         {
             case 9:
             case KEY_LEFT:
-                ctx->active_window = 0;
+                ctx->active_window_idx = 0;
+                ctx->active_window = ctx->start_windows[0];
                 focus_window(&ctx->start_windows[5], 2, "Details");
                 focus_window(&ctx->start_windows[0], 3, "Navigation");
                 doupdate();

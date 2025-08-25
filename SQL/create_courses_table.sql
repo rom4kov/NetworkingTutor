@@ -70,6 +70,50 @@ INSERT
     )
 VALUES
     (
+        'Serving Static Files',
+        'Learn how to extend your HTTP server to deliver real web content by reading
+files from disk — such as HTML, CSS, or images — and sending them with the correct
+headers to clients.',
+        '+------+            +------+  @
+|++  oo|            | HTML |  @
+|------| ---------> | CSS  |  @
+|++  oo|            | JPEG |  @
++------+            +------+  @
+ SERVER           STATIC FILES',
+        ''
+    );
+
+INSERT
+    OR IGNORE INTO courses (
+        name,
+        short_desc,
+        ascii_logo,
+        end_of_course_msg
+    )
+VALUES
+    (
+        'Implementing a Simple HTTP Router',
+        'Serve different content depending on the requested path. Map paths to
+handler functions, write different routines for each endpoint and a robust and
+reliable routing logic.',
+        '         HTTP ROUTER        @
+[ GET / ] ----> home()      @
+                            @
+[ GET /hello ] ----> hello()@
+                            @
+[ GET /about ] ----> about()',
+        ''
+    );
+
+INSERT
+    OR IGNORE INTO courses (
+        name,
+        short_desc,
+        ascii_logo,
+        end_of_course_msg
+    )
+VALUES
+    (
         'Handling multiple clients',
         'Master managing multiple clients in your HTTP server, implementing
 concurrent connections using techniques like threading to boost performance
@@ -102,5 +146,95 @@ interactions in this follow-up course.',
 |    0    |  ___) ___) | |___ @
 |    |    | |____|____/|_____|@
 +---------+     ENCRYPTION    ',
+        ''
+    );
+
+
+INSERT
+    OR IGNORE INTO courses (
+        name,
+        short_desc,
+        ascii_logo,
+        end_of_course_msg
+    )
+VALUES
+    (
+        'Implementing Non-Blocking I/O',
+        'Learn event-driven server design to handle many clients efficiently
+without relying on threads, using system calls like select() or poll() for
+scalable network programming.',
+        '        0s        5s       10s@
+        :         :         : @
+Blocking:xxxxxxxxx:ooooooooo: @
+        :         :         : @
+Non-    :ooooooo  :         : @
+Blocking:xxxxxxxxx:         : ',
+        ''
+    );
+
+INSERT
+    OR IGNORE INTO courses (
+        name,
+        short_desc,
+        ascii_logo,
+        end_of_course_msg
+    )
+VALUES
+    (
+        'Simple Auth (Cookies & Sessions)',
+        'Introduce logins, sessions, and cookies, giving your server stateful
+interaction with clients, enabling personalized responses and laying the groundwork
+for secure user authentication.',
+        '   ___                        @
+  (. .)     + Name ----------+@
+  _\-/_     |John            |@
+ /_____\    +----------------+@
+ __         + Password ------+@
+/o \_____   |ooooooo         |@
+\__/-="="`  +----------------+',
+        ''
+    );
+
+INSERT
+    OR IGNORE INTO courses (
+        name,
+        short_desc,
+        ascii_logo,
+        end_of_course_msg
+    )
+VALUES
+    (
+        'Building a Basic HTTP Client in C',
+        'Switch sides: create your own HTTP client that connects to servers, sends
+requests, and parses responses, learning how clients interact with web services.',
+        '   _____     ____ ____  _     @
+  /     \   / ___/ ___|| |    @
++---------+ \___ \___ \| |    @
+|    0    |  ___) ___) | |___ @
+|    |    | |____|____/|_____|@
++---------+     ENCRYPTION    ',
+        ''
+    );
+
+INSERT
+    OR IGNORE INTO courses (
+        name,
+        short_desc,
+        ascii_logo,
+        end_of_course_msg
+    )
+VALUES
+    (
+        'Build a Chat Server with TCP Sockets',
+        'Go beyond HTTP to raw TCP: build a real-time chat server where multiple
+clients can message each other simultaneously, practicing persistent connections
+and message broadcasting.',
+        '                +------------+@
+                |    Yo!     |@
++-----------+   |  What up?  |@
+|  Nothing  |   +--------+ +-+@
+|   much!   |             \|  @
++-+ +-------+                 @
+  |/                          ',
         ''
     );

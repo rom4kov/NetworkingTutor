@@ -11,6 +11,7 @@
 #define START_WINDOW_COUNT 6
 #define COURSE_WINDOW_COUNT 5
 #define PROGRESS_WINDOW_COUNT 5
+#define ALL_COURSES_WINDOW_COUNT 3
 #define SEPARATOR 333
 // #define BOLD 1
 // #define UNDERLINE 2
@@ -160,11 +161,14 @@ typedef struct _app_context
 {
     sqlite3 *db;
     WINDOW *greeter_screen;
+    WINDOW *greeter_ascii_window;
     WINDOW *start_windows[START_WINDOW_COUNT];
     WINDOW *course_windows[COURSE_WINDOW_COUNT];
     WINDOW *progress_windows[PROGRESS_WINDOW_COUNT];
+    WINDOW *all_courses_windows[ALL_COURSES_WINDOW_COUNT];
     WINDOW *line_num_win;
     WINDOW *edit_window;
+    WINDOW *active_window;
     USER_DATA *user_data;
     RIGHT_PANEL_STATE *rp_state;
     COURSE *courses;
@@ -181,12 +185,13 @@ typedef struct _app_context
     char *curr_file_path;
     char *current_course;
     TEXT_BUFFER *t_buffer;
+    I_TEXT_BUFFER *intro_buffer;
     I_TEXT_BUFFER *card_buffers[10];
     CU_ErrorCode ec; 
     CU_pSuite sp[15];
     CU_pRunSummary run_sum;
     int key;
-    int active_window;
+    int active_window_idx;
     int current_user_id;
     int current_course_id;
     int y, x;
@@ -199,13 +204,17 @@ typedef struct _app_context
     bool start_needs_redraw;
     bool course_needs_redraw;
     bool progress_needs_redraw;
+    bool all_courses_needs_redraw;
     bool greeter_view_active;
     bool start_view_active;
     bool course_view_active;
     bool progress_view_active;
+    bool all_courses_view_active;
+    bool first_greeter_draw;
     bool first_start_draw;
     bool first_course_draw;
     bool first_progress_draw;
+    bool first_all_courses_draw;
     bool editor_mode;
     bool explorer_mode;
     bool is_in_failure_list;

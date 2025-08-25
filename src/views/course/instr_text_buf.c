@@ -1,3 +1,4 @@
+#include <stddef.h>
 #ifdef __STDC_ALLOC_LIB__
 #else
 #define _POSIX_C_SOURCE 200809L
@@ -362,71 +363,52 @@ void read_end_of_course_page_into_buffer(APP_CONTEXT *ctx)
     wrefresh(ctx->course_windows[2]);
 }
 
-char *PROGRAMM_DESC =
-    "Welcome to NetworkingTutor!\n\n"
-    "NetworkingTutor is an interactive learning tool that aims to teach you "
-    "the basics of networking.\n"
-    "Start by creating a simple HTTP server while learning about "
-    "sockets, HTTP, and low-level\n"
-    "networking concepts. Each section presents "
-    "challenges, a built-in text editor, and instant\n"
-    "feedback to reinforce your learning. "
-    "Gamification keeps you engaged as you progress.\n"
-    "Expand your knowledge step by step and master "
-    "networking fundamentals—one challenge at a time.\nReady to begin? 🚀";
-
-void read_logo_and_header_text_into_buffer(APP_CONTEXT *ctx,
+void read_window_text_into_buffer(APP_CONTEXT *ctx,
                                            I_TEXT_BUFFER *header_tbuf,
                                            int win_width, int win,
-                                           int course_id)
+                                           int course_id, char *add_text)
 {
-    char *first_str = malloc(1024);
-    char *second_str = malloc(1024);
+    char *first_str = NULL;
+    char *second_str = NULL;
 
     if (win == 0)
     {
         first_str = get_ascii_art(ctx->db, "logo");
-        second_str = PROGRAMM_DESC;
+        second_str = add_text;
     }
     else if (win == 1)
     {
         first_str = ctx->courses[course_id].short_desc;
         second_str = ctx->courses[course_id].ascii_logo;
     }
+    else if (win == 2)
+    {
+        first_str = add_text;
+        second_str = "";
+    }
 
-    int logo_len = strlen(first_str);
-    int msg_len = strlen(second_str);
-
-    // literal lengths
-    const size_t nl4 = ctx->start_view_active ? 4 : 2; // "\n\n"
+    size_t logo_len = strlen(first_str);
+    size_t msg_len = strlen(second_str);
+    const char *nl = ctx->start_view_active ? "\n\n\n\n" : "\n\n";
+    size_t nl_len = strlen(nl);
 
     // +1 for terminating NUL
-    int total = logo_len + nl4 + msg_len + 1;
+    size_t total = logo_len + nl_len + msg_len + 1;
 
     char *logo_and_header_str = malloc(total);
     if (!logo_and_header_str)
         return;
     logo_and_header_str[0] = '\0';
 
-    strncat(logo_and_header_str, first_str, logo_len);
-    strncat(logo_and_header_str, ctx->start_view_active ? "\n\n\n\n" : "\n\n", nl4);
-    strncat(logo_and_header_str, second_str, msg_len);
-    logo_and_header_str[total - 1] = '\0';
-    // if (course_id == 1)
-    // {
-    //     mvwprintw(ctx->start_windows[2], 1, 5, "%s", second_str);
-    //     // mvwprintw(ctx->start_windows[2], 2, 5, "%s",
-    //     //           "################\n###########");
-    //     // mvwprintw(ctx->start_windows[2], 4, 5, "%s",
-    //     //           "################\n###########");
-    //     wrefresh(ctx->start_windows[2]);
-    // }
+    snprintf(logo_and_header_str, total, "%s%s%s", first_str, nl, second_str);
 
-    read_in_buf_str(logo_and_header_str, total, header_tbuf, win_width);
+    read_in_buf_str(logo_and_header_str, total, header_tbuf, win_width, win);
+
+    free(logo_and_header_str);
 }
 
 void read_in_buf_str(char *buf_str, int total, I_TEXT_BUFFER *header_tbuf,
-                     int win_width)
+                     int win_width, int win)
 {
     int i, j, last_space_pos, k;
     i = j = last_space_pos = k = 0;
@@ -461,14 +443,32 @@ void read_in_buf_str(char *buf_str, int total, I_TEXT_BUFFER *header_tbuf,
         {
             overflow = false;
             bl_point = false;
-            curr_line->centered = true;
-            curr_line->style = 0;
+
+            if (win < 2)
+                curr_line->centered = true;
+
+            if (win < 2)
+                curr_line->style = 0;
+            else if (win == 2 && buf_str[i - 1] == '@')
+            {
+                curr_line->style = A_UNDERLINE;
+                curr_line->buf_[j - 1] = '\n';
+            }
+
             curr_line->syntax_hl = 0;
-            // curr_line->style = COLOR_PAIR(4) | A_BOLD;
             add_line_break(NULL, header_tbuf, &curr_line, -1, &i, &j,
                            &line_number, &last_space_pos, overflow, &bl_point);
-            curr_line->centered = true;
-            curr_line->style = 0;
+            if (win < 2)
+                curr_line->centered = true;
+
+            if (win < 2)
+                curr_line->style = 0;
+            else if (win == 2 && buf_str[i - 1] == '@')
+            {
+                curr_line->style = A_UNDERLINE;
+                curr_line->buf_[j - 1] = '\n';
+            }
+
             curr_line->syntax_hl = 0;
             continue;
         }
@@ -477,14 +477,18 @@ void read_in_buf_str(char *buf_str, int total, I_TEXT_BUFFER *header_tbuf,
             overflow = true;
             // if (i < (ascii_len + 1))
             // {
-            curr_line->centered = true;
+            if (win < 2)
+                curr_line->centered = true;
+
             curr_line->style = 0;
             curr_line->syntax_hl = 0;
             //     curr_line->style = COLOR_PAIR(4) | A_BOLD;
             // }
             add_line_break(NULL, header_tbuf, &curr_line, -1, &i, &j,
                            &line_number, &last_space_pos, overflow, &bl_point);
-            curr_line->centered = true;
+            if (win < 2)
+                curr_line->centered = true;
+
             curr_line->style = 0;
             curr_line->syntax_hl = 0;
             continue;
@@ -496,7 +500,10 @@ void read_in_buf_str(char *buf_str, int total, I_TEXT_BUFFER *header_tbuf,
 
         curr_line->buf_[j] = buf_str[i];
         curr_line->length++;
-        curr_line->centered = true;
+
+        if (win < 2)
+            curr_line->centered = true;
+
         curr_line->style = 0;
         curr_line->syntax_hl = 0;
         i++;
@@ -506,11 +513,11 @@ void read_in_buf_str(char *buf_str, int total, I_TEXT_BUFFER *header_tbuf,
 
 void deallocate_it_buffer(I_TEXT_BUFFER *tbuf)
 {
-    if (tbuf->first_line == NULL)
+    if (tbuf == NULL)
         return;
 
     I_LINE *current_line = tbuf->first_line;
-    while (current_line != NULL && current_line->next != NULL)
+    while (current_line != NULL)
     {
         I_LINE *next = current_line->next;
         if (current_line->buf_)

@@ -93,7 +93,7 @@ I_LINE *initialize_iline()
 {
     I_LINE *line = malloc(sizeof(I_LINE));
 
-    line->buf_ = calloc(100, sizeof(wchar_t));
+    line->buf_ = calloc(128, sizeof(char));
     line->buf_[0] = '\n';
     line->line_num = 0;
     line->length = 1;
@@ -386,7 +386,7 @@ void open_file_from_explorer(APP_CONTEXT *ctx, bool *new_file_form_active)
     *new_file_form_active = false;
     ctx->explorer_mode = false;
     ctx->editor_mode = true;
-    ctx->active_window = 2;
+    ctx->active_window_idx = 2;
     focus_window(&ctx->course_windows[1], 2, "Explorer");
     focus_window(&ctx->course_windows[2], 3, "Editor");
     curs_set(2);
@@ -465,7 +465,7 @@ void create_new_file(APP_CONTEXT *ctx, WINDOW **form_window, WINDOW **inner_win,
                 *new_file_form_active = false;
                 ctx->explorer_mode = false;
                 ctx->editor_mode = true;
-                ctx->active_window = 2;
+                ctx->active_window_idx = 2;
 
                 deallocate_buffer(ctx->t_buffer);
                 ctx->t_buffer = initialize_buffer();
@@ -697,7 +697,7 @@ void delete_file(APP_CONTEXT *ctx, bool *del_file_form_active,
                     *del_file_form_active = false;
                     ctx->explorer_mode = true;
                     ctx->editor_mode = false;
-                    ctx->active_window = 1;
+                    ctx->active_window_idx = 1;
 
                     if (strcmp(ctx->file_tree->current_entry->name,
                                ctx->filename) == 0)
@@ -882,7 +882,7 @@ void rename_file(APP_CONTEXT *ctx, WINDOW **inner_win, WINDOW **form_window,
                 rename_file_form_active = false;
                 ctx->explorer_mode = true;
                 ctx->editor_mode = false;
-                ctx->active_window = 1;
+                ctx->active_window_idx = 1;
 
                 if (strcmp(ctx->file_tree->current_entry->name, new_filename) !=
                     0)
@@ -987,7 +987,7 @@ void create_directory(APP_CONTEXT *ctx, WINDOW **inner_win,
                 make_dir_form_active = false;
                 ctx->explorer_mode = true;
                 ctx->editor_mode = false;
-                ctx->active_window = 1;
+                ctx->active_window_idx = 1;
 
                 char *new_path;
                 if (ctx->file_tree->current_entry->state == 'o')

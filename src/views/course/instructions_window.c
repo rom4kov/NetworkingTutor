@@ -168,7 +168,7 @@ void print_course_complete(APP_CONTEXT *ctx)
     werase(ctx->rp_state->inner_win);
     werase(ctx->rp_state->right_panel);
 
-    focus_window(&ctx->rp_state->right_panel, ctx->active_window == 3 ? 3 : 2,
+    focus_window(&ctx->rp_state->right_panel, ctx->active_window_idx == 3 ? 3 : 2,
                  "Course instructions");
 
     ctx->rp_state->lines_excess = 0;

@@ -3,6 +3,7 @@
 #include "src/models/models.h"
 #include "src/views/start/start_menu.h"
 #include "src/views/views.h"
+#include <CUnit/CUnit.h>
 #include <CUnit/TestDB.h>
 #include <curses.h>
 #include <locale.h>
@@ -12,7 +13,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <CUnit/CUnit.h>
 
 #define COLOR_GREY 16
 #define COLOR_ORANGE 17
@@ -54,18 +54,20 @@ int main(void)
     ctx->running = true;
     ctx->user_data = malloc(sizeof(USER_DATA));
 
-    ctx->greeter_needs_redraw = true;
-    ctx->start_needs_redraw = true;
+    ctx->greeter_needs_redraw = false;
+    ctx->start_needs_redraw = false;
     ctx->course_needs_redraw = false;
     ctx->progress_needs_redraw = false;
+    ctx->all_courses_needs_redraw = false;
 
     ctx->first_start_draw = true;
     ctx->first_course_draw = true;
 
     ctx->greeter_view_active = true;
-    ctx->start_view_active = true;
+    ctx->start_view_active = false;
     ctx->course_view_active = false;
     ctx->progress_view_active = false;
+    ctx->all_courses_view_active = false;
 
     ctx->current_course = malloc(64 * sizeof(char));
     ctx->rp_state->curr_section = 0;
@@ -83,8 +85,7 @@ int main(void)
 
     int curr_line;
     int curr_col;
-
-    ctx->greeter_screen = create_greeter_screen(ctx);
+    // refresh();
 
     // seed_courses_data(ctx->db, ctx->greeter_screen,
     //                   "SQL/create_courses_table.sql");
@@ -125,31 +126,36 @@ int main(void)
 
     ESCDELAY = 100;
 
+    ctx->greeter_screen = create_greeter_screen(ctx);
+    ctx->active_window = ctx->greeter_screen;
     keypad(ctx->greeter_screen, TRUE);
-    while (ctx->greeter_view_active)
-    {
-        if (!ctx->greeter_view_active)
-            break;
-
-        ctx->key = wgetch(ctx->greeter_screen);
-
-        if (ctx->key == KEY_RESIZE)
-        {
-            wclear(ctx->greeter_screen);
-            delwin(ctx->greeter_screen);
-            ctx->greeter_screen = create_greeter_screen(ctx);
-            wrefresh(ctx->greeter_screen);
-        }
-
-        handle_greeter_input(ctx);
-        wrefresh(ctx->greeter_screen);
-    }
-    delwin(ctx->greeter_screen);
-    clear();
-    refresh();
+    wrefresh(ctx->greeter_screen);
 
     while (ctx->running)
     {
+        if (ctx->greeter_needs_redraw)
+        {
+            if (!ctx->first_greeter_draw)
+            {
+                endwin();
+                refresh();
+                if (ctx->greeter_screen != NULL)
+                {
+                    delwin(ctx->greeter_screen);
+                }
+            }
+            // wclear(ctx->greeter_screen);
+            // delwin(ctx->greeter_screen);
+            ctx->start_view_active = false;
+            ctx->start_needs_redraw = false;
+            ctx->greeter_screen = create_greeter_screen(ctx);
+            ctx->active_window = ctx->greeter_screen;
+            ctx->greeter_needs_redraw = false;
+            ctx->first_greeter_draw = false;
+            // mvwprintw(ctx->greeter_screen, 3, 3, "%s", ctx->start_view_active ? "yes" : "no");
+            // mvwprintw(ctx->greeter_screen, 4, 3, "%s", ctx->start_needs_redraw ? "yes" : "no");
+            wrefresh(ctx->greeter_screen);
+        }
         if (ctx->start_needs_redraw)
         {
             if (!ctx->first_start_draw)
@@ -164,12 +170,18 @@ int main(void)
                     }
                 }
             }
+            deallocate_it_buffer(ctx->intro_buffer);
             create_start_screen(ctx);
+            ctx->active_window = ctx->start_windows[0];
             ctx->start_needs_redraw = false;
             ctx->first_start_draw = false;
+            for (int i = 0; i < START_WINDOW_COUNT; i++)
+                wnoutrefresh(ctx->start_windows[i]);
+            doupdate();
         }
         else if (ctx->course_needs_redraw)
         {
+            refresh();
             if (!ctx->first_course_draw)
             {
                 if (ctx->rp_state->curr_section > 0)
@@ -194,6 +206,7 @@ int main(void)
                 }
             }
             create_course_view(ctx);
+            ctx->active_window = ctx->course_windows[0];
             if (ctx->file && ctx->file->_fileno > 0)
             {
                 fclose(ctx->file);
@@ -213,7 +226,7 @@ int main(void)
                 }
                 ctx->explorer_mode = false;
                 ctx->editor_mode = true;
-                ctx->active_window = 2;
+                ctx->active_window_idx = 2;
                 focus_window(&ctx->course_windows[0], 2, "Explorer");
                 focus_window(&ctx->course_windows[2], 3, "Editor");
                 curs_set(2);
@@ -230,37 +243,67 @@ int main(void)
             ctx->course_needs_redraw = false;
             ctx->first_course_draw = false;
         }
-        else if (ctx->progress_needs_redraw) {
+        else if (ctx->progress_needs_redraw)
+        {
             if (!ctx->first_progress_draw)
             {
 
                 endwin();
                 refresh();
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < 4; i++)
                 {
                     if (ctx->progress_windows[i] != NULL)
                     {
                         delwin(ctx->progress_windows[i]);
-                        // delwin(ctx->edit_window);
-                        // delwin(ctx->line_num_win);
-                        // delwin(ctx->rp_state->inner_win);
                     }
                 }
             }
             create_progress_view(ctx);
+            ctx->active_window = ctx->progress_windows[0];
             ctx->progress_needs_redraw = false;
             ctx->first_progress_draw = false;
             for (int i = 0; i < 3; i++)
                 wnoutrefresh(ctx->progress_windows[i]);
             doupdate();
         }
+        else if (ctx->all_courses_needs_redraw)
+        {
+            if (!ctx->first_all_courses_draw)
+            {
 
-        ctx->key = getch();
+                endwin();
+                refresh();
+                for (int i = 0; i < 3; i++)
+                {
+                    if (ctx->all_courses_windows[i] != NULL)
+                    {
+                        delwin(ctx->all_courses_windows[i]);
+                        // delwin(ctx->edit_window);
+                        // delwin(ctx->line_num_win);
+                        // delwin(ctx->rp_state->inner_win);
+                    }
+                }
+            }
+            create_all_courses_view(ctx);
+            ctx->active_window = ctx->all_courses_windows[0];
+            ctx->all_courses_needs_redraw = false;
+            ctx->first_all_courses_draw = false;
+            for (int i = 0; i < 3; i++)
+                wnoutrefresh(ctx->all_courses_windows[i]);
+            doupdate();
+        }
+
+        keypad(ctx->active_window, TRUE);
+        ctx->key = wgetch(ctx->active_window);
 
         switch (ctx->key)
         {
             case KEY_RESIZE:
-                if (ctx->start_view_active)
+                if (ctx->greeter_view_active)
+                {
+                    ctx->greeter_needs_redraw = true;
+                }
+                else if (ctx->start_view_active)
                 {
                     ctx->start_needs_redraw = true;
                 }
@@ -272,22 +315,41 @@ int main(void)
                 {
                     ctx->progress_needs_redraw = true;
                 }
+                else if (ctx->all_courses_view_active)
+                {
+                    ctx->all_courses_needs_redraw = true;
+                }
                 break;
             case 27:
                 CU_cleanup_registry();
                 ctx->running = false;
                 break;
             default:
-                if (ctx->start_view_active)
+                if (ctx->greeter_view_active)
                 {
+                    handle_greeter_input(ctx);
+                }
+                else if (ctx->start_view_active)
+                {
+                    // mvwprintw(ctx->start_windows[5], LINES - 5, 3, "%s", ctx->start_view_active ? "yes" : "no");
+                    // mvwprintw(ctx->start_windows[5], LINES - 4, 3, "%s", ctx->start_needs_redraw ? "yes" : "no");
+                    // wrefresh(ctx->start_windows[5]);
                     handle_start_input(ctx);
                 }
                 else if (ctx->course_view_active)
                 {
+                    // mvwprintw(ctx->course_windows[2], LINES - 5, 3, "%s", ctx->start_view_active ? "yes" : "no");
+                    // mvwprintw(ctx->course_windows[2], LINES - 4, 3, "%s", ctx->start_needs_redraw ? "yes" : "no");
+                    // wrefresh(ctx->course_windows[2]);
                     handle_course_input(ctx);
                 }
-                else if (ctx->progress_view_active) {
+                else if (ctx->progress_view_active)
+                {
                     handle_progress_input(ctx);
+                }
+                else if (ctx->all_courses_view_active)
+                {
+                    handle_nav_input(ctx);
                 }
         }
     }
@@ -381,7 +443,7 @@ MENU *create_greeter_menu(WINDOW *nav_window)
 WINDOW *create_greeter_screen(APP_CONTEXT *ctx)
 {
     WINDOW *greeter_screen = newwin(LINES, COLS, 0, 0);
-    WINDOW *ascii_logo_window =
+    ctx->greeter_ascii_window =
         derwin(greeter_screen, 10, 71, LINES / 5, (COLS - 71) / 2 + 2);
     draw_border(greeter_screen, 2, 0);
     wattron(greeter_screen, COLOR_PAIR(3) | A_BOLD);
@@ -389,9 +451,10 @@ WINDOW *create_greeter_screen(APP_CONTEXT *ctx)
     char *msg2 = "󰒍 NetworkingTutor v0.0.1";
     mvwprintw(greeter_screen, (LINES / 5) - 1, (COLS - strlen(msg)) / 2, "%s",
               msg);
-    wattron(ascii_logo_window, A_BOLD);
-    mvwprintw(ascii_logo_window, 0, 0, "%s", get_ascii_art(ctx->db, "logo"));
-    wattroff(ascii_logo_window, A_BOLD);
+    wattron(ctx->greeter_ascii_window, A_BOLD);
+    mvwprintw(ctx->greeter_ascii_window, 0, 0, "%s",
+              get_ascii_art(ctx->db, "logo"));
+    wattroff(ctx->greeter_ascii_window, A_BOLD);
 
     ctx->greeter_menu = create_greeter_menu(greeter_screen);
 
@@ -401,9 +464,7 @@ WINDOW *create_greeter_screen(APP_CONTEXT *ctx)
     mvwprintw(greeter_screen, (LINES / 2) + 14, (COLS - strlen(msg2)) / 2 + 2,
               msg2, LINES, COLS);
     wattroff(greeter_screen, COLOR_PAIR(3));
-    wnoutrefresh(greeter_screen);
-    wnoutrefresh(ascii_logo_window);
-    doupdate();
+    wrefresh(ctx->greeter_ascii_window);
 
     return greeter_screen;
 }

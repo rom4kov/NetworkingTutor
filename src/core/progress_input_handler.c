@@ -6,11 +6,11 @@
 
 void handle_progress_input(APP_CONTEXT *ctx)
 {
-    if (ctx->active_window == 0)
+    if (ctx->active_window_idx == 0)
     {
         handle_nav_input(ctx);
     }
-    else if (ctx->active_window == 1 && ctx->user_form_active)
+    else if (ctx->active_window_idx == 1 && ctx->user_form_active)
     {
         switch (ctx->key)
         {
@@ -67,29 +67,32 @@ void handle_progress_input(APP_CONTEXT *ctx)
                 break;
         }
     }
-    else if (ctx->active_window == 1) {
+    else if (ctx->active_window_idx == 1) {
         switch (ctx->key)
         {
             case KEY_UP:
-                ctx->active_window = 0;
+                ctx->active_window_idx = 0;
+                ctx->active_window = ctx->progress_windows[0];
                 focus_window(&ctx->progress_windows[1], 2, "");
                 ctx->progress_windows[0] =
-                    create_navigation_window(&ctx->active_window, &ctx->start_menu);
+                    create_navigation_window(&ctx->active_window_idx, &ctx->start_menu);
                 doupdate();
                 break;
             case 9:
             case KEY_DOWN:
-                ctx->active_window = 2;
+                ctx->active_window_idx = 2;
+                ctx->active_window = ctx->progress_windows[2];
                 curs_set(0);
                 focus_window(&ctx->progress_windows[1], 2, "");
                 focus_window(&ctx->progress_windows[2], 3, "");
                 doupdate();
                 break;
             case KEY_RIGHT:
-                ctx->active_window = 3;
+                ctx->active_window_idx = 3;
+                ctx->active_window = ctx->progress_windows[3];
                 curs_set(0);
                 focus_window(&ctx->progress_windows[1], 2, "");
-                draw_progress_border(ctx->progress_windows[3], 3, "");
+                draw_progress_border(ctx->progress_windows[3], 3, 2);
                 create_your_courses_window(ctx, ctx->progress_windows[3]);
                 print_completed_courses(ctx);
                 doupdate();
@@ -100,43 +103,47 @@ void handle_progress_input(APP_CONTEXT *ctx)
                 break;
         }
     }
-    else if (ctx->active_window == 2) {
+    else if (ctx->active_window_idx == 2) {
         switch (ctx->key)
         {
             case KEY_UP:
-                ctx->active_window = 1;
+                ctx->active_window_idx = 1;
+                ctx->active_window = ctx->progress_windows[1];
                 focus_window(&ctx->progress_windows[2], 2, "");
                 focus_window(&ctx->progress_windows[1], 3, "");
                 doupdate();
                 break;
             case KEY_RIGHT:
-                ctx->active_window = 3;
+                ctx->active_window_idx = 3;
+                ctx->active_window = ctx->progress_windows[3];
                 focus_window(&ctx->progress_windows[2], 2, "");
-                draw_progress_border(ctx->progress_windows[3], 3, "");
+                draw_progress_border(ctx->progress_windows[3], 3, 2);
                 create_your_courses_window(ctx, ctx->progress_windows[3]);
                 print_completed_courses(ctx);
                 doupdate();
                 break;
         }
     }
-    else if (ctx->active_window == 3) {
+    else if (ctx->active_window_idx == 3) {
         switch (ctx->key)
         {
             case KEY_LEFT:
-                ctx->active_window = 1;
-                draw_progress_border(ctx->progress_windows[3], 2, "");
+                ctx->active_window_idx = 1;
+                ctx->active_window = ctx->progress_windows[1];
+                draw_progress_border(ctx->progress_windows[3], 2, 2);
                 create_your_courses_window(ctx, ctx->progress_windows[3]);
                 print_completed_courses(ctx);
                 focus_window(&ctx->progress_windows[1], 3, "");
                 doupdate();
                 break;
             case KEY_UP:
-                ctx->active_window = 0;
-                draw_progress_border(ctx->progress_windows[3], 2, "");
+                ctx->active_window_idx = 0;
+                ctx->active_window = ctx->progress_windows[0];
+                draw_progress_border(ctx->progress_windows[3], 2, 2);
                 create_your_courses_window(ctx, ctx->progress_windows[3]);
                 print_completed_courses(ctx);
                 ctx->progress_windows[0] =
-                    create_navigation_window(&ctx->active_window, &ctx->start_menu);
+                    create_navigation_window(&ctx->active_window_idx, &ctx->start_menu);
                 doupdate();
                 break;
         }

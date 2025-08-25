@@ -50,27 +50,29 @@ void log_course_instr_values(APP_CONTEXT *ctx)
 
 void handle_course_input(APP_CONTEXT *ctx)
 {
-    if (ctx->active_window == 0)
+    if (ctx->active_window_idx == 0)
     {
         handle_nav_input(ctx);
     }
-    else if (ctx->active_window == 1 && ctx->explorer_mode)
+    else if (ctx->active_window_idx == 1 && ctx->explorer_mode)
     {
         handle_explorer_input(ctx);
     }
-    else if (ctx->active_window == 1)
+    else if (ctx->active_window_idx == 1)
     {
         switch (ctx->key)
         {
             case 9:
             case KEY_RIGHT:
-                ctx->active_window = 2;
+                ctx->active_window_idx = 2;
+                ctx->active_window = ctx->course_windows[2];
                 focus_window(&ctx->course_windows[1], 2, "Explorer");
                 focus_window(&ctx->course_windows[2], 3, "Editor");
                 doupdate();
                 break;
             case KEY_UP:
-                ctx->active_window = 0;
+                ctx->active_window_idx = 0;
+                ctx->active_window = ctx->course_windows[0];
                 focus_window(&ctx->course_windows[1], 2, "Explorer");
                 focus_window(&ctx->course_windows[0], 3, "Navigation");
                 doupdate();
@@ -80,23 +82,25 @@ void handle_course_input(APP_CONTEXT *ctx)
                 break;
         }
     }
-    else if (ctx->active_window == 2 && ctx->editor_mode && ctx->file)
+    else if (ctx->active_window_idx == 2 && ctx->editor_mode && ctx->file)
     {
         handle_editor_input(ctx);
     }
-    else if (ctx->active_window == 2)
+    else if (ctx->active_window_idx == 2)
     {
         switch (ctx->key)
         {
             case 9:
             case KEY_LEFT:
-                ctx->active_window = 1;
+                ctx->active_window_idx = 1;
+                ctx->active_window = ctx->course_windows[1];
                 focus_window(&ctx->course_windows[2], 2, "Editor");
                 focus_window(&ctx->course_windows[1], 3, "Explorer");
                 doupdate();
                 break;
             case KEY_RIGHT:
-                ctx->active_window = 3;
+                ctx->active_window_idx = 3;
+                ctx->active_window = ctx->course_windows[3];
                 focus_window(&ctx->course_windows[2], 2, "Editor");
                 focus_instructions_window(ctx->rp_state, 3,
                                           "Course Instructions");
@@ -104,9 +108,10 @@ void handle_course_input(APP_CONTEXT *ctx)
                 doupdate();
                 break;
             case KEY_UP:
-                ctx->active_window = 0;
-                focus_window(&ctx->course_windows[0], 3, "Navigation");
+                ctx->active_window_idx = 0;
+                ctx->active_window = ctx->course_windows[0];
                 focus_window(&ctx->course_windows[2], 2, "Editor");
+                focus_window(&ctx->course_windows[0], 3, "Navigation");
                 doupdate();
                 break;
             case 10:
@@ -122,13 +127,14 @@ void handle_course_input(APP_CONTEXT *ctx)
                 break;
         }
     }
-    else if (ctx->active_window == 3)
+    else if (ctx->active_window_idx == 3)
     {
         switch (ctx->key)
         {
             case 9:
             case KEY_LEFT:
-                ctx->active_window = 2;
+                ctx->active_window_idx = 2;
+                ctx->active_window = ctx->course_windows[2];
                 focus_window(&ctx->course_windows[2], 3, "Editor");
                 focus_instructions_window(ctx->rp_state, 2,
                                           "Course Instructions");

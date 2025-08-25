@@ -1,4 +1,3 @@
-#include <stdio.h>
 #define _XOPEN_SOURCE_EXTENDED 1
 
 #include "../../core/core.h"
@@ -19,10 +18,23 @@
 #define CARD_WIDTH (((WU * 7) / 3) + 1)
 #define REMAINDER (WU * 7 + 4) % CARD_WIDTH
 
+char *PROGRAMM_DESC =
+    "Welcome to NetworkingTutor!\n\n"
+    "NetworkingTutor is an interactive learning tool that aims to teach you "
+    "the basics of networking.\n"
+    "Start by creating a simple HTTP server while learning about "
+    "sockets, HTTP, and low-level\n"
+    "networking concepts. Each section presents "
+    "challenges, a built-in text editor, and instant\n"
+    "feedback to reinforce your learning. "
+    "Gamification keeps you engaged as you progress.\n"
+    "Expand your knowledge step by step and master "
+    "networking fundamentals—one challenge at a time.\nReady to begin? 🚀";
+
 void create_start_screen(APP_CONTEXT *ctx)
 {
     ctx->start_windows[0] =
-        create_navigation_window(&ctx->active_window, &ctx->start_menu);
+        create_navigation_window(&ctx->active_window_idx, &ctx->start_menu);
     ctx->start_windows[1] = create_header_section(ctx);
     ctx->start_windows[2] =
         create_course_preview_card(ctx, 0, 2, &ctx->courses[0]);
@@ -56,19 +68,19 @@ WINDOW *create_header_section(APP_CONTEXT *ctx)
     WINDOW *header_window = newwin(header_height, header_width, 3, 0);
     WINDOW *header_inner =
         derwin(header_window, header_height - 2, header_width - 2, 1, 1);
-    if (ctx->active_window == 1)
+    if (ctx->active_window_idx == 1)
     {
         wattron(header_inner, COLOR_PAIR(1) | A_BOLD);
     }
 
     I_TEXT_BUFFER *header_tbuf = initialize_it_buffer();
-    read_logo_and_header_text_into_buffer(ctx, header_tbuf, header_width, 0, 0);
+    read_window_text_into_buffer(ctx, header_tbuf, header_width, 0, 0, PROGRAMM_DESC);
 
     wattron(header_inner, A_BOLD);
     print_window_content(header_tbuf, header_inner, header_width - 2);
     wattroff(header_inner, A_BOLD);
     // mvwprintw(header_inner, 13, 0, "%s", PROGRAMM_DESC);
-    if (ctx->active_window == 1)
+    if (ctx->active_window_idx == 1)
     {
         wattroff(header_inner, COLOR_PAIR(1));
     }
@@ -87,7 +99,7 @@ WINDOW *create_course_preview_card(APP_CONTEXT *ctx, int x_position,
                                    int curr_win_idx, COURSE *course)
 {
     int remainder = 0;
-    if (curr_win_idx == 4)
+    if (ctx->start_view_active && curr_win_idx == 4)
     {
         remainder = REMAINDER;
     }
@@ -102,21 +114,21 @@ WINDOW *create_course_preview_card(APP_CONTEXT *ctx, int x_position,
         height = LINES % 2 == 0 ? LINES / 2 - 4 : LINES / 2 - 3;
         width = CARD_WIDTH;
     }
-    else if (ctx->progress_view_active)
+    else if (ctx->progress_view_active || ctx->all_courses_view_active)
     {
-        y_position = 12;
-        x_add = 80;
         height = LINES / 3 + 2;
-        width = CARD_WIDTH - 2;
+        y_position = course->id < 6 ? 12 : (13 + height);
+        x_add = ctx->progress_view_active ? 80 : 0;
+        width = CARD_WIDTH - (ctx->progress_view_active ? 2 : 4);
     }
     WINDOW *course_preview_card_outer =
         newwin(height, width + remainder, y_position, x_position + x_add);
     WINDOW *course_preview_card_inner = derwin(
         course_preview_card_outer, height - 3, width - 2 + remainder, 2, 1);
 
-    if ((ctx->active_window == 2 || ctx->active_window == 3 ||
-         ctx->active_window == 4) &&
-        curr_win_idx == ctx->active_window && ctx->start_view_active)
+    if ((ctx->active_window_idx == 2 || ctx->active_window_idx == 3 ||
+         ctx->active_window_idx == 4) &&
+        curr_win_idx == ctx->active_window_idx && ctx->start_view_active)
     {
         draw_border(course_preview_card_outer, 3, " Course");
     }
@@ -136,9 +148,9 @@ WINDOW *create_course_preview_card(APP_CONTEXT *ctx, int x_position,
               (width - strlen(course->name)) / 2 - 1, "%s", course->name);
 
     ctx->card_buffers[curr_win_idx - 2] = initialize_it_buffer();
-    read_logo_and_header_text_into_buffer(
+    read_window_text_into_buffer(
         ctx, ctx->card_buffers[curr_win_idx - 2], width - 2 + remainder, 1,
-        curr_win_idx - 2);
+        curr_win_idx - 2, "");
 
     print_window_content(ctx->card_buffers[curr_win_idx - 2],
                          course_preview_card_inner, width - 2 + remainder);
@@ -164,7 +176,7 @@ WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label)
 {
     init_right_panel_state(ctx->rp_state, ctx->course_view_active);
 
-    if (ctx->active_window == 5)
+    if (ctx->active_window_idx == 5)
     {
         draw_border(ctx->rp_state->right_panel, 3, "Right Panel");
     }
@@ -179,14 +191,14 @@ WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label)
 
     if (ctx->start_view_active)
     {
-        ctx->user_data = get_user_data(ctx->db, ctx->current_user_id);
-        mvwprintw(ctx->rp_state->right_panel, 2, 3, "Your name: %s",
-                  ctx->user_data->name);
-        mvwprintw(ctx->rp_state->right_panel, 3, 3, "Created at: %s",
-                  ctx->user_data->created_at);
-        mvwprintw(ctx->rp_state->right_panel, 4, 3, "%i", ctx->current_user_id);
-        print_intro(&ctx->rp_state->right_panel, ctx->rp_state->window_width,
-                    ctx->rp_state->intro_width);
+        // ctx->user_data = get_user_data(ctx->db, ctx->current_user_id);
+        // mvwprintw(ctx->rp_state->right_panel, 2, 3, "Your name: %s",
+        //           ctx->user_data->name);
+        // mvwprintw(ctx->rp_state->right_panel, 3, 3, "Created at: %s",
+        //           ctx->user_data->created_at);
+        // mvwprintw(ctx->rp_state->right_panel, 4, 3, "%i", ctx->current_user_id);
+        print_intro(ctx);
+        wnoutrefresh(ctx->rp_state->inner_win);
     }
     else if (ctx->course_view_active)
     {
@@ -202,7 +214,7 @@ WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label)
 MENU *create_start_menu(WINDOW *nav_window)
 {
     const char *choices[] = {
-        "Home",      "Courses", "Account", "Progress", "Settings", "Shortcuts",
+        "Home",      "All courses", "Account", "Progress", "Settings", "Shortcuts",
         (char *)NULL // Last element must be NULL
     };
 

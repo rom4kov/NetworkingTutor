@@ -39,12 +39,24 @@ void handle_greeter_input(APP_CONTEXT *ctx)
             }
             else if (item_index(curr_item) == 1)
             {
+                wclear(ctx->greeter_screen);
+                wrefresh(ctx->greeter_screen);
+                delwin(ctx->greeter_screen);
+                delwin(ctx->greeter_ascii_window);
+                ctx->greeter_screen = NULL;
                 ctx->greeter_view_active = false;
+                ctx->greeter_needs_redraw = false;
                 ctx->start_view_active = false;
                 ctx->start_needs_redraw = false;
                 ctx->course_view_active = true;
                 ctx->first_course_draw = true;
                 ctx->course_needs_redraw = true;
+                // for (int i = 0; i < START_WINDOW_COUNT; i++)
+                // {
+                //     wclear(ctx->start_windows[i]);
+                //     wrefresh(ctx->start_windows[i]);
+                //     delwin(ctx->start_windows[i]);
+                // }
 
                 ctx->current_user_id = 1;
                 ctx->user_data = get_user_data(ctx->db, ctx->current_user_id);

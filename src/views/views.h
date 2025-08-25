@@ -26,12 +26,12 @@ void add_line_break(COURSE_SECTION *c_sec_data, I_TEXT_BUFFER *tbuf,
 void read_item_into_buffer(APP_CONTEXT *ctx);
 void read_task_into_buffer(APP_CONTEXT *ctx);
 void read_end_of_course_page_into_buffer(APP_CONTEXT *ctx);
-void read_logo_and_header_text_into_buffer(APP_CONTEXT *ctx,
+void read_window_text_into_buffer(APP_CONTEXT *ctx,
                                            I_TEXT_BUFFER *header_tbuf,
                                            int win_width, int win,
-                                           int course_id);
+                                           int course_id, char *add_text);
 void read_in_buf_str(char *buf_str, int total, I_TEXT_BUFFER *header_tbuf,
-                     int win_width);
+                     int win_width, int win);
 
 void print_course_instructions(APP_CONTEXT *ctx);
 void init_right_panel_state(RIGHT_PANEL_STATE *rp_state,
@@ -40,7 +40,7 @@ void print_next_course_item(RIGHT_PANEL_STATE *rp_state);
 void print_window_content(I_TEXT_BUFFER *header_tbuf, WINDOW *win,
                           int win_width);
 
-void print_intro(WINDOW **right_panel, int window_width, int intro_width);
+void print_intro(APP_CONTEXT *ctx);
 void print_press_msg(RIGHT_PANEL_STATE *rps);
 
 void create_course_view(APP_CONTEXT *ctx);
@@ -86,3 +86,9 @@ WINDOW *create_progress_stats_window(APP_CONTEXT *ctx);
 void print_completed_courses(APP_CONTEXT *ctx);
 void print_your_courses_title(APP_CONTEXT *ctx);
 void print_no_courses_started_msg(WINDOW *win, int height, int width);
+
+// all courses view
+void create_all_courses_view(APP_CONTEXT *ctx);
+WINDOW *create_all_courses_screen(APP_CONTEXT *ctx);
+WINDOW *create_all_courses_container(APP_CONTEXT *ctx);
+void print_all_courses(APP_CONTEXT *ctx);

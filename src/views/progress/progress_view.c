@@ -13,7 +13,7 @@ void create_progress_view(APP_CONTEXT *ctx)
 {
     ctx->progress_windows[3] = create_progress_screen(ctx);
     ctx->progress_windows[0] =
-        create_navigation_window(&ctx->active_window, &ctx->start_menu);
+        create_navigation_window(&ctx->active_window_idx, &ctx->start_menu);
     ctx->progress_windows[1] = create_account_window(ctx);
     ctx->progress_windows[2] = create_progress_stats_window(ctx);
 
@@ -33,7 +33,7 @@ WINDOW *create_progress_screen(APP_CONTEXT *ctx)
 {
     WINDOW *progress_screen = newwin(LINES, COLS - 80, 0, 80);
 
-    draw_progress_border(progress_screen, 2, "");
+    draw_progress_border(progress_screen, 2, 2);
     create_your_courses_window(ctx, progress_screen);
 
     return progress_screen;

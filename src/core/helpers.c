@@ -53,8 +53,16 @@ void draw_border(WINDOW *win, int color_pair, char *label)
     wnoutrefresh(win);
 }
 
-void draw_progress_border(WINDOW *win, int color_pair, char *label)
+void draw_progress_border(WINDOW *win, int color_pair, int screen)
 {
+    int angle_pos = 0;
+    if (screen == 1)
+    {
+        angle_pos = 5;
+    }
+    else if (screen == 2) {
+        angle_pos = -75;
+    }
     int max_y, max_x;
     getmaxyx(win, max_y, max_x);
 
@@ -63,29 +71,23 @@ void draw_progress_border(WINDOW *win, int color_pair, char *label)
     // Draw top and bottom borders
     for (int i = 0; i < max_x - 1; i++)
     {
-        mvwaddch(win, i < (WU * 7 - 75) ? 3 : 0, i, ACS_HLINE);
+        mvwaddch(win, i < (WU * 7 + angle_pos) ? 3 : 0, i, ACS_HLINE);
         mvwaddch(win, max_y - 1, i, ACS_HLINE);
     }
 
     // Draw left and right borders
     for (int i = 1; i < max_y - 1; i++)
     {
-        mvwaddch(win, i, i < 4 ? (WU * 7 - 75) : 0, ACS_VLINE);
+        mvwaddch(win, i, i < 4 ? (WU * 7 + angle_pos) : 0, ACS_VLINE);
         mvwaddch(win, i, max_x - 1, ACS_VLINE);
     }
 
     mvwprintw(win, 3, 0, "╭");
-    mvwprintw(win, 0, WU * 7 - 75, "╭");
+    mvwprintw(win, 0, WU * 7 + angle_pos, "╭");
     mvwprintw(win, 0, max_x - 1, "╮");
     mvwprintw(win, max_y - 1, 0, "╰");
-    mvwprintw(win, 3, WU * 7 - 75, "╯");
+    mvwprintw(win, 3, WU * 7 + angle_pos, "╯");
     mvwprintw(win, max_y - 1, max_x - 1, "╯");
-
-    if (NULL != label && strcmp(label, "Lesson") == 0)
-    {
-        mvwaddch(win, 2, 0, ACS_LTEE);
-        mvwaddch(win, 2, max_x - 1, ACS_RTEE);
-    }
 
     wattroff(win, COLOR_PAIR(color_pair));
     wnoutrefresh(win);

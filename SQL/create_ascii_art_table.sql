@@ -75,6 +75,17 @@ INSERT
     OR IGNORE INTO ascii_art (name, content)
 VALUES
     (
+        "all_courses",
+        "   ___   ____                              @
+  / _ | / / / _______  __ _________ ___ ___@
+ / __ |/ / / / __/ _ \/ // / __(_-</ -_|_-<@
+/_/ |_/_/_/  \__/\___/\_,_/_/ /___/\__/___/@"
+    );
+
+INSERT
+    OR IGNORE INTO ascii_art (name, content)
+VALUES
+    (
         "account",
         "   ___                         __ @
   / _ |___________  __ _____  / /_@

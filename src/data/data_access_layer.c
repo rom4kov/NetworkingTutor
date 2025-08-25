@@ -169,7 +169,6 @@ COURSE *get_course_data(sqlite3 *db)
         num_courses++;
     }
     sqlite3_reset(stmt);
-
     COURSE *course_data = malloc(sizeof(COURSE) * num_courses);
 
     int i = 0;

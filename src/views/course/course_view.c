@@ -27,10 +27,10 @@ void create_course_view(APP_CONTEXT *ctx)
 {
     get_total_course_sections(ctx);
 
-    ctx->active_window = 0;
+    ctx->active_window_idx = 0;
 
     ctx->course_windows[0] =
-        create_navigation_window(&ctx->active_window, &ctx->start_menu);
+        create_navigation_window(&ctx->active_window_idx, &ctx->start_menu);
     ctx->course_windows[1] = create_explorer_window(ctx->file_tree);
     ctx->course_windows[2] = create_editor_window();
     ctx->course_windows[3] =

@@ -172,7 +172,6 @@ char *wrap_text(char *text, int width)
         {
             str[last_space] = '\n';
             col = 0;
-            // offset++;
         }
         else if (str[i] == ' ')
         {
@@ -181,11 +180,6 @@ char *wrap_text(char *text, int width)
         col++;
         i++;
     }
-
-    // if (curr_offset != NULL)
-    // {
-    //     *curr_offset = *curr_offset + offset + 3;
-    // }
 
     return str;
 }
@@ -254,24 +248,10 @@ int get_diff_time_in_days(WINDOW *win, char date1[], char date2[])
     end_date.tm_min = 0;
     end_date.tm_sec = 0;
 
-    // mvwprintw(win, 40, 10, "%i", start_date.tm_year);
-    // mvwprintw(win, 41, 10, "%i", start_date.tm_mon);
-    // mvwprintw(win, 42, 10, "%i", start_date.tm_mday);
-    //
-    // mvwprintw(win, 44, 10, "%i", end_date.tm_year);
-    // mvwprintw(win, 45, 10, "%i", end_date.tm_mon);
-    // mvwprintw(win, 46, 10, "%i", end_date.tm_mday);
-
     start_time = mktime(&start_date);
     end_time = mktime(&end_date);
 
-    // mvwprintw(win, 40, 20, "start_time: %ld", start_time / (3600 * 24));
-    // mvwprintw(win, 41, 20, "end_time: %ld", end_time / (3600 * 24));
-
     time_diff_in_seconds = difftime(end_time, start_time);
-
-    // mvwprintw(win, 42, 20, "time diff in days: %.f",
-    //           time_diff_in_seconds / (3600 * 24));
 
     diff_in_days = (int)time_diff_in_seconds / (3600 * 24);
     free(time1);

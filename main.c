@@ -144,16 +144,12 @@ int main(void)
                     delwin(ctx->greeter_screen);
                 }
             }
-            // wclear(ctx->greeter_screen);
-            // delwin(ctx->greeter_screen);
             ctx->start_view_active = false;
             ctx->start_needs_redraw = false;
             ctx->greeter_screen = create_greeter_screen(ctx);
             ctx->active_window = ctx->greeter_screen;
             ctx->greeter_needs_redraw = false;
             ctx->first_greeter_draw = false;
-            // mvwprintw(ctx->greeter_screen, 3, 3, "%s", ctx->start_view_active ? "yes" : "no");
-            // mvwprintw(ctx->greeter_screen, 4, 3, "%s", ctx->start_needs_redraw ? "yes" : "no");
             wrefresh(ctx->greeter_screen);
         }
         if (ctx->start_needs_redraw)
@@ -199,9 +195,6 @@ int main(void)
                     if (ctx->course_windows[i] != NULL)
                     {
                         delwin(ctx->course_windows[i]);
-                        // delwin(ctx->edit_window);
-                        // delwin(ctx->line_num_win);
-                        // delwin(ctx->rp_state->inner_win);
                     }
                 }
             }
@@ -278,9 +271,6 @@ int main(void)
                     if (ctx->all_courses_windows[i] != NULL)
                     {
                         delwin(ctx->all_courses_windows[i]);
-                        // delwin(ctx->edit_window);
-                        // delwin(ctx->line_num_win);
-                        // delwin(ctx->rp_state->inner_win);
                     }
                 }
             }
@@ -290,6 +280,29 @@ int main(void)
             ctx->first_all_courses_draw = false;
             for (int i = 0; i < 3; i++)
                 wnoutrefresh(ctx->all_courses_windows[i]);
+            doupdate();
+        }
+        else if (ctx->keybindings_needs_redraw)
+        {
+            if (!ctx->first_keybindings_draw)
+            {
+
+                endwin();
+                refresh();
+                for (int i = 0; i < 3; i++)
+                {
+                    if (ctx->keybindings_windows[i] != NULL)
+                    {
+                        delwin(ctx->keybindings_windows[i]);
+                    }
+                }
+            }
+            create_keybindings_view(ctx);
+            ctx->active_window = ctx->keybindings_windows[0];
+            ctx->keybindings_needs_redraw = false;
+            ctx->first_keybindings_draw = false;
+            for (int i = 0; i < 3; i++)
+                wnoutrefresh(ctx->keybindings_windows[i]);
             doupdate();
         }
 
@@ -319,6 +332,10 @@ int main(void)
                 {
                     ctx->all_courses_needs_redraw = true;
                 }
+                else if (ctx->keybindings_view_active)
+                {
+                    ctx->keybindings_needs_redraw = true;
+                }
                 break;
             case 27:
                 CU_cleanup_registry();
@@ -331,16 +348,10 @@ int main(void)
                 }
                 else if (ctx->start_view_active)
                 {
-                    // mvwprintw(ctx->start_windows[5], LINES - 5, 3, "%s", ctx->start_view_active ? "yes" : "no");
-                    // mvwprintw(ctx->start_windows[5], LINES - 4, 3, "%s", ctx->start_needs_redraw ? "yes" : "no");
-                    // wrefresh(ctx->start_windows[5]);
                     handle_start_input(ctx);
                 }
                 else if (ctx->course_view_active)
                 {
-                    // mvwprintw(ctx->course_windows[2], LINES - 5, 3, "%s", ctx->start_view_active ? "yes" : "no");
-                    // mvwprintw(ctx->course_windows[2], LINES - 4, 3, "%s", ctx->start_needs_redraw ? "yes" : "no");
-                    // wrefresh(ctx->course_windows[2]);
                     handle_course_input(ctx);
                 }
                 else if (ctx->progress_view_active)
@@ -348,6 +359,10 @@ int main(void)
                     handle_progress_input(ctx);
                 }
                 else if (ctx->all_courses_view_active)
+                {
+                    handle_nav_input(ctx);
+                }
+                else if (ctx->keybindings_view_active)
                 {
                     handle_nav_input(ctx);
                 }

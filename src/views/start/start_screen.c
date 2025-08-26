@@ -74,7 +74,8 @@ WINDOW *create_header_section(APP_CONTEXT *ctx)
     }
 
     I_TEXT_BUFFER *header_tbuf = initialize_it_buffer();
-    read_window_text_into_buffer(ctx, header_tbuf, header_width, 0, 0, PROGRAMM_DESC);
+    read_window_text_into_buffer(ctx, header_tbuf, header_width, 0, 0,
+                                 PROGRAMM_DESC);
 
     wattron(header_inner, A_BOLD);
     print_window_content(header_tbuf, header_inner, header_width - 2);
@@ -148,9 +149,9 @@ WINDOW *create_course_preview_card(APP_CONTEXT *ctx, int x_position,
               (width - strlen(course->name)) / 2 - 1, "%s", course->name);
 
     ctx->card_buffers[curr_win_idx - 2] = initialize_it_buffer();
-    read_window_text_into_buffer(
-        ctx, ctx->card_buffers[curr_win_idx - 2], width - 2 + remainder, 1,
-        curr_win_idx - 2, "");
+    read_window_text_into_buffer(ctx, ctx->card_buffers[curr_win_idx - 2],
+                                 width - 2 + remainder, 1, curr_win_idx - 2,
+                                 "");
 
     print_window_content(ctx->card_buffers[curr_win_idx - 2],
                          course_preview_card_inner, width - 2 + remainder);
@@ -161,8 +162,8 @@ WINDOW *create_course_preview_card(APP_CONTEXT *ctx, int x_position,
         int comp_percent = get_course_completion_percentage(ctx, course->id);
 
         wattron(course_preview_card_outer, COLOR_PAIR(4));
-        mvwprintw(course_preview_card_outer, height - 1, start_x, " %i%% complete ",
-                  comp_percent);
+        mvwprintw(course_preview_card_outer, height - 1, start_x,
+                  " %i%% complete ", comp_percent);
         wattroff(course_preview_card_outer, COLOR_PAIR(4));
     }
 
@@ -196,7 +197,8 @@ WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label)
         //           ctx->user_data->name);
         // mvwprintw(ctx->rp_state->right_panel, 3, 3, "Created at: %s",
         //           ctx->user_data->created_at);
-        // mvwprintw(ctx->rp_state->right_panel, 4, 3, "%i", ctx->current_user_id);
+        // mvwprintw(ctx->rp_state->right_panel, 4, 3, "%i",
+        // ctx->current_user_id);
         print_intro(ctx);
         wnoutrefresh(ctx->rp_state->inner_win);
     }
@@ -214,45 +216,46 @@ WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label)
 MENU *create_start_menu(WINDOW *nav_window)
 {
     const char *choices[] = {
-        "Home",      "All courses", "Account", "Progress", "Settings", "Shortcuts",
+        "Home",        "Current course", "All courses", "Account & Progress",
+        "Keybindings",
         (char *)NULL // Last element must be NULL
     };
 
-    ITEM **menu_items = (ITEM **)calloc(7, sizeof(ITEM *));
+    ITEM **menu_items = (ITEM **)calloc(6, sizeof(ITEM *));
 
     for (int i = 0; choices[i] != NULL; i++)
     {
         menu_items[i] = new_item(choices[i], "");
     }
 
-    TABSIZE = 12;
+    TABSIZE = 10;
 
     int MENU_SPACING;
 
     if (COLS > 240)
     {
-        MENU_SPACING = 12;
+        MENU_SPACING = 10;
     }
     else if (COLS > 220)
     {
-        MENU_SPACING = 10;
+        MENU_SPACING = 8;
     }
     else if (COLS > 200)
     {
-        MENU_SPACING = 8;
+        MENU_SPACING = 5;
     }
     else if (COLS > 180)
     {
-        MENU_SPACING = 6;
+        MENU_SPACING = 4;
     }
     else
     {
-        MENU_SPACING = 4;
+        MENU_SPACING = 3;
     }
 
     // Create the menu
     MENU *menu = new_menu(menu_items);
-    set_menu_format(menu, 1, 12);
+    set_menu_format(menu, 1, 6);
     set_menu_spacing(menu, 0, 1, MENU_SPACING);
     // mvwprintw(nav_window, 2, 3, "%i", COLS);
 

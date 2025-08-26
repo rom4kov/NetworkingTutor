@@ -12,12 +12,8 @@
 #define COURSE_WINDOW_COUNT 5
 #define PROGRESS_WINDOW_COUNT 5
 #define ALL_COURSES_WINDOW_COUNT 3
+#define KEYBINDINGS_WINDOW_COUNT 3
 #define SEPARATOR 333
-// #define BOLD 1
-// #define UNDERLINE 2
-// #define CENTERED 4
-// #define O_LIST 8
-// #define U_LIST 16
 
 typedef struct _user_data
 {
@@ -166,6 +162,7 @@ typedef struct _app_context
     WINDOW *course_windows[COURSE_WINDOW_COUNT];
     WINDOW *progress_windows[PROGRESS_WINDOW_COUNT];
     WINDOW *all_courses_windows[ALL_COURSES_WINDOW_COUNT];
+    WINDOW *keybindings_windows[ALL_COURSES_WINDOW_COUNT];
     WINDOW *line_num_win;
     WINDOW *edit_window;
     WINDOW *active_window;
@@ -205,16 +202,19 @@ typedef struct _app_context
     bool course_needs_redraw;
     bool progress_needs_redraw;
     bool all_courses_needs_redraw;
+    bool keybindings_needs_redraw;
     bool greeter_view_active;
     bool start_view_active;
     bool course_view_active;
     bool progress_view_active;
     bool all_courses_view_active;
+    bool keybindings_view_active;
     bool first_greeter_draw;
     bool first_start_draw;
     bool first_course_draw;
     bool first_progress_draw;
     bool first_all_courses_draw;
+    bool first_keybindings_draw;
     bool editor_mode;
     bool explorer_mode;
     bool is_in_failure_list;

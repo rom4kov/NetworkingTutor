@@ -92,3 +92,8 @@ void create_all_courses_view(APP_CONTEXT *ctx);
 WINDOW *create_all_courses_screen(APP_CONTEXT *ctx);
 WINDOW *create_all_courses_container(APP_CONTEXT *ctx);
 void print_all_courses(APP_CONTEXT *ctx);
+
+// keybindings view
+void create_keybindings_view(APP_CONTEXT *ctx);
+WINDOW *create_keybindings_screen(APP_CONTEXT *ctx);
+WINDOW *create_keybindings_container(APP_CONTEXT *ctx);

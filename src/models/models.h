@@ -7,6 +7,7 @@
 #include <sqlite3.h>
 #include <CUnit/Basic.h>
 #include <CUnit/CUError.h>
+#include <stdio.h>
 
 #define START_WINDOW_COUNT 6
 #define COURSE_WINDOW_COUNT 5
@@ -122,6 +123,17 @@ typedef struct _file_tree
     int num_of_entries;
 } FILE_TREE;
 
+typedef struct _pseudo_terminal
+{
+    TEXT_BUFFER *term_buffer;
+    WINDOW *term_inner_win;
+    int masterfd;
+    char buf[BUFSIZ];
+    int curr_buf_idx;
+    bool terminal_active;
+    bool terminal_focused;
+} SHELL;
+
 typedef struct _right_panel_state
 {
     I_TEXT_BUFFER *it_buffer;
@@ -160,6 +172,7 @@ typedef struct _app_context
     WINDOW *greeter_ascii_window;
     WINDOW *start_windows[START_WINDOW_COUNT];
     WINDOW *course_windows[COURSE_WINDOW_COUNT];
+    WINDOW *terminal_window;
     WINDOW *progress_windows[PROGRESS_WINDOW_COUNT];
     WINDOW *all_courses_windows[ALL_COURSES_WINDOW_COUNT];
     WINDOW *keybindings_windows[ALL_COURSES_WINDOW_COUNT];
@@ -167,6 +180,7 @@ typedef struct _app_context
     WINDOW *edit_window;
     WINDOW *active_window;
     USER_DATA *user_data;
+    SHELL *shell;
     RIGHT_PANEL_STATE *rp_state;
     COURSE *courses;
     MENU *greeter_menu;
@@ -219,4 +233,5 @@ typedef struct _app_context
     bool explorer_mode;
     bool is_in_failure_list;
     bool user_form_active;
+    bool terminal_active;
 } APP_CONTEXT;

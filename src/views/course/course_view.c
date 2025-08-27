@@ -2,10 +2,10 @@
 #define _GNU_SOURCE
 
 #include "../../core/core.h"
+#include "../../course_tests/tests.h"
 #include "../../models/models.h"
 #include "../start/start_menu.h"
 #include "../views.h"
-#include "../../course_tests/tests.h"
 #include <curses.h>
 #include <dirent.h>
 #include <form.h>
@@ -22,6 +22,7 @@
 #define EXPLORER_WIDTH WU + WU / 2
 #define EDITOR_WIDTH ((WU * 7 + 4) - (WU + WU / 2))
 #define EDIT_WIN_WIDTH WU * 5 + WU / 2
+#define SHELL_WINDOW_IDX 4
 
 void create_course_view(APP_CONTEXT *ctx)
 {
@@ -32,7 +33,7 @@ void create_course_view(APP_CONTEXT *ctx)
     ctx->course_windows[0] =
         create_navigation_window(&ctx->active_window_idx, &ctx->start_menu);
     ctx->course_windows[1] = create_explorer_window(ctx->file_tree);
-    ctx->course_windows[2] = create_editor_window();
+    ctx->course_windows[2] = create_editor_window(ctx);
     ctx->course_windows[3] =
         create_right_side_panel(ctx, " Course instructions ");
     ctx->course_windows[4] = create_progress_window(ctx);
@@ -54,15 +55,34 @@ void create_course_view(APP_CONTEXT *ctx)
         wattroff(ctx->course_windows[2], COLOR_PAIR(10));
     }
 
+    if (ctx->shell->terminal_active)
+    {
+        ctx->terminal_window = create_terminal_window(ctx);
+        wnoutrefresh(ctx->terminal_window);
+    }
+
     wnoutrefresh(ctx->course_windows[2]);
     wnoutrefresh(ctx->course_windows[4]);
 
     initialize_testing(ctx);
 }
 
-WINDOW *create_editor_window()
+WINDOW *create_editor_window(APP_CONTEXT *ctx)
 {
-    WINDOW *editor_window = newwin(LINES - 3, EDITOR_WIDTH, 3, WU + WU / 2);
+    unsigned int height;
+
+    if (!ctx->shell->terminal_active)
+    {
+        height = LINES - 3;
+    }
+    else
+    {
+        height = LINES - 13;
+    }
+
+    // curs_set(0);
+
+    WINDOW *editor_window = newwin(height, EDITOR_WIDTH, 3, WU + WU / 2);
     draw_border(editor_window, 2, "Editor");
 
     // mvwprintw(editor_window, 0, 2, "%i", *active_window);
@@ -76,6 +96,33 @@ WINDOW *create_editor_window()
     wnoutrefresh(editor_window);
 
     return editor_window;
+}
+
+WINDOW *create_terminal_window(APP_CONTEXT *ctx)
+{
+    WINDOW *terminal_window =
+        newwin(10, EDITOR_WIDTH, LINES - 10, EXPLORER_WIDTH);
+    draw_border(terminal_window, 3, " Terminal ");
+
+    wattron(terminal_window, COLOR_PAIR(3));
+    mvwprintw(terminal_window, 0, 2, " Terminal ");
+    wattroff(terminal_window, COLOR_PAIR(3));
+
+    ctx->shell->term_inner_win =
+        derwin(terminal_window, 8, EDITOR_WIDTH - 2, 1, 1);
+
+    ctx->active_window_idx = SHELL_WINDOW_IDX;
+    ctx->shell->terminal_focused = true;
+    ctx->shell->terminal_active = true;
+
+    mvwprintw(terminal_window, 1, 1, ">");
+    wmove(terminal_window, 1, 3);
+
+    create_pseudo_terminal(ctx);
+    curs_set(2);
+
+    wrefresh(terminal_window);
+    return terminal_window;
 }
 
 WINDOW *create_explorer_window(FILE_TREE *file_tree)

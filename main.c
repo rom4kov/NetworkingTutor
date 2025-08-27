@@ -83,6 +83,12 @@ int main(void)
 
     ctx->user_form_fields = false;
 
+    ctx->shell = calloc(1, sizeof(SHELL));
+    ctx->shell->terminal_active = false;
+    ctx->shell->curr_buf_idx = 0;
+    ctx->shell->masterfd = -1;
+    ctx->shell->term_buffer = initialize_buffer();
+
     int curr_line;
     int curr_col;
     // refresh();

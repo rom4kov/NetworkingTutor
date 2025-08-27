@@ -14,6 +14,8 @@
 #define WU COLS / 12 // WU for WIDTH_UNIT
 #define EDIT_MAX WU * 7 + 4
 
+#define SHELL_WINDOW_IDX 4
+
 void log_course_instr_values(APP_CONTEXT *ctx)
 {
     mvwprintw(ctx->course_windows[2], 2, 3, "%s", "                    ");
@@ -90,6 +92,23 @@ void handle_course_input(APP_CONTEXT *ctx)
     {
         switch (ctx->key)
         {
+            case KEY_UP:
+                ctx->active_window_idx = 0;
+                ctx->active_window = ctx->course_windows[0];
+                focus_window(&ctx->course_windows[2], 2, "Editor");
+                focus_window(&ctx->course_windows[0], 3, "Navigation");
+                doupdate();
+                break;
+            case KEY_DOWN:
+                if (ctx->shell->terminal_active)
+                {
+                    ctx->active_window_idx = SHELL_WINDOW_IDX;
+                    ctx->active_window = ctx->terminal_window;
+                    focus_window(&ctx->course_windows[2], 2, "Editor");
+                    focus_window(&ctx->terminal_window, 3, "Terminal");
+                    doupdate();
+                }
+                break;
             case 9:
             case KEY_LEFT:
                 ctx->active_window_idx = 1;
@@ -107,11 +126,16 @@ void handle_course_input(APP_CONTEXT *ctx)
                 wnoutrefresh(ctx->rp_state->inner_win);
                 doupdate();
                 break;
-            case KEY_UP:
-                ctx->active_window_idx = 0;
-                ctx->active_window = ctx->course_windows[0];
-                focus_window(&ctx->course_windows[2], 2, "Editor");
-                focus_window(&ctx->course_windows[0], 3, "Navigation");
+            case 't':
+                wclear(ctx->course_windows[2]);
+                wrefresh(ctx->course_windows[2]);
+                delwin(ctx->course_windows[2]);
+                ctx->shell->terminal_active = true;
+                ctx->active_window_idx = SHELL_WINDOW_IDX;
+                ctx->course_windows[2] = create_editor_window(ctx);
+                // mvwprintw(ctx->course_windows[2], 3, 3, "%s", "test");
+                ctx->terminal_window = create_terminal_window(ctx);
+                // wnoutrefresh(term_win);
                 doupdate();
                 break;
             case 10:
@@ -392,6 +416,53 @@ void handle_course_input(APP_CONTEXT *ctx)
                         print_press_msg(ctx->rp_state);
                     }
                 }
+                break;
+        }
+    }
+    else if (ctx->active_window_idx == SHELL_WINDOW_IDX && ctx->shell->terminal_focused)
+    {
+        handle_terminal_input(ctx);
+    }
+    else if (ctx->active_window_idx == SHELL_WINDOW_IDX)
+    {
+        switch (ctx->key)
+        {
+            case KEY_UP:
+                curs_set(0);
+                ctx->active_window_idx = 2;
+                ctx->active_window = ctx->course_windows[2];
+                focus_window(&ctx->terminal_window, 2, "Terminal");
+                focus_window(&ctx->course_windows[2], 3, "Editor");
+                doupdate();
+                break;
+            case KEY_LEFT:
+                curs_set(0);
+                ctx->active_window_idx = 1;
+                ctx->active_window = ctx->course_windows[1];
+                focus_window(&ctx->terminal_window, 2, "Terminal");
+                focus_window(&ctx->course_windows[1], 3, "Explorer");
+                doupdate();
+                break;
+            case KEY_RIGHT:
+                curs_set(0);
+                ctx->active_window_idx = 3;
+                ctx->active_window = ctx->course_windows[3];
+                focus_window(&ctx->terminal_window, 2, "Terminal");
+                focus_window(&ctx->course_windows[3], 3, "Course Details");
+                doupdate();
+                break;
+            case '\n':
+                ctx->shell->terminal_focused = true;
+                curs_set(2);
+                break;
+            case 't':
+                curs_set(0);
+                wclear(ctx->course_windows[2]);
+                wrefresh(ctx->course_windows[2]);
+                delwin(ctx->course_windows[2]);
+                ctx->shell->terminal_active = false;
+                ctx->course_windows[2] = create_editor_window(ctx);
+                doupdate();
                 break;
         }
     }

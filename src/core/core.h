@@ -53,6 +53,7 @@ void focus_instructions_window(RIGHT_PANEL_STATE *rps, int color_pair, char *lab
 void trim(char **str);
 char *return_trimmed(char *str);
 char *trunc_str(char *str, int win_width, int offset);
+int strip_ansi_escape_codes(char *buf, int len);
 int c_round(float x);
 char *current_datetime();
 int get_diff_time_in_days(APP_CONTEXT *ctx, char time1[], char time2[]);
@@ -61,3 +62,8 @@ int restore_stdout(int saved_stdout);
 void log_values(WINDOW **edit_window, int scroll_offset, TEXT_BUFFER *tbuf,
                 int lines_to_print, int y, int x);
 void log_course_instr_values(APP_CONTEXT *ctx);
+
+// terminal
+void create_pseudo_terminal(APP_CONTEXT *ctx);
+void read_term_input_and_write_to_pty(APP_CONTEXT *ctx);
+void read_term_output_and_print_in_term(APP_CONTEXT *ctx);

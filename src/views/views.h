@@ -44,7 +44,8 @@ void print_intro(APP_CONTEXT *ctx);
 void print_press_msg(RIGHT_PANEL_STATE *rps);
 
 void create_course_view(APP_CONTEXT *ctx);
-WINDOW *create_editor_window();
+WINDOW *create_editor_window(APP_CONTEXT *ctx);
+WINDOW *create_terminal_window(APP_CONTEXT *ctx);
 WINDOW *create_explorer_window(FILE_TREE *file_tree);
 void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree);
 WINDOW *create_progress_window(APP_CONTEXT *ctx);

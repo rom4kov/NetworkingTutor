@@ -705,7 +705,7 @@ void delete_file(APP_CONTEXT *ctx, bool *del_file_form_active,
                         wclear(ctx->line_num_win);
                         wclear(ctx->course_windows[2]);
                         wclear(ctx->edit_window);
-                        ctx->course_windows[2] = create_editor_window();
+                        ctx->course_windows[2] = create_editor_window(ctx);
 
                         wattron(ctx->course_windows[2], COLOR_PAIR(10));
                         print_no_open_file_msg(&ctx->course_windows[2]);
@@ -732,7 +732,7 @@ void delete_file(APP_CONTEXT *ctx, bool *del_file_form_active,
                     wclear(ctx->course_windows[1]);
                     ctx->course_windows[1] =
                         create_explorer_window(ctx->file_tree);
-                    ctx->course_windows[2] = create_editor_window();
+                    ctx->course_windows[2] = create_editor_window(ctx);
 
                     focus_window(&ctx->course_windows[2], 2, "Editor");
                     focus_window(&ctx->course_windows[1], 3, "Explorer");

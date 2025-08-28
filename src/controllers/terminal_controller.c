@@ -1,3 +1,4 @@
+#include "../controllers/controllers.h"
 #include "../core/core.h"
 #include "../models/models.h"
 #include "../views/views.h"
@@ -11,8 +12,13 @@ void handle_terminal_input(APP_CONTEXT *ctx)
         case KEY_DOWN:
             break;
         case KEY_RIGHT:
+            move_cursor_right(ctx);
             break;
         case KEY_LEFT:
+            move_cursor_left(ctx);
+            break;
+        case '\n':
+            submit_command(ctx);
             break;
         case KEY_F(1):
             curs_set(0);

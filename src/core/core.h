@@ -67,3 +67,7 @@ void log_course_instr_values(APP_CONTEXT *ctx);
 void create_pseudo_terminal(APP_CONTEXT *ctx);
 void read_term_input_and_write_to_pty(APP_CONTEXT *ctx);
 void read_term_output_and_print_in_term(APP_CONTEXT *ctx);
+void move_cursor_left(APP_CONTEXT *ctx);
+void move_cursor_right(APP_CONTEXT *ctx);
+void submit_command(APP_CONTEXT *ctx);
+void append_term_ouput_to_buf(WINDOW *win, char *buf, int buf_len, TEXT_BUFFER *term_buf);

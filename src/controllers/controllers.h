@@ -11,5 +11,4 @@ void handle_editor_input(APP_CONTEXT *ctx);
 void handle_explorer_input(APP_CONTEXT *ctx);
 void handle_terminal_input(APP_CONTEXT *ctx);
 void disable_echo(int fd);
-void append_term_ouput_to_buf(WINDOW *win, char *buf, int buf_len, TEXT_BUFFER *term_buf);
 void print_term_buf(WINDOW *term_win, TEXT_BUFFER *term_buf);

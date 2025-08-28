@@ -7,140 +7,114 @@
 #include <ncurses.h>
 #include <pty.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
-void create_pseudo_terminal(APP_CONTEXT *ctx)
+void move_cursor_left(APP_CONTEXT *ctx)
 {
-    int ret, master;
-
-    ret = forkpty(&master, NULL, NULL, NULL);
-
-    disable_echo(master);
-
-    if (ret == -1)
-        perror("forkpty failed");
-
-    if (ret == 0)
+    if (ctx->shell->curr_buf_idx >= 1)
     {
-        setenv("PS1", "", 1);
-        setenv("INPUTRC", "/dev/null", 1);
-        execlp("sh", "sh", "--norc", "--noprofile", "-i", NULL);
-        perror("execlp");
-        _exit(1);
+        int nol = ctx->shell->term_buffer->num_of_lines;
+        ctx->shell->term_buffer->current_col--;
+        ctx->shell->curr_buf_idx--;
+
+        wmove(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7,
+              ctx->shell->term_buffer->current_col);
+        wrefresh(ctx->shell->term_inner_win);
     }
+}
 
-    fcntl(master, F_SETFL, O_NONBLOCK);
+void move_cursor_right(APP_CONTEXT *ctx)
+{
+    if (ctx->shell->curr_buf_idx < strlen(ctx->shell->buf))
+    {
+        int nol = ctx->shell->term_buffer->num_of_lines;
+        ctx->shell->term_buffer->current_col++;
+        ctx->shell->curr_buf_idx++;
 
-    napms(200);
-
-    ctx->shell->masterfd = master;
+        wmove(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7,
+              ctx->shell->term_buffer->current_col);
+        wrefresh(ctx->shell->term_inner_win);
+    }
 }
 
 void read_term_input_and_write_to_pty(APP_CONTEXT *ctx)
 {
-    if (ctx->key != '\n')
+    int nol = ctx->shell->term_buffer->num_of_lines;
+    int ccol = ctx->shell->term_buffer->current_col;
+    int x = ctx->shell->curr_buf_idx;
+
+    memmove(&ctx->shell->buf[x + 1], &ctx->shell->buf[x],
+            strlen(ctx->shell->buf) - x);
+    ctx->shell->buf[x] = ctx->key;
+    ctx->shell->term_buffer->current_col++;
+
+    // ctx->shell->buf[ctx->shell->curr_buf_idx] = ctx->key;
+    // ctx->shell->term_buffer->current_line
+    //     ->buf_[ctx->shell->term_buffer->current_col] = ctx->key;
+
+    mvwprintw(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7, ccol, "%s",
+              ctx->shell->buf);
+
+    wmove(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7,
+          ctx->shell->term_buffer->current_col);
+
+    ctx->shell->curr_buf_idx += 1;
+
+    wnoutrefresh(ctx->edit_window);
+    wnoutrefresh(ctx->shell->term_inner_win);
+    doupdate();
+}
+
+void submit_command(APP_CONTEXT *ctx)
+{
+    wclear(ctx->shell->term_inner_win);
+    print_term_buf(ctx->edit_window, ctx->shell->term_buffer);
+    ctx->shell->buf[ctx->shell->curr_buf_idx] = '\n';
+    ctx->shell->buf[ctx->shell->curr_buf_idx + 1] = '\0';
+
+    memcpy(ctx->shell->term_buffer->current_line->buf_ + 2, ctx->shell->buf,
+           strlen(ctx->shell->buf));
+
+    LINE *curr_line = initialize_line();
+    ctx->shell->term_buffer->current_line->next = curr_line;
+    curr_line->prev = ctx->shell->term_buffer->current_line;
+    ctx->shell->term_buffer->current_line = curr_line;
+    ctx->shell->term_buffer->current_line->next = NULL;
+    ctx->shell->term_buffer->num_of_lines++;
+
+    FILE *fp = popen(ctx->shell->buf, "r");
+    char buf[BUFSIZ];
+    int i = 0;
+    char c;
+    while (fread(&c, 1, 1, fp))
     {
-        int nol = ctx->shell->term_buffer->num_of_lines;
-        int ccol = ctx->shell->term_buffer->current_col;
-        mvwprintw(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7, ccol, "%c",
-                  ctx->key);
-        ctx->shell->term_buffer->current_col++;
-
-        // unsigned short x = ctx->shell->term_buffer->current_col;
-        // TEXT_BUFFER *tbuf = ctx->shell->term_buffer;
-
-        ctx->shell->buf[ctx->shell->curr_buf_idx] = ctx->key;
-        ctx->shell->term_buffer->current_line
-            ->buf_[ctx->shell->term_buffer->current_col] = ctx->key;
-
-        // memmove(&ctx->shell->term_buffer->current_line->buf_[x + 1],
-        // &ctx->shell->term_buffer->current_line->buf_[x],
-        //         ctx->shell->term_buffer->current_line->length - x);
-        // ctx->shell->term_buffer->current_line->length++;
-        // ctx->shell->term_buffer->current_line->buf_[x] = ctx->key;
-        // ctx->shell->term_buffer->current_col++;
-
-        // ctx->shell->term_buffer->current_line
-        //     ->buf_[ctx->shell->term_buffer->current_col + 1] = '\0';
-        // ctx->shell->term_buffer->current_col++;
-        print_term_buf(ctx->shell->term_inner_win, ctx->shell->term_buffer);
-        wmove(ctx->shell->term_inner_win,
-              nol < 8 ? nol - 1 : 7,
-              ctx->shell->term_buffer->current_col);
-        // mvwprintw(ctx->shell->term_inner_win,
-        //           ctx->shell->term_buffer->num_of_lines - 1,
-        //           ctx->shell->curr_buf_idx + 2, "%c", ctx->key);
-        wrefresh(ctx->shell->term_inner_win);
-        ctx->shell->curr_buf_idx += 1;
+        buf[i] = c;
+        i++;
     }
-    else
-    {
-        wclear(ctx->shell->term_inner_win);
-        print_term_buf(ctx->edit_window, ctx->shell->term_buffer);
-        ctx->shell->buf[ctx->shell->curr_buf_idx] = '\n';
-        ctx->shell->buf[ctx->shell->curr_buf_idx + 1] = '\0';
+    buf[i - 1] = '\0';
+    append_term_ouput_to_buf(ctx->edit_window, buf, i - 1,
+                             ctx->shell->term_buffer);
+    // mvwprintw(ctx->edit_window, 15, 3, "%s", buf);
+    print_term_buf(ctx->shell->term_inner_win, ctx->shell->term_buffer);
+    // write(ctx->shell->masterfd, ctx->shell->buf,
+    //       ctx->shell->curr_buf_idx + 2);
 
-        // ctx->shell->term_buffer->current_line->buf_ = strdup(ctx->shell->buf);
-        memcpy(ctx->shell->term_buffer->current_line->buf_ + 2, ctx->shell->buf,
-               strlen(ctx->shell->buf));
+    memset(ctx->shell->buf, 0, BUFSIZ);
+    ctx->shell->term_buffer->current_col = 2;
+    int nol = ctx->shell->term_buffer->num_of_lines;
+    mvwprintw(ctx->edit_window, 20, 5, "nol: %i", nol);
+    mvwprintw(ctx->edit_window, 21, 5, "num_of_lines: %i",
+              ctx->shell->term_buffer->num_of_lines);
 
-        // memcpy(&ctx->shell->term_buffer->current_line->buf_[2],
-        // ctx->shell->buf,
-        //        ctx->shell->curr_buf_idx + 1);
+    // int nol = ctx->shell->term_buffer->num_of_lines;
+    wmove(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7,
+          ctx->shell->term_buffer->current_col);
 
-        LINE *curr_line = initialize_line();
-        ctx->shell->term_buffer->current_line->next = curr_line;
-        curr_line->prev = ctx->shell->term_buffer->current_line;
-        ctx->shell->term_buffer->current_line = curr_line;
-        ctx->shell->term_buffer->current_line->next = NULL;
-        ctx->shell->term_buffer->num_of_lines++;
-        // curr_line = initialize_line();
-        // ctx->shell->term_buffer->current_line = curr_line;
+    ctx->shell->curr_buf_idx = 0;
 
-        // ctx->shell->term_buffer->current_line->next = initialize_line();
-        // ctx->shell->term_buffer->current_line->next->prev =
-        //     ctx->shell->term_buffer->current_line;
-        // ctx->shell->term_buffer->current_line =
-        //     ctx->shell->term_buffer->current_line->next;
+    // napms(200);
 
-        FILE *fp = popen(ctx->shell->buf, "r");
-        char buf[BUFSIZ];
-        int i = 0;
-        char c;
-        while (fread(&c, 1, 1, fp))
-        {
-            buf[i] = c;
-            i++;
-        }
-        buf[i - 1] = '\0';
-        append_term_ouput_to_buf(ctx->edit_window, buf, i - 1,
-                                 ctx->shell->term_buffer);
-        // mvwprintw(ctx->edit_window, 15, 3, "%s", buf);
-        print_term_buf(ctx->shell->term_inner_win, ctx->shell->term_buffer);
-        // write(ctx->shell->masterfd, ctx->shell->buf,
-        //       ctx->shell->curr_buf_idx + 2);
-
-        memset(ctx->shell->buf, 0, BUFSIZ);
-        ctx->shell->term_buffer->current_col = 2;
-        int nol = ctx->shell->term_buffer->num_of_lines;
-        mvwprintw(ctx->edit_window, 20, 5, "nol: %i",
-                  nol);
-        mvwprintw(ctx->edit_window, 21, 5, "num_of_lines: %i",
-                  ctx->shell->term_buffer->num_of_lines);
-
-        // int nol = ctx->shell->term_buffer->num_of_lines;
-        wmove(ctx->shell->term_inner_win,
-              nol < 8 ? nol - 1 : 7,
-              ctx->shell->term_buffer->current_col);
-
-        ctx->shell->curr_buf_idx = 0;
-
-        napms(200);
-
-        // read_term_output_and_print_in_term(ctx);
-    }
     wnoutrefresh(ctx->edit_window);
     wnoutrefresh(ctx->shell->term_inner_win);
     doupdate();
@@ -222,26 +196,6 @@ void append_term_ouput_to_buf(WINDOW *win, char *buf, int buf_len,
     // mvwprintw(win, 7, 3, "%s", term_buf->first_line->next->next->buf_);
     // mvwprintw(win, 8, 3, "%s", term_buf->first_line->next->next->next->buf_);
     mvwprintw(win, 9, 3, "%s", term_buf->current_line->buf_);
-    //
-    // if (buf_len >= 99)
-    // {
-    //     while (buf_len > 0)
-    //     {
-    //         strncpy(curr_line->buf_, buf, buf_len > 99 ? rem_bytes :
-    //         buf_len); buf_len -= buf_len % rem_bytes; curr_line->next =
-    //         initialize_line(); curr_line = curr_line->next;
-    //         term_buf->current_line = curr_line;
-    //         term_buf->num_of_lines++;
-    //     }
-    // }
-    // else
-    // {
-    //     strncpy(term_buf->first_line->buf_, buf, buf_len);
-    //     curr_line->next = initialize_line();
-    //     curr_line = curr_line->next;
-    //     term_buf->current_line = curr_line;
-    //     term_buf->num_of_lines++;
-    // }
     memcpy(term_buf->current_line->buf_, "> ", 2);
 }
 
@@ -341,3 +295,30 @@ void read_term_output_and_print_in_term(APP_CONTEXT *ctx)
     wnoutrefresh(ctx->shell->term_inner_win);
     doupdate();
 }
+
+// void create_pseudo_terminal(APP_CONTEXT *ctx)
+// {
+//     int ret, master;
+//
+//     ret = forkpty(&master, NULL, NULL, NULL);
+//
+//     disable_echo(master);
+//
+//     if (ret == -1)
+//         perror("forkpty failed");
+//
+//     if (ret == 0)
+//     {
+//         setenv("PS1", "", 1);
+//         setenv("INPUTRC", "/dev/null", 1);
+//         execlp("sh", "sh", "--norc", "--noprofile", "-i", NULL);
+//         perror("execlp");
+//         _exit(1);
+//     }
+//
+//     fcntl(master, F_SETFL, O_NONBLOCK);
+//
+//     napms(200);
+//
+//     ctx->shell->masterfd = master;
+// }

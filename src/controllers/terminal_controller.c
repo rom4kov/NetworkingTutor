@@ -6,10 +6,14 @@
 void handle_terminal_input(APP_CONTEXT *ctx)
 {
     switch (ctx->key) {
-        // case KEY_RIGHT:
-        //     break;
-        // case KEY_LEFT:
-        //     break;
+        case KEY_UP:
+            break;
+        case KEY_DOWN:
+            break;
+        case KEY_RIGHT:
+            break;
+        case KEY_LEFT:
+            break;
         case KEY_F(1):
             curs_set(0);
             ctx->shell->terminal_focused = false;

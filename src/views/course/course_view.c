@@ -1,6 +1,7 @@
 #define _XOPEN_SOURCE_EXTENDED 1
 #define _GNU_SOURCE
 
+#include "../../controllers/controllers.h"
 #include "../../core/core.h"
 #include "../../course_tests/tests.h"
 #include "../../models/models.h"
@@ -58,7 +59,9 @@ void create_course_view(APP_CONTEXT *ctx)
     if (ctx->shell->terminal_active)
     {
         ctx->terminal_window = create_terminal_window(ctx);
+        print_term_buf(ctx->shell->term_inner_win, ctx->shell->term_buffer);
         wnoutrefresh(ctx->terminal_window);
+        wnoutrefresh(ctx->shell->term_inner_win);
     }
 
     wnoutrefresh(ctx->course_windows[2]);
@@ -109,17 +112,16 @@ WINDOW *create_terminal_window(APP_CONTEXT *ctx)
     wattroff(terminal_window, COLOR_PAIR(3));
 
     ctx->shell->term_inner_win =
-        derwin(terminal_window, 8, EDITOR_WIDTH - 2, 1, 1);
+        derwin(terminal_window, 8, EDITOR_WIDTH - 3, 1, 2);
 
     ctx->active_window_idx = SHELL_WINDOW_IDX;
     ctx->shell->terminal_focused = true;
     ctx->shell->terminal_active = true;
 
-    mvwprintw(terminal_window, 1, 1, ">");
-    wmove(terminal_window, 1, 3);
 
-    create_pseudo_terminal(ctx);
+    // create_pseudo_terminal(ctx);
     curs_set(2);
+    // wmove(ctx->terminal_window, 1, 8);
 
     wrefresh(terminal_window);
     return terminal_window;

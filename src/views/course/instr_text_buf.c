@@ -363,10 +363,9 @@ void read_end_of_course_page_into_buffer(APP_CONTEXT *ctx)
     wrefresh(ctx->course_windows[2]);
 }
 
-void read_window_text_into_buffer(APP_CONTEXT *ctx,
-                                           I_TEXT_BUFFER *header_tbuf,
-                                           int win_width, int win,
-                                           int course_id, char *add_text)
+void read_window_text_into_buffer(APP_CONTEXT *ctx, I_TEXT_BUFFER *header_tbuf,
+                                  int win_width, int win, int course_id,
+                                  char *add_text)
 {
     char *first_str = NULL;
     char *second_str = NULL;

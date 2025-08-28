@@ -88,6 +88,14 @@ int main(void)
     ctx->shell->curr_buf_idx = 0;
     ctx->shell->masterfd = -1;
     ctx->shell->term_buffer = initialize_buffer();
+    ctx->shell->term_buffer->num_of_lines = 1;
+    ctx->shell->term_buffer->first_line->buf_[0] = '>';
+    ctx->shell->term_buffer->first_line->buf_[1] = ' ';
+    ctx->shell->term_buffer->first_line->buf_[2] = '\0';
+    ctx->shell->term_buffer->current_line = ctx->shell->term_buffer->first_line;
+    ctx->shell->term_buffer->current_col = 2;
+    // ctx->shell->term_buffer->first_line->buf_[0] = '>';
+    // ctx->shell->term_buffer->first_line->buf_[1] = ' ';
 
     int curr_line;
     int curr_col;

@@ -129,7 +129,7 @@ void focus_instructions_window(RIGHT_PANEL_STATE *rps, int color_pair,
 //     print_completed_courses(ctx);
 // }
 
-void trim(char **str)
+void trim(char *str[])
 {
     char *end;
 

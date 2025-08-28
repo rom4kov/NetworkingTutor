@@ -135,7 +135,9 @@ void handle_course_input(APP_CONTEXT *ctx)
                 ctx->course_windows[2] = create_editor_window(ctx);
                 // mvwprintw(ctx->course_windows[2], 3, 3, "%s", "test");
                 ctx->terminal_window = create_terminal_window(ctx);
-                // wnoutrefresh(term_win);
+                print_term_buf(ctx->shell->term_inner_win, ctx->shell->term_buffer);
+                wmove(ctx->shell->term_inner_win, 0, 2);
+                wnoutrefresh(ctx->shell->term_inner_win);
                 doupdate();
                 break;
             case 10:

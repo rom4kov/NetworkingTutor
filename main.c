@@ -85,6 +85,8 @@ int main(void)
     ctx->shell->term_buffer->current_col = 2;
     ctx->shell->term_buffer->scroll_offset = 0;
     ctx->shell->cwd = "";
+    ctx->shell->home_dir = get_cwd();
+
     // ctx->shell->term_buffer->first_line->buf_[0] = '>';
     // ctx->shell->term_buffer->first_line->buf_[1] = ' ';
 

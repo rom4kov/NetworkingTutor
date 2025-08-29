@@ -130,6 +130,7 @@ typedef struct _pseudo_terminal
     WINDOW *term_inner_win;
     char buf[BUFSIZ];
     char *cwd;
+    char *home_dir;
     int curr_buf_idx;
     bool terminal_active;
     bool terminal_focused;

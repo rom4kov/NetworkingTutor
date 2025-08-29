@@ -8,6 +8,7 @@
 #include <ncurses.h>
 #include <pty.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -45,21 +46,26 @@ void delete_char_with_back_space(APP_CONTEXT *ctx)
     {
         int x = ctx->shell->curr_buf_idx;
         int nol = ctx->shell->term_buffer->num_of_lines;
+        int cwd_len = strlen(ctx->shell->cwd);
+
         for (int i = 0; i < strlen(ctx->shell->buf); i++)
         {
-            mvwaddch(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7, i + 2,
-                     ' ');
+            mvwaddch(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7,
+                     i + (cwd_len > 0 ? cwd_len + 1 : 0), ' ');
         }
         // mvwprintw(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7, 2, "%s",
         //           "                   ");
         memmove(&ctx->shell->buf[x - 1], &ctx->shell->buf[x],
                 strlen(ctx->shell->buf) - x + 1);
         memset(&ctx->shell->buf[strlen(ctx->shell->buf)], '\0', 1);
-        mvwprintw(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7, 2, "%s",
-                  ctx->shell->buf);
+
+        mvwprintw(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7,
+                  2 + (cwd_len > 0 ? cwd_len + 1 : 0), "%s", ctx->shell->buf);
+
         ctx->shell->curr_buf_idx--;
         ctx->shell->term_buffer->current_col--;
-        wmove(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7, x + 1);
+        wmove(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7,
+              x + 1 + (cwd_len > 0 ? cwd_len + 1 : 0));
         wrefresh(ctx->shell->term_inner_win);
     }
 }
@@ -103,8 +109,9 @@ void read_term_input_and_write_to_pty(APP_CONTEXT *ctx)
         print_term_buf(ctx->shell->term_inner_win, ctx->shell->term_buffer);
     }
 
-    mvwprintw(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7, 2, "%s",
-              ctx->shell->buf);
+    int cwd_len = strlen(ctx->shell->cwd);
+    mvwprintw(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7,
+              2 + (cwd_len > 0 ? cwd_len + 1 : 0), "%s", ctx->shell->buf);
 
     wmove(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7,
           ctx->shell->term_buffer->current_col);
@@ -116,27 +123,81 @@ void read_term_input_and_write_to_pty(APP_CONTEXT *ctx)
     doupdate();
 }
 
-void check_for_cd_cmd(APP_CONTEXT *ctx)
+bool cmd_is_cd(APP_CONTEXT *ctx)
 {
     char delim[] = " ";
     char *shell_buf = strdup(ctx->shell->buf);
 
     char *first_cmd_part = strsep(&shell_buf, delim);
 
-    mvwprintw(ctx->edit_window, 20, 60, "%s", "from cd func");
-
     if (strcmp(first_cmd_part, "cd") == 0)
     {
         ctx->shell->cwd = strdup(strsep(&shell_buf, delim));
-        chdir(ctx->shell->cwd);
-        mvwprintw(ctx->edit_window, 24, 60, "%s", ctx->shell->cwd);
-        mvwprintw(ctx->edit_window, 25, 60, "%lu", strlen(ctx->shell->cwd));
+        // ctx->shell->cwd[strlen(ctx->shell->cwd) - 1] = '\0';
+        return true;
     }
+
+    return false;
+}
+
+char *get_cwd(void)
+{
+    FILE *fp = popen("pwd", "r");
+    unsigned short max_path_len = 512;
+    char buf[max_path_len];
+    int i = 0;
+    char c = ' ';
+    while (fread(&c, 1, 1, fp) == 1)
+    {
+        if (i < max_path_len - 1)
+        {
+            buf[i++] = c;
+        }
+        else
+        {
+            break;
+        }
+    }
+    buf[i] = '\0';
+
+    char *cwd = strdup(buf);
+
+    pclose(fp);
+
+    return cwd;
+}
+
+char *get_cwd_base_name()
+{
+    FILE *fp = popen("pwd | xargs basename", "r");
+    unsigned short max_path_len = 512;
+    char buf[max_path_len];
+    int i = 0;
+    char c = ' ';
+    while (fread(&c, 1, 1, fp) == 1)
+    {
+        if (i < max_path_len - 1)
+        {
+            buf[i++] = c;
+        }
+        else
+        {
+            break;
+        }
+    }
+    buf[i] = '\0';
+
+    char *cwd_basename = strdup(buf);
+
+    pclose(fp);
+
+    return cwd_basename;
 }
 
 void submit_command(APP_CONTEXT *ctx)
 {
     werase(ctx->shell->term_inner_win);
+    int cwd_len = strlen(ctx->shell->cwd);
 
     LINE *curr_line = initialize_line();
     ctx->shell->term_buffer->current_line->next = curr_line;
@@ -145,40 +206,84 @@ void submit_command(APP_CONTEXT *ctx)
     ctx->shell->term_buffer->current_line->next = NULL;
     ctx->shell->term_buffer->num_of_lines++;
 
-    char *command = strdup(ctx->shell->buf);
-    strncat(command, " 2>&1", 5);
-    command[ctx->shell->curr_buf_idx + 5] = '\n';
-    command[ctx->shell->curr_buf_idx + 6] = '\0';
+    // char *command = strdup(ctx->shell->buf);
+    // strncat(command, " 2>&1", 5);
+    // command[ctx->shell->curr_buf_idx + 5] = '\n';
+    // command[ctx->shell->curr_buf_idx + 6] = '\0';
+
+    size_t len = strlen(ctx->shell->buf);
+    char *command =
+        malloc(len + 1 + 5 + 2); // original + null + " 2>&1" + '\n' + '\0'
+    if (!command)
+    {
+        perror("malloc");
+        exit(1);
+    }
+
+    strcpy(command, ctx->shell->buf);
+    strcat(command, " 2>&1");
+    command[len + 5] = '\n';
+    command[len + 6] = '\0';
+
     FILE *fp = popen(command, "r");
     char buf[BUFSIZ];
     int i = 0;
-    char c;
-    while (fread(&c, 1, 1, fp))
+    char c = ' ';
+    while (fread(&c, 1, 1, fp) == 1)
     {
-        buf[i] = c;
-        i++;
+        if (i < BUFSIZ - 1)
+        {
+            buf[i++] = c;
+        }
+        else
+        {
+            // buffer full, maybe flush or break
+            break;
+        }
     }
-    buf[i - 1] = '\0';
+    if (i > 0)
+        buf[i - 1] = '\0';
+    else
+        buf[i] = '\0';
+
     pclose(fp);
 
-    check_for_cd_cmd(ctx);
+    ctx->shell->buf[ctx->shell->curr_buf_idx] = '\0';
+
+    if (cmd_is_cd(ctx))
+    {
+        chdir(ctx->shell->cwd);
+        mvwprintw(ctx->edit_window, 28, 5, "get_cwd: %s", get_cwd());
+        mvwprintw(ctx->edit_window, 29, 5, "home_dir: %s",
+                  ctx->shell->home_dir);
+        if (strcmp(get_cwd(), ctx->shell->home_dir) == 0)
+        {
+            ctx->shell->cwd = strdup("");
+        }
+        else {
+            ctx->shell->cwd = get_cwd_base_name();
+            ctx->shell->cwd[strlen(ctx->shell->cwd) - 1] = '\0';
+        }
+    }
 
     ctx->shell->buf[ctx->shell->curr_buf_idx] = '\n';
     ctx->shell->buf[ctx->shell->curr_buf_idx + 1] = '\0';
 
-
-    memcpy(ctx->shell->term_buffer->current_line->prev->buf_ + 2,
+    memcpy(ctx->shell->term_buffer->current_line->prev->buf_ + cwd_len +
+               (cwd_len > 0 ? 3 : 2),
            ctx->shell->buf, strlen(ctx->shell->buf));
 
     append_term_ouput_to_buf(ctx->edit_window, buf, i - 1,
-                             ctx->shell->term_buffer);
+                             ctx->shell->term_buffer, ctx->shell->cwd);
 
     print_term_buf(ctx->shell->term_inner_win, ctx->shell->term_buffer);
 
     mvwprintw(ctx->edit_window, 23, 5, "buf: %s", ctx->shell->buf);
 
     memset(ctx->shell->buf, 0, BUFSIZ);
-    ctx->shell->term_buffer->current_col = 2;
+    cwd_len = strlen(ctx->shell->cwd);
+    mvwprintw(ctx->edit_window, 15, 5, "cwd_len: %i", cwd_len);
+    ctx->shell->term_buffer->current_col = cwd_len + (cwd_len > 0 ? 3 : 2);
     int nol = ctx->shell->term_buffer->num_of_lines;
     mvwprintw(ctx->edit_window, 20, 5, "nol: %i", nol);
     mvwprintw(ctx->edit_window, 21, 5, "num_of_lines: %i",
@@ -195,15 +300,18 @@ void submit_command(APP_CONTEXT *ctx)
 }
 
 void append_term_ouput_to_buf(WINDOW *win, char *buf, int buf_len,
-                              TEXT_BUFFER *term_buf)
+                              TEXT_BUFFER *term_buf, char *cwd)
 {
+    int cwd_len = strlen(cwd);
     int j = 0;
     int k = 0;
     int line_number = 0;
+    mvwprintw(win, 3, 3, "buf_len :: %i", buf_len);
 
     LINE *curr_line = initialize_line();
 
     curr_line = term_buf->current_line;
+    mvwprintw(win, 4, 3, "curr_line->buf_ :: %s", curr_line->buf_);
 
     while (j < buf_len + 1)
     {
@@ -254,8 +362,17 @@ void append_term_ouput_to_buf(WINDOW *win, char *buf, int buf_len,
         k++;
     }
 
+    char *new_prompt = malloc(cwd_len + 4);
+    if (cwd_len > 0)
+    {
+        snprintf(new_prompt, cwd_len + 4, "%s > ", cwd);
+        memcpy(term_buf->current_line->buf_, new_prompt, cwd_len + 4);
+    }
+    else
+    {
+        memcpy(term_buf->current_line->buf_, "> ", 2);
+    }
     mvwprintw(win, 9, 3, "%s", term_buf->current_line->buf_);
-    memcpy(term_buf->current_line->buf_, "> ", 2);
 }
 
 void print_term_buf(WINDOW *term_win, TEXT_BUFFER *term_buf)

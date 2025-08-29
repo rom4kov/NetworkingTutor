@@ -73,4 +73,6 @@ void scroll_up(APP_CONTEXT *ctx);
 void scroll_down(APP_CONTEXT *ctx);
 void delete_char_with_back_space(APP_CONTEXT *ctx);
 void submit_command(APP_CONTEXT *ctx);
-void append_term_ouput_to_buf(WINDOW *win, char *buf, int buf_len, TEXT_BUFFER *term_buf);
+void append_term_ouput_to_buf(WINDOW *win, char *buf, int buf_len,
+                              TEXT_BUFFER *term_buf, char *cwd);
+char *get_cwd(void);

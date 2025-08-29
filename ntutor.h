@@ -1,3 +1,4 @@
+#define _DEFAULT_SOURCE 1
 #define _POSIX_C_SOURCE 200809L
 #define COLOR_GREY 16
 #define COLOR_ORANGE 17

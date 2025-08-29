@@ -195,43 +195,6 @@ char *trunc_str(char *str, int win_width, int offset)
     return str_copy;
 }
 
-// Strip ANSI escape sequences (in-place).
-// buf: input buffer (null-terminated or not).
-// len: length of data in buffer.
-// Returns new length after stripping.
-int strip_ansi_escape_codes(char *buf, int len) {
-    char *src = buf;
-    char *dst = buf;
-    char *end = buf + len;
-
-    while (src < end) {
-        if (*src == '\x1b') {  // ESC
-            src++;
-            if (src < end && *src == '[') {
-                src++;
-                // Skip until we reach a letter (final byte of CSI sequence)
-                while (src < end && !isalpha((unsigned char)*src)) {
-                    src++;
-                }
-                if (src < end) {
-                    src++; // skip the final letter too
-                }
-            } else if (src < end && (*src == '(' || *src == ')')) {
-                // ESC ( B type sequences
-                src += 2;
-            } else {
-                // Unknown ESC sequence, skip one char
-                src++;
-            }
-        } else {
-            *dst++ = *src++;
-        }
-    }
-
-    return (int)(dst - buf);
-}
-
-
 int c_round(float x)
 {
     float fract = x - floor(x);

@@ -1,6 +1,4 @@
-#define _XOPEN_SOURCE_EXTENDED 1
-#define _GNU_SOURCE
-
+#include "../../../ntutor.h"
 #include "../../controllers/controllers.h"
 #include "../../core/core.h"
 #include "../../course_tests/tests.h"
@@ -16,14 +14,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
-
-#define WINDOW_COUNT 4
-#define WU COLS / 12 // WU for WIDTH_UNIT
-#define WIDTH_REMAINDER COLS % WU
-#define EXPLORER_WIDTH WU + WU / 2
-#define EDITOR_WIDTH ((WU * 7 + 4) - (WU + WU / 2))
-#define EDIT_WIN_WIDTH WU * 5 + WU / 2
-#define SHELL_WINDOW_IDX 4
 
 void create_course_view(APP_CONTEXT *ctx)
 {

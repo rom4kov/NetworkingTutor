@@ -455,7 +455,11 @@ void handle_course_input(APP_CONTEXT *ctx)
                 break;
             case '\n':
                 ctx->shell->terminal_focused = true;
+                int nol = ctx->shell->term_buffer->num_of_lines;
+                wmove(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7,
+                      ctx->shell->term_buffer->current_col);
                 curs_set(2);
+                wrefresh(ctx->shell->term_inner_win);
                 break;
             case 't':
                 curs_set(0);

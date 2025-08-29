@@ -1,3 +1,4 @@
+#include "ntutor.h"
 #include "src/core/core.h"
 #include "src/data/data_access_layer.h"
 #include "src/models/models.h"
@@ -13,17 +14,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#define COLOR_GREY 16
-#define COLOR_ORANGE 17
-#define COLOR_DARKGREY 18
-#define COLOR_TEALGREEN 19
-#define COLOR_BERMUDA 20
-
-#define START_WINDOW_COUNT 6
-
-#define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
-#define CTRLD 4
 
 int main(void)
 {
@@ -86,7 +76,6 @@ int main(void)
     ctx->shell = calloc(1, sizeof(SHELL));
     ctx->shell->terminal_active = false;
     ctx->shell->curr_buf_idx = 0;
-    ctx->shell->masterfd = -1;
     ctx->shell->term_buffer = initialize_buffer();
     ctx->shell->term_buffer->num_of_lines = 1;
     ctx->shell->term_buffer->first_line->buf_[0] = '>';
@@ -94,6 +83,8 @@ int main(void)
     ctx->shell->term_buffer->first_line->buf_[2] = '\0';
     ctx->shell->term_buffer->current_line = ctx->shell->term_buffer->first_line;
     ctx->shell->term_buffer->current_col = 2;
+    ctx->shell->term_buffer->scroll_offset = 0;
+    ctx->shell->cwd = "";
     // ctx->shell->term_buffer->first_line->buf_[0] = '>';
     // ctx->shell->term_buffer->first_line->buf_[1] = ' ';
 

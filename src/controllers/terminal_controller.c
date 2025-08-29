@@ -8,14 +8,19 @@ void handle_terminal_input(APP_CONTEXT *ctx)
 {
     switch (ctx->key) {
         case KEY_UP:
+            scroll_up(ctx);
             break;
         case KEY_DOWN:
+            scroll_down(ctx);
             break;
         case KEY_RIGHT:
             move_cursor_right(ctx);
             break;
         case KEY_LEFT:
             move_cursor_left(ctx);
+            break;
+        case KEY_BACKSPACE:
+            delete_char_with_back_space(ctx);
             break;
         case '\n':
             submit_command(ctx);
@@ -25,9 +30,6 @@ void handle_terminal_input(APP_CONTEXT *ctx)
             ctx->shell->terminal_focused = false;
             break;
         default:
-            // mvwprintw(ctx->terminal_window, 1, ctx->shell->curr_buf_idx + 2, "%c",
-            //           ctx->key);
-            // wrefresh(ctx->terminal_window);
             read_term_input_and_write_to_pty(ctx);
             break;
     }

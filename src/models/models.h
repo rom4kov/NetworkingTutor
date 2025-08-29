@@ -84,6 +84,7 @@ typedef struct text_buffer
     unsigned short curr_line_nr;
     unsigned short current_col;
     unsigned short num_of_lines;
+    unsigned short scroll_offset;
 } TEXT_BUFFER;
 
 typedef struct instructions_text_buffer
@@ -127,8 +128,8 @@ typedef struct _pseudo_terminal
 {
     TEXT_BUFFER *term_buffer;
     WINDOW *term_inner_win;
-    int masterfd;
     char buf[BUFSIZ];
+    char *cwd;
     int curr_buf_idx;
     bool terminal_active;
     bool terminal_focused;

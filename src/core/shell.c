@@ -1,4 +1,4 @@
-#define _POSIX_C_SOURCE 200809L
+#include "../../ntutor.h"
 #include "../controllers/controllers.h"
 #include "../core/core.h"
 #include "../models/models.h"
@@ -38,22 +38,75 @@ void move_cursor_right(APP_CONTEXT *ctx)
     }
 }
 
+void delete_char_with_back_space(APP_CONTEXT *ctx)
+{
+    if (ctx->shell->curr_buf_idx > 0)
+    {
+        int x = ctx->shell->curr_buf_idx;
+        int nol = ctx->shell->term_buffer->num_of_lines;
+        for (int i = 0; i < strlen(ctx->shell->buf); i++)
+        {
+            mvwaddch(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7, i + 2,
+                     ' ');
+        }
+        // mvwprintw(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7, 2, "%s",
+        //           "                   ");
+        memmove(&ctx->shell->buf[x - 1], &ctx->shell->buf[x],
+                strlen(ctx->shell->buf) - x + 1);
+        memset(&ctx->shell->buf[strlen(ctx->shell->buf)], '\0', 1);
+        mvwprintw(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7, 2, "%s",
+                  ctx->shell->buf);
+        ctx->shell->curr_buf_idx--;
+        ctx->shell->term_buffer->current_col--;
+        wmove(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7, x + 1);
+        wrefresh(ctx->shell->term_inner_win);
+    }
+}
+
+void scroll_up(APP_CONTEXT *ctx)
+{
+    if (ctx->shell->term_buffer->scroll_offset <
+        ctx->shell->term_buffer->num_of_lines - 8)
+    {
+        ctx->shell->term_buffer->scroll_offset++;
+        print_term_buf(ctx->shell->term_inner_win, ctx->shell->term_buffer);
+        wrefresh(ctx->shell->term_inner_win);
+    }
+}
+
+void scroll_down(APP_CONTEXT *ctx)
+{
+    if (ctx->shell->term_buffer->scroll_offset > 0)
+    {
+        werase(ctx->shell->term_inner_win);
+        ctx->shell->term_buffer->scroll_offset--;
+        print_term_buf(ctx->shell->term_inner_win, ctx->shell->term_buffer);
+        wrefresh(ctx->shell->term_inner_win);
+    }
+}
+
 void read_term_input_and_write_to_pty(APP_CONTEXT *ctx)
 {
     int nol = ctx->shell->term_buffer->num_of_lines;
-    int ccol = ctx->shell->term_buffer->current_col;
     int x = ctx->shell->curr_buf_idx;
 
-    memmove(&ctx->shell->buf[x + 1], &ctx->shell->buf[x],
+    memmove(&ctx->shell->buf[x + 2], &ctx->shell->buf[x + 1],
             strlen(ctx->shell->buf) - x);
     ctx->shell->buf[x] = ctx->key;
     ctx->shell->term_buffer->current_col++;
+
+    if (ctx->shell->term_buffer->scroll_offset > 0)
+    {
+        ctx->shell->term_buffer->scroll_offset = 0;
+        werase(ctx->shell->term_inner_win);
+        print_term_buf(ctx->shell->term_inner_win, ctx->shell->term_buffer);
+    }
 
     // ctx->shell->buf[ctx->shell->curr_buf_idx] = ctx->key;
     // ctx->shell->term_buffer->current_line
     //     ->buf_[ctx->shell->term_buffer->current_col] = ctx->key;
 
-    mvwprintw(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7, ccol, "%s",
+    mvwprintw(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7, 2, "%s",
               ctx->shell->buf);
 
     wmove(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7,
@@ -68,13 +121,7 @@ void read_term_input_and_write_to_pty(APP_CONTEXT *ctx)
 
 void submit_command(APP_CONTEXT *ctx)
 {
-    wclear(ctx->shell->term_inner_win);
-    print_term_buf(ctx->edit_window, ctx->shell->term_buffer);
-    ctx->shell->buf[ctx->shell->curr_buf_idx] = '\n';
-    ctx->shell->buf[ctx->shell->curr_buf_idx + 1] = '\0';
-
-    memcpy(ctx->shell->term_buffer->current_line->buf_ + 2, ctx->shell->buf,
-           strlen(ctx->shell->buf));
+    werase(ctx->shell->term_inner_win);
 
     LINE *curr_line = initialize_line();
     ctx->shell->term_buffer->current_line->next = curr_line;
@@ -83,7 +130,11 @@ void submit_command(APP_CONTEXT *ctx)
     ctx->shell->term_buffer->current_line->next = NULL;
     ctx->shell->term_buffer->num_of_lines++;
 
-    FILE *fp = popen(ctx->shell->buf, "r");
+    char *command = strdup(ctx->shell->buf);
+    strncat(command, " 2>&1", 5);
+    command[ctx->shell->curr_buf_idx + 5] = '\n';
+    command[ctx->shell->curr_buf_idx + 6] = '\0';
+    FILE *fp = popen(command, "r");
     char buf[BUFSIZ];
     int i = 0;
     char c;
@@ -93,6 +144,14 @@ void submit_command(APP_CONTEXT *ctx)
         i++;
     }
     buf[i - 1] = '\0';
+    pclose(fp);
+
+    ctx->shell->buf[ctx->shell->curr_buf_idx] = '\n';
+    ctx->shell->buf[ctx->shell->curr_buf_idx + 1] = '\0';
+
+    memcpy(ctx->shell->term_buffer->current_line->prev->buf_ + 2,
+           ctx->shell->buf, strlen(ctx->shell->buf));
+
     append_term_ouput_to_buf(ctx->edit_window, buf, i - 1,
                              ctx->shell->term_buffer);
     // mvwprintw(ctx->edit_window, 15, 3, "%s", buf);
@@ -100,6 +159,8 @@ void submit_command(APP_CONTEXT *ctx)
     // write(ctx->shell->masterfd, ctx->shell->buf,
     //       ctx->shell->curr_buf_idx + 2);
 
+    mvwprintw(ctx->edit_window, 23, 5, "buf: %s", ctx->shell->buf);
+    ;
     memset(ctx->shell->buf, 0, BUFSIZ);
     ctx->shell->term_buffer->current_col = 2;
     int nol = ctx->shell->term_buffer->num_of_lines;
@@ -173,7 +234,7 @@ void append_term_ouput_to_buf(WINDOW *win, char *buf, int buf_len,
             curr_line = initialize_line();
             continue;
         }
-        else if (k > 90)
+        else if (k > EDITOR_WIDTH)
         {
             k = 0;
             term_buf->current_line->next = curr_line;
@@ -204,6 +265,8 @@ void print_term_buf(WINDOW *term_win, TEXT_BUFFER *term_buf)
     // wclear(term_win);
     unsigned int nol = term_buf->num_of_lines;
     unsigned int start_line = nol < 8 ? 0 : nol - 8;
+
+    start_line -= term_buf->scroll_offset;
 
     LINE *curr_line = term_buf->first_line;
 

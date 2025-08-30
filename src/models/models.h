@@ -8,6 +8,7 @@
 #include <CUnit/Basic.h>
 #include <CUnit/CUError.h>
 #include <stdio.h>
+#include <sys/types.h>
 
 #define START_WINDOW_COUNT 6
 #define COURSE_WINDOW_COUNT 5
@@ -169,71 +170,89 @@ typedef struct _right_panel_state
 
 typedef struct _app_context
 {
-    sqlite3 *db;
-    WINDOW *greeter_screen;
-    WINDOW *greeter_ascii_window;
-    WINDOW *start_windows[START_WINDOW_COUNT];
-    WINDOW *course_windows[COURSE_WINDOW_COUNT];
-    WINDOW *terminal_window;
-    WINDOW *progress_windows[PROGRESS_WINDOW_COUNT];
-    WINDOW *all_courses_windows[ALL_COURSES_WINDOW_COUNT];
-    WINDOW *keybindings_windows[ALL_COURSES_WINDOW_COUNT];
-    WINDOW *line_num_win;
-    WINDOW *edit_window;
-    WINDOW *active_window;
-    USER_DATA *user_data;
-    SHELL *shell;
-    RIGHT_PANEL_STATE *rp_state;
-    COURSE *courses;
-    MENU *greeter_menu;
-    MENU *start_menu;
-    MENU *explorer_menu;
-    ITEM **menu_items;
-    ITEM *curr_item;
-    FORM *user_form;
-    FIELD *user_form_fields;
-    FILE_TREE *file_tree;
-    FILE *file;
-    char *filename;
-    char *curr_file_path;
-    char *current_course;
-    TEXT_BUFFER *t_buffer;
-    I_TEXT_BUFFER *intro_buffer;
-    I_TEXT_BUFFER *card_buffers[10];
-    CU_ErrorCode ec; 
-    CU_pSuite sp[15];
-    CU_pRunSummary run_sum;
-    int key;
-    int active_window_idx;
-    int current_user_id;
-    int current_course_id;
-    int y, x;
-    int scroll_offset;
-    int lines_to_print;
-    int curr_line;
-    int curr_col;
-    bool running;
-    bool greeter_needs_redraw;
-    bool start_needs_redraw;
-    bool course_needs_redraw;
-    bool progress_needs_redraw;
-    bool all_courses_needs_redraw;
-    bool keybindings_needs_redraw;
-    bool greeter_view_active;
-    bool start_view_active;
-    bool course_view_active;
-    bool progress_view_active;
-    bool all_courses_view_active;
-    bool keybindings_view_active;
-    bool first_greeter_draw;
-    bool first_start_draw;
-    bool first_course_draw;
-    bool first_progress_draw;
-    bool first_all_courses_draw;
-    bool first_keybindings_draw;
-    bool editor_mode;
-    bool explorer_mode;
-    bool is_in_failure_list;
-    bool user_form_active;
-    bool terminal_active;
+  sqlite3 *db;
+  WINDOW *greeter_screen;
+  WINDOW *greeter_ascii_window;
+  WINDOW *start_windows[START_WINDOW_COUNT];
+  WINDOW *course_windows[COURSE_WINDOW_COUNT];
+  WINDOW *terminal_window;
+  WINDOW *progress_windows[PROGRESS_WINDOW_COUNT];
+  WINDOW *all_courses_windows[ALL_COURSES_WINDOW_COUNT];
+  WINDOW *keybindings_windows[ALL_COURSES_WINDOW_COUNT];
+  WINDOW *line_num_win;
+  WINDOW *edit_window;
+  WINDOW *active_window;
+  USER_DATA *user_data;
+  SHELL *shell;
+  RIGHT_PANEL_STATE *rp_state;
+  COURSE *courses;
+  MENU *greeter_menu;
+  MENU *start_menu;
+  MENU *explorer_menu;
+  ITEM **menu_items;
+  ITEM *curr_item;
+  FORM *user_form;
+  FIELD *user_form_fields;
+  FILE_TREE *file_tree;
+  FILE *file;
+  char *filename;
+  char *curr_file_path;
+  char *current_course;
+  TEXT_BUFFER *t_buffer;
+  I_TEXT_BUFFER *intro_buffer;
+  I_TEXT_BUFFER *card_buffers[10];
+  CU_ErrorCode ec; 
+  CU_pSuite sp[15];
+  CU_pRunSummary run_sum;
+  int key;
+  int active_window_idx;
+  int current_user_id;
+  int current_course_id;
+  int y, x;
+  int scroll_offset;
+  int lines_to_print;
+  int curr_line;
+  int curr_col;
+  bool running;
+  bool greeter_needs_redraw;
+  bool start_needs_redraw;
+  bool course_needs_redraw;
+  bool progress_needs_redraw;
+  bool all_courses_needs_redraw;
+  bool keybindings_needs_redraw;
+  bool greeter_view_active;
+  bool start_view_active;
+  bool course_view_active;
+  bool progress_view_active;
+  bool all_courses_view_active;
+  bool keybindings_view_active;
+  bool first_greeter_draw;
+  bool first_start_draw;
+  bool first_course_draw;
+  bool first_progress_draw;
+  bool first_all_courses_draw;
+  bool first_keybindings_draw;
+  bool editor_mode;
+  bool explorer_mode;
+  bool is_in_failure_list;
+  bool user_form_active;
+  bool terminal_active;
 } APP_CONTEXT;
+
+typedef struct _thread_args
+{
+  char *cmd;
+  FILE *file;
+  pid_t *pid;
+  WINDOW *win;
+} THREAD_ARGS;
+
+typedef struct _output_thread_args
+{
+  FILE *file;
+  pid_t *pid;
+  APP_CONTEXT *ctx;
+  char buf[BUFSIZ];
+  WINDOW *win;
+  unsigned short stop_flag;
+} OUTPUT_THREAD_ARGS;

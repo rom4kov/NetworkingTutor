@@ -4,12 +4,16 @@
 #include "../models/models.h"
 
 #include <curses.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <ncurses.h>
+#include <pthread.h>
 #include <pty.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 void move_cursor_left(APP_CONTEXT *ctx)
@@ -51,7 +55,7 @@ void delete_char_with_back_space(APP_CONTEXT *ctx)
         for (int i = 0; i < strlen(ctx->shell->buf); i++)
         {
             mvwaddch(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7,
-                     i + (cwd_len > 0 ? cwd_len + 1 : 0), ' ');
+                     i + (cwd_len > 0 ? cwd_len + 3 : 2), ' ');
         }
         // mvwprintw(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7, 2, "%s",
         //           "                   ");
@@ -130,7 +134,20 @@ bool cmd_is_cd(APP_CONTEXT *ctx)
 
     char *first_cmd_part = strsep(&shell_buf, delim);
 
-    if (strcmp(first_cmd_part, "cd") == 0)
+    if (strcmp(first_cmd_part, ctx->shell->buf) == 0)
+    {
+        ctx->shell->cwd = strdup("");
+        int rv = (chdir(ctx->shell->home_dir));
+        mvwprintw(ctx->edit_window, 37, 4, "home dir: %s",
+                  ctx->shell->home_dir);
+        if (rv == -1)
+            mvwprintw(ctx->edit_window, 38, 4, "chdir error: %s",
+                      strerror(errno));
+        else if (rv == 0)
+            mvwprintw(ctx->edit_window, 38, 4, "chdir success");
+        return false;
+    }
+    else if (strcmp(first_cmd_part, "cd") == 0)
     {
         ctx->shell->cwd = strdup(strsep(&shell_buf, delim));
         // ctx->shell->cwd[strlen(ctx->shell->cwd) - 1] = '\0';
@@ -158,7 +175,7 @@ char *get_cwd(void)
             break;
         }
     }
-    buf[i] = '\0';
+    buf[i - 1] = '\0';
 
     char *cwd = strdup(buf);
 
@@ -198,6 +215,7 @@ void submit_command(APP_CONTEXT *ctx)
 {
     werase(ctx->shell->term_inner_win);
     int cwd_len = strlen(ctx->shell->cwd);
+    FILE *out = NULL;
 
     LINE *curr_line = initialize_line();
     ctx->shell->term_buffer->current_line->next = curr_line;
@@ -225,28 +243,64 @@ void submit_command(APP_CONTEXT *ctx)
     command[len + 5] = '\n';
     command[len + 6] = '\0';
 
-    FILE *fp = popen(command, "r");
     char buf[BUFSIZ];
     int i = 0;
     char c = ' ';
-    while (fread(&c, 1, 1, fp) == 1)
+    if (command[0] == '.' && command[1] == '/')
     {
-        if (i < BUFSIZ - 1)
-        {
-            buf[i++] = c;
-        }
-        else
-        {
-            // buffer full, maybe flush or break
-            break;
-        }
-    }
-    if (i > 0)
-        buf[i - 1] = '\0';
-    else
-        buf[i] = '\0';
+        mvwprintw(ctx->edit_window, 1, 30, "Before running program");
 
-    pclose(fp);
+        THREAD_ARGS args = {.cmd = command,
+                            .file = out,
+                            .pid = malloc(sizeof(pid_t)),
+                            .win = ctx->edit_window};
+        pthread_t run_executable;
+
+        pthread_create(&run_executable, NULL, popen_w_pid_ret, &args);
+
+        pthread_join(run_executable, (void **)&args);
+        napms(200);
+
+        OUTPUT_THREAD_ARGS output_thr_args = {0};
+        output_thr_args.file = args.file;
+        output_thr_args.pid = malloc(sizeof(pid_t));
+        output_thr_args.ctx = ctx;
+        output_thr_args.win = ctx->edit_window;
+        output_thr_args.stop_flag = 0;
+
+        pthread_t check_for_output;
+        pthread_create(&check_for_output, NULL, check_running_proc_for_output,
+                       &output_thr_args);
+        // output_thr_args.stop_flag = 1;
+        pthread_join(check_for_output, NULL);
+        mvwprintw(ctx->edit_window, 4, 30, "Child pid: %i\n", *args.pid);
+        wrefresh(ctx->edit_window);
+    }
+    else
+    {
+        FILE *fp = popen(command, "r");
+        while (fread(&c, 1, 1, fp) == 1)
+        {
+            if (i < BUFSIZ - 1)
+            {
+                buf[i++] = c;
+            }
+            else
+            {
+                // buffer full, maybe flush or break
+                break;
+            }
+        }
+        if (i > 0)
+            buf[i - 1] = '\0';
+        else
+            buf[i] = '\0';
+
+        pclose(fp);
+    }
+
+    mvwprintw(ctx->edit_window, 23, 5, "output: %s", command);
+    wrefresh(ctx->edit_window);
 
     ctx->shell->buf[ctx->shell->curr_buf_idx] = '\0';
 
@@ -260,7 +314,8 @@ void submit_command(APP_CONTEXT *ctx)
         {
             ctx->shell->cwd = strdup("");
         }
-        else {
+        else
+        {
             ctx->shell->cwd = get_cwd_base_name();
             ctx->shell->cwd[strlen(ctx->shell->cwd) - 1] = '\0';
         }
@@ -331,6 +386,11 @@ void append_term_ouput_to_buf(WINDOW *win, char *buf, int buf_len,
             term_buf->current_line->next = NULL;
             break;
         }
+        else if (buf[j] == '\r')
+        {
+            j++;
+            continue;
+        }
         else if (buf[j] == '\n')
         {
             curr_line->buf_[k] = '\n';
@@ -344,7 +404,7 @@ void append_term_ouput_to_buf(WINDOW *win, char *buf, int buf_len,
             curr_line = initialize_line();
             continue;
         }
-        else if (k > EDITOR_WIDTH)
+        else if (k > (EDITOR_WIDTH - 20))
         {
             k = 0;
             term_buf->current_line->next = curr_line;
@@ -396,4 +456,134 @@ void print_term_buf(WINDOW *term_win, TEXT_BUFFER *term_buf)
         curr_line = curr_line->next;
         i++;
     }
+}
+
+void *popen_w_pid_ret(void *arguments)
+{
+    THREAD_ARGS *args = (THREAD_ARGS *)arguments;
+    mvwprintw(args->win, 9, 30, "%s", "test popen_w_pid_ret");
+    wrefresh(args->win);
+    int pipefd[2];
+    if (pipe(pipefd) == -1)
+    {
+        perror("pipe");
+        return NULL;
+    }
+    mvwprintw(args->win, 10, 30, "%s", "test popen_w_pid_ret after pipe");
+    wrefresh(args->win);
+
+    *args->pid = fork();
+    if (*args->pid < 0)
+    {
+        perror("fork");
+        return NULL;
+    }
+    mvwprintw(args->win, 11, 30, "%s", "test popen_w_pid_ret after fork");
+    wrefresh(args->win);
+
+    if (*args->pid == 0)
+    {
+        // Child
+        close(pipefd[0]);               // close read end
+        dup2(pipefd[1], STDOUT_FILENO); // redirect stdout to pipe
+        dup2(pipefd[1], STDERR_FILENO); // redirect stderr too (optional)
+        close(pipefd[1]);
+
+        execl("/bin/sh", "sh", "-c", args->cmd, (char *)NULL);
+        perror("execl"); // only reached if exec fails
+        _exit(1);
+    }
+    mvwprintw(args->win, 12, 30, "%s", "test popen_w_pid_ret after execl");
+    wrefresh(args->win);
+
+    // Parent
+    close(pipefd[1]); // close write end
+
+    int status;
+    pid_t ret = waitpid(*args->pid, &status, WNOHANG);
+    if (ret == 0)
+    {
+        // child is still running
+    }
+    else if (ret == *args->pid)
+    {
+        // child terminated
+    }
+
+    args->file = fdopen(pipefd[0], "r");
+    if (!args->file)
+    {
+        perror("fdopen");
+        close(pipefd[0]);
+        return NULL;
+    }
+
+    fcntl(pipefd[0], F_SETFL, O_NONBLOCK);
+
+    return (void *)args; // parent gets child PID directly
+}
+
+void run_output_funcs(APP_CONTEXT *ctx, char buf[BUFSIZ])
+{
+    int cwd_len = strlen(ctx->shell->cwd);
+
+    ctx->shell->buf[ctx->shell->curr_buf_idx] = '\n';
+    ctx->shell->buf[ctx->shell->curr_buf_idx + 1] = '\0';
+
+    memcpy(ctx->shell->term_buffer->current_line->prev->buf_ + cwd_len +
+               (cwd_len > 0 ? 3 : 2),
+           ctx->shell->buf, strlen(ctx->shell->buf));
+
+    append_term_ouput_to_buf(ctx->edit_window, buf, strlen(buf) - 1,
+                             ctx->shell->term_buffer, ctx->shell->cwd);
+
+    print_term_buf(ctx->shell->term_inner_win, ctx->shell->term_buffer);
+
+    mvwprintw(ctx->edit_window, 23, 5, "buf: %s", ctx->shell->buf);
+
+    memset(ctx->shell->buf, 0, BUFSIZ);
+    cwd_len = strlen(ctx->shell->cwd);
+    mvwprintw(ctx->edit_window, 15, 5, "cwd_len: %i", cwd_len);
+    ctx->shell->term_buffer->current_col = cwd_len + (cwd_len > 0 ? 3 : 2);
+    int nol = ctx->shell->term_buffer->num_of_lines;
+    mvwprintw(ctx->edit_window, 20, 5, "nol: %i", nol);
+    mvwprintw(ctx->edit_window, 21, 5, "num_of_lines: %i",
+              ctx->shell->term_buffer->num_of_lines);
+
+    wmove(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7,
+          ctx->shell->term_buffer->current_col);
+
+    ctx->shell->curr_buf_idx = 0;
+
+    wnoutrefresh(ctx->edit_window);
+    wnoutrefresh(ctx->shell->term_inner_win);
+    doupdate();
+}
+
+void *check_running_proc_for_output(void *arg)
+{
+    OUTPUT_THREAD_ARGS *args = (OUTPUT_THREAD_ARGS *)arg;
+    char buf[BUFSIZ];
+    mvwprintw(args->ctx->course_windows[2], 5, 50, "%s", "in checking func");
+    wrefresh(args->ctx->course_windows[2]);
+
+    int fd = fileno(args->file);
+    fcntl(fd, F_SETFL, O_NONBLOCK); // make reads non-blocking
+
+    while (!args->stop_flag) {
+        ssize_t n = read(fd, buf, sizeof(buf)-1);
+        if (n > 0) {
+            buf[n] = '\0';
+            // call your function to append/print to ncurses window
+            run_output_funcs(args->ctx, buf);
+        } else if (n == 0) {
+            // EOF reached; child closed output
+            break;
+        } else {
+            // no data right now
+            usleep(50000); // 50ms sleep to avoid busy-waiting
+        }
+    }
+
+    return NULL;
 }

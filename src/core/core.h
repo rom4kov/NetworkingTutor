@@ -1,6 +1,7 @@
 #include "../data/data_access_layer.h"
 #include <menu.h>
 #include <ncurses.h>
+#include <stdio.h>
 
 void handle_greeter_input(APP_CONTEXT *ctx);
 void create_new_user_popup_form(WINDOW **inner_win, WINDOW **form_window,
@@ -76,3 +77,6 @@ void submit_command(APP_CONTEXT *ctx);
 void append_term_ouput_to_buf(WINDOW *win, char *buf, int buf_len,
                               TEXT_BUFFER *term_buf, char *cwd);
 char *get_cwd(void);
+void *popen_w_pid_ret(void *arguments);
+void *check_running_proc_for_output(void *args);
+void run_output_funcs(APP_CONTEXT *ctx, char buf[BUFSIZ]);

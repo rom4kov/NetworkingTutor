@@ -191,8 +191,8 @@ void open_file(APP_CONTEXT *ctx)
             read_file_into_buffer(ctx->file, ctx->t_buffer);
         }
 
-        ctx->lines_to_print = ctx->t_buffer->num_of_lines > (LINES - 7)
-                                  ? (LINES - 7)
+        ctx->lines_to_print = ctx->t_buffer->num_of_lines > (ctx->editor_height - 4)
+                                  ? (ctx->editor_height - 4)
                                   : ctx->t_buffer->num_of_lines;
 
         if (ctx->t_buffer->num_of_lines == 0)
@@ -204,7 +204,8 @@ void open_file(APP_CONTEXT *ctx)
         if (file_size < 1000)
             mvwprintw(ctx->course_windows[2], LINES - 5, 2, "%iB", file_size);
         else
-            mvwprintw(ctx->course_windows[2], LINES - 5, 2, "%.1fk", (1.0 * file_size / 1000));
+            mvwprintw(ctx->course_windows[2], LINES - 5, 2, "%.1fk",
+                      (1.0 * file_size / 1000));
         mvwprintw(ctx->edit_window, LINES - 7, EDIT_MAX - 15, "     ");
         mvwprintw(ctx->edit_window, LINES - 7, EDIT_MAX - 15, "0 : 0");
 
@@ -293,7 +294,8 @@ void write_buffer_to_file(TEXT_BUFFER *tbuf, FILE *file, int y)
 
     // if (tbuf->num_of_lines == 1)
     // {
-    //     tbuf->current_line->buf_[strlen(tbuf->current_line->buf_) + 1] = '\n';
+    //     tbuf->current_line->buf_[strlen(tbuf->current_line->buf_) + 1] =
+    //     '\n';
     // }
 
     rewind(file);
@@ -707,9 +709,7 @@ void delete_file(APP_CONTEXT *ctx, bool *del_file_form_active,
                         wclear(ctx->edit_window);
                         ctx->course_windows[2] = create_editor_window(ctx);
 
-                        wattron(ctx->course_windows[2], COLOR_PAIR(10));
-                        print_no_open_file_msg(&ctx->course_windows[2]);
-                        wattroff(ctx->course_windows[2], COLOR_PAIR(10));
+                        print_no_open_file_msg(ctx);
 
                         deallocate_buffer(ctx->t_buffer);
                         ctx->t_buffer = initialize_buffer();
@@ -737,9 +737,7 @@ void delete_file(APP_CONTEXT *ctx, bool *del_file_form_active,
                     focus_window(&ctx->course_windows[2], 2, "Editor");
                     focus_window(&ctx->course_windows[1], 3, "Explorer");
 
-                    wattron(ctx->course_windows[2], COLOR_PAIR(10));
-                    print_no_open_file_msg(&ctx->course_windows[2]);
-                    wattroff(ctx->course_windows[2], COLOR_PAIR(10));
+                    print_no_open_file_msg(ctx);
 
                     wnoutrefresh(ctx->course_windows[1]);
                     wnoutrefresh(ctx->line_num_win);

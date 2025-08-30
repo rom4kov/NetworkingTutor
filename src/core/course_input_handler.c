@@ -127,18 +127,25 @@ void handle_course_input(APP_CONTEXT *ctx)
                 doupdate();
                 break;
             case 't':
-                wclear(ctx->course_windows[2]);
-                wrefresh(ctx->course_windows[2]);
-                delwin(ctx->course_windows[2]);
-                ctx->shell->terminal_active = true;
-                ctx->active_window_idx = SHELL_WINDOW_IDX;
-                ctx->course_windows[2] = create_editor_window(ctx);
-                // mvwprintw(ctx->course_windows[2], 3, 3, "%s", "test");
-                ctx->terminal_window = create_terminal_window(ctx);
-                print_term_buf(ctx->shell->term_inner_win, ctx->shell->term_buffer);
-                wmove(ctx->shell->term_inner_win, 0, 2);
-                wnoutrefresh(ctx->shell->term_inner_win);
-                doupdate();
+                if (!ctx->shell->terminal_active)
+                {
+                    ctx->shell->terminal_active = true;
+                    ctx->active_window_idx = SHELL_WINDOW_IDX;
+                    recreate_editor_windows(ctx);
+
+                    ctx->terminal_window = create_terminal_window(ctx);
+                    print_term_buf(ctx->shell->term_inner_win,
+                                   ctx->shell->term_buffer);
+                    wmove(ctx->shell->term_inner_win, 0, 2);
+                    wnoutrefresh(ctx->course_windows[2]);
+                    wnoutrefresh(ctx->shell->term_inner_win);
+                    doupdate();
+                }
+                else {
+                    curs_set(0);
+                    ctx->shell->terminal_active = false;
+                    recreate_editor_windows(ctx);
+                }
                 break;
             case 10:
                 ctx->editor_mode = true;
@@ -421,7 +428,8 @@ void handle_course_input(APP_CONTEXT *ctx)
                 break;
         }
     }
-    else if (ctx->active_window_idx == SHELL_WINDOW_IDX && ctx->shell->terminal_focused)
+    else if (ctx->active_window_idx == SHELL_WINDOW_IDX &&
+             ctx->shell->terminal_focused)
     {
         handle_terminal_input(ctx);
     }
@@ -468,6 +476,7 @@ void handle_course_input(APP_CONTEXT *ctx)
                 delwin(ctx->course_windows[2]);
                 ctx->shell->terminal_active = false;
                 ctx->course_windows[2] = create_editor_window(ctx);
+                print_no_open_file_msg(ctx);
                 doupdate();
                 break;
         }

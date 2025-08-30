@@ -49,8 +49,9 @@ WINDOW *create_terminal_window(APP_CONTEXT *ctx);
 WINDOW *create_explorer_window(FILE_TREE *file_tree);
 void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree);
 WINDOW *create_progress_window(APP_CONTEXT *ctx);
-void print_no_open_file_msg(WINDOW **editor_window);
+void print_no_open_file_msg(APP_CONTEXT *ctx);
 void log_course_instr_values(APP_CONTEXT *ctx);
+void recreate_editor_windows(APP_CONTEXT *ctx);
 
 void create_user_form(WINDOW *window, FORM **user_form, FIELD **fields);
 
@@ -72,7 +73,6 @@ ICON get_file_icon(char *filename);
 void print_entries(FILE_TREE *f_tree, WINDOW **explorer_window);
 void move_to_next_entry(FILE_TREE *f_tree, WINDOW **explorer_window);
 void move_to_prev_entry(FILE_TREE *f_tree, WINDOW **explorer_window);
-void print_no_open_file_msg(WINDOW **editor_window);
 void deallocate_it_buffer(I_TEXT_BUFFER *tbuf);
 void print_course_complete(APP_CONTEXT *ctx);
 

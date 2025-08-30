@@ -209,6 +209,7 @@ typedef struct _app_context
   int current_user_id;
   int current_course_id;
   int y, x;
+  int editor_height;
   int scroll_offset;
   int lines_to_print;
   int curr_line;

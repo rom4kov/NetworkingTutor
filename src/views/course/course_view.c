@@ -29,22 +29,11 @@ void create_course_view(APP_CONTEXT *ctx)
         create_right_side_panel(ctx, " Course instructions ");
     ctx->course_windows[4] = create_progress_window(ctx);
 
-    ctx->line_num_win = derwin(ctx->course_windows[2], LINES - 7, 3, 2, 1);
+    ctx->line_num_win = derwin(ctx->course_windows[2], ctx->editor_height - 4, 3, 2, 1);
     ctx->edit_window =
-        derwin(ctx->course_windows[2], LINES - 7, WU * 5 + (WU / 2) - 2, 2, 5);
+        derwin(ctx->course_windows[2], ctx->editor_height - 4, WU * 5 + (WU / 2) - 2, 2, 5);
 
-    if (ctx->file == NULL)
-    {
-        wattron(ctx->line_num_win, COLOR_PAIR(11));
-        for (int i = 0; i < LINES - 4; ++i)
-        {
-            mvwprintw(ctx->line_num_win, i, 1, "%s", i % 2 == 0 ? "`" : " ");
-        }
-        wattroff(ctx->line_num_win, COLOR_PAIR(11));
-        wattron(ctx->course_windows[2], COLOR_PAIR(10));
-        print_no_open_file_msg(&ctx->course_windows[2]);
-        wattroff(ctx->course_windows[2], COLOR_PAIR(10));
-    }
+    print_no_open_file_msg(ctx);
 
     if (ctx->shell->terminal_active)
     {
@@ -62,20 +51,18 @@ void create_course_view(APP_CONTEXT *ctx)
 
 WINDOW *create_editor_window(APP_CONTEXT *ctx)
 {
-    unsigned int height;
-
     if (!ctx->shell->terminal_active)
     {
-        height = LINES - 3;
+        ctx->editor_height = LINES - 3;
     }
     else
     {
-        height = LINES - 13;
+        ctx->editor_height = LINES - 13;
     }
 
     // curs_set(0);
 
-    WINDOW *editor_window = newwin(height, EDITOR_WIDTH, 3, WU + WU / 2);
+    WINDOW *editor_window = newwin(ctx->editor_height, EDITOR_WIDTH, 3, WU + WU / 2);
     draw_border(editor_window, 2, "Editor");
 
     // mvwprintw(editor_window, 0, 2, "%i", *active_window);
@@ -107,7 +94,6 @@ WINDOW *create_terminal_window(APP_CONTEXT *ctx)
     ctx->active_window_idx = SHELL_WINDOW_IDX;
     ctx->shell->terminal_focused = true;
     ctx->shell->terminal_active = true;
-
 
     // create_pseudo_terminal(ctx);
     curs_set(2);
@@ -389,12 +375,41 @@ void close_sub_directory(DIR_ENTRY *dir_to_close, int entries_in_dir,
     dir_to_close->num_of_entries -= entries_in_dir;
 }
 
-void print_no_open_file_msg(WINDOW **editor_window)
+void print_no_open_file_msg(APP_CONTEXT *ctx)
 {
-    char *msg1 = "No file has been opened yet.";
-    char *msg2 = "Open or create a file in the file explorer";
-    int left_pad1 = (EDITOR_WIDTH - strlen(msg1)) / 2;
-    int left_pad2 = (EDITOR_WIDTH - strlen(msg2)) / 2;
-    mvwprintw(*editor_window, LINES - (LINES / 2) - 6, left_pad1, "%s", msg1);
-    mvwprintw(*editor_window, LINES - (LINES / 2) - 5, left_pad2, "%s", msg2);
+    if (ctx->file == NULL)
+    {
+        wattron(ctx->line_num_win, COLOR_PAIR(11));
+        for (int i = 0; i < LINES - 4; ++i)
+        {
+            mvwprintw(ctx->line_num_win, i, 1, "%s", i % 2 == 0 ? "`" : " ");
+        }
+        wattroff(ctx->line_num_win, COLOR_PAIR(11));
+        char *msg1 = "No file has been opened yet.";
+        char *msg2 = "Open or create a file in the file explorer";
+        int left_pad1 = (EDITOR_WIDTH - strlen(msg1)) / 2;
+        int left_pad2 = (EDITOR_WIDTH - strlen(msg2)) / 2;
+        int height = ctx->shell->terminal_active ? LINES / 2 - 2 : LINES / 2;
+        wattron(ctx->course_windows[2], COLOR_PAIR(10));
+        mvwprintw(ctx->course_windows[2], height - 5, left_pad1, "%s", msg1);
+        mvwprintw(ctx->course_windows[2], height - 6, left_pad2, "%s", msg2);
+        wattroff(ctx->course_windows[2], COLOR_PAIR(10));
+    }
+}
+
+void recreate_editor_windows(APP_CONTEXT *ctx)
+{
+    curs_set(0);
+    wclear(ctx->course_windows[2]);
+    wclear(ctx->edit_window);
+    wclear(ctx->line_num_win);
+    delwin(ctx->course_windows[2]);
+    delwin(ctx->edit_window);
+    delwin(ctx->line_num_win);
+    ctx->course_windows[2] = create_editor_window(ctx);
+    print_no_open_file_msg(ctx);
+    wnoutrefresh(ctx->course_windows[2]);
+    wnoutrefresh(ctx->edit_window);
+    wnoutrefresh(ctx->line_num_win);
+    doupdate();
 }

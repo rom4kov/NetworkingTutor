@@ -3,12 +3,14 @@
 #include "../core/core.h"
 #include "../models/models.h"
 
+#include <asm-generic/errno-base.h>
 #include <curses.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <ncurses.h>
 #include <pthread.h>
 #include <pty.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -96,8 +98,9 @@ void scroll_down(APP_CONTEXT *ctx)
     }
 }
 
-void read_term_input_and_write_to_pty(APP_CONTEXT *ctx)
+void print_term_input(APP_CONTEXT *ctx)
 {
+    int offset = 0;
     int nol = ctx->shell->term_buffer->num_of_lines;
     int x = ctx->shell->curr_buf_idx;
 
@@ -117,12 +120,16 @@ void read_term_input_and_write_to_pty(APP_CONTEXT *ctx)
     mvwprintw(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7,
               2 + (cwd_len > 0 ? cwd_len + 1 : 0), "%s", ctx->shell->buf);
 
+    if (ctx->shell->executable_running)
+    {
+        offset = 2;
+    }
     wmove(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7,
-          ctx->shell->term_buffer->current_col);
+          ctx->shell->term_buffer->current_col - offset);
 
     ctx->shell->curr_buf_idx += 1;
 
-    wnoutrefresh(ctx->edit_window);
+    // wnoutrefresh(ctx->edit_window);
     wnoutrefresh(ctx->shell->term_inner_win);
     doupdate();
 }
@@ -137,14 +144,14 @@ bool cmd_is_cd(APP_CONTEXT *ctx)
     if (strcmp(ctx->shell->buf, "cd") == 0)
     {
         ctx->shell->cwd = strdup("");
-        int rv = (chdir(ctx->shell->home_dir));
-        mvwprintw(ctx->edit_window, 37, 4, "home dir: %s",
-                  ctx->shell->home_dir);
-        if (rv == -1)
-            mvwprintw(ctx->edit_window, 38, 4, "chdir error: %s",
-                      strerror(errno));
-        else if (rv == 0)
-            mvwprintw(ctx->edit_window, 38, 4, "chdir success");
+        chdir(ctx->shell->home_dir);
+        // mvwprintw(ctx->edit_window, 37, 4, "home dir: %s",
+        //           ctx->shell->home_dir);
+        // if (rv == -1)
+        //     mvwprintw(ctx->edit_window, 38, 4, "chdir error: %s",
+        //               strerror(errno));
+        // else if (rv == 0)
+        //     mvwprintw(ctx->edit_window, 38, 4, "chdir success");
         return false;
     }
     else if (strcmp(first_cmd_part, "cd") == 0)
@@ -242,8 +249,6 @@ void submit_command(APP_CONTEXT *ctx)
     char c = ' ';
     if (command[0] == '.' && command[1] == '/')
     {
-        // mvwprintw(ctx->edit_window, 1, 30, "Before running program");
-
         THREAD_ARGS args = {.cmd = command,
                             .file = out,
                             .pid = malloc(sizeof(pid_t)),
@@ -253,22 +258,28 @@ void submit_command(APP_CONTEXT *ctx)
         pthread_create(&run_executable, NULL, popen_w_pid_ret, &args);
 
         pthread_join(run_executable, (void **)&args);
-        napms(200);
+
+        ctx->shell->executable_running = true;
+        ctx->shell->child_pid = *args.pid;
+        ctx->shell->buf[len] = '\0';
+
+        memcpy(ctx->shell->term_buffer->current_line->prev->buf_ + cwd_len +
+                   (cwd_len > 0 ? 3 : 2),
+               ctx->shell->buf, strlen(ctx->shell->buf));
+
+        print_term_buf(ctx->shell->term_inner_win, ctx->shell->term_buffer);
+        wrefresh(ctx->shell->term_inner_win);
 
         OUTPUT_THREAD_ARGS output_thr_args = {0};
         output_thr_args.file = args.file;
         output_thr_args.pid = malloc(sizeof(pid_t));
         output_thr_args.ctx = ctx;
-        output_thr_args.win = ctx->edit_window;
-        output_thr_args.stop_flag = 0;
 
         pthread_t check_for_output;
         pthread_create(&check_for_output, NULL, check_running_proc_for_output,
                        &output_thr_args);
-        // output_thr_args.stop_flag = 1;
-        pthread_join(check_for_output, NULL);
-        // mvwprintw(ctx->edit_window, 4, 30, "Child pid: %i\n", *args.pid);
-        // wrefresh(ctx->edit_window);
+
+        pthread_detach(check_for_output);
     }
     else
     {
@@ -321,8 +332,8 @@ void submit_command(APP_CONTEXT *ctx)
                    (cwd_len > 0 ? 3 : 2),
                ctx->shell->buf, strlen(ctx->shell->buf));
 
-        append_term_ouput_to_buf(ctx->edit_window, buf, i - 1,
-                                 ctx->shell->term_buffer, ctx->shell->cwd);
+        append_term_ouput_to_buf(buf, i - 1, ctx->shell->term_buffer,
+                                 ctx->shell->cwd);
 
         print_term_buf(ctx->shell->term_inner_win, ctx->shell->term_buffer);
 
@@ -344,14 +355,14 @@ void submit_command(APP_CONTEXT *ctx)
 
         ctx->shell->curr_buf_idx = 0;
 
-        wnoutrefresh(ctx->edit_window);
+        // wnoutrefresh(ctx->edit_window);
         wnoutrefresh(ctx->shell->term_inner_win);
         doupdate();
     }
 }
 
-void append_term_ouput_to_buf(WINDOW *win, char *buf, int buf_len,
-                              TEXT_BUFFER *term_buf, char *cwd)
+void append_term_ouput_to_buf(char *buf, int buf_len, TEXT_BUFFER *term_buf,
+                              char *cwd)
 {
     int cwd_len = strlen(cwd);
     // mvwprintw(win, 15, 50, "cwd_len in append: %i", cwd_len);
@@ -497,6 +508,7 @@ void *popen_w_pid_ret(void *arguments)
 
     if (*args->pid == 0)
     {
+        setpgid(0, 0);
         // Child
         close(pipefd[0]);               // close read end
         dup2(pipefd[1], STDOUT_FILENO); // redirect stdout to pipe
@@ -529,44 +541,27 @@ void *popen_w_pid_ret(void *arguments)
     return (void *)args; // parent gets child PID directly
 }
 
-void run_output_funcs(APP_CONTEXT *ctx, char buf[BUFSIZ])
+void run_output_funcs(APP_CONTEXT *ctx, char buf[])
 {
     int cwd_len = strlen(ctx->shell->cwd);
 
-    // ctx->shell->buf[ctx->shell->curr_buf_idx] = '\n';
-    // ctx->shell->buf[ctx->shell->curr_buf_idx + 1] = '\0';
-
-    // memcpy(ctx->shell->term_buffer->current_line->prev->buf_ + cwd_len +
-    //            (cwd_len > 0 ? 3 : 2),
-    //        ctx->shell->buf, strlen(ctx->shell->buf));
-    //
-    // mvwprintw(ctx->edit_window, 13, 5, "cwd: %s end", ctx->shell->cwd);
-    append_term_ouput_to_buf(ctx->edit_window, buf, strlen(buf) - 1,
-                             ctx->shell->term_buffer, ctx->shell->cwd);
-    // mvwprintw(ctx->edit_window, 14, 5, "cwd: %s end", ctx->shell->cwd);
+    append_term_ouput_to_buf(buf, strlen(buf) - 1, ctx->shell->term_buffer,
+                             ctx->shell->cwd);
 
     print_term_buf(ctx->shell->term_inner_win, ctx->shell->term_buffer);
-
-    // mvwprintw(ctx->edit_window, 23, 5, "buf: %s", ctx->shell->buf);
 
     memset(ctx->shell->buf, 0, BUFSIZ);
 
     cwd_len = strlen(ctx->shell->cwd);
-    // mvwprintw(ctx->edit_window, 15, 5, "%s", "cwd_len:    hello");
-    // mvwprintw(ctx->edit_window, 15, 5, "cwd_len: %i", cwd_len);
     ctx->shell->term_buffer->current_col = cwd_len + (cwd_len > 0 ? 3 : 2);
 
     int nol = ctx->shell->term_buffer->num_of_lines;
-    // mvwprintw(ctx->edit_window, 20, 5, "nol: %i", nol);
-    // mvwprintw(ctx->edit_window, 21, 5, "num_of_lines: %i",
-    //           ctx->shell->term_buffer->num_of_lines);
 
     wmove(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7,
           ctx->shell->term_buffer->current_col);
 
     ctx->shell->curr_buf_idx = 0;
 
-    wnoutrefresh(ctx->edit_window);
     wnoutrefresh(ctx->shell->term_inner_win);
     doupdate();
 }
@@ -581,9 +576,14 @@ void *check_running_proc_for_output(void *arg)
     int fd = fileno(args->file);
     fcntl(fd, F_SETFL, O_NONBLOCK); // make reads non-blocking
 
-    while (!args->stop_flag)
+    while (true)
     {
+        // mvwprintw(args->ctx->edit_window, 5, 3, "%i", *stop_exec);
+        // wrefresh(args->ctx->edit_window);
+
         ssize_t n = read(fd, buf, sizeof(buf) - 1);
+        // mvwprintw(args->ctx->edit_window, 12, 3, "%i", errno);
+        // wrefresh(args->ctx->edit_window);
         if (n > 0)
         {
             buf[n] = '\0';
@@ -593,12 +593,13 @@ void *check_running_proc_for_output(void *arg)
         else if (n == 0)
         {
             // EOF reached; child closed output
+            args->ctx->shell->executable_running = false;
             break;
         }
         else
         {
             // no data right now
-            usleep(50000); // 50ms sleep to avoid busy-waiting
+            usleep(1000000); // 50ms sleep to avoid busy-waiting
         }
     }
 

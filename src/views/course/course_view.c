@@ -65,8 +65,6 @@ WINDOW *create_editor_window(APP_CONTEXT *ctx)
     WINDOW *editor_window = newwin(ctx->editor_height, EDITOR_WIDTH, 3, WU + WU / 2);
     unsigned short border_color =
         (ctx->shell->terminal_active || ctx->first_course_draw) ? 2 : 3;
-    mvwprintw(ctx->rp_state->inner_win, 2, 2, "b_color: %i", border_color);
-    wrefresh(ctx->rp_state->inner_win);
 
     draw_border(editor_window, border_color, "Editor");
 

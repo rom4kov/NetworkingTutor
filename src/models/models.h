@@ -9,6 +9,8 @@
 #include <CUnit/CUError.h>
 #include <stdio.h>
 #include <sys/types.h>
+#include "stdatomic.h"
+#include <pthread.h>
 
 #define START_WINDOW_COUNT 6
 #define COURSE_WINDOW_COUNT 5
@@ -135,6 +137,12 @@ typedef struct _pseudo_terminal
     int curr_buf_idx;
     bool terminal_active;
     bool terminal_focused;
+    atomic_bool executable_running;
+    atomic_bool stop_executable;
+    pid_t child_pid;
+    FILE *child_stream;
+    int child_fd;
+    pthread_t reader_thread;
 } SHELL;
 
 typedef struct _right_panel_state
@@ -255,5 +263,4 @@ typedef struct _output_thread_args
   APP_CONTEXT *ctx;
   char buf[BUFSIZ];
   WINDOW *win;
-  unsigned short stop_flag;
 } OUTPUT_THREAD_ARGS;

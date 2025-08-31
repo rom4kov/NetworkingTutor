@@ -75,6 +75,10 @@ int main(void)
 
     ctx->shell = calloc(1, sizeof(SHELL));
     ctx->shell->terminal_active = false;
+    ctx->shell->executable_running = false;
+    // bool *stop_exec = false;
+    ctx->shell->stop_executable = false;
+    // ctx->shell->stop_executable = stop_exec;
     ctx->shell->curr_buf_idx = 0;
     ctx->shell->term_buffer = initialize_buffer();
     ctx->shell->term_buffer->num_of_lines = 1;
@@ -100,8 +104,8 @@ int main(void)
     //                   "SQL/create_completed_courses_table.sql");
     // seed_courses_data(ctx->db, ctx->greeter_screen,
     //                   "SQL/create_streaks_table.sql");
-    // seed_courses_data(ctx->db, ctx->greeter_screen,
-    //                   "SQL/create_ascii_art_table.sql");
+    seed_courses_data(ctx->db, ctx->greeter_screen,
+                      "SQL/create_ascii_art_table.sql");
     // seed_courses_data(ctx->db, ctx->greeter_screen,
     //                   "SQL/courses/http_server/sections.sql");
     // seed_courses_data(ctx->db, ctx->greeter_screen,

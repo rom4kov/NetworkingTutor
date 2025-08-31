@@ -397,7 +397,7 @@ void read_window_text_into_buffer(APP_CONTEXT *ctx, I_TEXT_BUFFER *header_tbuf,
     char *logo_and_header_str = malloc(total);
     if (!logo_and_header_str)
         return;
-    logo_and_header_str[0] = '\0';
+    // logo_and_header_str[0] = '\0';
 
     snprintf(logo_and_header_str, total, "%s%s%s", first_str, nl, second_str);
 

@@ -65,6 +65,7 @@ WINDOW *create_header_section(APP_CONTEXT *ctx)
 {
     int header_height = LINES / 2 + 1;
     int header_width = WU * 7 + 4;
+    // if (header_width % 2) header_width--;
     WINDOW *header_window = newwin(header_height, header_width, 3, 0);
     WINDOW *header_inner =
         derwin(header_window, header_height - 2, header_width - 2, 1, 1);
@@ -74,7 +75,7 @@ WINDOW *create_header_section(APP_CONTEXT *ctx)
     }
 
     I_TEXT_BUFFER *header_tbuf = initialize_it_buffer();
-    read_window_text_into_buffer(ctx, header_tbuf, header_width, 0, 0,
+    read_window_text_into_buffer(ctx, header_tbuf, header_width - 2, 0, 0,
                                  PROGRAMM_DESC);
 
     wattron(header_inner, A_BOLD);

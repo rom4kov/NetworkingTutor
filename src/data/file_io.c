@@ -243,8 +243,7 @@ void reopen_file(APP_CONTEXT *ctx, bool activate_ed)
     focus_window(&ctx->course_windows[0], 2, "Explorer");
     unsigned short border_color =
         (ctx->shell->terminal_active || ctx->first_course_draw) ? 2 : 3;
-    // mvwprintw(ctx->rp_state->inner_win, 2, 2, "b_color: %i", border_color);
-    // wrefresh(ctx->rp_state->inner_win);
+
     focus_window(&ctx->course_windows[2], border_color, "Editor");
     if (activate_ed)
         curs_set(2);

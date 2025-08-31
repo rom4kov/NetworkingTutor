@@ -1,12 +1,15 @@
+#include "../../ntutor.h"
 #include "../controllers/controllers.h"
 #include "../core/core.h"
 #include "../models/models.h"
 #include "../views/views.h"
 #include <curses.h>
+#include <signal.h>
 
 void handle_terminal_input(APP_CONTEXT *ctx)
 {
-    switch (ctx->key) {
+    switch (ctx->key)
+    {
         case KEY_UP:
             scroll_up(ctx);
             break;
@@ -29,10 +32,16 @@ void handle_terminal_input(APP_CONTEXT *ctx)
             curs_set(0);
             ctx->shell->terminal_focused = false;
             break;
+        case KEY_F(2):
+            if (ctx->shell->executable_running)
+            {
+                ctx->shell->executable_running = false;
+                kill(-(ctx->shell->child_pid), SIGKILL);
+                run_output_funcs(ctx, "");
+            }
+            break;
         default:
-            read_term_input_and_write_to_pty(ctx);
+            print_term_input(ctx);
             break;
     }
 }
-
-

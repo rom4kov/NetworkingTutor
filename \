@@ -63,12 +63,9 @@ WINDOW *create_editor_window(APP_CONTEXT *ctx)
     // curs_set(0);
 
     WINDOW *editor_window = newwin(ctx->editor_height, EDITOR_WIDTH, 3, WU + WU / 2);
-    unsigned short border_color =
-        (ctx->shell->terminal_active || ctx->first_course_draw) ? 2 : 3;
-    mvwprintw(ctx->rp_state->inner_win, 2, 2, "b_color: %i", border_color);
-    wrefresh(ctx->rp_state->inner_win);
+    draw_border(editor_window, 2, "Editor");
 
-    draw_border(editor_window, border_color, "Editor");
+    // mvwprintw(editor_window, 0, 2, "%i", *active_window);
 
     wattron(editor_window, COLOR_PAIR(3));
     mvwprintw(editor_window, 0, 2, " Editor ");
@@ -403,23 +400,23 @@ void print_no_open_file_msg(APP_CONTEXT *ctx)
 void recreate_editor_windows(APP_CONTEXT *ctx)
 {
     curs_set(0);
-    wclear(ctx->course_windows[2]);
-    wclear(ctx->edit_window);
-    wclear(ctx->line_num_win);
-    wrefresh(ctx->course_windows[2]);
+    werase(ctx->course_windows[2]);
+    werase(ctx->edit_window);
+    werase(ctx->line_num_win);
+    wnoutrefresh(ctx->course_windows[2]);
+    wnoutrefresh(ctx->edit_window);
+    wnoutrefresh(ctx->line_num_win);
+    doupdate();
     delwin(ctx->course_windows[2]);
-    // delwin(ctx->edit_window);
-    // delwin(ctx->line_num_win);
+    delwin(ctx->edit_window);
+    delwin(ctx->line_num_win);
+    mvwprintw(ctx->course_windows[1], LINES - 7, 3, "af: %i", ctx->editor_height);
     ctx->course_windows[2] = create_editor_window(ctx);
+    mvwprintw(ctx->course_windows[1], LINES - 6, 3, "af: %i", ctx->editor_height);
+    wrefresh(ctx->course_windows[1]);
     ctx->line_num_win = derwin(ctx->course_windows[2], ctx->editor_height - 4, 3, 2, 1);
     ctx->edit_window =
         derwin(ctx->course_windows[2], ctx->editor_height - 4, WU * 5 + (WU / 2) - 2, 2, 5);
-
-    if (ctx->file && ctx->file->_fileno > 0)
-    {
-        bool activate_editor = false;
-        reopen_file(ctx, activate_editor);
-    }
     print_no_open_file_msg(ctx);
     // wnoutrefresh(ctx->course_windows[2]);
     // wnoutrefresh(ctx->edit_window);

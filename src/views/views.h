@@ -65,7 +65,7 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
                   WINDOW **line_num_win, int *scroll_offset,
                   int lines_to_print);
 void print_line(LINE *current_line, int line_num, WINDOW **edit_window);
-void print_line_nr(WINDOW **edit_window, TEXT_BUFFER *tbuf);
+void print_line_nr(WINDOW **editor_window, TEXT_BUFFER *tbuf, int editor_height);
 char *match_file_icon(pcre2_code *re, int subj_len, char *filename, char *icon,
                       int color);
 ICON get_file_icon(char *filename);

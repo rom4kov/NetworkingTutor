@@ -65,6 +65,7 @@ void prepare_empty_file(TEXT_BUFFER **tbuf);
 void print_buffer_label(APP_CONTEXT *ctx);
 void open_new_file(APP_CONTEXT *ctx);
 void open_file(APP_CONTEXT *ctx);
+void reopen_file(APP_CONTEXT *ctx, bool activate_ed);
 void read_file_into_buffer(FILE *file, TEXT_BUFFER *text_buf);
 void write_buffer_to_file(TEXT_BUFFER *tbuf, FILE *file, int y);
 void deallocate_buffer(TEXT_BUFFER *tbuf);
@@ -89,5 +90,4 @@ void rename_file(APP_CONTEXT *ctx, WINDOW **inner_win, WINDOW **form_window,
 void create_directory(APP_CONTEXT *ctx, WINDOW **inner_win,
                       WINDOW **form_window, FORM **new_file_form,
                       FIELD **field);
-void create_keybinds_window(WINDOW **explorer_window);
 void create_keybinds_window(WINDOW **explorer_window);

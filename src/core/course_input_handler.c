@@ -1,3 +1,4 @@
+#include "../../ntutor.h"
 #include "../controllers/controllers.h"
 #include "../core/core.h"
 #include "../course_tests/tests.h"
@@ -18,36 +19,46 @@
 
 void log_course_instr_values(APP_CONTEXT *ctx)
 {
-    mvwprintw(ctx->course_windows[2], 2, 3, "%s", "                    ");
-    mvwprintw(ctx->course_windows[2], 3, 3, "%s", "                    ");
-    mvwprintw(ctx->course_windows[2], 4, 3, "%s", "                    ");
-    mvwprintw(ctx->course_windows[2], 5, 3, "%s", "                    ");
-    mvwprintw(ctx->course_windows[2], 6, 3, "%s", "                    ");
-    mvwprintw(ctx->course_windows[2], 7, 3, "%s", "                    ");
-    mvwprintw(ctx->course_windows[2], 8, 3, "%s", "                    ");
-    mvwprintw(ctx->course_windows[2], 9, 3, "%s", "                    ");
-    mvwprintw(ctx->course_windows[2], 10, 3, "%s", "                    ");
-    mvwprintw(ctx->course_windows[2], 11, 3, "%s", "                    ");
-    mvwprintw(ctx->course_windows[2], 2, 3, "curr_section %i",
+    mvwprintw(ctx->course_windows[2], 2, EDITOR_WIDTH, "%s",
+              "                    ");
+    mvwprintw(ctx->course_windows[2], 3, EDITOR_WIDTH, "%s",
+              "                    ");
+    mvwprintw(ctx->course_windows[2], 4, EDITOR_WIDTH, "%s",
+              "                    ");
+    mvwprintw(ctx->course_windows[2], 5, EDITOR_WIDTH, "%s",
+              "                    ");
+    mvwprintw(ctx->course_windows[2], 6, EDITOR_WIDTH, "%s",
+              "                    ");
+    mvwprintw(ctx->course_windows[2], 7, EDITOR_WIDTH, "%s",
+              "                    ");
+    mvwprintw(ctx->course_windows[2], 8, EDITOR_WIDTH, "%s",
+              "                    ");
+    mvwprintw(ctx->course_windows[2], 9, EDITOR_WIDTH, "%s",
+              "                    ");
+    mvwprintw(ctx->course_windows[2], 10, EDITOR_WIDTH, "%s",
+              "                    ");
+    mvwprintw(ctx->course_windows[2], 11, EDITOR_WIDTH, "%s",
+              "                    ");
+    mvwprintw(ctx->course_windows[2], 2, EDITOR_WIDTH, "curr_section %i",
               ctx->rp_state->curr_section);
-    mvwprintw(ctx->course_windows[2], 3, 3, "nosi %i",
+    mvwprintw(ctx->course_windows[2], 3, EDITOR_WIDTH, "nosi %i",
               ctx->rp_state->num_of_section_items[ctx->rp_state->curr_section]);
-    mvwprintw(ctx->course_windows[2], 4, 3, "curr_item %i",
+    mvwprintw(ctx->course_windows[2], 4, EDITOR_WIDTH, "curr_item %i",
               ctx->rp_state->curr_item);
-    mvwprintw(ctx->course_windows[2], 5, 3, "items_completed %i",
+    mvwprintw(ctx->course_windows[2], 5, EDITOR_WIDTH, "items_completed %i",
               ctx->rp_state->items_completed);
-    mvwprintw(ctx->course_windows[2], 6, 3, "tsi cs %i",
+    mvwprintw(ctx->course_windows[2], 6, EDITOR_WIDTH, "tsi cs %i",
               ctx->rp_state->total_section_items[ctx->rp_state->curr_section]);
-    mvwprintw(ctx->course_windows[2], 7, 3, "total course sections %i",
-              ctx->rp_state->total_course_sections);
-    mvwprintw(ctx->course_windows[2], 8, 3, "has_test %i",
+    mvwprintw(ctx->course_windows[2], 7, EDITOR_WIDTH,
+              "total course sections %i", ctx->rp_state->total_course_sections);
+    mvwprintw(ctx->course_windows[2], 8, EDITOR_WIDTH, "has_test %i",
               ctx->rp_state->s_metadata->has_test);
-    mvwprintw(ctx->course_windows[2], 9, 3, "test_mode: %i",
+    mvwprintw(ctx->course_windows[2], 9, EDITOR_WIDTH, "test_mode: %i",
               ctx->rp_state->showing_test_results);
-    mvwprintw(ctx->course_windows[2], 10, 3, "sections completed: %i",
-              ctx->rp_state->sections_completed);
-    mvwprintw(ctx->course_windows[2], 11, 3, "showing test results: %i",
-              ctx->rp_state->showing_test_results);
+    mvwprintw(ctx->course_windows[2], 10, EDITOR_WIDTH,
+              "sections completed: %i", ctx->rp_state->sections_completed);
+    mvwprintw(ctx->course_windows[2], 11, EDITOR_WIDTH,
+              "showing test results: %i", ctx->rp_state->showing_test_results);
 }
 
 void handle_course_input(APP_CONTEXT *ctx)
@@ -131,6 +142,7 @@ void handle_course_input(APP_CONTEXT *ctx)
                 {
                     ctx->shell->terminal_active = true;
                     ctx->active_window_idx = SHELL_WINDOW_IDX;
+                    // ctx->active_window = ctx->shell->term_inner_win;
                     recreate_editor_windows(ctx);
 
                     ctx->terminal_window = create_terminal_window(ctx);
@@ -141,10 +153,15 @@ void handle_course_input(APP_CONTEXT *ctx)
                     wnoutrefresh(ctx->shell->term_inner_win);
                     doupdate();
                 }
-                else {
+                else
+                {
                     curs_set(0);
                     ctx->shell->terminal_active = false;
                     recreate_editor_windows(ctx);
+                    wmove(ctx->edit_window,
+                          ctx->t_buffer->curr_line_nr - ctx->scroll_offset,
+                          ctx->t_buffer->current_col);
+                    wrefresh(ctx->edit_window);
                 }
                 break;
             case 10:
@@ -471,13 +488,16 @@ void handle_course_input(APP_CONTEXT *ctx)
                 break;
             case 't':
                 curs_set(0);
-                wclear(ctx->course_windows[2]);
-                wrefresh(ctx->course_windows[2]);
-                delwin(ctx->course_windows[2]);
                 ctx->shell->terminal_active = false;
-                ctx->course_windows[2] = create_editor_window(ctx);
-                print_no_open_file_msg(ctx);
-                doupdate();
+                ctx->active_window_idx = 2;
+                ctx->editor_mode = false;
+                recreate_editor_windows(ctx);
+                mvwprintw(ctx->rp_state->inner_win, 4, 3, "e_mode: %i", ctx->editor_mode);
+                wrefresh(ctx->rp_state->inner_win);
+                wmove(ctx->edit_window,
+                      ctx->t_buffer->curr_line_nr - ctx->scroll_offset,
+                      ctx->t_buffer->current_col);
+                wrefresh(ctx->edit_window);
                 break;
         }
     }

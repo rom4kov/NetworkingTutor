@@ -1,5 +1,4 @@
-#define _DEFAULT_SOURCE
-
+#include "../../ntutor.h"
 #include "../core/core.h"
 #include "../data/data_access_layer.h"
 #include "../models/models.h"
@@ -191,9 +190,10 @@ void open_file(APP_CONTEXT *ctx)
             read_file_into_buffer(ctx->file, ctx->t_buffer);
         }
 
-        ctx->lines_to_print = ctx->t_buffer->num_of_lines > (ctx->editor_height - 4)
-                                  ? (ctx->editor_height - 4)
-                                  : ctx->t_buffer->num_of_lines;
+        ctx->lines_to_print =
+            ctx->t_buffer->num_of_lines > (ctx->editor_height - 4)
+                ? (ctx->editor_height - 4)
+                : ctx->t_buffer->num_of_lines;
 
         if (ctx->t_buffer->num_of_lines == 0)
             ctx->t_buffer->num_of_lines = 1;
@@ -202,27 +202,53 @@ void open_file(APP_CONTEXT *ctx)
                      &ctx->scroll_offset, ctx->lines_to_print);
 
         if (file_size < 1000)
-            mvwprintw(ctx->course_windows[2], LINES - 5, 2, "%iB", file_size);
+            mvwprintw(ctx->course_windows[2], ctx->editor_height - 2, 2, "%iB",
+                      file_size);
         else
-            mvwprintw(ctx->course_windows[2], LINES - 5, 2, "%.1fk",
-                      (1.0 * file_size / 1000));
-        mvwprintw(ctx->edit_window, LINES - 7, EDIT_MAX - 15, "     ");
-        mvwprintw(ctx->edit_window, LINES - 7, EDIT_MAX - 15, "0 : 0");
+            mvwprintw(ctx->course_windows[2], ctx->editor_height - 2, 2,
+                      "%.1fk", (1.0 * file_size / 1000));
+
+        mvwprintw(ctx->course_windows[2], ctx->editor_height - 2,
+                  EDITOR_WIDTH - 7, "     ");
+        mvwprintw(ctx->course_windows[2], ctx->editor_height - 2,
+                  EDITOR_WIDTH - 7, "0 : 0");
 
         rewind(ctx->file);
-        // mvwprintw(ctx->rp_state->right_panel, 1, 4, "%s",
-        // ctx->t_buffer->first_line->buf_);
-        // mvwprintw(ctx->rp_state->right_panel, 1, 10, "%i",
-        // ctx->t_buffer->num_of_lines); mvwprintw(ctx->rp_state->right_panel,
-        // 1, 20, "%i", ctx->t_buffer->first_line->length);
-        // mvwprintw(ctx->rp_state->right_panel, 1, 30, "%i", file_size);
-        // wrefresh(ctx->rp_state->right_panel);
 
         print_buffer_label(ctx);
     }
 
-    // wnoutrefresh(ctx->course_windows[2]);
     doupdate();
+}
+
+void reopen_file(APP_CONTEXT *ctx, bool activate_ed)
+{
+    fclose(ctx->file);
+    int curr_line = ctx->t_buffer->curr_line_nr < ctx->editor_height - 5
+                        ? ctx->t_buffer->curr_line_nr
+                        : ctx->scroll_offset + ctx->editor_height - 5;
+    int curr_col = ctx->t_buffer->current_col;
+    ctx->t_buffer->curr_line_nr = curr_line;
+    open_file(ctx);
+    ctx->t_buffer->curr_line_nr = curr_line;
+    ctx->t_buffer->current_col = curr_col;
+    ctx->t_buffer->current_line = ctx->t_buffer->first_line;
+    for (int i = 0; i < curr_line; i++)
+    {
+        ctx->t_buffer->current_line = ctx->t_buffer->current_line->next;
+    }
+    ctx->explorer_mode = false;
+    ctx->editor_mode = activate_ed ? true : false;
+    ctx->active_window_idx = 2;
+    focus_window(&ctx->course_windows[0], 2, "Explorer");
+    unsigned short border_color =
+        (ctx->shell->terminal_active || ctx->first_course_draw) ? 2 : 3;
+    // mvwprintw(ctx->rp_state->inner_win, 2, 2, "b_color: %i", border_color);
+    // wrefresh(ctx->rp_state->inner_win);
+    focus_window(&ctx->course_windows[2], border_color, "Editor");
+    if (activate_ed)
+        curs_set(2);
+    wmove(ctx->edit_window, curr_line - ctx->scroll_offset, curr_col);
 }
 
 void read_file_into_buffer(FILE *file, TEXT_BUFFER *text_buf)
@@ -392,7 +418,7 @@ void open_file_from_explorer(APP_CONTEXT *ctx, bool *new_file_form_active)
     focus_window(&ctx->course_windows[1], 2, "Explorer");
     focus_window(&ctx->course_windows[2], 3, "Editor");
     curs_set(2);
-    print_line_nr(&ctx->edit_window, ctx->t_buffer);
+    print_line_nr(&ctx->edit_window, ctx->t_buffer, ctx->editor_height);
     wmove(ctx->edit_window, 0, 0);
     wnoutrefresh(ctx->course_windows[1]);
     wnoutrefresh(ctx->line_num_win);

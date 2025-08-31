@@ -129,10 +129,10 @@ void read_term_input_and_write_to_pty(APP_CONTEXT *ctx)
 
 bool cmd_is_cd(APP_CONTEXT *ctx)
 {
-    char delim[] = " ";
+    const char delim[] = " ";
     char *shell_buf = strdup(ctx->shell->buf);
 
-    char *first_cmd_part = strsep(&shell_buf, delim);
+    const char *first_cmd_part = strsep(&shell_buf, delim);
 
     if (strcmp(ctx->shell->buf, "cd") == 0)
     {
@@ -150,7 +150,6 @@ bool cmd_is_cd(APP_CONTEXT *ctx)
     else if (strcmp(first_cmd_part, "cd") == 0)
     {
         ctx->shell->cwd = strdup(strsep(&shell_buf, delim));
-        // ctx->shell->cwd[strlen(ctx->shell->cwd) - 1] = '\0';
         return true;
     }
 

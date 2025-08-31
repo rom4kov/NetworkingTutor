@@ -90,8 +90,6 @@ int main(void)
     // ctx->shell->term_buffer->first_line->buf_[0] = '>';
     // ctx->shell->term_buffer->first_line->buf_[1] = ' ';
 
-    int curr_line;
-    int curr_col;
     // refresh();
 
     // seed_courses_data(ctx->db, ctx->greeter_screen,
@@ -209,29 +207,8 @@ int main(void)
             ctx->active_window = ctx->course_windows[0];
             if (ctx->file && ctx->file->_fileno > 0)
             {
-                fclose(ctx->file);
-                curr_line = ctx->t_buffer->curr_line_nr < LINES - 8
-                                ? ctx->t_buffer->curr_line_nr
-                                : ctx->scroll_offset + LINES - 8;
-                curr_col = ctx->t_buffer->current_col;
-                ctx->t_buffer->curr_line_nr = curr_line;
-                open_file(ctx);
-                ctx->t_buffer->curr_line_nr = curr_line;
-                ctx->t_buffer->current_col = curr_col;
-                ctx->t_buffer->current_line = ctx->t_buffer->first_line;
-                for (int i = 0; i < curr_line; i++)
-                {
-                    ctx->t_buffer->current_line =
-                        ctx->t_buffer->current_line->next;
-                }
-                ctx->explorer_mode = false;
-                ctx->editor_mode = true;
-                ctx->active_window_idx = 2;
-                focus_window(&ctx->course_windows[0], 2, "Explorer");
-                focus_window(&ctx->course_windows[2], 3, "Editor");
-                curs_set(2);
-                wmove(ctx->edit_window, curr_line - ctx->scroll_offset,
-                      curr_col);
+                bool activate_editor = true;
+                reopen_file(ctx, activate_editor);
             }
             wnoutrefresh(ctx->course_windows[0]);
             wnoutrefresh(ctx->course_windows[1]);

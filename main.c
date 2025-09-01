@@ -104,8 +104,8 @@ int main(void)
     //                   "SQL/create_completed_courses_table.sql");
     // seed_courses_data(ctx->db, ctx->greeter_screen,
     //                   "SQL/create_streaks_table.sql");
-    seed_courses_data(ctx->db, ctx->greeter_screen,
-                      "SQL/create_ascii_art_table.sql");
+    // seed_courses_data(ctx->db, ctx->greeter_screen,
+    //                   "SQL/create_ascii_art_table.sql");
     // seed_courses_data(ctx->db, ctx->greeter_screen,
     //                   "SQL/courses/http_server/sections.sql");
     // seed_courses_data(ctx->db, ctx->greeter_screen,
@@ -186,7 +186,6 @@ int main(void)
         }
         else if (ctx->course_needs_redraw)
         {
-            refresh();
             if (!ctx->first_course_draw)
             {
                 if (ctx->rp_state->curr_section > 0)

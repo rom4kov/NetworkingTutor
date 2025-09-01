@@ -60,19 +60,16 @@ WINDOW *create_editor_window(APP_CONTEXT *ctx)
         ctx->editor_height = LINES - 13;
     }
 
-    // curs_set(0);
-
     WINDOW *editor_window = newwin(ctx->editor_height, EDITOR_WIDTH, 3, WU + WU / 2);
+
     unsigned short border_color =
-        (ctx->shell->terminal_active || ctx->first_course_draw) ? 2 : 3;
+        (ctx->shell->terminal_active || ctx->course_needs_redraw) ? 2 : 3;
 
     draw_border(editor_window, border_color, "Editor");
 
     wattron(editor_window, COLOR_PAIR(3));
     mvwprintw(editor_window, 0, 2, " Editor ");
     wattroff(editor_window, COLOR_PAIR(3));
-    // mvwprintw(editor_window, 9, 2, "COLS: %i", COLS);
-    // mvwprintw(editor_window, 10, 2, "Editor width: %i", EDITOR_WIDTH);
 
     wnoutrefresh(editor_window);
 
@@ -96,9 +93,7 @@ WINDOW *create_terminal_window(APP_CONTEXT *ctx)
     ctx->shell->terminal_focused = true;
     ctx->shell->terminal_active = true;
 
-    // create_pseudo_terminal(ctx);
     curs_set(2);
-    // wmove(ctx->terminal_window, 1, 8);
 
     wrefresh(terminal_window);
     return terminal_window;
@@ -136,7 +131,6 @@ void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree)
         }
         strncpy(prev_dir->name, next->d_name, 30);
         prev_dir->name[29] = '\0';
-        // mvwprintw(*explorer_window, LINES - 7, 2, "%s", prev_dir->name);
         strncpy(prev_dir->path, next->d_name, 30);
         prev_dir->path[29] = '\0';
         prev_dir->type = next->d_type;
@@ -406,8 +400,6 @@ void recreate_editor_windows(APP_CONTEXT *ctx)
     wclear(ctx->line_num_win);
     wrefresh(ctx->course_windows[2]);
     delwin(ctx->course_windows[2]);
-    // delwin(ctx->edit_window);
-    // delwin(ctx->line_num_win);
     ctx->course_windows[2] = create_editor_window(ctx);
     ctx->line_num_win = derwin(ctx->course_windows[2], ctx->editor_height - 4, 3, 2, 1);
     ctx->edit_window =
@@ -419,8 +411,5 @@ void recreate_editor_windows(APP_CONTEXT *ctx)
         reopen_file(ctx, activate_editor);
     }
     print_no_open_file_msg(ctx);
-    // wnoutrefresh(ctx->course_windows[2]);
-    // wnoutrefresh(ctx->edit_window);
-    // wnoutrefresh(ctx->line_num_win);
     doupdate();
 }

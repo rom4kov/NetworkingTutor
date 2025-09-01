@@ -82,6 +82,20 @@ void handle_nav_input(APP_CONTEXT *ctx)
                 ctx->start_view_active = true;
                 ctx->start_needs_redraw = true;
             }
+            else if (item_index(ctx->curr_item) == 1) {
+                ctx->active_window_idx = 0;
+                ctx->start_view_active = false;
+                for (int i = 0; i < START_WINDOW_COUNT; i++)
+                {
+                    wclear(ctx->start_windows[i]);
+                    wnoutrefresh(ctx->start_windows[i]);
+                }
+                doupdate();
+                ctx->course_needs_redraw = true;
+                ctx->course_view_active = true;
+                // ctx->current_course_id = ctx->courses[this_win - 2].id;
+                // ctx->current_course = strdup(ctx->courses[this_win - 2].name);
+            }
             else if (item_index(ctx->curr_item) == 2) {
                 ctx->active_window_idx = 0;
                 ctx->active_window = ctx->all_courses_windows[0];

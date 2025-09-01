@@ -23,7 +23,7 @@ HTTP server in C, using the very basic version 1.1 of the HTTP protocol.',
 | `_ \| __| __| `_ (_) / / / @
 | | | | |_| |_| |_) | / / /  @
 |_| |_|\__|\__| .__(_)_/_/   @
-              |_|            ',
+    SERVER    |_|            ',
         'Well done! You’ve taken your first real steps into the world of network programming. Along the way,
 you’ve:@
 @
@@ -96,8 +96,8 @@ VALUES
         'Serve different content depending on the requested path. Map paths to
 handler functions, write different routines for each endpoint and a robust and
 reliable routing logic.',
-        '         HTTP ROUTER        @
-[ GET / ] ----> home()      @
+        'REQUEST        ROUTE HANDLER@
+[ GET / ] ---------> home() @
                             @
 [ GET /hello ] ----> hello()@
                             @
@@ -164,11 +164,11 @@ VALUES
 without relying on threads, using system calls like select() or poll() for
 scalable network programming.',
         '        0s        5s       10s@
-        :         :         : @
-Blocking:xxxxxxxxx:ooooooooo: @
-        :         :         : @
-Non-    :ooooooo  :         : @
-Blocking:xxxxxxxxx:         : ',
+         :         :         :@
+Blocking :xxxxxxxxx:oooooooo :@
+         :         :         :@
+Non-     :xxxxxxxxx:         :@
+Blocking :ooooooo  :         :',
         ''
     );
 
@@ -185,11 +185,10 @@ VALUES
         'Introduce logins, sessions, and cookies, giving your server stateful
 interaction with clients, enabling personalized responses and laying the groundwork
 for secure user authentication.',
-        '   ___                        @
-  (. .)     + Name ----------+@
-  _\-/_     |John            |@
+        '    _       +- Name ---------+@
+  _(-)_     |John            |@
  /_____\    +----------------+@
- __         + Password ------+@
+ __         +- Password -----+@
 /o \_____   |ooooooo         |@
 \__/-="="`  +----------------+',
         ''
@@ -207,12 +206,12 @@ VALUES
         'Building a Basic HTTP Client in C',
         'Switch sides: create your own HTTP client that connects to servers, sends
 requests, and parses responses, learning how clients interact with web services.',
-        '   _____     ____ ____  _     @
-  /     \   / ___/ ___|| |    @
-+---------+ \___ \___ \| |    @
-|    0    |  ___) ___) | |___ @
-|    |    | |____|____/|_____|@
-+---------+     ENCRYPTION    ',
+        ' _     _   _             ____@
+| |__ | |_| |_ _ __ _   / / /@
+| `_ \| __| __| `_ (_) / / / @
+| | | | |_| |_| |_) | / / /  @
+|_| |_|\__|\__| .__(_)_/_/   @
+    CLIENT    |_|            ',
         ''
     );
 
@@ -225,16 +224,15 @@ INSERT
     )
 VALUES
     (
-        'Build a Chat Server with TCP Sockets',
+        'Chat Server with TCP Sockets',
         'Go beyond HTTP to raw TCP: build a real-time chat server where multiple
 clients can message each other simultaneously, practicing persistent connections
 and message broadcasting.',
         '                +------------+@
-                |    Yo!     |@
-+-----------+   |  What up?  |@
-|  Nothing  |   +--------+ +-+@
-|   much!   |             \|  @
-+-+ +-------+                 @
++-----------+   |    Yo!     |@
+|  Nothing  |   |  What up?  |@
+|   much!   |   +--------+ +-+@
++-+ +-------+             \|  @
   |/                          ',
         ''
     );

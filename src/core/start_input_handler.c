@@ -106,7 +106,7 @@ void handle_start_input(APP_CONTEXT *ctx)
                     &ctx->courses[this_win - 2]);
                 doupdate();
                 break;
-            case 10: // Enter / Return key
+            case '\n': // Enter / Return key
                 this_win = ctx->active_window_idx;
                 ctx->start_view_active = false;
                 for (int i = 0; i < WINDOW_COUNT; i++)

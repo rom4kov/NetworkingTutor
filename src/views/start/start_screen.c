@@ -78,10 +78,8 @@ WINDOW *create_header_section(APP_CONTEXT *ctx)
     read_window_text_into_buffer(ctx, header_tbuf, header_width - 2, 0, 0,
                                  PROGRAMM_DESC);
 
-    wattron(header_inner, A_BOLD);
     print_window_content(header_tbuf, header_inner, header_width - 2);
-    wattroff(header_inner, A_BOLD);
-    // mvwprintw(header_inner, 13, 0, "%s", PROGRAMM_DESC);
+
     if (ctx->active_window_idx == 1)
     {
         wattroff(header_inner, COLOR_PAIR(1));
@@ -157,15 +155,25 @@ WINDOW *create_course_preview_card(APP_CONTEXT *ctx, int x_position,
     print_window_content(ctx->card_buffers[curr_win_idx - 2],
                          course_preview_card_inner, width - 2 + remainder);
 
+    int start_x = 14;
     if (ctx->progress_view_active)
     {
-        int start_x = 14;
         int comp_percent = get_course_completion_percentage(ctx, course->id);
 
         wattron(course_preview_card_outer, COLOR_PAIR(4));
         mvwprintw(course_preview_card_outer, height - 1, start_x,
                   " %i%% complete ", comp_percent);
         wattroff(course_preview_card_outer, COLOR_PAIR(4));
+    }
+    else if (course->id > 1) {
+        int comp_percent_prev = get_course_completion_percentage(ctx, course->id - 1);
+        if (comp_percent_prev != 100)
+        {
+            wattron(course_preview_card_outer, COLOR_PAIR(10));
+            mvwprintw(course_preview_card_outer, height - 1, start_x,
+                      " %s ", "LOCKED");
+            wattroff(course_preview_card_outer, COLOR_PAIR(10));
+        }
     }
 
     wnoutrefresh(course_preview_card_outer);

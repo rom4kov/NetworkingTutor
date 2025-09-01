@@ -373,6 +373,7 @@ void read_window_text_into_buffer(APP_CONTEXT *ctx, I_TEXT_BUFFER *header_tbuf,
     if (win == 0)
     {
         first_str = get_ascii_art(ctx->db, "logo");
+        mvwprintw(ctx->start_windows[1], 1, 1, "%lu", strlen(first_str));
         second_str = add_text;
     }
     else if (win == 1)
@@ -391,13 +392,11 @@ void read_window_text_into_buffer(APP_CONTEXT *ctx, I_TEXT_BUFFER *header_tbuf,
     const char *nl = ctx->start_view_active ? "\n\n\n\n" : "\n\n";
     size_t nl_len = strlen(nl);
 
-    // +1 for terminating NUL
     size_t total = logo_len + nl_len + msg_len + 1;
 
     char *logo_and_header_str = malloc(total);
     if (!logo_and_header_str)
         return;
-    // logo_and_header_str[0] = '\0';
 
     snprintf(logo_and_header_str, total, "%s%s%s", first_str, nl, second_str);
 
@@ -446,7 +445,9 @@ void read_in_buf_str(char *buf_str, int total, I_TEXT_BUFFER *header_tbuf,
             if (win < 2)
                 curr_line->centered = true;
 
-            if (win < 2)
+            if (win == 0 && i < 750)
+                curr_line->style = A_BOLD;
+            else if (win == 1)
                 curr_line->style = 0;
             else if (win == 2 && buf_str[i - 1] == '@')
             {

@@ -122,13 +122,14 @@ USER_DATA *get_user_data(sqlite3 *db, int user_id)
     }
     sqlite3_step(stmt);
 
-    user_data->name = (const unsigned char *)strdup((const char *)sqlite3_column_text(stmt, 1));
-    user_data->created_at = (const unsigned char *)strdup((const char *)sqlite3_column_text(stmt, 2));
+    user_data->name = (const unsigned char *)strdup(
+        (const char *)sqlite3_column_text(stmt, 1));
+    user_data->created_at = (const unsigned char *)strdup(
+        (const char *)sqlite3_column_text(stmt, 2));
     // sqlite3_finalize(stmt);
 
     return user_data;
 }
-
 
 void seed_courses_data(sqlite3 *db, WINDOW *win, char *query)
 {
@@ -320,7 +321,8 @@ SECTION_METADATA *get_section_metadata(APP_CONTEXT *ctx)
 
     if (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        section_metadata->title = (char *)strdup((const char *)sqlite3_column_text(stmt, 0));
+        section_metadata->title =
+            (char *)strdup((const char *)sqlite3_column_text(stmt, 0));
         section_metadata->has_test = (bool)sqlite3_column_int(stmt, 1);
         section_metadata->has_separate_task = (bool)sqlite3_column_int(stmt, 2);
     }
@@ -391,7 +393,7 @@ void get_total_course_sections(APP_CONTEXT *ctx)
     int rc = 0;
 
     const char *sql =
-        "SELECT COUNT(DISTINCT section_id) FROM materials WHERE course_id = ?;";
+        "SELECT COUNT(DISTINCT id) FROM sections WHERE course_id = ?;";
 
     sqlite3_stmt *stmt;
     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
@@ -737,25 +739,28 @@ char *get_ascii_art(sqlite3 *db, char *ascii_art_name)
     char *result = NULL;
 
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
-    if (rc != SQLITE_OK) {
+    if (rc != SQLITE_OK)
+    {
         fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(db));
         return NULL;
     }
 
     sqlite3_bind_text(stmt, 1, ascii_art_name, strlen(ascii_art_name), NULL);
 
-    rc = sqlite3_step(stmt);   // <-- must store this
-    if (rc == SQLITE_ROW) {
-        const unsigned char *ascii = (const unsigned char*)strdup((char *)sqlite3_column_text(stmt, 0));
-        if (ascii) {
+    rc = sqlite3_step(stmt); // <-- must store this
+    if (rc == SQLITE_ROW)
+    {
+        const unsigned char *ascii =
+            (const unsigned char *)strdup((char *)sqlite3_column_text(stmt, 0));
+        if (ascii)
+        {
             result = strdup((const char *)ascii);
         }
     }
 
-    sqlite3_finalize(stmt);  // <-- always finalize!
-    return result;           // caller must free()
+    sqlite3_finalize(stmt); // <-- always finalize!
+    return result;          // caller must free()
 }
-
 
 char *get_end_of_course_msg(sqlite3 *db, int course_id)
 {
@@ -779,7 +784,8 @@ char *get_end_of_course_msg(sqlite3 *db, int course_id)
 
     sqlite3_step(stmt);
 
-    end_of_course_msg = (const unsigned char *)strdup((char *)sqlite3_column_text(stmt, 0));
+    end_of_course_msg =
+        (const unsigned char *)strdup((char *)sqlite3_column_text(stmt, 0));
 
     return (char *)end_of_course_msg;
 }
@@ -872,12 +878,12 @@ int get_current_streak(APP_CONTEXT *ctx)
 
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        const char *tmp_date = (const char *)strdup((char *)sqlite3_column_text(stmt, 0));
+        const char *tmp_date =
+            (const char *)strdup((char *)sqlite3_column_text(stmt, 0));
         if (tmp_date == NULL || strcmp(tmp_date, "") == 0)
             break;
         strcpy(cmp_date, tmp_date);
-        if ((diff = get_diff_time_in_days(ctx, cmp_date,
-                                          c_date)) > 1)
+        if ((diff = get_diff_time_in_days(ctx, cmp_date, c_date)) > 1)
         {
             break;
         }
@@ -892,7 +898,8 @@ int get_current_streak(APP_CONTEXT *ctx)
 
 int get_longest_streak(APP_CONTEXT *ctx)
 {
-    if (!ctx || !ctx->db) return 0;
+    if (!ctx || !ctx->db)
+        return 0;
 
     const char *sql = "SELECT MAX(streak) FROM streaks WHERE user_id = ?;";
     sqlite3_stmt *stmt = NULL;
@@ -900,24 +907,31 @@ int get_longest_streak(APP_CONTEXT *ctx)
 
     // Prepare the statement
     int rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
-    if (rc != SQLITE_OK) {
-        fprintf(stderr, "sqlite3_prepare_v2 failed: %s\n", sqlite3_errmsg(ctx->db));
+    if (rc != SQLITE_OK)
+    {
+        fprintf(stderr, "sqlite3_prepare_v2 failed: %s\n",
+                sqlite3_errmsg(ctx->db));
         return 0;
     }
 
     // Bind the user_id
     rc = sqlite3_bind_int(stmt, 1, ctx->current_user_id);
-    if (rc != SQLITE_OK) {
-        fprintf(stderr, "sqlite3_bind_int failed: %s\n", sqlite3_errmsg(ctx->db));
+    if (rc != SQLITE_OK)
+    {
+        fprintf(stderr, "sqlite3_bind_int failed: %s\n",
+                sqlite3_errmsg(ctx->db));
         sqlite3_finalize(stmt);
         return 0;
     }
 
     // Execute the statement
     rc = sqlite3_step(stmt);
-    if (rc == SQLITE_ROW) {
+    if (rc == SQLITE_ROW)
+    {
         longest_streak = sqlite3_column_int(stmt, 0);
-    } else if (rc != SQLITE_DONE) {
+    }
+    else if (rc != SQLITE_DONE)
+    {
         fprintf(stderr, "sqlite3_step failed: %s\n", sqlite3_errmsg(ctx->db));
     }
 
@@ -926,7 +940,6 @@ int get_longest_streak(APP_CONTEXT *ctx)
 
     return longest_streak;
 }
-
 
 // int get_longest_streak(APP_CONTEXT *ctx)
 // {
@@ -960,8 +973,7 @@ int get_course_completion_percentage(APP_CONTEXT *ctx, int course_id)
     int completion_percentage = 0;
     int total_items_completed = 0;
     int rc = 0;
-    const char *sql =
-        "SELECT COUNT(*) FROM materials WHERE course_id = ?;";
+    const char *sql = "SELECT COUNT(*) FROM materials WHERE course_id = ?;";
 
     sqlite3_stmt *stmt;
     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
@@ -980,12 +992,13 @@ int get_course_completion_percentage(APP_CONTEXT *ctx, int course_id)
         course_total_items = (int)sqlite3_column_int(stmt, 0) - 1;
     }
 
-    if (course_total_items == -1) return 0;
+    if (course_total_items == -1)
+        return 0;
 
     mvwprintw(ctx->progress_windows[3], 44, 6, "%i", course_total_items);
 
-    const char *sql2 =
-        "SELECT items_completed FROM progress WHERE user_id = ? AND course_id = ?;";
+    const char *sql2 = "SELECT items_completed FROM progress WHERE user_id = ? "
+                       "AND course_id = ?;";
 
     sqlite3_stmt *stmt2;
     rc = sqlite3_prepare_v2(ctx->db, sql2, -1, &stmt2, NULL);
@@ -1006,7 +1019,9 @@ int get_course_completion_percentage(APP_CONTEXT *ctx, int course_id)
         total_items_completed += items_completed;
     }
 
-    completion_percentage = (course_total_items / total_items_completed) * 100;
+    if (total_items_completed)
+        completion_percentage =
+            (course_total_items / total_items_completed) * 100;
 
     return completion_percentage;
 }

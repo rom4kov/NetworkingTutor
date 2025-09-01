@@ -66,9 +66,9 @@ int main(void)
     ctx->rp_state->curr_offset = 0;
     ctx->rp_state->scroll_offset = 0;
     ctx->rp_state->it_buffer = initialize_it_buffer();
-    ctx->rp_state->course_progress = (int *)calloc(32, sizeof(int));
-    ctx->rp_state->completed_sections = (bool *)calloc(32, sizeof(bool));
-    ctx->rp_state->total_section_items = (int *)calloc(32, sizeof(int));
+    ctx->rp_state->course_progress = (int *)calloc(MAX_COURSE_SECTIONS, sizeof(int));
+    ctx->rp_state->completed_sections = (bool *)calloc(MAX_COURSE_SECTIONS, sizeof(bool));
+    ctx->rp_state->total_section_items = (int *)calloc(MAX_COURSE_SECTIONS, sizeof(int));
     ctx->rp_state->total_course_sections = 0;
 
     ctx->user_form_fields = false;
@@ -132,6 +132,11 @@ int main(void)
     //                   "SQL/create_tasks_table.sql");
     // seed_courses_data(ctx->db, ctx->greeter_screen,
     //                   "SQL/courses/http_server/tasks.sql");
+    //
+    // seed_courses_data(ctx->db, ctx->greeter_screen,
+    //                   "SQL/courses/http_parser/sections.sql");
+    seed_courses_data(ctx->db, ctx->greeter_screen,
+                      "SQL/courses/http_parser/0_intro.sql");
 
     ESCDELAY = 100;
 

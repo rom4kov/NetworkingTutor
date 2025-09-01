@@ -1,3 +1,4 @@
+#include "../controllers/controllers.h"
 #include "../core/core.h"
 #include "../data/data_access_layer.h"
 #include "../models/models.h"
@@ -39,44 +40,8 @@ void handle_greeter_input(APP_CONTEXT *ctx)
             }
             else if (item_index(curr_item) == 1)
             {
-                wclear(ctx->greeter_screen);
-                wrefresh(ctx->greeter_screen);
-                delwin(ctx->greeter_screen);
-                delwin(ctx->greeter_ascii_window);
-                ctx->greeter_screen = NULL;
-                ctx->greeter_view_active = false;
-                ctx->greeter_needs_redraw = false;
-                ctx->start_view_active = false;
-                ctx->start_needs_redraw = false;
-                ctx->course_view_active = true;
-                ctx->first_course_draw = true;
-                ctx->course_needs_redraw = true;
-                // for (int i = 0; i < START_WINDOW_COUNT; i++)
-                // {
-                //     wclear(ctx->start_windows[i]);
-                //     wrefresh(ctx->start_windows[i]);
-                //     delwin(ctx->start_windows[i]);
-                // }
-
-                ctx->current_user_id = 1;
-                ctx->user_data = get_user_data(ctx->db, ctx->current_user_id);
-                ctx->current_course_id = get_current_course(ctx->db, 1);
-                ctx->current_course =
-                    get_course_name_by_id(ctx->db, ctx->current_course_id);
-                get_course_progress(ctx);
-
-                get_completed_sections(ctx);
-                ctx->rp_state->curr_section =
-                    ctx->rp_state->sections_completed;
-                ctx->rp_state->curr_item =
-                    ctx->rp_state
-                        ->course_progress[ctx->rp_state->sections_completed] +
-                    (ctx->rp_state->curr_section == 0 ? 1 : 0);
-                ctx->rp_state->items_completed =
-                    ctx->rp_state
-                        ->course_progress[ctx->rp_state->sections_completed -
-                                          1];
-
+                int current_course_id = get_current_course(ctx->db, 1);
+                go_to_course_by_id(ctx, current_course_id);
             }
             else if (item_index(curr_item) == 6)
             {

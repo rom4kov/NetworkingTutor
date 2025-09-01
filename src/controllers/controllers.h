@@ -3,6 +3,9 @@
 #include <ncurses.h>
 #include <stdio.h>
 
+// start view controller functions
+void go_to_course_by_id(APP_CONTEXT *ctx, int course_id);
+
 void read_file_into_buffer(FILE *file, TEXT_BUFFER *text_buf);
 // void handle_editor_input(int ch, WINDOW **line_num_win, WINDOW **edit_window,
 //                          TEXT_BUFFER *text_buf, FILE *file, bool *editor_mode,

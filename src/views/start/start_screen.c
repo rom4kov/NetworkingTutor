@@ -166,13 +166,20 @@ WINDOW *create_course_preview_card(APP_CONTEXT *ctx, int x_position,
         wattroff(course_preview_card_outer, COLOR_PAIR(4));
     }
     else if (course->id > 1) {
+        start_x = (width - 8) / 2;
+        if (ctx->start_view_active)
+        {
+            start_x++;
+            height--;
+        }
         int comp_percent_prev = get_course_completion_percentage(ctx, course->id - 1);
         if (comp_percent_prev != 100)
         {
-            wattron(course_preview_card_outer, COLOR_PAIR(10));
+            course->locked = true;
+            wattron(course_preview_card_outer, COLOR_PAIR(10) | A_BOLD);
             mvwprintw(course_preview_card_outer, height - 1, start_x,
                       " %s ", "LOCKED");
-            wattroff(course_preview_card_outer, COLOR_PAIR(10));
+            wattroff(course_preview_card_outer, COLOR_PAIR(10 | A_BOLD));
         }
     }
 

@@ -1,4 +1,5 @@
 CREATE TABLE completed_courses (
+    id INTEGER PRIMARY KEY,
     user_id INTEGER NOT NULL,
     course_id INTEGER NOT NULL,
     completed_at DATETIME,

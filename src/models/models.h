@@ -31,6 +31,7 @@ typedef struct _course_data
     char *name;
     char *short_desc;
     char *ascii_logo;
+    bool locked;
 } COURSE;
 
 typedef struct _course_section

@@ -18,3 +18,5 @@
 #define EXPLORER_WIDTH WU + WU / 2
 #define EDIT_WIN_WIDTH WU * 5 + WU / 2
 #define SHELL_WINDOW_IDX 4
+
+#define MAX_COURSE_SECTIONS 16

@@ -19,45 +19,45 @@
 
 void log_course_instr_values(APP_CONTEXT *ctx)
 {
-    mvwprintw(ctx->course_windows[2], 2, EDITOR_WIDTH, "%s",
+    mvwprintw(ctx->course_windows[2], 2, EDITOR_WIDTH - 30, "%s",
               "                    ");
-    mvwprintw(ctx->course_windows[2], 3, EDITOR_WIDTH, "%s",
+    mvwprintw(ctx->course_windows[2], 3, EDITOR_WIDTH - 30, "%s",
               "                    ");
-    mvwprintw(ctx->course_windows[2], 4, EDITOR_WIDTH, "%s",
+    mvwprintw(ctx->course_windows[2], 4, EDITOR_WIDTH - 30, "%s",
               "                    ");
-    mvwprintw(ctx->course_windows[2], 5, EDITOR_WIDTH, "%s",
+    mvwprintw(ctx->course_windows[2], 5, EDITOR_WIDTH - 30, "%s",
               "                    ");
-    mvwprintw(ctx->course_windows[2], 6, EDITOR_WIDTH, "%s",
+    mvwprintw(ctx->course_windows[2], 6, EDITOR_WIDTH - 30, "%s",
               "                    ");
-    mvwprintw(ctx->course_windows[2], 7, EDITOR_WIDTH, "%s",
+    mvwprintw(ctx->course_windows[2], 7, EDITOR_WIDTH - 30, "%s",
               "                    ");
-    mvwprintw(ctx->course_windows[2], 8, EDITOR_WIDTH, "%s",
+    mvwprintw(ctx->course_windows[2], 8, EDITOR_WIDTH - 30, "%s",
               "                    ");
-    mvwprintw(ctx->course_windows[2], 9, EDITOR_WIDTH, "%s",
+    mvwprintw(ctx->course_windows[2], 9, EDITOR_WIDTH - 30, "%s",
               "                    ");
-    mvwprintw(ctx->course_windows[2], 10, EDITOR_WIDTH, "%s",
+    mvwprintw(ctx->course_windows[2], 10, EDITOR_WIDTH - 30, "%s",
               "                    ");
-    mvwprintw(ctx->course_windows[2], 11, EDITOR_WIDTH, "%s",
+    mvwprintw(ctx->course_windows[2], 11, EDITOR_WIDTH - 30, "%s",
               "                    ");
-    mvwprintw(ctx->course_windows[2], 2, EDITOR_WIDTH, "curr_section %i",
+    mvwprintw(ctx->course_windows[2], 2, EDITOR_WIDTH - 30, "curr_section %i",
               ctx->rp_state->curr_section);
-    mvwprintw(ctx->course_windows[2], 3, EDITOR_WIDTH, "nosi %i",
+    mvwprintw(ctx->course_windows[2], 3, EDITOR_WIDTH - 30, "nosi %i",
               ctx->rp_state->num_of_section_items[ctx->rp_state->curr_section]);
-    mvwprintw(ctx->course_windows[2], 4, EDITOR_WIDTH, "curr_item %i",
+    mvwprintw(ctx->course_windows[2], 4, EDITOR_WIDTH - 30, "curr_item %i",
               ctx->rp_state->curr_item);
-    mvwprintw(ctx->course_windows[2], 5, EDITOR_WIDTH, "items_completed %i",
+    mvwprintw(ctx->course_windows[2], 5, EDITOR_WIDTH - 30, "items_completed %i",
               ctx->rp_state->items_completed);
-    mvwprintw(ctx->course_windows[2], 6, EDITOR_WIDTH, "tsi cs %i",
+    mvwprintw(ctx->course_windows[2], 6, EDITOR_WIDTH - 30, "tsi cs %i",
               ctx->rp_state->total_section_items[ctx->rp_state->curr_section]);
-    mvwprintw(ctx->course_windows[2], 7, EDITOR_WIDTH,
+    mvwprintw(ctx->course_windows[2], 7, EDITOR_WIDTH - 30,
               "total course sections %i", ctx->rp_state->total_course_sections);
-    mvwprintw(ctx->course_windows[2], 8, EDITOR_WIDTH, "has_test %i",
+    mvwprintw(ctx->course_windows[2], 8, EDITOR_WIDTH - 30, "has_test %i",
               ctx->rp_state->s_metadata->has_test);
-    mvwprintw(ctx->course_windows[2], 9, EDITOR_WIDTH, "test_mode: %i",
+    mvwprintw(ctx->course_windows[2], 9, EDITOR_WIDTH - 30, "test_mode: %i",
               ctx->rp_state->showing_test_results);
-    mvwprintw(ctx->course_windows[2], 10, EDITOR_WIDTH,
+    mvwprintw(ctx->course_windows[2], 10, EDITOR_WIDTH - 30,
               "sections completed: %i", ctx->rp_state->sections_completed);
-    mvwprintw(ctx->course_windows[2], 11, EDITOR_WIDTH,
+    mvwprintw(ctx->course_windows[2], 11, EDITOR_WIDTH - 30,
               "showing test results: %i", ctx->rp_state->showing_test_results);
 }
 

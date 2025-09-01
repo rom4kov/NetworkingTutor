@@ -1,5 +1,6 @@
 #include "../../core/core.h"
 #include "../views.h"
+#include <curses.h>
 #include <ncurses.h>
 #include <string.h>
 
@@ -12,7 +13,8 @@ void print_course_instructions(APP_CONTEXT *ctx)
     ctx->rp_state->s_metadata = get_section_metadata(ctx);
 
     read_item_into_buffer(ctx);
-    // log_course_instr_values(ctx);
+    log_course_instr_values(ctx);
+    wrefresh(ctx->course_windows[2]);
 
     if (ctx->rp_state->curr_section < ctx->rp_state->total_course_sections)
     {

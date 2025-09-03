@@ -135,8 +135,8 @@ int main(void)
     //
     // seed_courses_data(ctx->db, ctx->greeter_screen,
     //                   "SQL/courses/http_parser/sections.sql");
-    seed_courses_data(ctx->db, ctx->greeter_screen,
-                      "SQL/courses/http_parser/0_intro.sql");
+    // seed_courses_data(ctx->db, ctx->greeter_screen,
+    //                   "SQL/courses/http_parser/0_intro.sql");
 
     ESCDELAY = 100;
 
@@ -404,74 +404,4 @@ void initialize_colors()
 
     init_color(COLOR_BERMUDA, 523, 851, 718);
     init_pair(15, COLOR_BERMUDA, -1);
-}
-
-MENU *create_greeter_menu(WINDOW *nav_window)
-{
-    const char *choices[] = {
-        "   🛫 Start new learning path",
-        " 👉 Continue where you left off",
-        "     👤 Create new account",
-        "          🚀 Progress",
-        "            Settings",
-        "            Shortcuts",
-        "            🚪 Quit",
-        (char *)NULL // Last element must be NULL
-    };
-
-    ITEM **menu_items = (ITEM **)calloc(8, sizeof(ITEM *));
-
-    for (int i = 0; choices[i] != NULL; i++)
-    {
-        menu_items[i] = new_item(choices[i], "");
-    }
-
-    // Create the menu
-    MENU *menu = new_menu(menu_items);
-    set_menu_format(menu, 14, 1);
-    set_menu_spacing(menu, 0, 2, 2);
-    // mvwprintw(nav_window, 2, 3, "%i", COLS);
-
-    // Set the window for the menu to be displayed inside left_inner_win
-    set_menu_win(menu, nav_window);
-    set_menu_sub(menu, derwin(nav_window, 28, COLS / 6, (LINES / 5) * 2 + 3,
-                              (COLS - 35) / 2 - 1));
-    set_menu_fore(menu, A_BOLD | A_ITALIC);
-    set_menu_mark(menu, " > "); // Mark for the selected item
-
-    // Post the menu (make it visible)
-    post_menu(menu);
-
-    // Refresh the left_inner_win window
-    wrefresh(nav_window);
-    return menu;
-}
-
-WINDOW *create_greeter_screen(APP_CONTEXT *ctx)
-{
-    WINDOW *greeter_screen = newwin(LINES, COLS, 0, 0);
-    ctx->greeter_ascii_window =
-        derwin(greeter_screen, 10, 71, LINES / 5, (COLS - 71) / 2 + 2);
-    draw_border(greeter_screen, 2, 0);
-    wattron(greeter_screen, COLOR_PAIR(3) | A_BOLD);
-    char *msg = "Welcome to";
-    char *msg2 = "󰒍 NetworkingTutor v0.0.1";
-    mvwprintw(greeter_screen, (LINES / 5) - 1, (COLS - strlen(msg)) / 2, "%s",
-              msg);
-    wattron(ctx->greeter_ascii_window, A_BOLD);
-    mvwprintw(ctx->greeter_ascii_window, 0, 0, "%s",
-              get_ascii_art(ctx->db, "logo"));
-    wattroff(ctx->greeter_ascii_window, A_BOLD);
-
-    ctx->greeter_menu = create_greeter_menu(greeter_screen);
-
-    wattroff(greeter_screen, COLOR_PAIR(3) | A_BOLD);
-
-    wattron(greeter_screen, COLOR_PAIR(3));
-    mvwprintw(greeter_screen, (LINES / 2) + 14, (COLS - strlen(msg2)) / 2 + 2,
-              msg2, LINES, COLS);
-    wattroff(greeter_screen, COLOR_PAIR(3));
-    wrefresh(ctx->greeter_ascii_window);
-
-    return greeter_screen;
 }

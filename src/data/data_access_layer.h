@@ -13,6 +13,7 @@ sqlite3 *create_database();
 char *read_sql_query(char *filename);
 int create_new_user(APP_CONTEXT *ctx, char *username);
 USER_DATA *get_user_data(sqlite3 *db, int user_id);
+int get_user_count(sqlite3 *db);
 
 void seed_courses_data(sqlite3 *db, WINDOW *win, char *query);
 char *get_course_name_by_id(sqlite3 *db, int course_id);

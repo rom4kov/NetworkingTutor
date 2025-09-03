@@ -2,6 +2,7 @@
 #include "../core/core.h"
 #include "../data/data_access_layer.h"
 #include "../models/models.h"
+#include "../views/views.h"
 #include <curses.h>
 #include <menu.h>
 #include <ncurses.h>
@@ -29,14 +30,8 @@ void handle_greeter_input(APP_CONTEXT *ctx)
             curr_item = current_item(ctx->greeter_menu);
             if (item_index(curr_item) == 0)
             {
-                ctx->greeter_view_active = false;
-                ctx->start_view_active = true;
-                ctx->start_needs_redraw = true;
-                ctx->rp_state->sections_completed = 0;
-                ctx->rp_state->items_completed = 0;
-                ctx->rp_state->curr_section = 0;
-                ctx->rp_state->curr_item = 2;
-                create_new_user_popup(ctx);
+                create_start_options_popup(ctx);
+                // create_new_user_popup(ctx);
             }
             else if (item_index(curr_item) == 1)
             {
@@ -79,8 +74,7 @@ void create_new_user_popup_form(WINDOW **inner_win, WINDOW **form_window,
     draw_border(*inner_win, 1, "");
     mvwprintw(*inner_win, 0, 2, "%s", label);
     mvwprintw(*inner_win, 2, 3, "Your name: ");
-    mvwprintw(*inner_win, 4, 3,
-              "Press ENTER to confirm and start your journey");
+    mvwprintw(*inner_win, 4, 3, "Press ENTER to confirm, q to cancel");
 
     set_form_win(*new_file_form, *inner_win);
     set_form_sub(*new_file_form, *form_window);
@@ -132,99 +126,189 @@ void create_new_user_popup(APP_CONTEXT *ctx)
                 form_driver(new_file_form, REQ_VALIDATION);
                 username = field_buffer(field[0], 0);
                 trim(&username);
-                // mvwprintw(inner_win, 5, 2, "%s", username);
-                // wrefresh(inner_win);
 
                 ctx->current_user_id = create_new_user(ctx, username);
                 ctx->key = wgetch(ctx->greeter_screen);
 
-                // if (strcmp(answer, "y") == 0)
-                // {
                 create_user_form_active = false;
-                //     ctx->explorer_mode = true;
-                //     ctx->editor_mode = false;
-                //     ctx->active_window = 1;
-                //
-                //     if (strcmp(ctx->file_tree->current_entry->name,
-                //                ctx->filename) == 0)
-                //     {
-                wclear(inner_win);
-                wclear(form_window);
-                //         wclear(ctx->course_windows[2]);
-                //         wclear(ctx->edit_window);
-                //         ctx->course_windows[2] =
-                //             create_editor_window();
-                //
-                //         wattron(ctx->course_windows[2], COLOR_PAIR(10));
-                //         print_no_open_file_msg(&ctx->course_windows[2]);
-                //         wattroff(ctx->course_windows[2], COLOR_PAIR(10));
-                //
-                //         deallocate_buffer(ctx->t_buffer);
-                //         ctx->t_buffer = initialize_buffer();
-                //     }
-                //
-                //     if (ctx->file && ctx->file->_fileno > 0)
-                //         fclose(ctx->file);
-                //     // mvwprintw(ctx->course_windows[3], 15, 50, "%s",
-                //     //           ctx->file_tree->current_entry->path);
-                //     // wrefresh(ctx->course_windows[3]);
-                //     remove(ctx->file_tree->current_entry->path);
-                //
-                //     remove_entry_from_file_tree(ctx->file_tree);
-                //
+                werase(inner_win);
+                werase(form_window);
                 curs_set(0);
                 unpost_form(new_file_form);
                 free_form(new_file_form);
                 free_field(field[0]);
-                //
-                //     wclear(ctx->course_windows[1]);
-                //     ctx->course_windows[1] =
-                //         create_explorer_window(ctx->file_tree);
-                //     ctx->course_windows[2] =
-                //         create_editor_window();
-                //
-                //     focus_window(&ctx->course_windows[2], 2, "Editor");
-                //     focus_window(&ctx->course_windows[1], 3, "Explorer");
-                //
-                //     wattron(ctx->course_windows[2], COLOR_PAIR(10));
-                //     print_no_open_file_msg(&ctx->course_windows[2]);
-                //     wattroff(ctx->course_windows[2], COLOR_PAIR(10));
-                //
-                //     wnoutrefresh(ctx->course_windows[1]);
-                //     wnoutrefresh(ctx->line_num_win);
-                //     wnoutrefresh(ctx->edit_window);
-                //     wnoutrefresh(ctx->course_windows[2]);
-                //     doupdate();
-                // }
-                // else
-                // {
-                //     *create_user_form_active = false;
-                //     curs_set(0);
-                //     unpost_form(new_file_form);
-                //     free_form(new_file_form);
-                //     free_field(field[0]);
-                //     menu_driver(ctx->explorer_menu, REQ_NEXT_ITEM);
-                //     ctx->course_windows[1] =
-                //         create_explorer_window(ctx->file_tree);
-                //     focus_window(&ctx->course_windows[1], 3, "Explorer");
-                //     doupdate();
-                // }
+                ctx->greeter_screen = create_greeter_screen(ctx);
+                doupdate();
+                ctx->greeter_view_active = false;
+                ctx->start_view_active = true;
+                ctx->start_needs_redraw = true;
+                ctx->rp_state->sections_completed = 0;
+                ctx->rp_state->items_completed = 0;
+                ctx->rp_state->curr_section = 0;
+                ctx->rp_state->curr_item = 2;
                 break;
             case 'q':
                 create_user_form_active = false;
+                werase(inner_win);
+                werase(form_window);
+                wrefresh(inner_win);
+                wrefresh(form_window);
+                menu_driver(ctx->greeter_menu, REQ_NEXT_ITEM);
+                menu_driver(ctx->greeter_menu, REQ_PREV_ITEM);
+                doupdate();
                 curs_set(0);
                 unpost_form(new_file_form);
                 free_form(new_file_form);
                 free_field(field[0]);
-                // menu_driver(ctx->explorer_menu, REQ_NEXT_ITEM);
-                // ctx->course_windows[1] =
-                // create_explorer_window(ctx->file_tree);
-                // focus_window(&ctx->course_windows[1], 3, "Explorer");
                 doupdate();
                 break;
             default:
                 form_driver(new_file_form, ctx->key);
                 wrefresh(form_window);
+                break;
+        }
+    }
+}
+
+void create_start_options_popup(APP_CONTEXT *ctx)
+{
+    int num_of_users = get_user_count(ctx->db);
+
+    WINDOW *start_opt_menu_win =
+        derwin(ctx->greeter_screen, 7, 50, (LINES / 2) - 4, (COLS / 2) - 25);
+    WINDOW *start_opt_menu_sub = derwin(start_opt_menu_win, 5, 41, 2, 7);
+    MENU *start_options_menu = create_start_options_menu(
+        ctx, &start_opt_menu_win, &start_opt_menu_sub, num_of_users);
+    ITEM *curr_item = NULL;
+
+    bool start_opt_menu_active = true;
+
+    while (start_opt_menu_active)
+    {
+        keypad(start_opt_menu_sub, TRUE);
+        ctx->key = wgetch(start_opt_menu_sub);
+
+        switch (ctx->key)
+        {
+            case KEY_DOWN: // Backspace
+                menu_driver(start_options_menu, REQ_DOWN_ITEM);
+                break;
+            case KEY_UP: // Backspace
+                menu_driver(start_options_menu, REQ_UP_ITEM);
+                break;
+            case 10:
+                curr_item = current_item(start_options_menu);
+                if (item_index(curr_item) == 0)
+                {
+                    create_new_user_popup(ctx);
+                }
+                else if (item_index(curr_item) == 1)
+                {
+                    create_user_selection_popup(
+                        ctx, num_of_users, start_options_menu,
+                        start_opt_menu_win, start_opt_menu_sub);
+                    menu_driver(start_options_menu, REQ_PREV_ITEM);
+                    menu_driver(start_options_menu, REQ_NEXT_ITEM);
+                    werase(start_opt_menu_win);
+                    wrefresh(start_opt_menu_win);
+                }
+                break;
+            case 'q':
+                start_opt_menu_active = false;
+                wclear(start_opt_menu_win);
+                wclear(start_opt_menu_sub);
+                wnoutrefresh(start_opt_menu_win);
+                wnoutrefresh(start_opt_menu_sub);
+                menu_driver(ctx->greeter_menu, REQ_NEXT_ITEM);
+                menu_driver(ctx->greeter_menu, REQ_PREV_ITEM);
+                doupdate();
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+void create_user_selection_popup(APP_CONTEXT *ctx, int num_of_users,
+                                 MENU *start_opt_menu, WINDOW *start_opts_win,
+                                 WINDOW *start_opts_sub)
+{
+
+    USER_DATA **users = malloc(sizeof(USER_DATA) * num_of_users);
+    int max_name_len = 0;
+    for (int i = 0; i < num_of_users; i++)
+    {
+        users[i] = get_user_data(ctx->db, i + 1);
+        int name_len = strlen((char *)users[i]->name);
+        if (name_len > max_name_len)
+            max_name_len = name_len;
+    }
+    WINDOW *user_select_win = derwin(ctx->greeter_screen, num_of_users * 2 + 4,
+                                     50, (LINES / 2) - 4, (COLS / 2) - 25);
+    WINDOW *user_select_sub_win =
+        derwin(user_select_win, num_of_users * 2, 44, 2, 2);
+    MENU *user_select_menu =
+        create_user_selection_menu(ctx, &user_select_win, &user_select_sub_win,
+                                   num_of_users, max_name_len);
+    ITEM *curr_item = NULL;
+
+    bool user_select_menu_active = true;
+
+    while (user_select_menu_active)
+    {
+        keypad(user_select_sub_win, TRUE);
+        ctx->key = wgetch(user_select_sub_win);
+
+        switch (ctx->key)
+        {
+            case KEY_DOWN: // Backspace
+                menu_driver(user_select_menu, REQ_DOWN_ITEM);
+                break;
+            case KEY_UP: // Backspace
+                menu_driver(user_select_menu, REQ_UP_ITEM);
+                break;
+            case '\n':
+                curr_item = current_item(user_select_menu);
+
+                ctx->current_user_id = item_index(curr_item) + 1;
+                ctx->user_data = get_user_data(ctx->db, ctx->current_user_id);
+
+                user_select_menu_active = false;
+                wclear(ctx->greeter_screen);
+                wrefresh(ctx->greeter_screen);
+                // werase(inner_win);
+                // werase(form_window);
+                // curs_set(0);
+                // unpost_form(new_file_form);
+                // free_form(new_file_form);
+                // free_field(field[0]);
+                ctx->greeter_view_active = false;
+                ctx->start_view_active = true;
+                ctx->start_needs_redraw = true;
+                ctx->rp_state->sections_completed = 0;
+                ctx->rp_state->items_completed = 0;
+                ctx->rp_state->curr_section = 0;
+                ctx->rp_state->curr_item = 2;
+                break;
+            case 'q':
+                user_select_menu_active = false;
+                wclear(user_select_win);
+                wclear(user_select_sub_win);
+                wnoutrefresh(user_select_win);
+                wnoutrefresh(user_select_sub_win);
+                wnoutrefresh(start_opts_win);
+                wnoutrefresh(start_opts_sub);
+                unpost_menu(user_select_menu);
+                free_menu(user_select_menu);
+                keypad(start_opts_sub, TRUE);
+                menu_driver(start_opt_menu, REQ_PREV_ITEM);
+                menu_driver(start_opt_menu, REQ_NEXT_ITEM);
+                doupdate();
+                curs_set(0);
+                break;
+            default:
+                // form_driver(new_file_form, ctx->key);
+                // wrefresh(form_window);
                 break;
         }
     }

@@ -7,7 +7,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 
 sqlite3 *create_database()
 {
@@ -129,6 +128,31 @@ USER_DATA *get_user_data(sqlite3 *db, int user_id)
     // sqlite3_finalize(stmt);
 
     return user_data;
+}
+
+int get_user_count(sqlite3 *db)
+{
+    int rc = 0;
+
+    const char *sql =
+        "SELECT COUNT(id) FROM users;";
+
+    sqlite3_stmt *stmt;
+    rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+    if (rc != SQLITE_OK)
+    {
+        return 0;
+    }
+
+    int num_of_users = 0;
+    if (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        num_of_users = sqlite3_column_int(stmt, 0);
+    }
+
+    sqlite3_finalize(stmt);
+
+    return num_of_users;
 }
 
 void seed_courses_data(sqlite3 *db, WINDOW *win, char *query)
@@ -995,7 +1019,7 @@ int get_course_completion_percentage(APP_CONTEXT *ctx, int course_id)
     if (course_total_items == -1)
         return 0;
 
-    mvwprintw(ctx->progress_windows[3], 44, 6, "%i", course_total_items);
+    // mvwprintw(ctx->progress_windows[3], 44, 6, "%i", course_total_items);
 
     const char *sql2 = "SELECT items_completed FROM progress WHERE user_id = ? "
                        "AND course_id = ?;";
@@ -1022,6 +1046,11 @@ int get_course_completion_percentage(APP_CONTEXT *ctx, int course_id)
     if (total_items_completed)
         completion_percentage =
             (course_total_items / total_items_completed) * 100;
+    //
+    // mvwprintw(ctx->start_windows[1], 3, 4 * course_id, "%i", course_total_items);
+    // mvwprintw(ctx->start_windows[1], 4, 4 * course_id, "%i", total_items_completed);
+    // mvwprintw(ctx->start_windows[1], 5, 4 * course_id, "%i", completion_percentage);
+    // wrefresh(ctx->start_windows[1]);
 
     return completion_percentage;
 }

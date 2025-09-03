@@ -12,6 +12,17 @@
 
 void initialize_colors();
 WINDOW *create_greeter_screen(APP_CONTEXT *ctx);
+MENU *create_greeter_menu(WINDOW *nav_window);
+void create_start_options_popup(APP_CONTEXT *ctx);
+MENU *create_start_options_menu(APP_CONTEXT *ctx, WINDOW **start_opt_menu_win,
+                                WINDOW **start_opt_menu_sub, int num_of_users);
+void create_user_selection_popup(APP_CONTEXT *ctx, int num_of_users,
+                                 MENU *start_opt_menu, WINDOW *start_opts_win,
+                                 WINDOW *start_opts_sub);
+MENU *create_user_selection_menu(APP_CONTEXT *ctx,
+                                 WINDOW **user_select_menu_win,
+                                 WINDOW **user_select_sub, int num_of_users,
+                                 int max_name_len);
 
 void create_start_screen(APP_CONTEXT *ctx);
 WINDOW *create_navigation_window(int *active_win, MENU **start_menu);
@@ -26,10 +37,9 @@ void add_line_break(COURSE_SECTION *c_sec_data, I_TEXT_BUFFER *tbuf,
 void read_item_into_buffer(APP_CONTEXT *ctx);
 void read_task_into_buffer(APP_CONTEXT *ctx);
 void read_end_of_course_page_into_buffer(APP_CONTEXT *ctx);
-void read_window_text_into_buffer(APP_CONTEXT *ctx,
-                                           I_TEXT_BUFFER *header_tbuf,
-                                           int win_width, int win,
-                                           int course_id, char *add_text);
+void read_window_text_into_buffer(APP_CONTEXT *ctx, I_TEXT_BUFFER *header_tbuf,
+                                  int win_width, int win, int course_id,
+                                  char *add_text);
 void read_in_buf_str(char *buf_str, int total, I_TEXT_BUFFER *header_tbuf,
                      int win_width, int win);
 
@@ -65,7 +75,8 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
                   WINDOW **line_num_win, int *scroll_offset,
                   int lines_to_print);
 void print_line(LINE *current_line, int line_num, WINDOW **edit_window);
-void print_line_nr(WINDOW **editor_window, TEXT_BUFFER *tbuf, int editor_height);
+void print_line_nr(WINDOW **editor_window, TEXT_BUFFER *tbuf,
+                   int editor_height);
 char *match_file_icon(pcre2_code *re, int subj_len, char *filename, char *icon,
                       int color);
 ICON get_file_icon(char *filename);

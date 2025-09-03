@@ -1,7 +1,6 @@
 #include "../data/data_access_layer.h"
 #include <menu.h>
 #include <ncurses.h>
-#include <stdio.h>
 
 void handle_greeter_input(APP_CONTEXT *ctx);
 void create_new_user_popup_form(WINDOW **inner_win, WINDOW **form_window,

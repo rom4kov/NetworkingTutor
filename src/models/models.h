@@ -1,8 +1,9 @@
 #pragma once
 
-#include <curses.h>
+#include "../../ntutor.h"
 #include <form.h>
 #include <menu.h>
+#include <panel.h>
 #include <ncurses.h>
 #include <sqlite3.h>
 #include <CUnit/Basic.h>
@@ -181,6 +182,7 @@ typedef struct _app_context
 {
   sqlite3 *db;
   WINDOW *greeter_screen;
+  PANEL *greeter_panels[GREETER_PANEL_COUNT];
   WINDOW *greeter_ascii_window;
   WINDOW *start_windows[START_WINDOW_COUNT];
   WINDOW *course_windows[COURSE_WINDOW_COUNT];

@@ -65,10 +65,8 @@ void create_your_courses_window(APP_CONTEXT *ctx, WINDOW *win)
 
 WINDOW *create_progress_stats_window(APP_CONTEXT *ctx)
 {
-    int current_streak = 0;
-    int longest_streak = 0;
-    int courses, sections, items;
-    courses = sections = items = 0;
+    int current_streak, longest_streak, courses, sections, items, points;
+    current_streak = longest_streak = courses = sections = items = points = 0;
 
     WINDOW *stats_window = newwin(LINES - (LINES / 3), 79, (LINES / 3), 0);
     draw_border(stats_window, 2, NULL);
@@ -100,14 +98,14 @@ WINDOW *create_progress_stats_window(APP_CONTEXT *ctx)
     sections = get_total_completed_sections(ctx);
     items = get_total_completed_items(ctx);
 
+    points = courses * 100 + sections * 10 + items;
+
     mvwprintw(inner_stats_win, 17, 0, "Courses completed: %i", courses);
     mvwprintw(inner_stats_win, 19, 0, "Sections completed: %i", sections);
     mvwprintw(inner_stats_win, 21, 0, "Items completed: %i", items);
 
-    mvwprintw(inner_stats_win, 25, 0, "Experience Points: %i",
-              get_num_of_completed_courses(ctx));
-    mvwprintw(inner_stats_win, 27, 0, "Points until next rank: %i",
-              get_total_completed_sections(ctx));
+    mvwprintw(inner_stats_win, 25, 0, "Experience Points: %i", points);
+    mvwprintw(inner_stats_win, 27, 0, "Points until next rank: %i", points);
     mvwprintw(inner_stats_win, 29, 0, "Rank: %s", "Packet Novice");
 
     char *novice_ascii = "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿\n"
@@ -138,11 +136,61 @@ WINDOW *create_progress_stats_window(APP_CONTEXT *ctx)
                        "⣿⣿⣿⠟⠛⠵⠶⠿⠿⠂⢀⣀⣀⣀⢤⢃⣸⣿⣷⣿⠁⣠⡾⢱⣿⣿⣿⣿\n"
                        "⣿⣿⢫⠴⣀⣤⣀⣤⣶⣾⣿⣿⣿⣿⣷⣾⣿⣿⣿⡧⣀⣡⡠⣾⣿⣿⣿⣿\n"
                        "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⣶⣿⣶⣿⣿⣿⣿⣿⣿";
+
+    char *appr_ascii = "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⠛⠹⡻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿"
+                       "⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠀⢾⠁⡀⢉⣫⠻⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿"
+                       "⣿⣿⣿⣿⣿⣿⣿⣿⣷⡄⠀⡀⠀⠀⠺⢿⣿⣷⣬⣛⠿⣿⣿⣿⣿⣿⣿⣿"
+                       "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣆⠀⠐⠀⡀⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿"
+                       "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⠀⠈⠄⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿"
+                       "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀⠀⢂⠀⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿"
+                       "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠇⠀⠐⡀⠐⠀⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿"
+                       "⣿⣿⣿⣿⣿⣿⣿⣿⠟⠁⠀⠄⢁⠀⠑⠀⠄⠹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿"
+                       "⣿⣿⣿⣿⣿⣿⣿⠇⠀⠈⡀⠑⣠⣤⠁⠨⢀⠈⢽⣿⣿⣿⣿⣿⣿⣿⣿⣿"
+                       "⣿⣿⣿⣿⣿⣿⣿⡇⠀⢠⡀⣰⣿⣿⣧⡀⠂⢀⠀⠛⣿⣿⣿⣿⣿⣿⣿⣿"
+                       "⣿⣿⣿⣿⣿⣿⣿⣿⡿⠀⢽⣿⣿⣿⣿⣿⣷⣿⣦⡀⠻⣿⣿⣿⣿⣿⣿⣿"
+                       "⣿⣿⣿⣿⣿⣿⣿⣬⣤⣦⣼⣿⣿⣿⣿⣿⣿⣿⣿⣷⡆⠙⢿⣿⣿⣿⣿⣿"
+                       "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⣠⣸⣿⣿⣿⣿";
     mvwprintw(rank_window, 0, 0, "%s", novice_ascii);
     wnoutrefresh(rank_window);
 
     wnoutrefresh(inner_stats_win);
     return stats_window;
+}
+
+void print_completed_courses(APP_CONTEXT *ctx)
+{
+    int number = 0;
+    COURSE *completed_courses = get_completed_courses(ctx, &number);
+
+    if (number > 0)
+    {
+        for (int i = 0; i < number; i++)
+        {
+            create_course_preview_card(ctx, 10 + (i * 46), 2 + i,
+                                       &completed_courses[i]);
+        }
+    }
+    else
+    {
+        char *msg = "You have not started any courses yet.";
+        mvwprintw(ctx->progress_windows[3], LINES / 2,
+                  ((COLS - 80) - strlen(msg)) / 2, "%s", msg);
+        wrefresh(ctx->progress_windows[3]);
+    }
+}
+
+void print_your_courses_title(APP_CONTEXT *ctx)
+{
+    wattron(ctx->progress_windows[3], A_BOLD);
+    mvwprintw(ctx->progress_windows[3], 0, 0, "%s",
+              get_ascii_art(ctx->db, "your_courses"));
+    wattroff(ctx->progress_windows[3], A_BOLD);
+}
+mvwprintw(rank_window, 0, 0, "%s", novice_ascii);
+wnoutrefresh(rank_window);
+
+wnoutrefresh(inner_stats_win);
+return stats_window;
 }
 
 void print_completed_courses(APP_CONTEXT *ctx)

@@ -2,18 +2,28 @@
 #include "../data/data_access_layer.h"
 #include "../models/models.h"
 #include "../views/views.h"
+#include <curses.h>
 
 void go_to_course_by_id(APP_CONTEXT *ctx, int course_id)
 {
-    wclear(ctx->greeter_screen);
-    wrefresh(ctx->greeter_screen);
-    delwin(ctx->greeter_screen);
-    delwin(ctx->greeter_ascii_window);
-    ctx->greeter_screen = NULL;
-    ctx->greeter_view_active = false;
-    ctx->greeter_needs_redraw = false;
-    ctx->start_view_active = false;
-    ctx->start_needs_redraw = false;
+    if (ctx->greeter_view_active)
+    {
+        ctx->greeter_view_active = false;
+        ctx->greeter_needs_redraw = false;
+        for (int i = 0; i < START_WINDOW_COUNT; i++) {
+            wclear(ctx->greeter_windows[i]);
+            delwin(ctx->greeter_windows[i]);
+        }
+        delwin(ctx->greeter_ascii_window);
+    }
+    else if (ctx->start_view_active) {
+        ctx->start_view_active = false;
+        ctx->start_needs_redraw = false;
+        for (int i = 0; i < START_WINDOW_COUNT; i++) {
+            wclear(ctx->start_windows[i]);
+            delwin(ctx->start_windows[i]);
+        }
+    }
     ctx->course_view_active = true;
     ctx->first_course_draw = true;
     ctx->course_needs_redraw = true;
@@ -44,15 +54,10 @@ void go_to_course_by_id(APP_CONTEXT *ctx, int course_id)
 
     get_total_course_sections(ctx);
 
-    ctx->rp_state->curr_section =
-        ctx->rp_state->sections_completed;
+    ctx->rp_state->curr_section = ctx->rp_state->sections_completed;
     ctx->rp_state->curr_item =
-        ctx->rp_state
-        ->course_progress[ctx->rp_state->sections_completed] +
+        ctx->rp_state->course_progress[ctx->rp_state->sections_completed] +
         (ctx->rp_state->curr_section == 0 ? 1 : 0);
     ctx->rp_state->items_completed =
-        ctx->rp_state
-        ->course_progress[ctx->rp_state->sections_completed -
-        1];
-
+        ctx->rp_state->course_progress[ctx->rp_state->sections_completed - 1];
 }

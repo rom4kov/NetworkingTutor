@@ -1,4 +1,4 @@
-#define _POSIX_C_SOURCE 200809L
+#include "../../ntutor.h"
 #include "../controllers/controllers.h"
 #include "../views/views.h"
 #include "core.h"
@@ -7,7 +7,6 @@
 #include <ncurses.h>
 #include <stdbool.h>
 
-#define WINDOW_COUNT 6
 #define WU COLS / 12 // WU for WIDTH_UNIT
 #define CARD_WIDTH (((WU * 7) / 3) + 1)
 
@@ -51,7 +50,7 @@ void handle_start_input(APP_CONTEXT *ctx)
                 ctx->active_window_idx = 0;
                 ctx->start_view_active = false;
                 ctx->start_needs_redraw = false;
-                // for (int i = 0; i < START_WINDOW_COUNT; i++)
+                // for (int i = 0; i < START_START_WINDOW_COUNT; i++)
                 // {
                 //     wclear(ctx->start_windows[i]);
                 //     wnoutrefresh(ctx->start_windows[i]);
@@ -72,7 +71,7 @@ void handle_start_input(APP_CONTEXT *ctx)
                 if (ctx->active_window_idx == 2 || ctx->active_window_idx == 3)
                 {
                     ctx->active_window_idx =
-                        (ctx->active_window_idx + 1) % WINDOW_COUNT;
+                        (ctx->active_window_idx + 1) % START_WINDOW_COUNT;
                     ctx->active_window =
                         ctx->start_windows[ctx->active_window_idx];
                     ctx->start_windows[ctx->active_window_idx - 1] =
@@ -90,7 +89,7 @@ void handle_start_input(APP_CONTEXT *ctx)
                 else
                 {
                     ctx->active_window_idx =
-                        (ctx->active_window_idx + 1) % WINDOW_COUNT;
+                        (ctx->active_window_idx + 1) % START_WINDOW_COUNT;
                     ctx->active_window =
                         ctx->start_windows[ctx->active_window_idx];
                     ctx->start_windows[ctx->active_window_idx - 1] =
@@ -136,7 +135,7 @@ void handle_start_input(APP_CONTEXT *ctx)
                 {
                     go_to_course_by_id(ctx, this_win - 1);
                     // ctx->start_view_active = false;
-                    // for (int i = 0; i < WINDOW_COUNT; i++)
+                    // for (int i = 0; i < START_WINDOW_COUNT; i++)
                     // {
                     //     wclear(ctx->start_windows[i]);
                     //     wnoutrefresh(ctx->start_windows[i]);
@@ -147,7 +146,7 @@ void handle_start_input(APP_CONTEXT *ctx)
                     // ctx->current_course_id = ctx->courses[this_win - 2].id;
                     // ctx->current_course =
                     //     strdup(ctx->courses[this_win - 2].name);
-                    // for (int i = 1; i < WINDOW_COUNT; ++i)
+                    // for (int i = 1; i < START_WINDOW_COUNT; ++i)
                     // {
                     //     delwin(ctx->start_windows[i]);
                     //     wclear(ctx->start_windows[i]);

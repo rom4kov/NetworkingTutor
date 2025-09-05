@@ -19,6 +19,9 @@ void move_down(TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **edit_window,
     if (tbuf->curr_line_nr + 1 >= tbuf->num_of_lines)
         return;
 
+    if (tbuf->current_line->next == NULL)
+        return;
+
     if (x + 1 < tbuf->current_line->next->length)
     {
         tbuf->current_line = tbuf->current_line->next;

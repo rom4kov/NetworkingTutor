@@ -6,8 +6,10 @@
 #define COLOR_TEALGREEN 19
 #define COLOR_BERMUDA 20
 
-#define GREETER_PANEL_COUNT 3
+#define GREETER_WINDOW_COUNT 8
+#define GREETER_PANEL_COUNT 8
 #define START_WINDOW_COUNT 6
+#define KEYBINDINGS_WINDOW_COUNT 3
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 #define CTRLD 4

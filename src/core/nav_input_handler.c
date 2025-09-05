@@ -130,16 +130,6 @@ void handle_nav_input(APP_CONTEXT *ctx)
                 ctx->all_courses_view_active = true;
                 ctx->all_courses_needs_redraw = true;
             }
-            // else if (item_index(ctx->curr_item) == 2)
-            // {
-            //     focus_window(&ctx->start_windows[0], 2, "Navigation");
-            //     focus_window(&ctx->start_windows[5], 3, "Details");
-            //     ctx->active_window_idx = 5;
-            //     focus_window(&ctx->start_windows[5], 3, "Details");
-            //     wmove(ctx->start_windows[5], 4, 14);
-            //     wnoutrefresh(ctx->start_windows[5]);
-            //     doupdate();
-            // }
             else if (item_index(ctx->curr_item) == 3) {
                 ctx->active_window_idx = 0;
                 ctx->active_window = ctx->progress_windows[0];
@@ -167,6 +157,15 @@ void handle_nav_input(APP_CONTEXT *ctx)
                     {
                         wclear(ctx->all_courses_windows[i]);
                         wnoutrefresh(ctx->all_courses_windows[i]);
+                    }
+                    doupdate();
+                    ctx->all_courses_view_active = false;
+                }
+                else if (ctx->keybindings_view_active) {
+                    for (int i = 0; i < KEYBINDINGS_WINDOW_COUNT; ++i)
+                    {
+                        wclear(ctx->keybindings_windows[i]);
+                        wnoutrefresh(ctx->keybindings_windows[i]);
                     }
                     doupdate();
                     ctx->all_courses_view_active = false;

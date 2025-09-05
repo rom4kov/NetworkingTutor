@@ -11,17 +11,16 @@
 #include <sqlite3.h>
 
 void initialize_colors();
-WINDOW *create_greeter_screen(APP_CONTEXT *ctx);
-MENU *create_greeter_menu(WINDOW *nav_window);
-void create_start_options_popup(APP_CONTEXT *ctx);
+void create_greeter_screen(APP_CONTEXT *ctx);
+MENU *create_greeter_menu(APP_CONTEXT *ctx);
+WINDOW *create_start_options_popup(APP_CONTEXT *ctx);
+WINDOW *create_start_opt_popup_sub_win(APP_CONTEXT *ctx, int num_of_users);
 MENU *create_start_options_menu(APP_CONTEXT *ctx, WINDOW **start_opt_menu_win,
                                 WINDOW **start_opt_menu_sub, int num_of_users);
-void create_user_selection_popup(APP_CONTEXT *ctx, int num_of_users,
-                                 MENU *start_opt_menu, WINDOW *start_opts_win,
-                                 WINDOW *start_opts_sub);
-MENU *create_user_selection_menu(APP_CONTEXT *ctx,
-                                 WINDOW **user_select_menu_win,
-                                 WINDOW **user_select_sub, int num_of_users,
+FORM *create_new_user_popup_form(APP_CONTEXT *ctx, char *label);
+WINDOW *create_user_selection_popup(APP_CONTEXT *ctx, int num_of_users, int *max_name_len);
+WINDOW *create_user_select_sub_win(APP_CONTEXT *ctx, int num_of_users, int *max_name_len);
+MENU *create_user_selection_menu(APP_CONTEXT *ctx, int num_of_users,
                                  int max_name_len);
 
 void create_start_screen(APP_CONTEXT *ctx);

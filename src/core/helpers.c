@@ -1,6 +1,4 @@
-#define _POSIX_C_SOURCE 200809L
-#define _DEFAULT_SOURCE 1
-
+#include "../../ntutor.h"
 #include "../models/models.h"
 #include "../views/views.h"
 #include "fcntl.h"

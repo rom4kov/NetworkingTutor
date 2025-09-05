@@ -1,4 +1,4 @@
-#define _POSIX_C_SOURCE 2
+#include "../../../ntutor.h"
 #include "../../data/data_access_layer.h"
 #include "../../views/views.h"
 #include "../tests.h"

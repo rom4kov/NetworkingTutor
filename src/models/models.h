@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../ntutor.h"
+#include <curses.h>
 #include <form.h>
 #include <menu.h>
 #include <panel.h>
@@ -182,6 +183,7 @@ typedef struct _app_context
 {
   sqlite3 *db;
   WINDOW *greeter_screen;
+  WINDOW *greeter_windows[GREETER_WINDOW_COUNT];
   PANEL *greeter_panels[GREETER_PANEL_COUNT];
   WINDOW *greeter_ascii_window;
   WINDOW *start_windows[START_WINDOW_COUNT];
@@ -198,12 +200,16 @@ typedef struct _app_context
   RIGHT_PANEL_STATE *rp_state;
   COURSE *courses;
   MENU *greeter_menu;
+  MENU *greeter_start_opts_menu;
+  MENU *greeter_user_select_menu;
   MENU *start_menu;
   MENU *explorer_menu;
   ITEM **menu_items;
   ITEM *curr_item;
+  FORM *new_user_form;
   FORM *user_form;
   FIELD *user_form_fields;
+  FIELD *new_user_form_field[2];
   FILE_TREE *file_tree;
   FILE *file;
   char *filename;
@@ -219,6 +225,7 @@ typedef struct _app_context
   int active_window_idx;
   int current_user_id;
   int current_course_id;
+  int num_of_users;
   int y, x;
   int editor_height;
   int scroll_offset;

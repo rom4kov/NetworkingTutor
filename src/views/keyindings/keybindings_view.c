@@ -16,7 +16,6 @@ void create_keybindings_view(APP_CONTEXT *ctx)
     wnoutrefresh(ctx->keybindings_windows[1]);
     wnoutrefresh(ctx->keybindings_windows[2]);
     doupdate();
-    // print_keybindings(ctx);
 }
 
 WINDOW *create_keybindings_screen(APP_CONTEXT *ctx)
@@ -142,33 +141,3 @@ WINDOW *create_keybindings_container(APP_CONTEXT *ctx)
 
     return keybindings_container;
 }
-
-// void print_keybindings(APP_CONTEXT *ctx)
-// {
-//     int number = 10;
-//     int x_pos = 0;
-//
-//     if (number > 0)
-//     {
-//         for (int i = 0; i < number; i++)
-//         {
-//             if ((x_pos + 30) > COLS)
-//             {
-//                 x_pos = 0;
-//             }
-//             create_course_preview_card(ctx, 8 + x_pos, 2 + i, &ctx->courses[i]);
-//             if ((x_pos + 30) <= COLS)
-//             {
-//                 x_pos += (COLS - 16) / 5;
-//             }
-//         }
-//     }
-//     else
-//     {
-//         char *msg = "No courses in the database.";
-//         mvwprintw(ctx->progress_windows[3], LINES / 2,
-//                   ((COLS - 80) - strlen(msg)) / 2, "%s", msg);
-//         wrefresh(ctx->progress_windows[3]);
-//     }
-// }
-//

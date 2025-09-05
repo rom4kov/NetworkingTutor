@@ -636,9 +636,11 @@ int get_current_course(sqlite3 *db, int user_id)
         sqlite3_bind_int(stmt, 1, user_id);
     }
 
-    sqlite3_step(stmt);
+    rc = sqlite3_step(stmt);
 
-    const int course_id = sqlite3_column_int(stmt, 0);
+    int course_id = sqlite3_column_int(stmt, 0);
+
+    if (course_id == 0) course_id = 1;
 
     return course_id;
 }
@@ -846,10 +848,6 @@ void set_current_streak(APP_CONTEXT *ctx)
     char *current_date = strsep(&current_date_time, " ");
     int rc = 0;
 
-    mvwprintw(ctx->course_windows[2], 30, 5, "%i", current_streak);
-    mvwprintw(ctx->course_windows[2], 31, 5, "%s", current_date_time);
-    mvwprintw(ctx->course_windows[2], 32, 5, "%s", current_date);
-
     const char *sql = "INSERT OR IGNORE INTO streaks (user_id, streak, "
                       "achieved_at) VALUES (?, ?, ?);";
 
@@ -1045,8 +1043,8 @@ int get_course_completion_percentage(APP_CONTEXT *ctx, int course_id)
 
     if (total_items_completed)
         completion_percentage =
-            (course_total_items / total_items_completed) * 100;
-    //
+            (1.0 * total_items_completed / course_total_items) * 100;
+
     // mvwprintw(ctx->start_windows[1], 3, 4 * course_id, "%i", course_total_items);
     // mvwprintw(ctx->start_windows[1], 4, 4 * course_id, "%i", total_items_completed);
     // mvwprintw(ctx->start_windows[1], 5, 4 * course_id, "%i", completion_percentage);

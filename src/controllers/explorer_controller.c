@@ -1,5 +1,3 @@
-#define _DEFAULT_SOURCE
-
 #include "../core/core.h"
 #include "../data/data_access_layer.h"
 #include "../models/models.h"

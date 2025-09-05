@@ -96,54 +96,54 @@ int main(void)
 
     // refresh();
 
-    // seed_courses_data(ctx->db, ctx->greeter_screen,
+    // seed_courses_data(ctx->db, ctx->greeter_windows[0],
     //                   "SQL/create_courses_table.sql");
-    // seed_courses_data(ctx->db, ctx->greeter_screen,
+    // seed_courses_data(ctx->db, ctx->greeter_windows[0],
     //                   "SQL/create_sections_table.sql");
-    // seed_courses_data(ctx->db, ctx->greeter_screen,
+    // seed_courses_data(ctx->db, ctx->greeter_windows[0],
     //                   "SQL/create_completed_courses_table.sql");
-    // seed_courses_data(ctx->db, ctx->greeter_screen,
+    // seed_courses_data(ctx->db, ctx->greeter_windows[0],
     //                   "SQL/create_streaks_table.sql");
-    // seed_courses_data(ctx->db, ctx->greeter_screen,
+    // seed_courses_data(ctx->db, ctx->greeter_windows[0],
     //                   "SQL/create_ascii_art_table.sql");
-    // seed_courses_data(ctx->db, ctx->greeter_screen,
+    // seed_courses_data(ctx->db, ctx->greeter_windows[0],
     //                   "SQL/courses/http_server/sections.sql");
-    // seed_courses_data(ctx->db, ctx->greeter_screen,
+    // seed_courses_data(ctx->db, ctx->greeter_windows[0],
     //                   "SQL/courses/http_server/0_intro.sql");
-    // seed_courses_data(ctx->db, ctx->greeter_screen,
+    // seed_courses_data(ctx->db, ctx->greeter_windows[0],
     //                   "SQL/courses/http_server/1_foundations.sql");
-    // seed_courses_data(ctx->db, ctx->greeter_screen,
+    // seed_courses_data(ctx->db, ctx->greeter_windows[0],
     //                   "SQL/courses/http_server/2_getaddrinfo.sql");
-    // seed_courses_data(ctx->db, ctx->greeter_screen,
+    // seed_courses_data(ctx->db, ctx->greeter_windows[0],
     //                   "SQL/courses/http_server/3_socket.sql");
-    // seed_courses_data(ctx->db, ctx->greeter_screen,
+    // seed_courses_data(ctx->db, ctx->greeter_windows[0],
     //                   "SQL/courses/http_server/4_bind.sql");
-    // seed_courses_data(ctx->db, ctx->greeter_screen,
+    // seed_courses_data(ctx->db, ctx->greeter_windows[0],
     //                   "SQL/courses/http_server/5_listen_and_accept.sql");
-    // seed_courses_data(ctx->db, ctx->greeter_screen,
+    // seed_courses_data(ctx->db, ctx->greeter_windows[0],
     //                   "SQL/courses/http_server/6_recv_and_send.sql");
-    // seed_courses_data(ctx->db, ctx->greeter_screen,
+    // seed_courses_data(ctx->db, ctx->greeter_windows[0],
     //                   "SQL/create_users_table.sql");
-    // seed_courses_data(ctx->db, ctx->greeter_screen,
+    // seed_courses_data(ctx->db, ctx->greeter_windows[0],
     //                   "SQL/create_progress_table.sql");
-    // seed_courses_data(ctx->db, ctx->greeter_screen,
+    // seed_courses_data(ctx->db, ctx->greeter_windows[0],
     //                   "SQL/courses/http_server/update_http_logo.sql");
-    // seed_courses_data(ctx->db, ctx->greeter_screen,
+    // seed_courses_data(ctx->db, ctx->greeter_windows[0],
     //                   "SQL/create_tasks_table.sql");
-    // seed_courses_data(ctx->db, ctx->greeter_screen,
+    // seed_courses_data(ctx->db, ctx->greeter_windows[0],
     //                   "SQL/courses/http_server/tasks.sql");
     //
-    // seed_courses_data(ctx->db, ctx->greeter_screen,
+    // seed_courses_data(ctx->db, ctx->greeter_windows[0],
     //                   "SQL/courses/http_parser/sections.sql");
-    // seed_courses_data(ctx->db, ctx->greeter_screen,
+    // seed_courses_data(ctx->db, ctx->greeter_windows[0],
     //                   "SQL/courses/http_parser/0_intro.sql");
 
     ESCDELAY = 100;
 
-    ctx->greeter_screen = create_greeter_screen(ctx);
-    ctx->active_window = ctx->greeter_screen;
-    keypad(ctx->greeter_screen, TRUE);
-    wrefresh(ctx->greeter_screen);
+    create_greeter_screen(ctx);
+    ctx->active_window = ctx->greeter_windows[1];
+    // keypad(ctx->greeter_windows[1], TRUE);
+    // wrefresh(ctx->greeter_windows[1]);
 
     while (ctx->running)
     {
@@ -153,18 +153,18 @@ int main(void)
             {
                 endwin();
                 refresh();
-                if (ctx->greeter_screen != NULL)
+                if (ctx->greeter_windows[0] != NULL)
                 {
-                    delwin(ctx->greeter_screen);
+                    delwin(ctx->greeter_windows[0]);
                 }
             }
             ctx->start_view_active = false;
             ctx->start_needs_redraw = false;
-            ctx->greeter_screen = create_greeter_screen(ctx);
-            ctx->active_window = ctx->greeter_screen;
+            create_greeter_screen(ctx);
+            // ctx->active_window = ctx->greeter_windows[0];
             ctx->greeter_needs_redraw = false;
             ctx->first_greeter_draw = false;
-            wrefresh(ctx->greeter_screen);
+            wrefresh(ctx->greeter_windows[0]);
         }
         if (ctx->start_needs_redraw)
         {
@@ -300,6 +300,7 @@ int main(void)
 
         keypad(ctx->active_window, TRUE);
         ctx->key = wgetch(ctx->active_window);
+        // ctx->key = getch();
 
         switch (ctx->key)
         {
@@ -336,6 +337,7 @@ int main(void)
             default:
                 if (ctx->greeter_view_active)
                 {
+                    // keypad(ctx->greeter_windows[0], TRUE);
                     handle_greeter_input(ctx);
                 }
                 else if (ctx->start_view_active)

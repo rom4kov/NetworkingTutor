@@ -3,9 +3,6 @@
 #include <ncurses.h>
 
 void handle_greeter_input(APP_CONTEXT *ctx);
-void create_new_user_popup_form(WINDOW **inner_win, WINDOW **form_window,
-                                FORM **new_file_form, FIELD **field,
-                                char *label);
 void create_new_user_popup(APP_CONTEXT *ctx);
 
 void handle_start_input(APP_CONTEXT *ctx);

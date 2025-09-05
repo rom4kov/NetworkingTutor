@@ -1,5 +1,6 @@
 #define _XOPEN_SOURCE_EXTENDED 1
 
+#include "../../../ntutor.h"
 #include "../../core/core.h"
 #include "../../models/models.h"
 #include "../views.h"
@@ -12,7 +13,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define WINDOW_COUNT 6
 #define WU COLS / 12 // WU for WIDTH_UNIT
 #define WIDTH_REMAINDER COLS % WU
 #define CARD_WIDTH (((WU * 7) / 3) + 1)

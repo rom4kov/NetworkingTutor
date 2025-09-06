@@ -108,8 +108,7 @@ void handle_greeter_input(APP_CONTEXT *ctx)
     }
 }
 
-void handle_start_opts_menu_input(APP_CONTEXT *ctx, MENU *start_options_menu,
-                                  int num_of_users)
+void handle_start_opts_menu_input(APP_CONTEXT *ctx, MENU *start_options_menu)
 {
     ITEM *curr_item = NULL;
     bool start_opt_menu_active = true;
@@ -253,10 +252,10 @@ void handle_user_select_win_input(APP_CONTEXT *ctx, bool *start_opt_menu_active,
 
         switch (ctx->key)
         {
-            case KEY_DOWN: // Backspace
+            case KEY_DOWN:
                 menu_driver(ctx->greeter_user_select_menu, REQ_DOWN_ITEM);
                 break;
-            case KEY_UP: // Backspace
+            case KEY_UP:
                 menu_driver(ctx->greeter_user_select_menu, REQ_UP_ITEM);
                 break;
             case '\n':
@@ -286,10 +285,6 @@ void handle_user_select_win_input(APP_CONTEXT *ctx, bool *start_opt_menu_active,
                     ctx->start_needs_redraw = true;
                 
                 }
-                // ctx->rp_state->sections_completed = 0;
-                // ctx->rp_state->items_completed = 0;
-                // ctx->rp_state->curr_section = 0;
-                // ctx->rp_state->curr_item = 2;
                 break;
             case 'q':
                 user_select_menu_active = false;

@@ -350,7 +350,7 @@ SECTION_METADATA *get_section_metadata(APP_CONTEXT *ctx)
 
     int rc = 0;
 
-    const char *sql = "SELECT section_title, has_test FROM sections WHERE "
+    const char *sql = "SELECT section_title, has_test, has_separate_task FROM sections WHERE "
                       "course_id = ? AND order_num = ?;";
 
     sqlite3_stmt *stmt;
@@ -518,9 +518,9 @@ void set_section_completed(APP_CONTEXT *ctx)
     rc = sqlite3_step(res);
     if (rc == SQLITE_DONE)
     {
-        mvwprintw(ctx->course_windows[2], 1, 2, "rc: %i\n", rc);
-        wrefresh(ctx->course_windows[2]);
-        set_current_streak(ctx);
+        int current_streak = get_current_streak(ctx);
+        if (current_streak > 1)
+            set_current_streak(ctx, current_streak);
     }
 }
 
@@ -729,7 +729,7 @@ void get_course_progress(APP_CONTEXT *ctx)
     int rc = 0;
 
     const char *sql = "SELECT section_id, items_completed FROM progress WHERE "
-                      "user_id = 1 AND course_id = ?";
+                      "user_id = ? AND course_id = ?";
 
     sqlite3_stmt *stmt;
     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
@@ -740,7 +740,8 @@ void get_course_progress(APP_CONTEXT *ctx)
 
     if (rc == SQLITE_OK)
     {
-        sqlite3_bind_int(stmt, 1, ctx->current_course_id);
+        sqlite3_bind_int(stmt, 1, ctx->current_user_id);
+        sqlite3_bind_int(stmt, 2, ctx->current_course_id);
     }
 
     while (sqlite3_step(stmt) == SQLITE_ROW)
@@ -866,9 +867,8 @@ int get_num_of_completed_courses(APP_CONTEXT *ctx)
     return sqlite3_column_int(stmt, 0);
 }
 
-void set_current_streak(APP_CONTEXT *ctx)
+void set_current_streak(APP_CONTEXT *ctx, int current_streak)
 {
-    int current_streak = get_current_streak(ctx);
     char *current_date_time = malloc(20);
     current_date_time = current_datetime();
     char *current_date = strsep(&current_date_time, " ");
@@ -927,22 +927,33 @@ int get_current_streak(APP_CONTEXT *ctx)
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
         const unsigned char *date = sqlite3_column_text(stmt, 0);
-        if (date == NULL) break;
+        if (date == NULL)
+            break;
         const char *tmp_date = (const char *)strdup((char *)date);
         if (tmp_date == NULL || strcmp(tmp_date, "") == 0)
             break;
         strcpy(cmp_date, tmp_date);
-        if ((diff = get_diff_time_in_days(ctx, cmp_date, c_date)) > 1)
+        if ((diff = get_diff_time_in_days(cmp_date, c_date)) > 1)
         {
             break;
         }
+        else if (diff == 1)
+        {
+            streak_length++;
+        }
         strcpy(c_date, tmp_date);
-        streak_length++;
         i++;
     }
 
-    wrefresh(ctx->progress_windows[1]);
-    return streak_length;
+    mvwprintw(ctx->progress_windows[3], 1, 70, "%s", c_date);
+    mvwprintw(ctx->progress_windows[3], 2, 70, "%s", cmp_date);
+    mvwprintw(ctx->progress_windows[3], 3, 70, "%i", streak_length);
+    mvwprintw(ctx->progress_windows[3], 4, 70, "%i", diff);
+    mvwprintw(ctx->progress_windows[3], 5, 70, "%i", i);
+
+    wnoutrefresh(ctx->progress_windows[1]);
+    wnoutrefresh(ctx->progress_windows[3]);
+    return streak_length + 1;
 }
 
 int get_longest_streak(APP_CONTEXT *ctx)
@@ -954,7 +965,6 @@ int get_longest_streak(APP_CONTEXT *ctx)
     sqlite3_stmt *stmt = NULL;
     int longest_streak = 0;
 
-    // Prepare the statement
     int rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
     if (rc != SQLITE_OK)
     {
@@ -963,7 +973,6 @@ int get_longest_streak(APP_CONTEXT *ctx)
         return 0;
     }
 
-    // Bind the user_id
     rc = sqlite3_bind_int(stmt, 1, ctx->current_user_id);
     if (rc != SQLITE_OK)
     {
@@ -973,7 +982,6 @@ int get_longest_streak(APP_CONTEXT *ctx)
         return 0;
     }
 
-    // Execute the statement
     rc = sqlite3_step(stmt);
     if (rc == SQLITE_ROW)
     {
@@ -984,37 +992,10 @@ int get_longest_streak(APP_CONTEXT *ctx)
         fprintf(stderr, "sqlite3_step failed: %s\n", sqlite3_errmsg(ctx->db));
     }
 
-    // Finalize the statement (always)
     sqlite3_finalize(stmt);
 
     return longest_streak;
 }
-
-// int get_longest_streak(APP_CONTEXT *ctx)
-// {
-//     int longest_streak = 0;
-//     int rc = 0;
-//
-//     const char *sql = "SELECT MAX(streak) FROM streaks WHERE user_id = ?;";
-//
-//     sqlite3_stmt *stmt;
-//     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
-//     // if (rc != SQLITE_OK)
-//     // {
-//     //     sqlite3_finalize(stmt);
-//     // }
-//
-//     if (rc == SQLITE_OK)
-//     {
-//         sqlite3_bind_int(stmt, 1, ctx->current_user_id);
-//     }
-//
-//     sqlite3_step(stmt);
-//
-//     longest_streak = sqlite3_column_int(stmt, 0);
-//     sqlite3_finalize(stmt);
-//     return longest_streak;
-// }
 
 int get_course_completion_percentage(APP_CONTEXT *ctx, int course_id)
 {
@@ -1043,8 +1024,6 @@ int get_course_completion_percentage(APP_CONTEXT *ctx, int course_id)
 
     if (course_total_items == -1)
         return 0;
-
-    // mvwprintw(ctx->progress_windows[3], 44, 6, "%i", course_total_items);
 
     const char *sql2 = "SELECT items_completed FROM progress WHERE user_id = ? "
                        "AND course_id = ?;";

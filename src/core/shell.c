@@ -59,8 +59,6 @@ void delete_char_with_back_space(APP_CONTEXT *ctx)
             mvwaddch(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7,
                      i + (cwd_len > 0 ? cwd_len + 3 : 2), ' ');
         }
-        // mvwprintw(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7, 2, "%s",
-        //           "                   ");
         memmove(&ctx->shell->buf[x - 1], &ctx->shell->buf[x],
                 strlen(ctx->shell->buf) - x + 1);
         memset(&ctx->shell->buf[strlen(ctx->shell->buf)], '\0', 1);
@@ -129,7 +127,6 @@ void print_term_input(APP_CONTEXT *ctx)
 
     ctx->shell->curr_buf_idx += 1;
 
-    // wnoutrefresh(ctx->edit_window);
     wnoutrefresh(ctx->shell->term_inner_win);
     doupdate();
 }
@@ -145,13 +142,6 @@ bool cmd_is_cd(APP_CONTEXT *ctx)
     {
         ctx->shell->cwd = strdup("");
         chdir(ctx->shell->home_dir);
-        // mvwprintw(ctx->edit_window, 37, 4, "home dir: %s",
-        //           ctx->shell->home_dir);
-        // if (rv == -1)
-        //     mvwprintw(ctx->edit_window, 38, 4, "chdir error: %s",
-        //               strerror(errno));
-        // else if (rv == 0)
-        //     mvwprintw(ctx->edit_window, 38, 4, "chdir success");
         return false;
     }
     else if (strcmp(first_cmd_part, "cd") == 0)

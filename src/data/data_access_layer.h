@@ -44,7 +44,7 @@ int get_num_of_completed_courses(APP_CONTEXT *ctx);
 int get_total_completed_sections(APP_CONTEXT *ctx);
 int get_course_completion_percentage(APP_CONTEXT *ctx, int course_id);
 
-void set_current_streak(APP_CONTEXT *ctx);
+void set_current_streak(APP_CONTEXT *ctx, int current_streak);
 int get_current_streak(APP_CONTEXT *ctx);
 int get_longest_streak(APP_CONTEXT *ctx);
 

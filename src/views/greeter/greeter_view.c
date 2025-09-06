@@ -100,23 +100,16 @@ MENU *create_greeter_menu(APP_CONTEXT *ctx)
         menu_items[i] = new_item(choices[i], "");
     }
 
-    // Create the menu
     MENU *menu = new_menu(menu_items);
     set_menu_format(menu, 14, 1);
     set_menu_spacing(menu, 0, 2, 2);
-    // mvwprintw(nav_window, 2, 3, "%i", COLS);
 
-    // Set the window for the menu to be displayed inside left_inner_win
     set_menu_win(menu, ctx->greeter_windows[1]);
     set_menu_sub(menu, derwin(ctx->greeter_windows[1], 16, COLS / 6, 1, 1));
     set_menu_fore(menu, A_BOLD | A_ITALIC);
-    set_menu_mark(menu, " > "); // Mark for the selected item
+    set_menu_mark(menu, " > ");
 
-    // Post the menu (make it visible)
     post_menu(menu);
-
-    // Refresh the left_inner_win window
-    // wnoutrefresh(ctx->greeter_windows[1]);
     return menu;
 }
 
@@ -157,26 +150,20 @@ MENU *create_start_options_menu(APP_CONTEXT *ctx, WINDOW **start_opt_menu_win,
         menu_items[i] = new_item(choices[i], "");
     }
 
-    // Create the menu
     MENU *menu = new_menu(menu_items);
     set_menu_format(menu, 14, 1);
     set_menu_spacing(menu, 0, 2, 2);
-    // mvwprintw(nav_window, 2, 3, "%i", COLS);
 
-    // Set the window for the menu to be displayed inside left_inner_win
     wclear(*start_opt_menu_win);
     draw_border(*start_opt_menu_win, 2, "Choose an option");
     set_menu_win(menu, ctx->greeter_windows[2]);
     ctx->greeter_windows[3] = derwin(ctx->greeter_windows[2], 3, 42, 2, 7);
     set_menu_sub(menu, ctx->greeter_windows[3]);
     set_menu_fore(menu, A_BOLD | A_ITALIC);
-    set_menu_mark(menu, " > "); // Mark for the selected item
+    set_menu_mark(menu, " > ");
 
-    // Post the menu (make it visible)
     post_menu(menu);
 
-    // Refresh the left_inner_win window
-    // wnoutrefresh(*start_opt_menu_win);
     return menu;
 }
 
@@ -206,16 +193,12 @@ FORM *create_new_user_popup_form(APP_CONTEXT *ctx, char *label)
     set_form_win(new_user_form, ctx->greeter_windows[4]);
     set_form_sub(new_user_form, ctx->greeter_windows[5]);
 
-    // wclear(ctx->greeter_windows[5]);
-
     wmove(ctx->greeter_windows[5], 0, 0);
 
     curs_set(1);
     set_current_field(new_user_form, ctx->new_user_form_field[0]);
     post_form(new_user_form);
 
-    // wnoutrefresh(ctx->greeter_windows[4]);
-    // wnoutrefresh(ctx->greeter_windows[5]);
     doupdate();
 
     return new_user_form;

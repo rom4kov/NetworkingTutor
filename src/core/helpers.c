@@ -120,12 +120,6 @@ void focus_instructions_window(RIGHT_PANEL_STATE *rps, int color_pair,
 
     wnoutrefresh(rps->right_panel);
 }
-//
-// void focus_progress_window(APP_CONTEXT *ctx, int color_pair)
-// {
-//     draw_progress_border(ctx->progress_windows[3], color_pair, "");
-//     print_completed_courses(ctx);
-// }
 
 void trim(char *str[])
 {
@@ -218,7 +212,7 @@ char *current_datetime()
     return datetime;
 }
 
-int get_diff_time_in_days(WINDOW *win, char date1[], char date2[])
+int get_diff_time_in_days(char date1[], char date2[])
 {
     char *time1 = malloc(20);
     char *time2 = malloc(20);

@@ -527,5 +527,6 @@ void deallocate_it_buffer(I_TEXT_BUFFER *tbuf)
         free(current_line);
         current_line = next;
     }
+
     free(tbuf);
 }

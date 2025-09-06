@@ -67,15 +67,16 @@ void handle_progress_input(APP_CONTEXT *ctx)
                 break;
         }
     }
-    else if (ctx->active_window_idx == 1) {
+    else if (ctx->active_window_idx == 1)
+    {
         switch (ctx->key)
         {
             case KEY_UP:
                 ctx->active_window_idx = 0;
                 ctx->active_window = ctx->progress_windows[0];
                 focus_window(&ctx->progress_windows[1], 2, "");
-                ctx->progress_windows[0] =
-                    create_navigation_window(&ctx->active_window_idx, &ctx->start_menu);
+                ctx->progress_windows[0] = create_navigation_window(
+                    &ctx->active_window_idx, &ctx->start_menu, ctx->curr_nav_item);
                 doupdate();
                 break;
             case 9:
@@ -103,7 +104,8 @@ void handle_progress_input(APP_CONTEXT *ctx)
                 break;
         }
     }
-    else if (ctx->active_window_idx == 2) {
+    else if (ctx->active_window_idx == 2)
+    {
         switch (ctx->key)
         {
             case KEY_UP:
@@ -124,7 +126,8 @@ void handle_progress_input(APP_CONTEXT *ctx)
                 break;
         }
     }
-    else if (ctx->active_window_idx == 3) {
+    else if (ctx->active_window_idx == 3)
+    {
         switch (ctx->key)
         {
             case KEY_LEFT:
@@ -142,8 +145,8 @@ void handle_progress_input(APP_CONTEXT *ctx)
                 draw_progress_border(ctx->progress_windows[3], 2, 2);
                 create_your_courses_window(ctx, ctx->progress_windows[3]);
                 print_completed_courses(ctx);
-                ctx->progress_windows[0] =
-                    create_navigation_window(&ctx->active_window_idx, &ctx->start_menu);
+                ctx->progress_windows[0] = create_navigation_window(
+                    &ctx->active_window_idx, &ctx->start_menu, ctx->curr_nav_item);
                 doupdate();
                 break;
         }

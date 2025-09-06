@@ -29,10 +29,7 @@ void handle_greeter_input(APP_CONTEXT *ctx)
             mvwprintw(ctx->greeter_windows[0], 3, 1, "act win: %p",
                       ctx->active_window);
             menu_driver(ctx->greeter_menu, REQ_DOWN_ITEM);
-            // wnoutrefresh(ctx->greeter_windows[0]);
             wnoutrefresh(ctx->greeter_windows[1]);
-            // pos_menu_cursor(ctx->greeter_menu);
-            // update_panels();
             doupdate();
             break;
         case KEY_UP:
@@ -44,10 +41,7 @@ void handle_greeter_input(APP_CONTEXT *ctx)
             mvwprintw(ctx->greeter_windows[0], 3, 1, "act win: %p",
                       ctx->active_window);
             menu_driver(ctx->greeter_menu, REQ_UP_ITEM);
-            // wnoutrefresh(ctx->greeter_windows[0]);
             wnoutrefresh(ctx->greeter_windows[1]);
-            // pos_menu_cursor(ctx->greeter_menu);
-            // update_panels();
             doupdate();
             break;
         case 10:
@@ -63,23 +57,42 @@ void handle_greeter_input(APP_CONTEXT *ctx)
                     handle_start_opts_menu_input(
                         ctx, ctx->greeter_start_opts_menu, ctx->num_of_users);
                 }
-                else {
+                else
+                {
                     ctx->active_window = ctx->greeter_windows[4];
-                    ctx->new_user_form = create_new_user_popup_form(
-                        ctx, " Create new user ");
+                    ctx->new_user_form =
+                        create_new_user_popup_form(ctx, " Create new user ");
                     top_panel(ctx->greeter_panels[3]);
                     update_panels();
                     doupdate();
                     handle_new_user_input(ctx, &start_opt_menu_active);
                 }
-
-                // create_start_options_popup(ctx);
-                // create_new_user_popup(ctx);
             }
             else if (item_index(curr_item) == 1)
             {
-                int current_course_id = get_current_course(ctx->db, 1);
-                go_to_course_by_id(ctx, current_course_id);
+                if (ctx->num_of_users > 1)
+                {
+                    ctx->active_window = ctx->greeter_windows[6];
+                    ctx->greeter_user_select_menu =
+                        create_user_selection_menu(ctx, ctx->num_of_users, 14);
+                    top_panel(ctx->greeter_panels[4]);
+                    update_panels();
+                    doupdate();
+                    handle_user_select_win_input(ctx, &start_opt_menu_active,
+                                                 true);
+                }
+                else
+                {
+                    int user_id = get_id_of_first_user(ctx->db);
+                    if (user_id < 1)
+                    {
+                        mvwprintw(ctx->greeter_windows[1], ctx->num_of_users * 2 + 2, 2, "%s", "No user found");
+                        wrefresh(ctx->greeter_windows[1]);
+                        break;
+                    }
+                    int current_course_id = get_current_course(ctx->db, user_id);
+                    go_to_course_by_id(ctx, current_course_id);
+                }
             }
             else if (item_index(curr_item) == 6)
             {
@@ -119,8 +132,8 @@ void handle_start_opts_menu_input(APP_CONTEXT *ctx, MENU *start_options_menu,
                 if (item_index(curr_item) == 0)
                 {
                     ctx->active_window = ctx->greeter_windows[4];
-                    ctx->new_user_form = create_new_user_popup_form(
-                        ctx, " Create new user ");
+                    ctx->new_user_form =
+                        create_new_user_popup_form(ctx, " Create new user ");
                     top_panel(ctx->greeter_panels[3]);
                     update_panels();
                     doupdate();
@@ -134,7 +147,8 @@ void handle_start_opts_menu_input(APP_CONTEXT *ctx, MENU *start_options_menu,
                     top_panel(ctx->greeter_panels[4]);
                     update_panels();
                     doupdate();
-                    handle_user_select_win_input(ctx, &start_opt_menu_active);
+                    handle_user_select_win_input(ctx, &start_opt_menu_active,
+                                                 false);
                 }
                 break;
             case 'q':
@@ -185,7 +199,8 @@ void handle_new_user_input(APP_CONTEXT *ctx, bool *start_opt_menu_active)
                 ctx->current_user_id = create_new_user(ctx, username);
                 ctx->user_data = get_user_data(ctx->db, ctx->current_user_id);
                 ctx->current_course_id = 1;
-                ctx->current_course = get_course_name_by_id(ctx->db, ctx->current_user_id);
+                ctx->current_course =
+                    get_course_name_by_id(ctx->db, ctx->current_user_id);
 
                 create_user_form_active = false;
                 *start_opt_menu_active = false;
@@ -224,7 +239,8 @@ void handle_new_user_input(APP_CONTEXT *ctx, bool *start_opt_menu_active)
     }
 }
 
-void handle_user_select_win_input(APP_CONTEXT *ctx, bool *start_opt_menu_active)
+void handle_user_select_win_input(APP_CONTEXT *ctx, bool *start_opt_menu_active,
+                                  bool continue_course)
 {
     ITEM *curr_item = NULL;
 
@@ -259,12 +275,21 @@ void handle_user_select_win_input(APP_CONTEXT *ctx, bool *start_opt_menu_active)
                 wrefresh(ctx->greeter_windows[0]);
 
                 ctx->greeter_view_active = false;
-                ctx->start_view_active = true;
-                ctx->start_needs_redraw = true;
-                ctx->rp_state->sections_completed = 0;
-                ctx->rp_state->items_completed = 0;
-                ctx->rp_state->curr_section = 0;
-                ctx->rp_state->curr_item = 2;
+                if (continue_course)
+                {
+                    ctx->course_view_active = true;
+                    ctx->course_needs_redraw = true;
+                    go_to_course_by_id(ctx, ctx->current_course_id);
+                }
+                else {
+                    ctx->start_view_active = true;
+                    ctx->start_needs_redraw = true;
+                
+                }
+                // ctx->rp_state->sections_completed = 0;
+                // ctx->rp_state->items_completed = 0;
+                // ctx->rp_state->curr_section = 0;
+                // ctx->rp_state->curr_item = 2;
                 break;
             case 'q':
                 user_select_menu_active = false;

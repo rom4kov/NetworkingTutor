@@ -8,8 +8,8 @@
 void create_keybindings_view(APP_CONTEXT *ctx)
 {
     ctx->keybindings_windows[1] = create_keybindings_screen(ctx);
-    ctx->keybindings_windows[0] =
-        create_navigation_window(&ctx->active_window_idx, &ctx->start_menu);
+    ctx->keybindings_windows[0] = create_navigation_window(
+        &ctx->active_window_idx, &ctx->start_menu, ctx->curr_nav_item);
     ctx->keybindings_windows[2] = create_keybindings_container(ctx);
 
     wnoutrefresh(ctx->keybindings_windows[0]);
@@ -36,28 +36,24 @@ WINDOW *create_keybindings_container(APP_CONTEXT *ctx)
     wattroff(keybindings_container, A_BOLD);
 
     wattron(keybindings_container, A_UNDERLINE | A_BOLD);
-    mvwprintw(keybindings_container, 7, 0, "%s",
-              "All views");
+    mvwprintw(keybindings_container, 7, 0, "%s", "All views");
     wattroff(keybindings_container, A_UNDERLINE | A_BOLD);
 
     mvwprintw(keybindings_container, 9, 0, "%s",
               "Move between windows: Arrow keys ← ↑ → ↓");
     mvwprintw(keybindings_container, 11, 0, "%s",
               "Activate a window: move to window and press ENTER");
-    mvwprintw(keybindings_container, 13, 0, "%s",
-              "Deactivate a window: F1");
+    mvwprintw(keybindings_container, 13, 0, "%s", "Deactivate a window: F1");
 
     wattron(keybindings_container, A_UNDERLINE | A_BOLD);
-    mvwprintw(keybindings_container, 16, 0, "%s",
-              "Navbar");
+    mvwprintw(keybindings_container, 16, 0, "%s", "Navbar");
     wattroff(keybindings_container, A_UNDERLINE | A_BOLD);
 
     mvwprintw(keybindings_container, 18, 0, "%s",
               "Go to different screen: ← → and press Enter");
 
     wattron(keybindings_container, A_UNDERLINE | A_BOLD);
-    mvwprintw(keybindings_container, 21, 0, "%s",
-              "Start view");
+    mvwprintw(keybindings_container, 21, 0, "%s", "Start view");
     wattroff(keybindings_container, A_UNDERLINE | A_BOLD);
 
     mvwprintw(keybindings_container, 23, 0, "%s",
@@ -66,8 +62,7 @@ WINDOW *create_keybindings_container(APP_CONTEXT *ctx)
               "Go to a course: move to course card and press Enter");
 
     wattron(keybindings_container, A_UNDERLINE | A_BOLD);
-    mvwprintw(keybindings_container, 28, 0, "%s",
-              "Editor window");
+    mvwprintw(keybindings_container, 28, 0, "%s", "Editor window");
     wattroff(keybindings_container, A_UNDERLINE | A_BOLD);
 
     mvwprintw(keybindings_container, 30, 0, "%s",
@@ -76,12 +71,10 @@ WINDOW *create_keybindings_container(APP_CONTEXT *ctx)
               "Move to start of line: Home key");
     mvwprintw(keybindings_container, 34, 0, "%s",
               "Move to end of line: End key");
-    mvwprintw(keybindings_container, 36, 0, "%s",
-              "Save file: F10");
+    mvwprintw(keybindings_container, 36, 0, "%s", "Save file: F10");
 
     wattron(keybindings_container, A_UNDERLINE | A_BOLD);
-    mvwprintw(keybindings_container, 7, 65, "%s",
-              "Explorer window");
+    mvwprintw(keybindings_container, 7, 65, "%s", "Explorer window");
     wattroff(keybindings_container, A_UNDERLINE | A_BOLD);
 
     mvwprintw(keybindings_container, 9, 65, "%s",
@@ -120,8 +113,7 @@ WINDOW *create_keybindings_container(APP_CONTEXT *ctx)
               "Complete current section and go to next one: ENTER");
 
     wattron(keybindings_container, A_UNDERLINE | A_BOLD);
-    mvwprintw(keybindings_container, 7, 135, "%s",
-              "Terminal window");
+    mvwprintw(keybindings_container, 7, 135, "%s", "Terminal window");
     wattroff(keybindings_container, A_UNDERLINE | A_BOLD);
 
     mvwprintw(keybindings_container, 9, 135, "%s",

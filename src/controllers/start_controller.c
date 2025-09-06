@@ -10,7 +10,7 @@ void go_to_course_by_id(APP_CONTEXT *ctx, int course_id)
     {
         ctx->greeter_view_active = false;
         ctx->greeter_needs_redraw = false;
-        for (int i = 0; i < START_WINDOW_COUNT; i++) {
+        for (int i = 0; i < GREETER_WINDOW_COUNT; i++) {
             wclear(ctx->greeter_windows[i]);
             delwin(ctx->greeter_windows[i]);
         }
@@ -34,7 +34,6 @@ void go_to_course_by_id(APP_CONTEXT *ctx, int course_id)
     //     delwin(ctx->start_windows[i]);
     // }
 
-    ctx->current_user_id = 1;
     ctx->user_data = get_user_data(ctx->db, ctx->current_user_id);
     ctx->current_course_id = course_id;
     ctx->current_course =
@@ -45,6 +44,8 @@ void go_to_course_by_id(APP_CONTEXT *ctx, int course_id)
         ctx->rp_state->course_progress[i] = 0;
     }
 
+    ctx->rp_state->lines_excess = 0;
+    ctx->rp_state->lines_to_print = 0;
     deallocate_it_buffer(ctx->rp_state->it_buffer);
     ctx->rp_state->it_buffer = initialize_it_buffer();
 

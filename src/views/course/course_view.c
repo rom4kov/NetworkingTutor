@@ -21,17 +21,18 @@ void create_course_view(APP_CONTEXT *ctx)
 
     ctx->active_window_idx = 0;
 
-    ctx->course_windows[0] =
-        create_navigation_window(&ctx->active_window_idx, &ctx->start_menu);
+    ctx->course_windows[0] = create_navigation_window(
+        &ctx->active_window_idx, &ctx->start_menu, ctx->curr_nav_item);
     ctx->course_windows[1] = create_explorer_window(ctx->file_tree);
     ctx->course_windows[2] = create_editor_window(ctx);
     ctx->course_windows[3] =
         create_right_side_panel(ctx, " Course instructions ");
     ctx->course_windows[4] = create_progress_window(ctx);
 
-    ctx->line_num_win = derwin(ctx->course_windows[2], ctx->editor_height - 4, 3, 2, 1);
-    ctx->edit_window =
-        derwin(ctx->course_windows[2], ctx->editor_height - 4, WU * 5 + (WU / 2) - 2, 2, 5);
+    ctx->line_num_win =
+        derwin(ctx->course_windows[2], ctx->editor_height - 4, 3, 2, 1);
+    ctx->edit_window = derwin(ctx->course_windows[2], ctx->editor_height - 4,
+                              WU * 5 + (WU / 2) - 2, 2, 5);
 
     print_no_open_file_msg(ctx);
 
@@ -60,7 +61,8 @@ WINDOW *create_editor_window(APP_CONTEXT *ctx)
         ctx->editor_height = LINES - 13;
     }
 
-    WINDOW *editor_window = newwin(ctx->editor_height, EDITOR_WIDTH, 3, WU + WU / 2);
+    WINDOW *editor_window =
+        newwin(ctx->editor_height, EDITOR_WIDTH, 3, WU + WU / 2);
 
     unsigned short border_color =
         (ctx->shell->terminal_active || ctx->course_needs_redraw) ? 2 : 3;
@@ -401,9 +403,10 @@ void recreate_editor_windows(APP_CONTEXT *ctx)
     wrefresh(ctx->course_windows[2]);
     delwin(ctx->course_windows[2]);
     ctx->course_windows[2] = create_editor_window(ctx);
-    ctx->line_num_win = derwin(ctx->course_windows[2], ctx->editor_height - 4, 3, 2, 1);
-    ctx->edit_window =
-        derwin(ctx->course_windows[2], ctx->editor_height - 4, WU * 5 + (WU / 2) - 2, 2, 5);
+    ctx->line_num_win =
+        derwin(ctx->course_windows[2], ctx->editor_height - 4, 3, 2, 1);
+    ctx->edit_window = derwin(ctx->course_windows[2], ctx->editor_height - 4,
+                              WU * 5 + (WU / 2) - 2, 2, 5);
 
     if (ctx->file && ctx->file->_fileno > 0)
     {

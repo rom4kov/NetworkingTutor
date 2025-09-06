@@ -24,7 +24,8 @@ MENU *create_user_selection_menu(APP_CONTEXT *ctx, int num_of_users,
                                  int max_name_len);
 
 void create_start_screen(APP_CONTEXT *ctx);
-WINDOW *create_navigation_window(int *active_win, MENU **start_menu);
+WINDOW *create_navigation_window(int *active_win, MENU **start_menu,
+                                 int curr_nav_item);
 WINDOW *create_header_section(APP_CONTEXT *ctx);
 WINDOW *create_course_preview_card(APP_CONTEXT *ctx, int x_position,
                                    int curr_win_idx, COURSE *course);

@@ -1,3 +1,4 @@
+#include "../controllers/controllers.h"
 #include "../core/core.h"
 #include "../models/models.h"
 #include "../views/views.h"
@@ -69,7 +70,8 @@ void handle_nav_input(APP_CONTEXT *ctx)
             break;
         case '\n':
             ctx->curr_item = current_item(ctx->start_menu);
-            if (item_index(ctx->curr_item) == 0)
+            ctx->curr_nav_item = item_index(ctx->curr_item);
+            if (ctx->curr_nav_item == 0)
             {
                 ctx->course_view_active = false;
                 ctx->progress_view_active = false;
@@ -82,21 +84,11 @@ void handle_nav_input(APP_CONTEXT *ctx)
                 ctx->start_view_active = true;
                 ctx->start_needs_redraw = true;
             }
-            else if (item_index(ctx->curr_item) == 1) {
+            else if (ctx->curr_nav_item == 1) {
                 ctx->active_window_idx = 0;
-                ctx->start_view_active = false;
-                for (int i = 0; i < START_WINDOW_COUNT; i++)
-                {
-                    wclear(ctx->start_windows[i]);
-                    wnoutrefresh(ctx->start_windows[i]);
-                }
-                doupdate();
-                ctx->course_needs_redraw = true;
-                ctx->course_view_active = true;
-                // ctx->current_course_id = ctx->courses[this_win - 2].id;
-                // ctx->current_course = strdup(ctx->courses[this_win - 2].name);
+                go_to_course_by_id(ctx, ctx->current_course_id);
             }
-            else if (item_index(ctx->curr_item) == 2) {
+            else if (ctx->curr_nav_item == 2) {
                 ctx->active_window_idx = 0;
                 ctx->active_window = ctx->all_courses_windows[0];
                 if (ctx->start_view_active)
@@ -130,7 +122,7 @@ void handle_nav_input(APP_CONTEXT *ctx)
                 ctx->all_courses_view_active = true;
                 ctx->all_courses_needs_redraw = true;
             }
-            else if (item_index(ctx->curr_item) == 3) {
+            else if (ctx->curr_nav_item == 3) {
                 ctx->active_window_idx = 0;
                 ctx->active_window = ctx->progress_windows[0];
                 if (ctx->start_view_active)
@@ -173,7 +165,7 @@ void handle_nav_input(APP_CONTEXT *ctx)
                 ctx->progress_view_active = true;
                 ctx->progress_needs_redraw = true;
             }
-            else if (item_index(ctx->curr_item) == 4) {
+            else if (ctx->curr_nav_item == 4) {
                 ctx->active_window_idx = 0;
                 ctx->active_window = ctx->keybindings_windows[0];
                 if (ctx->start_view_active)

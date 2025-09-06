@@ -130,12 +130,35 @@ USER_DATA *get_user_data(sqlite3 *db, int user_id)
     return user_data;
 }
 
+int get_id_of_first_user(sqlite3 *db)
+{
+    int rc = 0;
+    int id = 0;
+
+    const char *sql = "SELECT id FROM users;";
+
+    sqlite3_stmt *stmt;
+    rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+    if (rc != SQLITE_OK)
+    {
+        return 0;
+    }
+
+    if (sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        id = sqlite3_column_int(stmt, 0);
+    }
+
+    sqlite3_finalize(stmt);
+
+    return id;
+}
+
 int get_user_count(sqlite3 *db)
 {
     int rc = 0;
 
-    const char *sql =
-        "SELECT COUNT(id) FROM users;";
+    const char *sql = "SELECT COUNT(id) FROM users;";
 
     sqlite3_stmt *stmt;
     rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
@@ -474,7 +497,7 @@ void set_section_completed(APP_CONTEXT *ctx)
 
     const char *sql =
         "UPDATE progress SET section_completed = 1, section_completed_at = ? "
-        "WHERE user_id = 1 AND course_id = ? "
+        "WHERE user_id = ? AND course_id = ? "
         "AND section_id = ?;";
 
     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &res, 0);
@@ -482,8 +505,9 @@ void set_section_completed(APP_CONTEXT *ctx)
     if (rc == SQLITE_OK)
     {
         sqlite3_bind_text(res, 1, curr_datetime, strlen(curr_datetime), NULL);
-        sqlite3_bind_int(res, 2, ctx->current_course_id);
-        sqlite3_bind_int(res, 3, ctx->rp_state->curr_section);
+        sqlite3_bind_int(res, 2, ctx->current_user_id);
+        sqlite3_bind_int(res, 3, ctx->current_course_id);
+        sqlite3_bind_int(res, 4, ctx->rp_state->curr_section);
     }
     else
     {
@@ -568,7 +592,7 @@ void set_items_completed(APP_CONTEXT *ctx)
         ctx->rp_state->curr_item - (ctx->rp_state->curr_section == 0 ? 1 : 0);
 
     sql = "INSERT INTO progress (user_id, course_id, "
-          "section_id, items_completed) VALUES (1, ?, ?, ?) "
+          "section_id, items_completed) VALUES (?, ?, ?, ?) "
           "ON CONFLICT(user_id, course_id, section_id) DO UPDATE SET "
           "items_completed = excluded.items_completed;";
 
@@ -576,9 +600,10 @@ void set_items_completed(APP_CONTEXT *ctx)
 
     if (rc == SQLITE_OK)
     {
-        sqlite3_bind_int(res, 1, ctx->current_course_id);
-        sqlite3_bind_int(res, 2, ctx->rp_state->curr_section);
-        sqlite3_bind_int(res, 3, curr_item);
+        sqlite3_bind_int(res, 1, ctx->current_user_id);
+        sqlite3_bind_int(res, 2, ctx->current_course_id);
+        sqlite3_bind_int(res, 3, ctx->rp_state->curr_section);
+        sqlite3_bind_int(res, 4, curr_item);
         mvwprintw(ctx->course_windows[4], 1, 2, "rc: %i", rc);
     }
     else
@@ -640,7 +665,8 @@ int get_current_course(sqlite3 *db, int user_id)
 
     int course_id = sqlite3_column_int(stmt, 0);
 
-    if (course_id == 0) course_id = 1;
+    if (course_id == 0)
+        course_id = 1;
 
     return course_id;
 }
@@ -900,8 +926,9 @@ int get_current_streak(APP_CONTEXT *ctx)
 
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        const char *tmp_date =
-            (const char *)strdup((char *)sqlite3_column_text(stmt, 0));
+        const unsigned char *date = sqlite3_column_text(stmt, 0);
+        if (date == NULL) break;
+        const char *tmp_date = (const char *)strdup((char *)date);
         if (tmp_date == NULL || strcmp(tmp_date, "") == 0)
             break;
         strcpy(cmp_date, tmp_date);
@@ -1045,10 +1072,10 @@ int get_course_completion_percentage(APP_CONTEXT *ctx, int course_id)
         completion_percentage =
             (1.0 * total_items_completed / course_total_items) * 100;
 
-    // mvwprintw(ctx->start_windows[1], 3, 4 * course_id, "%i", course_total_items);
-    // mvwprintw(ctx->start_windows[1], 4, 4 * course_id, "%i", total_items_completed);
-    // mvwprintw(ctx->start_windows[1], 5, 4 * course_id, "%i", completion_percentage);
-    // wrefresh(ctx->start_windows[1]);
+    // mvwprintw(ctx->start_windows[1], 3, 4 * course_id, "%i",
+    // course_total_items); mvwprintw(ctx->start_windows[1], 4, 4 * course_id,
+    // "%i", total_items_completed); mvwprintw(ctx->start_windows[1], 5, 4 *
+    // course_id, "%i", completion_percentage); wrefresh(ctx->start_windows[1]);
 
     return completion_percentage;
 }

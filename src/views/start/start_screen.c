@@ -33,8 +33,8 @@ char *PROGRAMM_DESC =
 
 void create_start_screen(APP_CONTEXT *ctx)
 {
-    ctx->start_windows[0] =
-        create_navigation_window(&ctx->active_window_idx, &ctx->start_menu);
+    ctx->start_windows[0] = create_navigation_window(
+        &ctx->active_window_idx, &ctx->start_menu, ctx->curr_nav_item);
     ctx->start_windows[1] = create_header_section(ctx);
     ctx->start_windows[2] =
         create_course_preview_card(ctx, 0, 2, &ctx->courses[0]);
@@ -47,12 +47,13 @@ void create_start_screen(APP_CONTEXT *ctx)
     wrefresh(ctx->start_windows[5]);
 }
 
-WINDOW *create_navigation_window(int *active_win, MENU **start_menu)
+WINDOW *create_navigation_window(int *active_win, MENU **start_menu,
+                                 int curr_nav_item)
 {
     WINDOW *navigation;
     navigation = newwin(3, WU * 7 + 4, 0, 0);
     draw_border(navigation, *active_win == 0 ? 3 : 2, "");
-    *start_menu = create_start_menu(navigation);
+    *start_menu = create_start_menu(navigation, curr_nav_item);
 
     wattron(navigation, COLOR_PAIR(3));
     mvwprintw(navigation, 0, 2, " Navigation ");
@@ -86,7 +87,8 @@ WINDOW *create_header_section(APP_CONTEXT *ctx)
     }
 
     mvwprintw(header_inner, 14,
-              (header_width - (strlen((char *)ctx->user_data->name) + 10)) / 2,
+              (header_width - (strlen((char *)ctx->user_data->name) + 10)) / 2 -
+                  1,
               "Hello %s!", ctx->user_data->name);
 
     draw_border(header_window, 2, "Header");
@@ -175,8 +177,8 @@ WINDOW *create_course_preview_card(APP_CONTEXT *ctx, int x_position,
         }
         int comp_percent_prev =
             get_course_completion_percentage(ctx, course->id - 1);
-        // mvwprintw(ctx->start_windows[1], 1, 4 * course->id, "%i ", comp_percent_prev);
-        // wrefresh(ctx->start_windows[1]);
+        // mvwprintw(ctx->start_windows[1], 1, 4 * course->id, "%i ",
+        // comp_percent_prev); wrefresh(ctx->start_windows[1]);
         if (comp_percent_prev != 100)
         {
             course->locked = true;
@@ -233,7 +235,7 @@ WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label)
     return ctx->rp_state->right_panel;
 }
 
-MENU *create_start_menu(WINDOW *nav_window)
+MENU *create_start_menu(WINDOW *nav_window, int curr_nav_item)
 {
     const char *choices[] = {
         "Home",        "Current course", "All courses", "Account & Progress",
@@ -243,7 +245,8 @@ MENU *create_start_menu(WINDOW *nav_window)
 
     ITEM **menu_items = (ITEM **)calloc(6, sizeof(ITEM *));
 
-    for (int i = 0; choices[i] != NULL; i++)
+    int i;
+    for (i = 0; choices[i] != NULL; i++)
     {
         menu_items[i] = new_item(choices[i], "");
     }
@@ -284,6 +287,8 @@ MENU *create_start_menu(WINDOW *nav_window)
     set_menu_sub(menu, derwin(nav_window, 1, WU * 7, 1, 1));
     set_menu_fore(menu, A_BOLD | A_ITALIC);
     set_menu_mark(menu, " > "); // Mark for the selected item
+    //
+    set_current_item(menu, menu_items[curr_nav_item]);
 
     // Post the menu (make it visible)
     post_menu(menu);

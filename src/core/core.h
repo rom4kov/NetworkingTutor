@@ -59,6 +59,11 @@ void draw_progress_border(WINDOW *win, int color_pair, int screen);
 void focus_window(WINDOW **window, int color_pair, char *label);
 void focus_instructions_window(RIGHT_PANEL_STATE *rps, int color_pair,
                                char *label);
+
+const char* get_rank_name(Rank rank);
+Rank determine_rank(int points);
+Rank get_next_rank(Rank r);
+
 void trim(char **str);
 char *return_trimmed(char *str);
 char *trunc_str(char *str, int win_width, int offset);

@@ -232,6 +232,7 @@ typedef struct _app_context
   int lines_to_print;
   int curr_line;
   int curr_col;
+  int curr_nav_item;
   bool running;
   bool greeter_needs_redraw;
   bool start_needs_redraw;
@@ -274,3 +275,18 @@ typedef struct _output_thread_args
   char buf[BUFSIZ];
   WINDOW *win;
 } OUTPUT_THREAD_ARGS;
+
+typedef enum {
+    RANK_PACKET_NOVICE = 0,
+    RANK_LAYER_SHIKOMI = 18,
+    RANK_ADDRESSINFO_DESHI = 39,
+    RANK_SOCKET_APPRENTICE = 68,
+    RANK_HTTP_BUSHI = 270,
+    RANK_PARSER_NINJA = 400,
+    RANK_ROUTER_RONIN = 600,
+    RANK_PROTOCOL_KENSEI = 800,
+    RANK_ENCRYPTION_SHOGUN = 1000,
+    RANK_MULTITHREAD_DAIMYO = 1300,
+    RANK_STREAM_SENSEI = 1600,
+    RANK_NETWORK_TENGU = 2000
+} Rank;

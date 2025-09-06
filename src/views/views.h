@@ -13,15 +13,12 @@
 void initialize_colors();
 void create_greeter_screen(APP_CONTEXT *ctx);
 MENU *create_greeter_menu(APP_CONTEXT *ctx);
-WINDOW *create_start_options_popup(APP_CONTEXT *ctx);
-WINDOW *create_start_opt_popup_sub_win(APP_CONTEXT *ctx, int num_of_users);
+WINDOW *create_start_options_popup();
 MENU *create_start_options_menu(APP_CONTEXT *ctx, WINDOW **start_opt_menu_win,
-                                WINDOW **start_opt_menu_sub, int num_of_users);
+                                int num_of_users);
 FORM *create_new_user_popup_form(APP_CONTEXT *ctx, char *label);
 WINDOW *create_user_selection_popup(APP_CONTEXT *ctx, int num_of_users, int *max_name_len);
-WINDOW *create_user_select_sub_win(APP_CONTEXT *ctx, int num_of_users, int *max_name_len);
-MENU *create_user_selection_menu(APP_CONTEXT *ctx, int num_of_users,
-                                 int max_name_len);
+MENU *create_user_selection_menu(APP_CONTEXT *ctx, int num_of_users);
 
 void create_start_screen(APP_CONTEXT *ctx);
 WINDOW *create_navigation_window(int *active_win, MENU **start_menu,
@@ -101,11 +98,11 @@ void print_no_courses_started_msg(WINDOW *win, int height, int width);
 
 // all courses view
 void create_all_courses_view(APP_CONTEXT *ctx);
-WINDOW *create_all_courses_screen(APP_CONTEXT *ctx);
+WINDOW *create_all_courses_screen();
 WINDOW *create_all_courses_container(APP_CONTEXT *ctx);
 void print_all_courses(APP_CONTEXT *ctx);
 
 // keybindings view
 void create_keybindings_view(APP_CONTEXT *ctx);
-WINDOW *create_keybindings_screen(APP_CONTEXT *ctx);
+WINDOW *create_keybindings_screen();
 WINDOW *create_keybindings_container(APP_CONTEXT *ctx);

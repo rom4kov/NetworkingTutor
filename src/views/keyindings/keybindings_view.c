@@ -18,7 +18,7 @@ void create_keybindings_view(APP_CONTEXT *ctx)
     doupdate();
 }
 
-WINDOW *create_keybindings_screen(APP_CONTEXT *ctx)
+WINDOW *create_keybindings_screen()
 {
     WINDOW *keybindings_screen = newwin(LINES, COLS, 0, 0);
     draw_progress_border(keybindings_screen, 2, 1);

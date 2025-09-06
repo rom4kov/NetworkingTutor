@@ -134,23 +134,6 @@ void handle_start_input(APP_CONTEXT *ctx)
                 if (!ctx->courses[this_win - 2].locked)
                 {
                     go_to_course_by_id(ctx, this_win - 1);
-                    // ctx->start_view_active = false;
-                    // for (int i = 0; i < START_WINDOW_COUNT; i++)
-                    // {
-                    //     wclear(ctx->start_windows[i]);
-                    //     wnoutrefresh(ctx->start_windows[i]);
-                    // }
-                    // doupdate();
-                    // ctx->course_needs_redraw = true;
-                    // ctx->course_view_active = true;
-                    // ctx->current_course_id = ctx->courses[this_win - 2].id;
-                    // ctx->current_course =
-                    //     strdup(ctx->courses[this_win - 2].name);
-                    // for (int i = 1; i < START_WINDOW_COUNT; ++i)
-                    // {
-                    //     delwin(ctx->start_windows[i]);
-                    //     wclear(ctx->start_windows[i]);
-                    // }
                 }
                 break;
         }

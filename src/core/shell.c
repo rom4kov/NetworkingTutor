@@ -34,7 +34,7 @@ void move_cursor_left(APP_CONTEXT *ctx)
 
 void move_cursor_right(APP_CONTEXT *ctx)
 {
-    if (ctx->shell->curr_buf_idx < strlen(ctx->shell->buf))
+    if (ctx->shell->curr_buf_idx < (int)strlen(ctx->shell->buf))
     {
         int nol = ctx->shell->term_buffer->num_of_lines;
         ctx->shell->term_buffer->current_col++;
@@ -54,7 +54,7 @@ void delete_char_with_back_space(APP_CONTEXT *ctx)
         int nol = ctx->shell->term_buffer->num_of_lines;
         int cwd_len = strlen(ctx->shell->cwd);
 
-        for (int i = 0; i < strlen(ctx->shell->buf); i++)
+        for (int i = 0; i < (int)strlen(ctx->shell->buf); i++)
         {
             mvwaddch(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7,
                      i + (cwd_len > 0 ? cwd_len + 3 : 2), ' ');
@@ -452,8 +452,8 @@ void append_term_ouput_to_buf(char *buf, int buf_len, TEXT_BUFFER *term_buf,
 void print_term_buf(WINDOW *term_win, TEXT_BUFFER *term_buf)
 {
     werase(term_win);
-    unsigned int nol = term_buf->num_of_lines;
-    unsigned int start_line = nol < 8 ? 0 : nol - 8;
+    int nol = term_buf->num_of_lines;
+    int start_line = nol < 8 ? 0 : nol - 8;
 
     start_line -= term_buf->scroll_offset;
 

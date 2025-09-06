@@ -55,7 +55,7 @@ void handle_greeter_input(APP_CONTEXT *ctx)
                     update_panels();
                     doupdate();
                     handle_start_opts_menu_input(
-                        ctx, ctx->greeter_start_opts_menu, ctx->num_of_users);
+                        ctx, ctx->greeter_start_opts_menu);
                 }
                 else
                 {
@@ -74,7 +74,7 @@ void handle_greeter_input(APP_CONTEXT *ctx)
                 {
                     ctx->active_window = ctx->greeter_windows[6];
                     ctx->greeter_user_select_menu =
-                        create_user_selection_menu(ctx, ctx->num_of_users, 14);
+                        create_user_selection_menu(ctx, ctx->num_of_users);
                     top_panel(ctx->greeter_panels[4]);
                     update_panels();
                     doupdate();
@@ -142,7 +142,7 @@ void handle_start_opts_menu_input(APP_CONTEXT *ctx, MENU *start_options_menu)
                 {
                     ctx->active_window = ctx->greeter_windows[6];
                     ctx->greeter_user_select_menu =
-                        create_user_selection_menu(ctx, ctx->num_of_users, 14);
+                        create_user_selection_menu(ctx, ctx->num_of_users);
                     top_panel(ctx->greeter_panels[4]);
                     update_panels();
                     doupdate();

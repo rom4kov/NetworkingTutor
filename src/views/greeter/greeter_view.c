@@ -26,14 +26,13 @@ void create_greeter_screen(APP_CONTEXT *ctx)
 
     ctx->greeter_menu = create_greeter_menu(ctx);
 
-    ctx->greeter_windows[2] = create_start_options_popup(ctx);
+    ctx->greeter_windows[2] = create_start_options_popup();
     ctx->greeter_panels[2] = new_panel(ctx->greeter_windows[2]);
 
     ctx->greeter_windows[3] = derwin(ctx->greeter_windows[1], 5, 41, 2, 7);
 
-    ctx->greeter_start_opts_menu =
-        create_start_options_menu(ctx, &ctx->greeter_windows[2],
-                                  &ctx->greeter_windows[2], ctx->num_of_users);
+    ctx->greeter_start_opts_menu = create_start_options_menu(
+        ctx, &ctx->greeter_windows[2], ctx->num_of_users);
 
     ctx->greeter_windows[4] = newwin(7, 60, (LINES / 2) - 5, (COLS / 2) - 30);
     ctx->greeter_panels[3] = new_panel(ctx->greeter_windows[4]);
@@ -46,7 +45,6 @@ void create_greeter_screen(APP_CONTEXT *ctx)
 
     ctx->greeter_windows[7] =
         derwin(ctx->greeter_windows[6], ctx->num_of_users * 2, 44, 2, 2);
-
 
     ctx->greeter_ascii_window =
         derwin(ctx->greeter_windows[0], 10, 71, LINES / 5, (COLS - 71) / 2 + 2);
@@ -113,22 +111,15 @@ MENU *create_greeter_menu(APP_CONTEXT *ctx)
     return menu;
 }
 
-WINDOW *create_start_options_popup(APP_CONTEXT *ctx)
+WINDOW *create_start_options_popup()
 {
     WINDOW *start_opt_menu_win =
         newwin(7, 50, (LINES / 2) - 4, (COLS / 2) - 25);
     return start_opt_menu_win;
 }
 
-WINDOW *create_start_opt_popup_sub_win(APP_CONTEXT *ctx, int num_of_users)
-{
-    WINDOW *start_opt_menu_sub = derwin(ctx->greeter_windows[1], 5, 41, 2, 7);
-
-    return start_opt_menu_sub;
-}
-
 MENU *create_start_options_menu(APP_CONTEXT *ctx, WINDOW **start_opt_menu_win,
-                                WINDOW **start_opt_menu_sub, int num_of_users)
+                                int num_of_users)
 {
     char *choices[3] = {0};
 
@@ -221,17 +212,7 @@ WINDOW *create_user_selection_popup(APP_CONTEXT *ctx, int num_of_users,
     return user_select_win;
 }
 
-WINDOW *create_user_select_sub_win(APP_CONTEXT *ctx, int num_of_users,
-                                   int *max_name_len)
-{
-    WINDOW *user_select_sub_win =
-        derwin(ctx->greeter_windows[4], num_of_users * 2, 44, 2, 2);
-
-    return user_select_sub_win;
-}
-
-MENU *create_user_selection_menu(APP_CONTEXT *ctx, int num_of_users,
-                                 int max_name_len)
+MENU *create_user_selection_menu(APP_CONTEXT *ctx, int num_of_users)
 {
     USER_DATA **users = malloc(sizeof(USER_DATA) * num_of_users);
     for (int i = 0; i < num_of_users; i++)

@@ -7,7 +7,7 @@
 
 void create_all_courses_view(APP_CONTEXT *ctx)
 {
-    ctx->all_courses_windows[1] = create_all_courses_screen(ctx);
+    ctx->all_courses_windows[1] = create_all_courses_screen();
     ctx->all_courses_windows[0] = create_navigation_window(
         &ctx->active_window_idx, &ctx->start_menu, ctx->curr_nav_item);
     ctx->all_courses_windows[2] = create_all_courses_container(ctx);
@@ -19,7 +19,7 @@ void create_all_courses_view(APP_CONTEXT *ctx)
     print_all_courses(ctx);
 }
 
-WINDOW *create_all_courses_screen(APP_CONTEXT *ctx)
+WINDOW *create_all_courses_screen()
 {
     WINDOW *all_courses_screen = newwin(LINES, COLS, 0, 0);
     draw_progress_border(all_courses_screen, 2, 1);

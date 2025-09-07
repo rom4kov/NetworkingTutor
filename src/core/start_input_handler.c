@@ -50,13 +50,6 @@ void handle_start_input(APP_CONTEXT *ctx)
                 ctx->active_window_idx = 0;
                 ctx->start_view_active = false;
                 ctx->start_needs_redraw = false;
-                // for (int i = 0; i < START_START_WINDOW_COUNT; i++)
-                // {
-                //     wclear(ctx->start_windows[i]);
-                //     wnoutrefresh(ctx->start_windows[i]);
-                //     delwin(ctx->start_windows[i]);
-                // }
-                // doupdate();
                 ctx->greeter_needs_redraw = true;
                 ctx->greeter_view_active = true;
                 break;

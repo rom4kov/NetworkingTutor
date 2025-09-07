@@ -7,13 +7,12 @@ void complete_section(APP_CONTEXT *ctx)
     set_section_completed(ctx);
     get_completed_sections(ctx);
     ctx->rp_state->curr_item = 1;
-    // ctx->rp_state->items_completed = 0;
     ctx->rp_state->curr_section += 1;
-    // set_items_completed(ctx);
     set_items_completed(ctx);
     ctx->rp_state->lines_to_print = 0;
     ctx->rp_state->lines_excess = 0;
     ctx->rp_state->scroll_offset = 0;
+    ctx->rp_state->showing_test_results = false;
     wclear(ctx->course_windows[4]);
     delwin(ctx->course_windows[4]);
     ctx->course_windows[4] = create_progress_window(ctx);
@@ -29,8 +28,6 @@ void complete_section(APP_CONTEXT *ctx)
 
         mvwprintw(ctx->rp_state->right_panel, LINES - 5, 3,
                   "%s", blank_line);
-        // mvwprintw(ctx->rp_state->right_panel, 9, 3, "%s",
-        //           blank_line);
     }
     deallocate_it_buffer(ctx->rp_state->it_buffer);
     ctx->rp_state->it_buffer = initialize_it_buffer();

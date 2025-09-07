@@ -339,11 +339,7 @@ void read_end_of_course_page_into_buffer(APP_CONTEXT *ctx)
         else if (j > ctx->rp_state->window_width - 10)
         {
             overflow = true;
-            // if (i < (ascii_len + 1))
-            // {
             curr_line->centered = false;
-            //     curr_line->style = COLOR_PAIR(4) | A_BOLD;
-            // }
             add_line_break(NULL, ctx->rp_state->it_buffer, &curr_line, -1, &i,
                            &j, &line_number, &last_space_pos, overflow,
                            &bl_point);
@@ -359,6 +355,8 @@ void read_end_of_course_page_into_buffer(APP_CONTEXT *ctx)
         i++;
         j++;
     }
+
+    free(end_of_course_page_str);
 
     wrefresh(ctx->course_windows[2]);
 }

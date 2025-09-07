@@ -317,12 +317,6 @@ void write_buffer_to_file(TEXT_BUFFER *tbuf, FILE *file, int y)
         tbuf->current_line = tbuf->current_line->next;
     }
 
-    // if (tbuf->num_of_lines == 1)
-    // {
-    //     tbuf->current_line->buf_[strlen(tbuf->current_line->buf_) + 1] =
-    //     '\n';
-    // }
-
     rewind(file);
 
     int fd = fileno(file);
@@ -581,23 +575,9 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
             entries_iterator = entries_iterator->parent_dir;
         }
 
-        // if (current_entry->parent_dir)
-        // {
-        //     new_entry->parent_dir = current_entry->parent_dir;
-        //
-        //     if (current_entry->parent_dir->parent_dir)
-        //     {
-        //         current_entry->parent_dir->parent_dir->num_of_entries++;
-        //     }
-        // }
         new_entry->indent_level = current_entry->indent_level + 1;
 
         new_entry->parent_dir = current_entry;
-
-        // if (current_entry->parent_dir)
-        // {
-        //     current_entry->parent_dir->num_of_entries++;
-        // }
     }
     else if (current_entry->parent_dir)
     {
@@ -618,16 +598,6 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
         {
             current_entry->parent_dir->parent_dir->num_of_entries++;
         }
-
-        // mvwprintw(ctx->course_windows[3], 3, 45, "                       ");
-        // mvwprintw(ctx->course_windows[3], 3, 45, "%s", current_entry->name);
-        // mvwprintw(ctx->course_windows[3], 4, 45, "                       ");
-        // mvwprintw(ctx->course_windows[3], 4, 45, "%s",
-        //           current_entry->parent_dir->name);
-        // mvwprintw(ctx->course_windows[3], 5, 45, "                       ");
-        // mvwprintw(ctx->course_windows[3], 5, 45, "%i",
-        //           current_entry->parent_dir->num_of_entries);
-        // wrefresh(ctx->course_windows[3]);
     }
     else
     {
@@ -637,21 +607,7 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
         new_entry->parent_dir = current_entry->parent_dir;
     }
 
-    // mvwprintw(ctx->course_windows[3], 5, 2, "%s", new_entry->path);
-    // wnoutrefresh(ctx->course_windows[3]);
     new_entry->type = type;
-
-    mvwprintw(ctx->course_windows[3], 3, 50, "            ");
-    mvwprintw(ctx->course_windows[3], 4, 50, "            ");
-    mvwprintw(ctx->course_windows[3], 5, 50, "            ");
-    mvwprintw(ctx->course_windows[3], 6, 50, "            ");
-    mvwprintw(ctx->course_windows[3], 3, 50, "new entry: %s", new_entry->name);
-    mvwprintw(ctx->course_windows[3], 4, 50, "last: %b",
-              new_entry->last_in_sub_dir);
-    mvwprintw(ctx->course_windows[3], 5, 50, "indent: %i",
-              new_entry->indent_level);
-    // mvwprintw(ctx->course_windows[3], 6, 50, "parent: %s",
-    //           new_entry->parent_dir->path);
     wrefresh(ctx->course_windows[3]);
 
     new_entry->prev = ctx->file_tree->current_entry;

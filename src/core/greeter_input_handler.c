@@ -120,10 +120,10 @@ void handle_start_opts_menu_input(APP_CONTEXT *ctx, MENU *start_options_menu)
 
         switch (ctx->key)
         {
-            case KEY_DOWN: // Backspace
+            case KEY_DOWN:
                 menu_driver(start_options_menu, REQ_DOWN_ITEM);
                 break;
-            case KEY_UP: // Backspace
+            case KEY_UP:
                 menu_driver(start_options_menu, REQ_UP_ITEM);
                 break;
             case 10:
@@ -288,7 +288,7 @@ void handle_user_select_win_input(APP_CONTEXT *ctx, bool *start_opt_menu_active,
                 break;
             case 'q':
                 user_select_menu_active = false;
-                // *start_opt_menu_active = false;
+
                 ctx->active_window = ctx->greeter_windows[2];
                 hide_panel(ctx->greeter_panels[4]);
                 top_panel(ctx->greeter_panels[2]);

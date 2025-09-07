@@ -127,7 +127,6 @@ int perform_tests(APP_CONTEXT *ctx)
     // wnoutrefresh(ctx->course_windows[4]);
     doupdate();
 
-    // CU_cleanup_registry();
     return 0;
 }
 

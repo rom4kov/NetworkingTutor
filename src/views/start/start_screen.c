@@ -66,7 +66,7 @@ WINDOW *create_header_section(APP_CONTEXT *ctx)
 {
     int header_height = LINES / 2 + 1;
     int header_width = WU * 7 + 4;
-    // if (header_width % 2) header_width--;
+
     WINDOW *header_window = newwin(header_height, header_width, 3, 0);
     WINDOW *header_inner =
         derwin(header_window, header_height - 2, header_width - 2, 1, 1);
@@ -81,6 +81,8 @@ WINDOW *create_header_section(APP_CONTEXT *ctx)
 
     print_window_content(header_tbuf, header_inner, header_width - 2);
 
+    deallocate_it_buffer(header_tbuf);
+
     if (ctx->active_window_idx == 1)
     {
         wattroff(header_inner, COLOR_PAIR(1));
@@ -94,6 +96,7 @@ WINDOW *create_header_section(APP_CONTEXT *ctx)
     draw_border(header_window, 2, "Header");
     wrefresh(header_window);
     wrefresh(header_inner);
+    delwin(header_inner);
     return header_window;
 }
 
@@ -123,6 +126,7 @@ WINDOW *create_course_preview_card(APP_CONTEXT *ctx, int x_position,
         x_add = ctx->progress_view_active ? 80 : 0;
         width = CARD_WIDTH - (ctx->progress_view_active ? 2 : 4);
     }
+
     WINDOW *course_preview_card_outer =
         newwin(height, width + remainder, y_position, x_position + x_add);
     WINDOW *course_preview_card_inner = derwin(
@@ -150,6 +154,7 @@ WINDOW *create_course_preview_card(APP_CONTEXT *ctx, int x_position,
               (width - strlen(course->name)) / 2 - 1, "%s", course->name);
 
     ctx->card_buffers[curr_win_idx - 2] = initialize_it_buffer();
+
     read_window_text_into_buffer(ctx, ctx->card_buffers[curr_win_idx - 2],
                                  width - 2 + remainder, 1, curr_win_idx - 2,
                                  "");
@@ -177,8 +182,7 @@ WINDOW *create_course_preview_card(APP_CONTEXT *ctx, int x_position,
         }
         int comp_percent_prev =
             get_course_completion_percentage(ctx, course->id - 1);
-        // mvwprintw(ctx->start_windows[1], 1, 4 * course->id, "%i ",
-        // comp_percent_prev); wrefresh(ctx->start_windows[1]);
+
         if (comp_percent_prev != 100)
         {
             course->locked = true;
@@ -192,6 +196,9 @@ WINDOW *create_course_preview_card(APP_CONTEXT *ctx, int x_position,
     wnoutrefresh(course_preview_card_outer);
     wnoutrefresh(course_preview_card_inner);
     doupdate();
+
+    delwin(course_preview_card_inner);
+
     return course_preview_card_outer;
 }
 
@@ -214,13 +221,6 @@ WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label)
 
     if (ctx->start_view_active)
     {
-        // ctx->user_data = get_user_data(ctx->db, ctx->current_user_id);
-        // mvwprintw(ctx->rp_state->right_panel, 2, 3, "Your name: %s",
-        //           ctx->user_data->name);
-        // mvwprintw(ctx->rp_state->right_panel, 3, 3, "Created at: %s",
-        //           ctx->user_data->created_at);
-        // mvwprintw(ctx->rp_state->right_panel, 4, 3, "%i",
-        // ctx->current_user_id);
         print_intro(ctx);
         wnoutrefresh(ctx->rp_state->inner_win);
     }
@@ -276,24 +276,19 @@ MENU *create_start_menu(WINDOW *nav_window, int curr_nav_item)
         MENU_SPACING = 3;
     }
 
-    // Create the menu
     MENU *menu = new_menu(menu_items);
     set_menu_format(menu, 1, 6);
     set_menu_spacing(menu, 0, 1, MENU_SPACING);
-    // mvwprintw(nav_window, 2, 3, "%i", COLS);
 
-    // Set the window for the menu to be displayed inside left_inner_win
     set_menu_win(menu, nav_window);
     set_menu_sub(menu, derwin(nav_window, 1, WU * 7, 1, 1));
     set_menu_fore(menu, A_BOLD | A_ITALIC);
     set_menu_mark(menu, " > "); // Mark for the selected item
-    //
+
     set_current_item(menu, menu_items[curr_nav_item]);
 
-    // Post the menu (make it visible)
     post_menu(menu);
 
-    // Refresh the left_inner_win window
     wrefresh(nav_window);
     return menu;
 }
@@ -336,9 +331,6 @@ void print_window_content(I_TEXT_BUFFER *header_tbuf, WINDOW *win,
         else if (current_line->style == 0 && current_line->syntax_hl == false)
         {
             mvwprintw(win, i, offset, "%s", current_line->buf_);
-            // mvwprintw(win, i, offset, "%i %i %i %i %li", offset,
-            // current_line->length,
-            //           win_width, CARD_WIDTH, strlen(current_line->buf_));
         }
         else if (current_line->syntax_hl == true)
         {

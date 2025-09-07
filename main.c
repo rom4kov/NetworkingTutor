@@ -10,6 +10,7 @@
 #include <locale.h>
 #include <menu.h>
 #include <ncurses.h>
+#include <panel.h>
 #include <sqlite3.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -76,9 +77,7 @@ int main(void)
     ctx->shell = calloc(1, sizeof(SHELL));
     ctx->shell->terminal_active = false;
     ctx->shell->executable_running = false;
-    // bool *stop_exec = false;
     ctx->shell->stop_executable = false;
-    // ctx->shell->stop_executable = stop_exec;
     ctx->shell->curr_buf_idx = 0;
     ctx->shell->term_buffer = initialize_buffer();
     ctx->shell->term_buffer->num_of_lines = 1;
@@ -91,11 +90,6 @@ int main(void)
     ctx->shell->cwd = "";
     ctx->shell->home_dir = get_cwd();
 
-    // ctx->shell->term_buffer->first_line->buf_[0] = '>';
-    // ctx->shell->term_buffer->first_line->buf_[1] = ' ';
-
-    // refresh();
-
     // seed_courses_data(ctx->db, ctx->greeter_windows[0],
     //                   "SQL/create_courses_table.sql");
     // seed_courses_data(ctx->db, ctx->greeter_windows[0],
@@ -104,8 +98,8 @@ int main(void)
     //                   "SQL/create_completed_courses_table.sql");
     // seed_courses_data(ctx->db, ctx->greeter_windows[0],
     //                   "SQL/create_streaks_table.sql");
-    seed_courses_data(ctx->db, ctx->greeter_windows[0],
-                      "SQL/create_ascii_art_table.sql");
+    // seed_courses_data(ctx->db, ctx->greeter_windows[0],
+    //                   "SQL/create_ascii_art_table.sql");
     // seed_courses_data(ctx->db, ctx->greeter_windows[0],
     //                   "SQL/courses/http_server/sections.sql");
     // seed_courses_data(ctx->db, ctx->greeter_windows[0],
@@ -142,8 +136,6 @@ int main(void)
 
     create_greeter_screen(ctx);
     ctx->active_window = ctx->greeter_windows[1];
-    // keypad(ctx->greeter_windows[1], TRUE);
-    // wrefresh(ctx->greeter_windows[1]);
 
     while (ctx->running)
     {
@@ -161,7 +153,7 @@ int main(void)
             ctx->start_view_active = false;
             ctx->start_needs_redraw = false;
             create_greeter_screen(ctx);
-            // ctx->active_window = ctx->greeter_windows[0];
+
             ctx->greeter_needs_redraw = false;
             ctx->first_greeter_draw = false;
             wrefresh(ctx->greeter_windows[0]);
@@ -300,7 +292,6 @@ int main(void)
 
         keypad(ctx->active_window, TRUE);
         ctx->key = wgetch(ctx->active_window);
-        // ctx->key = getch();
 
         switch (ctx->key)
         {
@@ -337,7 +328,6 @@ int main(void)
             default:
                 if (ctx->greeter_view_active)
                 {
-                    // keypad(ctx->greeter_windows[0], TRUE);
                     handle_greeter_input(ctx);
                 }
                 else if (ctx->start_view_active)
@@ -369,6 +359,10 @@ int main(void)
 
     endwin();
 
+    free_memory(ctx);
+
+    exit_curses(0);
+
     return EXIT_SUCCESS;
 }
 
@@ -382,8 +376,7 @@ void initialize_colors()
     init_pair(1, COLOR_GREY, -1);
     init_pair(2, -1, -1);
     init_pair(3, COLOR_RED, -1);
-    // if (can_change_color())
-    //      init_color(COLOR_WHITE, 195, 225, 225);
+
     init_pair(4, COLOR_GREEN, -1);
     init_pair(5, COLOR_YELLOW, -1);
     init_pair(6, COLOR_CYAN, -1);
@@ -406,4 +399,66 @@ void initialize_colors()
 
     init_color(COLOR_BERMUDA, 523, 851, 718);
     init_pair(15, COLOR_BERMUDA, -1);
+}
+
+void free_memory(APP_CONTEXT *ctx)
+{
+    deallocate_buffer(ctx->t_buffer);
+    deallocate_buffer(ctx->shell->term_buffer);
+    deallocate_it_buffer(ctx->rp_state->it_buffer);
+
+    for (int i = 0; ctx->card_buffers[i] != NULL; i++) {
+        deallocate_it_buffer(ctx->card_buffers[i]);
+    }
+
+    for (int i = 0; i < GREETER_PANEL_COUNT; i++) {
+        del_panel(ctx->greeter_panels[i]);
+    }
+
+    for (int i = 0; i < GREETER_WINDOW_COUNT; i++) {
+        delwin(ctx->greeter_windows[i]);
+    }
+
+    for (int i = 0; i < START_WINDOW_COUNT; i++) {
+        delwin(ctx->start_windows[i]);
+    }
+
+    for (int i = 0; i < COURSE_WINDOW_COUNT; i++) {
+        delwin(ctx->course_windows[i]);
+    }
+
+    for (int i = 0; i < PROGRESS_WINDOW_COUNT; i++) {
+        delwin(ctx->progress_windows[i]);
+    }
+
+    for (int i = 0; i < ALL_COURSES_WINDOW_COUNT; i++) {
+        delwin(ctx->all_courses_windows[i]);
+    }
+
+    for (int i = 0; i < KEYBINDINGS_WINDOW_COUNT; i++) {
+        delwin(ctx->keybindings_windows[i]);
+    }
+
+    sqlite3_db_release_memory(ctx->db);
+    CU_cleanup_registry();
+
+    unpost_menu(ctx->greeter_menu);
+    unpost_menu(ctx->greeter_start_opts_menu);
+    unpost_menu(ctx->greeter_user_select_menu);
+    unpost_menu(ctx->start_menu);
+
+    free(ctx->shell->home_dir);
+    free(ctx->shell->cwd);
+    free(ctx->shell);
+    free(ctx->filename);
+    free(ctx->curr_file_path);
+    free(ctx->user_data);
+    free(ctx->courses);
+    free(ctx->current_course);
+    free(ctx->rp_state->course_progress);
+    free(ctx->rp_state->completed_sections);
+    free(ctx->rp_state->total_section_items);
+    free(ctx->rp_state->inner_win);
+    free(ctx->rp_state);
+    free(ctx);
 }

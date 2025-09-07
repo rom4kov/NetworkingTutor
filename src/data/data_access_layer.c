@@ -125,7 +125,8 @@ USER_DATA *get_user_data(sqlite3 *db, int user_id)
         (const char *)sqlite3_column_text(stmt, 1));
     user_data->created_at = (const unsigned char *)strdup(
         (const char *)sqlite3_column_text(stmt, 2));
-    // sqlite3_finalize(stmt);
+
+    sqlite3_finalize(stmt);
 
     return user_data;
 }

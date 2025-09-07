@@ -208,6 +208,7 @@ void handle_course_input(APP_CONTEXT *ctx)
                              [ctx->rp_state->curr_section]) &&
                         ctx->rp_state->s_metadata->has_test == false)
                     {
+                        ctx->rp_state->showing_test_results = false;
                         print_section_or_task_compl_msg(ctx, NULL);
                         wnoutrefresh(ctx->course_windows[4]);
                     }
@@ -324,8 +325,8 @@ void handle_course_input(APP_CONTEXT *ctx)
                     wnoutrefresh(ctx->rp_state->inner_win);
                     doupdate();
                 }
-                log_course_instr_values(ctx);
-                wrefresh(ctx->course_windows[2]);
+                // log_course_instr_values(ctx);
+                // wrefresh(ctx->course_windows[2]);
                 break;
             case '>':
                 // log_course_instr_values(ctx);

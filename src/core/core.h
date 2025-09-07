@@ -93,3 +93,5 @@ char *get_cwd(void);
 void *popen_w_pid_ret(void *arguments);
 void *check_running_proc_for_output(void *args);
 void run_output_funcs(APP_CONTEXT *ctx, char buf[]);
+
+void free_memory(APP_CONTEXT *ctx);

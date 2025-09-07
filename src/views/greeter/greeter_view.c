@@ -88,7 +88,7 @@ MENU *create_greeter_menu(APP_CONTEXT *ctx)
         "            Settings",
         "            Shortcuts",
         "            🚪 Quit",
-        (char *)NULL // Last element must be NULL
+        (char *)NULL
     };
 
     ITEM **menu_items = (ITEM **)calloc(8, sizeof(ITEM *));

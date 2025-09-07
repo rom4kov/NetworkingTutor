@@ -1,11 +1,10 @@
 #include "../models/models.h"
 #include "../views/views.h"
+#include <CUnit/CUnit.h>
 #include <ncurses.h>
 #include <pthread.h>
-#include <unistd.h>
 #include <string.h>
-#include <CUnit/CUnit.h>
-
+#include <unistd.h>
 
 void *print_press_enter_after_sec_compl(void *arg)
 {
@@ -20,15 +19,19 @@ void *print_press_enter_after_sec_compl(void *arg)
                   press_enter);
     }
     else
-{
+    {
         char *press_enter = "Press ENTER to finish the course";
         mvwprintw(ctx->rp_state->right_panel, LINES - 5,
                   (ctx->rp_state->window_width - strlen(press_enter)) / 2, "%s",
                   press_enter);
     }
 
-    mvwprintw(ctx->rp_state->right_panel, LINES - 5, 2, "%s",
-              "< Back to section");
+    if (ctx->rp_state->showing_test_results)
+    {
+        mvwprintw(ctx->rp_state->right_panel, LINES - 5, 2, "%s",
+                  "< Back to section");
+    }
+
     wrefresh(ctx->rp_state->right_panel);
     return NULL;
 }
@@ -59,4 +62,3 @@ void print_section_or_task_compl_msg(APP_CONTEXT *ctx, CU_pRunSummary rs)
     pthread_create(&delayed_msg, NULL, print_press_enter_after_sec_compl, ctx);
     pthread_detach(delayed_msg);
 }
-

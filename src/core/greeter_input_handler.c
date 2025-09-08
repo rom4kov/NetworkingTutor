@@ -21,25 +21,11 @@ void handle_greeter_input(APP_CONTEXT *ctx)
     switch (ctx->key)
     {
         case KEY_DOWN:
-            mvwprintw(ctx->greeter_windows[0], 1, 1, "%s", "                 ");
-            mvwprintw(ctx->greeter_windows[0], 1, 1, "%s", "KEY_DOWN PRESSED");
-            curr_item = current_item(ctx->greeter_menu);
-            mvwprintw(ctx->greeter_windows[0], 2, 1, "item: %i",
-                      item_index(curr_item));
-            mvwprintw(ctx->greeter_windows[0], 3, 1, "act win: %p",
-                      ctx->active_window);
             menu_driver(ctx->greeter_menu, REQ_DOWN_ITEM);
             wnoutrefresh(ctx->greeter_windows[1]);
             doupdate();
             break;
         case KEY_UP:
-            mvwprintw(ctx->greeter_windows[0], 1, 1, "%s", "                 ");
-            mvwprintw(ctx->greeter_windows[0], 1, 1, "%s", "KEY_UP PRESSED");
-            curr_item = current_item(ctx->greeter_menu);
-            mvwprintw(ctx->greeter_windows[0], 2, 1, "item: %i",
-                      item_index(curr_item));
-            mvwprintw(ctx->greeter_windows[0], 3, 1, "act win: %p",
-                      ctx->active_window);
             menu_driver(ctx->greeter_menu, REQ_UP_ITEM);
             wnoutrefresh(ctx->greeter_windows[1]);
             doupdate();
@@ -54,8 +40,8 @@ void handle_greeter_input(APP_CONTEXT *ctx)
                     top_panel(ctx->greeter_panels[2]);
                     update_panels();
                     doupdate();
-                    handle_start_opts_menu_input(
-                        ctx, ctx->greeter_start_opts_menu);
+                    handle_start_opts_menu_input(ctx,
+                                                 ctx->greeter_start_opts_menu);
                 }
                 else
                 {
@@ -73,8 +59,6 @@ void handle_greeter_input(APP_CONTEXT *ctx)
                 if (ctx->num_of_users > 1)
                 {
                     ctx->active_window = ctx->greeter_windows[6];
-                    ctx->greeter_user_select_menu =
-                        create_user_selection_menu(ctx, ctx->num_of_users);
                     top_panel(ctx->greeter_panels[4]);
                     update_panels();
                     doupdate();
@@ -86,11 +70,14 @@ void handle_greeter_input(APP_CONTEXT *ctx)
                     int user_id = get_id_of_first_user(ctx->db);
                     if (user_id < 1)
                     {
-                        mvwprintw(ctx->greeter_windows[1], ctx->num_of_users * 2 + 2, 2, "%s", "No user found");
+                        mvwprintw(ctx->greeter_windows[1],
+                                  ctx->num_of_users * 2 + 2, 2, "%s",
+                                  "No user found");
                         wrefresh(ctx->greeter_windows[1]);
                         break;
                     }
-                    int current_course_id = get_current_course(ctx->db, user_id);
+                    int current_course_id =
+                        get_current_course(ctx->db, user_id);
                     go_to_course_by_id(ctx, current_course_id);
                 }
             }
@@ -280,18 +267,26 @@ void handle_user_select_win_input(APP_CONTEXT *ctx, bool *start_opt_menu_active,
                     ctx->course_needs_redraw = true;
                     go_to_course_by_id(ctx, ctx->current_course_id);
                 }
-                else {
+                else
+                {
                     ctx->start_view_active = true;
                     ctx->start_needs_redraw = true;
-                
                 }
                 break;
             case 'q':
                 user_select_menu_active = false;
 
-                ctx->active_window = ctx->greeter_windows[2];
-                hide_panel(ctx->greeter_panels[4]);
-                top_panel(ctx->greeter_panels[2]);
+                if (continue_course)
+                {
+                    ctx->active_window = ctx->greeter_windows[1];
+                    hide_panel(ctx->greeter_panels[4]);
+                    top_panel(ctx->greeter_panels[1]);
+                }
+                else {
+                    ctx->active_window = ctx->greeter_windows[2];
+                    hide_panel(ctx->greeter_panels[4]);
+                    top_panel(ctx->greeter_panels[2]);
+                }
 
                 update_panels();
                 doupdate();

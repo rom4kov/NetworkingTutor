@@ -930,6 +930,7 @@ int get_current_streak(APP_CONTEXT *ctx)
         const unsigned char *date = sqlite3_column_text(stmt, 0);
         if (date == NULL)
             break;
+
         const char *tmp_date = (const char *)strdup((char *)date);
         if (tmp_date == NULL || strcmp(tmp_date, "") == 0)
             break;

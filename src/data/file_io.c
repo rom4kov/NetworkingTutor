@@ -344,6 +344,17 @@ void deallocate_buffer(TEXT_BUFFER *tbuf)
     free(tbuf);
 }
 
+void deallocate_file_tree(FILE_TREE *f_tree)
+{
+    DIR_ENTRY *curr_entry = f_tree->first_entry;
+
+    while (curr_entry != NULL)
+    {
+        free(curr_entry->name);
+    }
+
+}
+
 void create_new_file_input(WINDOW **inner_win, WINDOW **form_window,
                            FORM **new_file_form, FIELD **field, char *label)
 {

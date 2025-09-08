@@ -60,7 +60,6 @@ void create_your_courses_window(APP_CONTEXT *ctx, WINDOW *win)
     mvwprintw(ctx->progress_windows[4], 0, 0, "%s",
               get_ascii_art(ctx->db, "your_courses"));
     wattroff(ctx->progress_windows[4], A_BOLD);
-    // wrefresh(ctx->progress_windows[4]);
 }
 
 WINDOW *create_progress_stats_window(APP_CONTEXT *ctx)
@@ -146,6 +145,8 @@ WINDOW *create_progress_stats_window(APP_CONTEXT *ctx)
     wnoutrefresh(rank_window);
 
     wnoutrefresh(inner_stats_win);
+    delwin(inner_stats_win);
+    delwin(rank_window);
     return stats_window;
 }
 

@@ -46,6 +46,9 @@ void create_greeter_screen(APP_CONTEXT *ctx)
     ctx->greeter_windows[7] =
         derwin(ctx->greeter_windows[6], ctx->num_of_users * 2, 44, 2, 2);
 
+    ctx->greeter_user_select_menu =
+        create_user_selection_menu(ctx, ctx->num_of_users);
+
     ctx->greeter_ascii_window =
         derwin(ctx->greeter_windows[0], 10, 71, LINES / 5, (COLS - 71) / 2 + 2);
     draw_border(ctx->greeter_windows[0], 2, 0);
@@ -91,14 +94,14 @@ MENU *create_greeter_menu(APP_CONTEXT *ctx)
         (char *)NULL
     };
 
-    ITEM **menu_items = (ITEM **)calloc(8, sizeof(ITEM *));
+    ctx->greeter_menu_items = (ITEM **)calloc(8, sizeof(ITEM *));
 
     for (int i = 0; choices[i] != NULL; i++)
     {
-        menu_items[i] = new_item(choices[i], "");
+        ctx->greeter_menu_items[i] = new_item(choices[i], "");
     }
 
-    MENU *menu = new_menu(menu_items);
+    MENU *menu = new_menu(ctx->greeter_menu_items);
     set_menu_format(menu, 14, 1);
     set_menu_spacing(menu, 0, 2, 2);
 
@@ -108,6 +111,12 @@ MENU *create_greeter_menu(APP_CONTEXT *ctx)
     set_menu_mark(menu, " > ");
 
     post_menu(menu);
+
+    for (int i = 0; ctx->greeter_menu_items[i] != NULL; i++)
+    {
+        free_item(ctx->greeter_menu_items[i]);
+    }
+
     return menu;
 }
 

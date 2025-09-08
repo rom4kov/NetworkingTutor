@@ -353,13 +353,14 @@ int main(void)
         }
     }
 
+    sqlite3_db_release_memory(ctx->db);
     sqlite3_close(ctx->db);
 
     curs_set(1);
 
-    endwin();
-
     free_memory(ctx);
+
+    endwin();
 
     exit_curses(0);
 
@@ -419,6 +420,11 @@ void free_memory(APP_CONTEXT *ctx)
         delwin(ctx->greeter_windows[i]);
     }
 
+    for (int i = 0; ctx->greeter_menu_items[i] != NULL; i++)
+    {
+        free_item(ctx->greeter_menu_items[i]);
+    }
+
     for (int i = 0; i < START_WINDOW_COUNT; i++) {
         delwin(ctx->start_windows[i]);
     }
@@ -439,16 +445,19 @@ void free_memory(APP_CONTEXT *ctx)
         delwin(ctx->keybindings_windows[i]);
     }
 
-    sqlite3_db_release_memory(ctx->db);
     CU_cleanup_registry();
 
     unpost_menu(ctx->greeter_menu);
-    unpost_menu(ctx->greeter_start_opts_menu);
+    // unpost_menu(ctx->greeter_start_opts_menu);
     unpost_menu(ctx->greeter_user_select_menu);
     unpost_menu(ctx->start_menu);
+    free_menu(ctx->greeter_menu);
+    free_menu(ctx->greeter_start_opts_menu);
+    free_menu(ctx->greeter_user_select_menu);
+    free_menu(ctx->start_menu);
 
     free(ctx->shell->home_dir);
-    free(ctx->shell->cwd);
+    // free(ctx->shell->cwd);
     free(ctx->shell);
     free(ctx->filename);
     free(ctx->curr_file_path);
@@ -458,7 +467,6 @@ void free_memory(APP_CONTEXT *ctx)
     free(ctx->rp_state->course_progress);
     free(ctx->rp_state->completed_sections);
     free(ctx->rp_state->total_section_items);
-    free(ctx->rp_state->inner_win);
     free(ctx->rp_state);
     free(ctx);
 }

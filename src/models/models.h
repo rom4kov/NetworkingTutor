@@ -14,13 +14,6 @@
 #include "stdatomic.h"
 #include <pthread.h>
 
-#define START_WINDOW_COUNT 6
-#define COURSE_WINDOW_COUNT 5
-#define PROGRESS_WINDOW_COUNT 5
-#define ALL_COURSES_WINDOW_COUNT 3
-#define KEYBINDINGS_WINDOW_COUNT 3
-#define SEPARATOR 333
-
 typedef struct _user_data
 {
     const unsigned char *name;
@@ -204,7 +197,8 @@ typedef struct _app_context
   MENU *greeter_user_select_menu;
   MENU *start_menu;
   MENU *explorer_menu;
-  ITEM **menu_items;
+  ITEM **greeter_menu_items;
+  ITEM **nav_menu_items;
   ITEM *curr_item;
   FORM *new_user_form;
   FORM *user_form;

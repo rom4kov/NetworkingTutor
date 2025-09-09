@@ -16,8 +16,8 @@
 
 typedef struct _user_data
 {
-    const unsigned char *name;
-    const unsigned char *created_at;
+    char *name;
+    char *created_at;
 } USER_DATA;
 
 typedef struct _course_data
@@ -90,9 +90,9 @@ typedef struct instructions_text_buffer
 {
     I_LINE *first_line;
     I_LINE *current_line;
-    unsigned short curr_line_nr;
-    unsigned short current_col;
-    unsigned short num_of_lines;
+    int curr_line_nr;
+    int current_col;
+    int num_of_lines;
 } I_TEXT_BUFFER;
 
 typedef struct _icon
@@ -198,6 +198,8 @@ typedef struct _app_context
   MENU *start_menu;
   MENU *explorer_menu;
   ITEM **greeter_menu_items;
+  ITEM **greeter_start_opts_menu_items;
+  ITEM **greeter_user_select_menu_items;
   ITEM **nav_menu_items;
   ITEM *curr_item;
   FORM *new_user_form;
@@ -209,6 +211,7 @@ typedef struct _app_context
   char *filename;
   char *curr_file_path;
   char *current_course;
+  char **user_select_menu_strings;
   TEXT_BUFFER *t_buffer;
   I_TEXT_BUFFER *intro_buffer;
   I_TEXT_BUFFER *card_buffers[10];
@@ -220,6 +223,7 @@ typedef struct _app_context
   int current_user_id;
   int current_course_id;
   int num_of_users;
+  int num_of_courses;
   int y, x;
   int editor_height;
   int scroll_offset;

@@ -10,6 +10,7 @@
 void print_entries(FILE_TREE *f_tree, WINDOW **explorer_window)
 {
     int items = 0;
+    DIR_ENTRY *parent_level = NULL;
 
     while (f_tree->current_entry != NULL)
     {
@@ -18,7 +19,6 @@ void print_entries(FILE_TREE *f_tree, WINDOW **explorer_window)
         {
             if (f_tree->current_entry->type == 4)
             {
-                DIR_ENTRY *parent_level = initialize_dir_entry();
                 wattron(*explorer_window, COLOR_PAIR(10));
                 for (int j = 0; j < f_tree->current_entry->indent_level; j++)
                 {
@@ -51,11 +51,15 @@ void print_entries(FILE_TREE *f_tree, WINDOW **explorer_window)
 
                 if (f_tree->curr_entry_nr == items)
                     wattron(*explorer_window, A_BOLD | A_ITALIC);
+
+                char *truncated_str = trunc_str(f_tree->current_entry->name, (WU + WU / 2) - 2,
+                              4 + f_tree->current_entry->indent_level * 2);
                 mvwprintw(
                     *explorer_window, items + 1,
                     4 + f_tree->current_entry->indent_level * 2, "%s",
-                    trunc_str(f_tree->current_entry->name, (WU + WU / 2) - 2,
-                              4 + f_tree->current_entry->indent_level * 2));
+                    truncated_str);
+                free(truncated_str);
+
                 if (f_tree->curr_entry_nr == items)
                     wattroff(*explorer_window, A_BOLD | A_ITALIC);
 
@@ -63,7 +67,6 @@ void print_entries(FILE_TREE *f_tree, WINDOW **explorer_window)
             }
             else if (f_tree->current_entry->type != 4)
             {
-                DIR_ENTRY *parent_level = initialize_dir_entry();
                 wattron(*explorer_window, COLOR_PAIR(10));
                 for (int j = 0; j < f_tree->current_entry->indent_level; j++)
                 {
@@ -99,11 +102,15 @@ void print_entries(FILE_TREE *f_tree, WINDOW **explorer_window)
 
                 if (f_tree->curr_entry_nr == items)
                     wattron(*explorer_window, A_BOLD | A_ITALIC);
+
+                char *truncated_str = trunc_str(f_tree->current_entry->name, (WU + WU / 2) - 2,
+                              4 + f_tree->current_entry->indent_level * 2);
                 mvwprintw(
                     *explorer_window, items + 1,
                     4 + f_tree->current_entry->indent_level * 2, "%s",
-                    trunc_str(f_tree->current_entry->name, (WU + WU / 2) - 2,
-                              4 + f_tree->current_entry->indent_level * 2));
+                    truncated_str);
+                free(truncated_str);
+
                 if (f_tree->curr_entry_nr == items)
                     wattroff(*explorer_window, A_BOLD | A_ITALIC);
 

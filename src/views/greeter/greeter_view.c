@@ -3,6 +3,7 @@
 #include "../../models/models.h"
 #include "../../views/views.h"
 #include <curses.h>
+#include <form.h>
 #include <menu.h>
 #include <ncurses.h>
 #include <panel.h>
@@ -14,53 +15,52 @@ void create_greeter_screen(APP_CONTEXT *ctx)
 {
     // WINDOW *greeter_screen = newwin(LINES, COLS, 0, 0);
     ctx->num_of_users = get_user_count(ctx->db);
-    int max_name_len = 0;
 
     ctx->greeter_windows[0] = newwin(LINES, COLS, 0, 0);
     ctx->greeter_panels[0] = new_panel(ctx->greeter_windows[0]);
 
     ctx->greeter_windows[1] =
         newwin(18, COLS / 6 + 2, (LINES / 5) * 2 + 1, (COLS - 35) / 2 - 3);
-    newwin(18, COLS / 6 + 2, (LINES / 5) * 2 + 1, (COLS - 35) / 2 - 3);
     ctx->greeter_panels[1] = new_panel(ctx->greeter_windows[1]);
 
     ctx->greeter_menu = create_greeter_menu(ctx);
 
     ctx->greeter_windows[2] = create_start_options_popup();
     ctx->greeter_panels[2] = new_panel(ctx->greeter_windows[2]);
-
     ctx->greeter_windows[3] = derwin(ctx->greeter_windows[1], 5, 41, 2, 7);
-
     ctx->greeter_start_opts_menu = create_start_options_menu(
         ctx, &ctx->greeter_windows[2], ctx->num_of_users);
 
     ctx->greeter_windows[4] = newwin(7, 60, (LINES / 2) - 5, (COLS / 2) - 30);
     ctx->greeter_panels[3] = new_panel(ctx->greeter_windows[4]);
-
     ctx->greeter_windows[5] = derwin(ctx->greeter_windows[4], 1, 42, 2, 14);
+    ctx->new_user_form =
+        create_new_user_popup_form(ctx, " Create new user ");
 
     ctx->greeter_windows[6] =
-        create_user_selection_popup(ctx, ctx->num_of_users, &max_name_len);
+        newwin(ctx->num_of_users * 2 + 3, 50, (LINES / 2) - 4, (COLS / 2) - 25);
     ctx->greeter_panels[4] = new_panel(ctx->greeter_windows[6]);
-
     ctx->greeter_windows[7] =
         derwin(ctx->greeter_windows[6], ctx->num_of_users * 2, 44, 2, 2);
-
     ctx->greeter_user_select_menu =
         create_user_selection_menu(ctx, ctx->num_of_users);
 
     ctx->greeter_ascii_window =
         derwin(ctx->greeter_windows[0], 10, 71, LINES / 5, (COLS - 71) / 2 + 2);
+
+    wattron(ctx->greeter_ascii_window, A_BOLD);
+    char *greeter_ascii = get_ascii_art(ctx->db, "logo");
+    mvwprintw(ctx->greeter_ascii_window, 0, 0, "%s", greeter_ascii);
+    wattroff(ctx->greeter_ascii_window, A_BOLD);
+    free(greeter_ascii);
+
     draw_border(ctx->greeter_windows[0], 2, 0);
+
     wattron(ctx->greeter_windows[0], COLOR_PAIR(3) | A_BOLD);
     char *msg = "Welcome to";
     char *msg2 = "󰒍 NetworkingTutor v0.0.1";
     mvwprintw(ctx->greeter_windows[0], (LINES / 5) - 1,
               (COLS - strlen(msg)) / 2, "%s", msg);
-    wattron(ctx->greeter_ascii_window, A_BOLD);
-    mvwprintw(ctx->greeter_ascii_window, 0, 0, "%s",
-              get_ascii_art(ctx->db, "logo"));
-    wattroff(ctx->greeter_ascii_window, A_BOLD);
 
     wattroff(ctx->greeter_windows[0], COLOR_PAIR(3) | A_BOLD);
 
@@ -84,15 +84,10 @@ void create_greeter_screen(APP_CONTEXT *ctx)
 MENU *create_greeter_menu(APP_CONTEXT *ctx)
 {
     const char *choices[] = {
-        "   🛫 Start new learning path",
-        " 👉 Continue where you left off",
-        "     👤 Create new account",
-        "          🚀 Progress",
-        "            Settings",
-        "            Shortcuts",
-        "            🚪 Quit",
-        (char *)NULL
-    };
+        "   🛫 Start new learning path", " 👉 Continue where you left off",
+        "     👤 Create new account",    "          🚀 Progress",
+        "            Settings",       "            Shortcuts",
+        "            🚪 Quit",           (char *)NULL};
 
     ctx->greeter_menu_items = (ITEM **)calloc(8, sizeof(ITEM *));
 
@@ -143,14 +138,14 @@ MENU *create_start_options_menu(APP_CONTEXT *ctx, WINDOW **start_opt_menu_win,
         choices[1] = (char *)NULL;
     }
 
-    ITEM **menu_items = (ITEM **)calloc(8, sizeof(ITEM *));
+    ctx->greeter_start_opts_menu_items = (ITEM **)calloc(8, sizeof(ITEM *));
 
     for (int i = 0; choices[i] != NULL; i++)
     {
-        menu_items[i] = new_item(choices[i], "");
+        ctx->greeter_start_opts_menu_items[i] = new_item(choices[i], "");
     }
 
-    MENU *menu = new_menu(menu_items);
+    MENU *menu = new_menu(ctx->greeter_start_opts_menu_items);
     set_menu_format(menu, 14, 1);
     set_menu_spacing(menu, 0, 2, 2);
 
@@ -179,10 +174,10 @@ FORM *create_new_user_popup_form(APP_CONTEXT *ctx, char *label)
 
     FORM *new_user_form = new_form(ctx->new_user_form_field);
 
-    scale_form(ctx->new_user_form, &rows, &cols);
+    scale_form(new_user_form, &rows, &cols);
 
-    set_form_win(ctx->new_user_form, ctx->greeter_windows[4]);
-    set_form_sub(ctx->new_user_form, ctx->greeter_windows[5]);
+    set_form_win(new_user_form, ctx->greeter_windows[4]);
+    set_form_sub(new_user_form, ctx->greeter_windows[5]);
 
     draw_border(ctx->greeter_windows[4], 1, "");
     mvwprintw(ctx->greeter_windows[4], 0, 2, "%s", label);
@@ -190,35 +185,14 @@ FORM *create_new_user_popup_form(APP_CONTEXT *ctx, char *label)
     mvwprintw(ctx->greeter_windows[4], 4, 3,
               "Press ENTER to confirm, q to cancel");
 
-    set_form_win(new_user_form, ctx->greeter_windows[4]);
-    set_form_sub(new_user_form, ctx->greeter_windows[5]);
+    wmove(ctx->greeter_windows[4], 0, 0);
 
-    wmove(ctx->greeter_windows[5], 0, 0);
-
-    curs_set(1);
     set_current_field(new_user_form, ctx->new_user_form_field[0]);
     post_form(new_user_form);
 
     doupdate();
 
     return new_user_form;
-}
-
-WINDOW *create_user_selection_popup(APP_CONTEXT *ctx, int num_of_users,
-                                    int *max_name_len)
-{
-    USER_DATA **users = malloc(sizeof(USER_DATA) * num_of_users);
-    *max_name_len = 0;
-    for (int i = 0; i < num_of_users; i++)
-    {
-        users[i] = get_user_data(ctx->db, i + 1);
-        int name_len = strlen((char *)users[i]->name);
-        if (name_len > *max_name_len)
-            *max_name_len = name_len;
-    }
-    WINDOW *user_select_win =
-        newwin(num_of_users * 2 + 3, 50, (LINES / 2) - 4, (COLS / 2) - 25);
-    return user_select_win;
 }
 
 MENU *create_user_selection_menu(APP_CONTEXT *ctx, int num_of_users)
@@ -229,21 +203,34 @@ MENU *create_user_selection_menu(APP_CONTEXT *ctx, int num_of_users)
         users[i] = get_user_data(ctx->db, i + 1);
     }
 
-    ITEM **menu_items = (ITEM **)calloc(num_of_users + 1, sizeof(ITEM *));
+    ctx->greeter_user_select_menu_items =
+        (ITEM **)calloc(num_of_users + 1, sizeof(ITEM *));
+    ctx->user_select_menu_strings =
+        (char **)calloc(num_of_users, sizeof(char *));
 
     for (int i = 0; i < num_of_users; i++)
     {
-        char *combined_str = calloc(40, 1);
+        ctx->user_select_menu_strings[i] = (char *)calloc(40, 1);
         size_t len1 = strlen((char *)users[i]->name);
-        memcpy(combined_str, users[i]->name, len1);
-        memset(combined_str + len1, ' ', 29 - len1);
-        memcpy(combined_str + 29, (char *)users[i]->created_at, 11);
-        combined_str[39] = '\0';
-        menu_items[i] = new_item(combined_str, "");
+        memcpy(ctx->user_select_menu_strings[i], users[i]->name, len1);
+        memset(ctx->user_select_menu_strings[i] + len1, ' ', 29 - len1);
+        memcpy(ctx->user_select_menu_strings[i] + 29,
+               (char *)users[i]->created_at, 11);
+        ctx->user_select_menu_strings[i][39] = '\0';
+        ctx->greeter_user_select_menu_items[i] =
+            new_item(ctx->user_select_menu_strings[i], "");
     }
-    menu_items[num_of_users] = NULL;
+    ctx->greeter_user_select_menu_items[num_of_users] = NULL;
 
-    MENU *menu = new_menu(menu_items);
+    for (int i = 0; i < num_of_users; i++)
+    {
+        free((void *)users[i]->name);
+        free((void *)users[i]->created_at);
+        free(users[i]);
+    }
+    free(users);
+
+    MENU *menu = new_menu(ctx->greeter_user_select_menu_items);
     set_menu_format(menu, num_of_users, 1);
     set_menu_spacing(menu, 8, 2, 0);
 
@@ -259,4 +246,52 @@ MENU *create_user_selection_menu(APP_CONTEXT *ctx, int num_of_users)
 
     wnoutrefresh(ctx->greeter_windows[6]);
     return menu;
+}
+
+void deallocate_greeter_memory(APP_CONTEXT *ctx)
+{
+    unpost_menu(ctx->greeter_menu);
+    unpost_menu(ctx->greeter_start_opts_menu);
+    unpost_form(ctx->new_user_form);
+    unpost_menu(ctx->greeter_user_select_menu);
+    free_menu(ctx->greeter_menu);
+    free_menu(ctx->greeter_start_opts_menu);
+    free_form(ctx->new_user_form);
+    free_menu(ctx->greeter_user_select_menu);
+
+    free_field(ctx->new_user_form_field[0]);
+
+    for (int i = 0; ctx->greeter_menu_items[i] != NULL; i++)
+    {
+        free_item(ctx->greeter_menu_items[i]);
+    }
+    free(ctx->greeter_menu_items);
+
+    for (int i = 0; ctx->greeter_start_opts_menu_items[i] != NULL; i++)
+    {
+        free_item(ctx->greeter_start_opts_menu_items[i]);
+    }
+    free(ctx->greeter_start_opts_menu_items);
+
+    for (int i = 0; ctx->greeter_user_select_menu_items[i] != NULL; i++)
+    {
+        free_item(ctx->greeter_user_select_menu_items[i]);
+    }
+    free(ctx->greeter_user_select_menu_items);
+
+    for (int i = 0; i < ctx->num_of_users; i++)
+    {
+        free(ctx->user_select_menu_strings[i]);
+    }
+    free(ctx->user_select_menu_strings);
+
+    for (int i = 0; i < GREETER_PANEL_COUNT; i++)
+    {
+        del_panel(ctx->greeter_panels[i]);
+    }
+
+    for (int i = 0; i < GREETER_WINDOW_COUNT; i++)
+    {
+        delwin(ctx->greeter_windows[i]);
+    }
 }

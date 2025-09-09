@@ -75,8 +75,7 @@ void handle_progress_input(APP_CONTEXT *ctx)
                 ctx->active_window_idx = 0;
                 ctx->active_window = ctx->progress_windows[0];
                 focus_window(&ctx->progress_windows[1], 2, "");
-                ctx->progress_windows[0] = create_navigation_window(
-                    &ctx->active_window_idx, &ctx->start_menu, ctx->curr_nav_item);
+                ctx->progress_windows[0] = create_navigation_window(ctx);
                 doupdate();
                 break;
             case 9:
@@ -145,8 +144,7 @@ void handle_progress_input(APP_CONTEXT *ctx)
                 draw_progress_border(ctx->progress_windows[3], 2, 2);
                 create_your_courses_window(ctx, ctx->progress_windows[3]);
                 print_completed_courses(ctx);
-                ctx->progress_windows[0] = create_navigation_window(
-                    &ctx->active_window_idx, &ctx->start_menu, ctx->curr_nav_item);
+                ctx->progress_windows[0] = create_navigation_window(ctx);
                 doupdate();
                 break;
         }

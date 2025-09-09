@@ -17,8 +17,9 @@ int get_id_of_first_user(sqlite3 *db);
 int get_user_count(sqlite3 *db);
 
 void seed_courses_data(sqlite3 *db, WINDOW *win, char *query);
+int get_num_of_courses(sqlite3 *db);
 char *get_course_name_by_id(sqlite3 *db, int course_id);
-COURSE *get_course_data(sqlite3 *db);
+COURSE *get_course_data(sqlite3 *db, int num_of_courses);
 COURSE *get_course_by_id(sqlite3 *db, int course_id);
 COURSE *get_completed_courses(APP_CONTEXT *ctx, int *num);
 int get_current_course(sqlite3 *db, int user_id);
@@ -63,6 +64,9 @@ TEXT_BUFFER *initialize_buffer();
 I_TEXT_BUFFER *initialize_it_buffer();
 LINE *initialize_line();
 I_LINE *initialize_iline();
+void deallocate_buffer(TEXT_BUFFER *tbuf);
+void deallocate_it_buffer(I_TEXT_BUFFER *tbuf);
+void deallocate_file_tree(FILE_TREE *f_tree);
 void prepare_empty_file(TEXT_BUFFER **tbuf);
 void print_buffer_label(APP_CONTEXT *ctx);
 void open_new_file(APP_CONTEXT *ctx);
@@ -70,7 +74,6 @@ void open_file(APP_CONTEXT *ctx);
 void reopen_file(APP_CONTEXT *ctx, bool activate_ed);
 void read_file_into_buffer(FILE *file, TEXT_BUFFER *text_buf);
 void write_buffer_to_file(TEXT_BUFFER *tbuf, FILE *file, int y);
-void deallocate_buffer(TEXT_BUFFER *tbuf);
 void create_new_file_input(WINDOW **inner_win, WINDOW **form_window,
                            FORM **new_file_form, FIELD **field, char *label);
 void open_sub_directory(char *dir_name, FILE_TREE *f_tree);

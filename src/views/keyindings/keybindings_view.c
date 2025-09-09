@@ -7,9 +7,8 @@
 
 void create_keybindings_view(APP_CONTEXT *ctx)
 {
-    ctx->keybindings_windows[1] = create_keybindings_screen(ctx);
-    ctx->keybindings_windows[0] = create_navigation_window(
-        &ctx->active_window_idx, &ctx->start_menu, ctx->curr_nav_item);
+    ctx->keybindings_windows[1] = create_keybindings_screen();
+    ctx->keybindings_windows[0] = create_navigation_window(ctx);
     ctx->keybindings_windows[2] = create_keybindings_container(ctx);
 
     wnoutrefresh(ctx->keybindings_windows[0]);
@@ -18,7 +17,7 @@ void create_keybindings_view(APP_CONTEXT *ctx)
     doupdate();
 }
 
-WINDOW *create_keybindings_screen()
+WINDOW *create_keybindings_screen(void)
 {
     WINDOW *keybindings_screen = newwin(LINES, COLS, 0, 0);
     draw_progress_border(keybindings_screen, 2, 1);

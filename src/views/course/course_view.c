@@ -21,8 +21,7 @@ void create_course_view(APP_CONTEXT *ctx)
 
     ctx->active_window_idx = 0;
 
-    ctx->course_windows[0] = create_navigation_window(
-        &ctx->active_window_idx, &ctx->start_menu, ctx->curr_nav_item);
+    ctx->course_windows[0] = create_navigation_window(ctx);
     ctx->course_windows[1] = create_explorer_window(ctx->file_tree);
     ctx->course_windows[2] = create_editor_window(ctx);
     ctx->course_windows[3] =
@@ -190,6 +189,10 @@ void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree)
         f_tree->current_entry = f_tree->first_entry;
         rewinddir(dir);
     }
+
+    free(curr_dir->name);
+    free(curr_dir->path);
+    free(curr_dir);
 
     mvwprintw(*explorer_window, LINES - 5, 2, "Press ? for Keys");
 
@@ -415,4 +418,41 @@ void recreate_editor_windows(APP_CONTEXT *ctx)
     }
     print_no_open_file_msg(ctx);
     doupdate();
+}
+
+void deallocate_course_view_memory(APP_CONTEXT *ctx)
+{
+    deallocate_buffer(ctx->t_buffer);
+    deallocate_buffer(ctx->shell->term_buffer);
+    deallocate_it_buffer(ctx->rp_state->it_buffer);
+    deallocate_file_tree(ctx->file_tree);
+
+    free(ctx->user_data->name);
+    free(ctx->user_data->created_at);
+    free(ctx->user_data);
+
+    for (int i = 0;
+         i < ctx->rp_state->num_of_section_items[ctx->rp_state->curr_section];
+         i++)
+    {
+        free(ctx->rp_state->course_section_data[i].content_title);
+        free(ctx->rp_state->course_section_data[i].content);
+    }
+    free(ctx->rp_state->course_section_data);
+
+    free(ctx->rp_state->s_metadata->title);
+    free(ctx->rp_state->s_metadata);
+
+    unpost_menu(ctx->start_menu);
+    free_menu(ctx->start_menu);
+    for (int i = 0; i < 6; i++)
+    {
+        free_item(ctx->nav_menu_items[i]);
+    }
+
+    free(ctx->nav_menu_items);
+    for (int i = 0; i < COURSE_WINDOW_COUNT; i++)
+    {
+        delwin(ctx->course_windows[i]);
+    }
 }

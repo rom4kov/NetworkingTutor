@@ -8,8 +8,7 @@
 void create_all_courses_view(APP_CONTEXT *ctx)
 {
     ctx->all_courses_windows[1] = create_all_courses_screen();
-    ctx->all_courses_windows[0] = create_navigation_window(
-        &ctx->active_window_idx, &ctx->start_menu, ctx->curr_nav_item);
+    ctx->all_courses_windows[0] = create_navigation_window(ctx);
     ctx->all_courses_windows[2] = create_all_courses_container(ctx);
 
     wnoutrefresh(ctx->all_courses_windows[0]);

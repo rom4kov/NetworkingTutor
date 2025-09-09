@@ -85,6 +85,7 @@ void read_item_into_buffer(APP_CONTEXT *ctx)
 
         if (ctx->rp_state->curr_section > 0 && i == 0)
         {
+            ctx->rp_state->it_buffer->first_line = malloc(sizeof(I_LINE));
             ctx->rp_state->it_buffer->first_line->buf_ =
                 strdup(ctx->rp_state->s_metadata->title);
             ctx->rp_state->it_buffer->first_line->centered = true;
@@ -93,7 +94,7 @@ void read_item_into_buffer(APP_CONTEXT *ctx)
             line_number++;
 
             ctx->rp_state->it_buffer->num_of_lines++;
-            curr_line = initialize_iline();
+            // curr_line = initialize_iline();
 
             curr_line->buf_[k] = '\n';
             curr_line->line_num = line_number;
@@ -401,6 +402,8 @@ void read_window_text_into_buffer(APP_CONTEXT *ctx, I_TEXT_BUFFER *header_tbuf,
     read_in_buf_str(logo_and_header_str, total, header_tbuf, win_width, win);
 
     free(logo_and_header_str);
+    if (win == 0)
+        free(first_str);
 }
 
 void read_in_buf_str(char *buf_str, int total, I_TEXT_BUFFER *header_tbuf,
@@ -424,14 +427,14 @@ void read_in_buf_str(char *buf_str, int total, I_TEXT_BUFFER *header_tbuf,
             curr_line->prev = header_tbuf->current_line;
             header_tbuf->current_line = curr_line;
 
-            curr_line = initialize_iline();
-            curr_line->buf_[j] = ' ';
-            curr_line->buf_[j + 1] = '\n';
-            curr_line->style = SEPARATOR;
-            header_tbuf->num_of_lines++;
-            header_tbuf->current_line->next = curr_line;
-            curr_line->prev = header_tbuf->current_line;
-            header_tbuf->current_line = curr_line;
+            // curr_line = initialize_iline();
+            // curr_line->buf_[j] = ' ';
+            // curr_line->buf_[j + 1] = '\n';
+            // curr_line->style = SEPARATOR;
+            // header_tbuf->num_of_lines++;
+            // header_tbuf->current_line->next = curr_line;
+            // curr_line->prev = header_tbuf->current_line;
+            // header_tbuf->current_line = curr_line;
             header_tbuf->current_line->next = NULL;
             break;
         }
@@ -507,24 +510,34 @@ void read_in_buf_str(char *buf_str, int total, I_TEXT_BUFFER *header_tbuf,
         i++;
         j++;
     }
-}
 
-void deallocate_it_buffer(I_TEXT_BUFFER *tbuf)
-{
-    if (tbuf == NULL)
-        return;
-
-    I_LINE *current_line = tbuf->first_line;
-    while (current_line != NULL)
+    if (curr_line && curr_line->prev == NULL &&
+        header_tbuf->current_line != curr_line)
     {
-        I_LINE *next = current_line->next;
-        if (current_line->buf_)
-        {
-            free(current_line->buf_);
-        }
-        free(current_line);
-        current_line = next;
+        free(curr_line->prev->buf_);
+        free(curr_line->prev);
+        free(curr_line->buf_);
+        free(curr_line);
     }
-
-    free(tbuf);
 }
+
+// void deallocate_it2_buffer(I_TEXT_BUFFER *tbuf)
+// {
+//     if (tbuf == NULL)
+//         return;
+//
+//     I_LINE *current_line = tbuf->first_line;
+//     while (current_line != NULL)
+//     {
+//         I_LINE *next = current_line->next;
+//         if (current_line->buf_)
+//         {
+//             free(current_line->buf_);
+//         }
+//         free(current_line);
+//         current_line = next;
+//     }
+//     free(tbuf->first_line);
+//
+//     free(tbuf);
+// }

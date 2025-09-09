@@ -33,8 +33,7 @@ char *PROGRAMM_DESC =
 
 void create_start_screen(APP_CONTEXT *ctx)
 {
-    ctx->start_windows[0] = create_navigation_window(
-        &ctx->active_window_idx, &ctx->start_menu, ctx->curr_nav_item);
+    ctx->start_windows[0] = create_navigation_window(ctx);
     ctx->start_windows[1] = create_header_section(ctx);
     ctx->start_windows[2] =
         create_course_preview_card(ctx, 0, 2, &ctx->courses[0]);
@@ -47,13 +46,13 @@ void create_start_screen(APP_CONTEXT *ctx)
     wrefresh(ctx->start_windows[5]);
 }
 
-WINDOW *create_navigation_window(int *active_win, MENU **start_menu,
-                                 int curr_nav_item)
+WINDOW *create_navigation_window(APP_CONTEXT *ctx)
 {
     WINDOW *navigation;
     navigation = newwin(3, WU * 7 + 4, 0, 0);
-    draw_border(navigation, *active_win == 0 ? 3 : 2, "");
-    *start_menu = create_start_menu(navigation, curr_nav_item);
+    draw_border(navigation, ctx->active_window_idx == 0 ? 3 : 2, "");
+    ctx->start_menu =
+        create_start_menu(navigation, ctx);
 
     wattron(navigation, COLOR_PAIR(3));
     mvwprintw(navigation, 0, 2, " Navigation ");
@@ -235,7 +234,7 @@ WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label)
     return ctx->rp_state->right_panel;
 }
 
-MENU *create_start_menu(WINDOW *nav_window, int curr_nav_item)
+MENU *create_start_menu(WINDOW *nav_window, APP_CONTEXT *ctx)
 {
     const char *choices[] = {
         "Home",        "Current course", "All courses", "Account & Progress",
@@ -243,12 +242,12 @@ MENU *create_start_menu(WINDOW *nav_window, int curr_nav_item)
         (char *)NULL // Last element must be NULL
     };
 
-    ITEM **menu_items = (ITEM **)calloc(6, sizeof(ITEM *));
+    ctx->nav_menu_items = (ITEM **)calloc(6, sizeof(ITEM *));
 
     int i;
     for (i = 0; choices[i] != NULL; i++)
     {
-        menu_items[i] = new_item(choices[i], "");
+        ctx->nav_menu_items[i] = new_item(choices[i], "");
     }
 
     TABSIZE = 10;
@@ -276,7 +275,7 @@ MENU *create_start_menu(WINDOW *nav_window, int curr_nav_item)
         MENU_SPACING = 3;
     }
 
-    MENU *menu = new_menu(menu_items);
+    MENU *menu = new_menu(ctx->nav_menu_items);
     set_menu_format(menu, 1, 6);
     set_menu_spacing(menu, 0, 1, MENU_SPACING);
 
@@ -285,7 +284,7 @@ MENU *create_start_menu(WINDOW *nav_window, int curr_nav_item)
     set_menu_fore(menu, A_BOLD | A_ITALIC);
     set_menu_mark(menu, " > "); // Mark for the selected item
 
-    set_current_item(menu, menu_items[curr_nav_item]);
+    set_current_item(menu, ctx->nav_menu_items[ctx->curr_nav_item]);
 
     post_menu(menu);
 
@@ -338,5 +337,31 @@ void print_window_content(I_TEXT_BUFFER *header_tbuf, WINDOW *win,
         }
 
         current_line = current_line->next;
+    }
+}
+
+void deallocate_start_screen_memory(APP_CONTEXT *ctx)
+{
+    deallocate_buffer(ctx->t_buffer);
+    deallocate_buffer(ctx->shell->term_buffer);
+    deallocate_it_buffer(ctx->intro_buffer);
+    deallocate_it_buffer(ctx->rp_state->it_buffer);
+    deallocate_file_tree(ctx->file_tree);
+
+    free(ctx->current_course);
+    free(ctx->user_data->name);
+    free(ctx->user_data->created_at);
+    free(ctx->user_data);
+
+    unpost_menu(ctx->start_menu);
+    free_menu(ctx->start_menu);
+    for (int i = 0; i < 6; i++) {
+        free_item(ctx->nav_menu_items[i]);
+    }
+    free(ctx->nav_menu_items);
+
+    for (int i = 0; i < START_WINDOW_COUNT; i++)
+    {
+        delwin(ctx->start_windows[i]);
     }
 }

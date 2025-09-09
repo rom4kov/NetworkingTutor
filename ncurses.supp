@@ -10,4 +10,10 @@
    ...
    obj:/usr/lib/libtinfo.so.*
 }
+{
+   ncursesw_leaks
+   Memcheck:Leak
+   ...
+   obj:/usr/lib/libncursesw.so.*
+}
 

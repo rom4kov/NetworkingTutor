@@ -39,9 +39,9 @@ FILE_TREE *initialize_file_tree()
 {
     FILE_TREE *f_tree = calloc(1, sizeof(FILE_TREE));
 
-    f_tree->first_entry = calloc(1, sizeof(DIR_ENTRY));
-    f_tree->first_entry->name = (char *)malloc((50 * sizeof(char)));
-    f_tree->first_entry->path = (char *)malloc((50 * sizeof(char)));
+    f_tree->first_entry = NULL;
+    // f_tree->first_entry->name = (char *)malloc((50 * sizeof(char)));
+    // f_tree->first_entry->path = (char *)malloc((50 * sizeof(char)));
     f_tree->current_entry = f_tree->first_entry;
     f_tree->curr_entry_nr = 0;
     f_tree->num_of_entries = 0;
@@ -66,7 +66,7 @@ I_TEXT_BUFFER *initialize_it_buffer()
 {
     I_TEXT_BUFFER *text_buf = malloc(sizeof(I_TEXT_BUFFER));
 
-    text_buf->first_line = initialize_iline();
+    text_buf->first_line = NULL;
     text_buf->current_line = text_buf->first_line;
     text_buf->num_of_lines = 0;
     text_buf->curr_line_nr = 0;
@@ -103,6 +103,57 @@ I_LINE *initialize_iline()
     line->next = NULL;
 
     return line;
+}
+
+void deallocate_buffer(TEXT_BUFFER *tbuf)
+{
+    if (!tbuf)
+        return;
+
+    LINE *current_line = tbuf->first_line;
+    while (current_line->next != NULL)
+    {
+        free(current_line->buf_);
+        current_line = current_line->next;
+        free(current_line->prev);
+    }
+
+    free(current_line->buf_);
+    free(current_line);
+    free(tbuf);
+}
+
+void deallocate_it_buffer(I_TEXT_BUFFER *tbuf)
+{
+    if (!tbuf) return;
+
+    I_LINE *current_line = tbuf->first_line;
+    while (current_line) {
+        free(current_line->buf_);
+        I_LINE *next = current_line->next;
+        free(current_line);
+        current_line = next;
+    }
+
+    free(tbuf);  // <-- always free the buffer itself
+}
+
+
+void deallocate_file_tree(FILE_TREE *f_tree)
+{
+    DIR_ENTRY *curr_entry = f_tree->first_entry;
+
+    while (curr_entry)
+    {
+        free(curr_entry->name);
+        free(curr_entry->path);
+        DIR_ENTRY *next = curr_entry->next; 
+        free(curr_entry);
+        curr_entry = next;
+    }
+
+    free(f_tree->first_entry);
+    free(f_tree);
 }
 
 void prepare_empty_file(TEXT_BUFFER **tbuf)
@@ -327,32 +378,6 @@ void write_buffer_to_file(TEXT_BUFFER *tbuf, FILE *file, int y)
     {
         tbuf->current_line = tbuf->current_line->next;
     }
-}
-
-void deallocate_buffer(TEXT_BUFFER *tbuf)
-{
-    if (tbuf->first_line == NULL)
-        return;
-
-    LINE *current_line = tbuf->first_line;
-    while (current_line->next != NULL)
-    {
-        free(current_line->buf_);
-        current_line = current_line->next;
-        free(current_line->prev);
-    }
-    free(tbuf);
-}
-
-void deallocate_file_tree(FILE_TREE *f_tree)
-{
-    DIR_ENTRY *curr_entry = f_tree->first_entry;
-
-    while (curr_entry != NULL)
-    {
-        free(curr_entry->name);
-    }
-
 }
 
 void create_new_file_input(WINDOW **inner_win, WINDOW **form_window,

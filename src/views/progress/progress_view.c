@@ -12,8 +12,7 @@
 void create_progress_view(APP_CONTEXT *ctx)
 {
     ctx->progress_windows[3] = create_progress_screen(ctx);
-    ctx->progress_windows[0] = create_navigation_window(
-        &ctx->active_window_idx, &ctx->start_menu, ctx->curr_nav_item);
+    ctx->progress_windows[0] = create_navigation_window(ctx);
     ctx->progress_windows[1] = create_account_window(ctx);
     ctx->progress_windows[2] = create_progress_stats_window(ctx);
 

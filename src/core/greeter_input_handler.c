@@ -46,8 +46,6 @@ void handle_greeter_input(APP_CONTEXT *ctx)
                 else
                 {
                     ctx->active_window = ctx->greeter_windows[4];
-                    ctx->new_user_form =
-                        create_new_user_popup_form(ctx, " Create new user ");
                     top_panel(ctx->greeter_panels[3]);
                     update_panels();
                     doupdate();
@@ -79,6 +77,7 @@ void handle_greeter_input(APP_CONTEXT *ctx)
                     int current_course_id =
                         get_current_course(ctx->db, user_id);
                     go_to_course_by_id(ctx, current_course_id);
+                    deallocate_greeter_memory(ctx);
                 }
             }
             else if (item_index(curr_item) == 6)
@@ -89,7 +88,6 @@ void handle_greeter_input(APP_CONTEXT *ctx)
             break;
         case 'q':
         case 27:
-            ctx->greeter_view_active = false;
             ctx->running = false;
             break;
     }
@@ -118,8 +116,6 @@ void handle_start_opts_menu_input(APP_CONTEXT *ctx, MENU *start_options_menu)
                 if (item_index(curr_item) == 0)
                 {
                     ctx->active_window = ctx->greeter_windows[4];
-                    ctx->new_user_form =
-                        create_new_user_popup_form(ctx, " Create new user ");
                     top_panel(ctx->greeter_panels[3]);
                     update_panels();
                     doupdate();
@@ -128,8 +124,6 @@ void handle_start_opts_menu_input(APP_CONTEXT *ctx, MENU *start_options_menu)
                 else if (item_index(curr_item) == 1)
                 {
                     ctx->active_window = ctx->greeter_windows[6];
-                    ctx->greeter_user_select_menu =
-                        create_user_selection_menu(ctx, ctx->num_of_users);
                     top_panel(ctx->greeter_panels[4]);
                     update_panels();
                     doupdate();
@@ -159,10 +153,12 @@ void handle_new_user_input(APP_CONTEXT *ctx, bool *start_opt_menu_active)
 
     char *username;
 
+    curs_set(1);
+
     while (create_user_form_active)
     {
-        keypad(ctx->greeter_windows[5], TRUE);
-        ctx->key = wgetch(ctx->greeter_windows[5]);
+        keypad(ctx->greeter_windows[4], TRUE);
+        ctx->key = wgetch(ctx->greeter_windows[4]);
 
         switch (ctx->key)
         {
@@ -174,7 +170,7 @@ void handle_new_user_input(APP_CONTEXT *ctx, bool *start_opt_menu_active)
                 if (buf && strlen(buf) > 0)
                 {
                     form_driver(ctx->new_user_form, REQ_DEL_PREV);
-                    wrefresh(ctx->greeter_windows[5]);
+                    wrefresh(ctx->greeter_windows[4]);
                 }
                 break;
             case 10:
@@ -196,6 +192,7 @@ void handle_new_user_input(APP_CONTEXT *ctx, bool *start_opt_menu_active)
                 unpost_form(ctx->new_user_form);
                 free_form(ctx->new_user_form);
                 free_field(ctx->new_user_form_field[0]);
+                deallocate_greeter_memory(ctx);
                 doupdate();
                 ctx->greeter_view_active = false;
                 ctx->start_view_active = true;
@@ -215,10 +212,12 @@ void handle_new_user_input(APP_CONTEXT *ctx, bool *start_opt_menu_active)
 
                 update_panels();
                 doupdate();
+                deallocate_greeter_memory(ctx);
 
                 break;
             default:
                 form_driver(ctx->new_user_form, ctx->key);
+                wrefresh(ctx->greeter_windows[4]);
                 wrefresh(ctx->greeter_windows[5]);
                 break;
         }
@@ -249,11 +248,8 @@ void handle_user_select_win_input(APP_CONTEXT *ctx, bool *start_opt_menu_active,
                 curr_item = current_item(ctx->greeter_user_select_menu);
 
                 ctx->current_user_id = item_index(curr_item) + 1;
-                ctx->user_data = get_user_data(ctx->db, ctx->current_user_id);
                 ctx->current_course_id =
                     get_current_course(ctx->db, ctx->current_user_id);
-                ctx->current_course =
-                    get_course_name_by_id(ctx->db, ctx->current_course_id);
 
                 user_select_menu_active = false;
                 *start_opt_menu_active = false;
@@ -263,18 +259,24 @@ void handle_user_select_win_input(APP_CONTEXT *ctx, bool *start_opt_menu_active,
                 ctx->greeter_view_active = false;
                 if (continue_course)
                 {
-                    ctx->course_view_active = true;
-                    ctx->course_needs_redraw = true;
                     go_to_course_by_id(ctx, ctx->current_course_id);
                 }
                 else
                 {
+                    ctx->user_data = get_user_data(ctx->db, ctx->current_user_id);
                     ctx->start_view_active = true;
                     ctx->start_needs_redraw = true;
                 }
+                deallocate_greeter_memory(ctx);
                 break;
             case 'q':
                 user_select_menu_active = false;
+
+                for (int i = 0; i < ctx->num_of_users; i++)
+                {
+                    free(ctx->user_select_menu_strings[i]);
+                }
+                free(ctx->user_select_menu_strings);
 
                 if (continue_course)
                 {

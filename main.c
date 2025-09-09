@@ -36,14 +36,14 @@ int main(void)
 
     ctx->db = create_database();
     ctx->rp_state = (RIGHT_PANEL_STATE *)malloc(sizeof(RIGHT_PANEL_STATE));
-    ctx->courses = get_course_data(ctx->db);
+    ctx->num_of_courses = get_num_of_courses(ctx->db);
+    ctx->courses = get_course_data(ctx->db, ctx->num_of_courses);
     ctx->file = NULL;
     ctx->file_tree = initialize_file_tree();
     ctx->t_buffer = initialize_buffer();
     ctx->filename = (char *)calloc(30, sizeof(char));
     ctx->curr_file_path = (char *)calloc(30, sizeof(char));
     ctx->running = true;
-    ctx->user_data = malloc(sizeof(USER_DATA));
 
     ctx->greeter_needs_redraw = false;
     ctx->start_needs_redraw = false;
@@ -60,16 +60,18 @@ int main(void)
     ctx->progress_view_active = false;
     ctx->all_courses_view_active = false;
 
-    ctx->current_course = malloc(64 * sizeof(char));
     ctx->rp_state->curr_section = 0;
     ctx->rp_state->curr_item = 2;
     ctx->rp_state->items_to_print = 1;
     ctx->rp_state->curr_offset = 0;
     ctx->rp_state->scroll_offset = 0;
     ctx->rp_state->it_buffer = initialize_it_buffer();
-    ctx->rp_state->course_progress = (int *)calloc(MAX_COURSE_SECTIONS, sizeof(int));
-    ctx->rp_state->completed_sections = (bool *)calloc(MAX_COURSE_SECTIONS, sizeof(bool));
-    ctx->rp_state->total_section_items = (int *)calloc(MAX_COURSE_SECTIONS, sizeof(int));
+    ctx->rp_state->course_progress =
+        (int *)calloc(MAX_COURSE_SECTIONS, sizeof(int));
+    ctx->rp_state->completed_sections =
+        (bool *)calloc(MAX_COURSE_SECTIONS, sizeof(bool));
+    ctx->rp_state->total_section_items =
+        (int *)calloc(MAX_COURSE_SECTIONS, sizeof(int));
     ctx->rp_state->total_course_sections = 0;
 
     ctx->user_form_fields = false;
@@ -172,7 +174,7 @@ int main(void)
                     }
                 }
             }
-            deallocate_it_buffer(ctx->intro_buffer);
+            // deallocate_it_buffer(ctx->intro_buffer);
             create_start_screen(ctx);
             ctx->active_window = ctx->start_windows[0];
             ctx->start_needs_redraw = false;
@@ -404,69 +406,69 @@ void initialize_colors()
 
 void free_memory(APP_CONTEXT *ctx)
 {
-    deallocate_buffer(ctx->t_buffer);
-    deallocate_buffer(ctx->shell->term_buffer);
-    deallocate_it_buffer(ctx->rp_state->it_buffer);
-
-    for (int i = 0; ctx->card_buffers[i] != NULL; i++) {
+    for (int i = 0; ctx->card_buffers[i] != NULL; i++)
+    {
         deallocate_it_buffer(ctx->card_buffers[i]);
     }
 
-    for (int i = 0; i < GREETER_PANEL_COUNT; i++) {
-        del_panel(ctx->greeter_panels[i]);
-    }
-
-    for (int i = 0; i < GREETER_WINDOW_COUNT; i++) {
-        delwin(ctx->greeter_windows[i]);
-    }
-
-    for (int i = 0; ctx->greeter_menu_items[i] != NULL; i++)
+    if (ctx->greeter_view_active)
     {
-        free_item(ctx->greeter_menu_items[i]);
+        deallocate_file_tree(ctx->file_tree);
+        deallocate_buffer(ctx->t_buffer);
+        deallocate_buffer(ctx->shell->term_buffer);
+        deallocate_it_buffer(ctx->rp_state->it_buffer);
+        deallocate_greeter_memory(ctx);
     }
-
-    for (int i = 0; i < START_WINDOW_COUNT; i++) {
-        delwin(ctx->start_windows[i]);
+    else if (ctx->start_view_active)
+    {
+        deallocate_start_screen_memory(ctx);
     }
-
-    for (int i = 0; i < COURSE_WINDOW_COUNT; i++) {
-        delwin(ctx->course_windows[i]);
+    else if (ctx->course_view_active)
+    {
+        deallocate_course_view_memory(ctx);
     }
-
-    for (int i = 0; i < PROGRESS_WINDOW_COUNT; i++) {
-        delwin(ctx->progress_windows[i]);
+    else if (ctx->progress_view_active)
+    {
+        for (int i = 0; i < PROGRESS_WINDOW_COUNT; i++)
+        {
+            delwin(ctx->progress_windows[i]);
+        }
     }
-
-    for (int i = 0; i < ALL_COURSES_WINDOW_COUNT; i++) {
-        delwin(ctx->all_courses_windows[i]);
+    else if (ctx->all_courses_view_active)
+    {
+        for (int i = 0; i < ALL_COURSES_WINDOW_COUNT; i++)
+        {
+            delwin(ctx->all_courses_windows[i]);
+        }
     }
-
-    for (int i = 0; i < KEYBINDINGS_WINDOW_COUNT; i++) {
-        delwin(ctx->keybindings_windows[i]);
+    else if (ctx->keybindings_view_active)
+    {
+        for (int i = 0; i < KEYBINDINGS_WINDOW_COUNT; i++)
+        {
+            delwin(ctx->keybindings_windows[i]);
+        }
     }
 
     CU_cleanup_registry();
-
-    unpost_menu(ctx->greeter_menu);
-    // unpost_menu(ctx->greeter_start_opts_menu);
-    unpost_menu(ctx->greeter_user_select_menu);
-    unpost_menu(ctx->start_menu);
-    free_menu(ctx->greeter_menu);
-    free_menu(ctx->greeter_start_opts_menu);
-    free_menu(ctx->greeter_user_select_menu);
-    free_menu(ctx->start_menu);
 
     free(ctx->shell->home_dir);
     // free(ctx->shell->cwd);
     free(ctx->shell);
     free(ctx->filename);
     free(ctx->curr_file_path);
-    free(ctx->user_data);
+    // free(ctx->user_data);
+
+    for (int i = 0; i < ctx->num_of_courses; i++) {
+        free(ctx->courses[i].name);
+        free(ctx->courses[i].short_desc);
+        free(ctx->courses[i].ascii_logo);
+    }
     free(ctx->courses);
-    free(ctx->current_course);
+
     free(ctx->rp_state->course_progress);
     free(ctx->rp_state->completed_sections);
     free(ctx->rp_state->total_section_items);
+    // free(ctx->rp_state->it_buffer);
     free(ctx->rp_state);
     free(ctx);
 }

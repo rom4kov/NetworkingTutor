@@ -11,23 +11,39 @@
 #include <sqlite3.h>
 
 void initialize_colors();
+
+// greeter screen
 void create_greeter_screen(APP_CONTEXT *ctx);
 MENU *create_greeter_menu(APP_CONTEXT *ctx);
 WINDOW *create_start_options_popup();
 MENU *create_start_options_menu(APP_CONTEXT *ctx, WINDOW **start_opt_menu_win,
                                 int num_of_users);
 FORM *create_new_user_popup_form(APP_CONTEXT *ctx, char *label);
-WINDOW *create_user_selection_popup(APP_CONTEXT *ctx, int num_of_users, int *max_name_len);
 MENU *create_user_selection_menu(APP_CONTEXT *ctx, int num_of_users);
+void deallocate_greeter_memory(APP_CONTEXT *ctx);
 
+// start screen
 void create_start_screen(APP_CONTEXT *ctx);
-WINDOW *create_navigation_window(int *active_win, MENU **start_menu,
-                                 int curr_nav_item);
+WINDOW *create_navigation_window(APP_CONTEXT *ctx);
 WINDOW *create_header_section(APP_CONTEXT *ctx);
 WINDOW *create_course_preview_card(APP_CONTEXT *ctx, int x_position,
                                    int curr_win_idx, COURSE *course);
 WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label);
+void deallocate_start_screen_memory(APP_CONTEXT *ctx);
 // void read_item_into_buffer(COURSE_SECTION *c_sec, TEXT_BUFFER *text_buf);
+
+
+// course view
+void create_course_view(APP_CONTEXT *ctx);
+WINDOW *create_editor_window(APP_CONTEXT *ctx);
+WINDOW *create_terminal_window(APP_CONTEXT *ctx);
+WINDOW *create_explorer_window(FILE_TREE *file_tree);
+void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree);
+WINDOW *create_progress_window(APP_CONTEXT *ctx);
+void print_no_open_file_msg(APP_CONTEXT *ctx);
+void log_course_instr_values(APP_CONTEXT *ctx);
+void recreate_editor_windows(APP_CONTEXT *ctx);
+
 void add_line_break(COURSE_SECTION *c_sec_data, I_TEXT_BUFFER *tbuf,
                     I_LINE **curr_line, int i, int *j, int *k, int *line_number,
                     int *last_space_pos, bool overflow, bool *bl_point);
@@ -50,15 +66,7 @@ void print_window_content(I_TEXT_BUFFER *header_tbuf, WINDOW *win,
 void print_intro(APP_CONTEXT *ctx);
 void print_press_msg(RIGHT_PANEL_STATE *rps);
 
-void create_course_view(APP_CONTEXT *ctx);
-WINDOW *create_editor_window(APP_CONTEXT *ctx);
-WINDOW *create_terminal_window(APP_CONTEXT *ctx);
-WINDOW *create_explorer_window(FILE_TREE *file_tree);
-void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree);
-WINDOW *create_progress_window(APP_CONTEXT *ctx);
-void print_no_open_file_msg(APP_CONTEXT *ctx);
-void log_course_instr_values(APP_CONTEXT *ctx);
-void recreate_editor_windows(APP_CONTEXT *ctx);
+void deallocate_course_view_memory(APP_CONTEXT *ctx);
 
 void create_user_form(WINDOW *window, FORM **user_form, FIELD **fields);
 
@@ -81,7 +89,6 @@ ICON get_file_icon(char *filename);
 void print_entries(FILE_TREE *f_tree, WINDOW **explorer_window);
 void move_to_next_entry(FILE_TREE *f_tree, WINDOW **explorer_window);
 void move_to_prev_entry(FILE_TREE *f_tree, WINDOW **explorer_window);
-void deallocate_it_buffer(I_TEXT_BUFFER *tbuf);
 void print_course_complete(APP_CONTEXT *ctx);
 
 void print_section_or_task_compl_msg(APP_CONTEXT *ctx, CU_pRunSummary rs);
@@ -104,5 +111,5 @@ void print_all_courses(APP_CONTEXT *ctx);
 
 // keybindings view
 void create_keybindings_view(APP_CONTEXT *ctx);
-WINDOW *create_keybindings_screen();
+WINDOW *create_keybindings_screen(void);
 WINDOW *create_keybindings_container(APP_CONTEXT *ctx);

@@ -19,10 +19,18 @@
 
 DIR_ENTRY *initialize_dir_entry()
 {
-    DIR_ENTRY *d_entry = malloc(sizeof(DIR_ENTRY));
+    DIR_ENTRY *d_entry = calloc(1, sizeof(DIR_ENTRY));
+    if (!d_entry) return NULL;
 
     d_entry->name = (char *)malloc(50 * sizeof(char));
     d_entry->path = (char *)malloc(50 * sizeof(char));
+    if (!d_entry->name || !d_entry->path) {
+        free(d_entry->name);
+        free(d_entry->path);
+        free(d_entry);
+        return NULL;
+    }
+
     d_entry->state = 'c';
     d_entry->type = 'd';
     d_entry->num_of_entries = 0;
@@ -42,7 +50,7 @@ FILE_TREE *initialize_file_tree()
     f_tree->first_entry = NULL;
     // f_tree->first_entry->name = (char *)malloc((50 * sizeof(char)));
     // f_tree->first_entry->path = (char *)malloc((50 * sizeof(char)));
-    f_tree->current_entry = f_tree->first_entry;
+    f_tree->current_entry = NULL;
     f_tree->curr_entry_nr = 0;
     f_tree->num_of_entries = 0;
 
@@ -138,21 +146,32 @@ void deallocate_it_buffer(I_TEXT_BUFFER *tbuf)
     free(tbuf);  // <-- always free the buffer itself
 }
 
-
 void deallocate_file_tree(FILE_TREE *f_tree)
 {
     DIR_ENTRY *curr_entry = f_tree->first_entry;
 
+    FILE *log_file = fopen("f_tree_dealloc_log.txt", "a");
+    // int i = 0;
     while (curr_entry)
     {
+        char buf[40];
+        memset(buf, 0, 40);
+        buf[39] = '\0';
+        snprintf(buf, 40, "%p\n", curr_entry);
+        fwrite(buf, 40, 1, log_file);
         free(curr_entry->name);
         free(curr_entry->path);
         DIR_ENTRY *next = curr_entry->next; 
         free(curr_entry);
         curr_entry = next;
+        // i++;
     }
+    fclose(log_file);
 
-    free(f_tree->first_entry);
+    f_tree->first_entry = NULL;
+    f_tree->current_entry = NULL;
+    f_tree->num_of_entries = 0;
+    f_tree->curr_entry_nr = 0;
     free(f_tree);
 }
 
@@ -411,8 +430,7 @@ void create_new_file_input(WINDOW **inner_win, WINDOW **form_window,
 
 void open_or_close_dir(FILE_TREE *f_tree, WINDOW **explorer_window)
 {
-    char *curr_path = calloc(30, sizeof(char));
-    curr_path = return_trimmed(f_tree->current_entry->path);
+    char *curr_path = return_trimmed(f_tree->current_entry->path);
 
     if (f_tree->current_entry->state == 'c')
     {

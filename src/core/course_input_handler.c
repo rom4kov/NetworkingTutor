@@ -281,13 +281,19 @@ void handle_course_input(APP_CONTEXT *ctx)
                 {
                     ctx->rp_state->showing_end_of_course_page = false;
                 }
+                else {
+                    free_section_data(ctx);
+                }
                 if (ctx->rp_state->showing_test_results)
                 {
                     ctx->rp_state->showing_test_results = false;
                     mvwprintw(ctx->rp_state->right_panel, LINES - 5, 2, "%s",
                               "<                ");
                     wclear(ctx->rp_state->inner_win);
+
+                    // free_section_data(ctx);
                     deallocate_it_buffer(ctx->rp_state->it_buffer);
+
                     ctx->rp_state->it_buffer = initialize_it_buffer();
                     print_course_instructions(ctx);
                     ctx->rp_state->showing_test_results = false;
@@ -314,6 +320,8 @@ void handle_course_input(APP_CONTEXT *ctx)
                     ctx->rp_state->lines_excess = 0;
 
                     wclear(ctx->rp_state->inner_win);
+
+                    // free_section_data(ctx);
                     deallocate_it_buffer(ctx->rp_state->it_buffer);
                     ctx->rp_state->it_buffer = initialize_it_buffer();
 
@@ -337,6 +345,8 @@ void handle_course_input(APP_CONTEXT *ctx)
                     if (ctx->rp_state->curr_section - 1 <
                         ctx->rp_state->total_course_sections)
                     {
+                        free_section_data(ctx);
+
                         ctx->rp_state->showing_test_results = false;
                         ctx->rp_state->curr_section++;
                         get_course_progress(ctx);

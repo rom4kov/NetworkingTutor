@@ -206,6 +206,8 @@ void read_item_into_buffer(APP_CONTEXT *ctx)
             ctx->rp_state->it_buffer->current_line->next = curr_line;
             curr_line->prev = ctx->rp_state->it_buffer->current_line;
             ctx->rp_state->it_buffer->current_line = curr_line;
+            // ctx->rp_state->it_buffer->first_line = malloc(sizeof(I_LINE));
+            // ctx->rp_state->it_buffer->first_line = ctx->rp_state->it_buffer->current_line;
             curr_line = initialize_iline();
 
             curr_line->buf_ = strdup(ctx->current_course);

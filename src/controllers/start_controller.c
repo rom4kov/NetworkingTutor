@@ -35,7 +35,7 @@ void go_to_course_by_id(APP_CONTEXT *ctx, int course_id)
     // }
 
     ctx->user_data = get_user_data(ctx->db, ctx->current_user_id);
-    // ctx->current_course_id = course_id;
+    ctx->current_course_id = course_id;
     ctx->current_course = ctx->courses[course_id - 1].name;
 
     for (int i = 0; i < MAX_COURSE_SECTIONS; i++)

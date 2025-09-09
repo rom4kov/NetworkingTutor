@@ -119,6 +119,7 @@ typedef struct _file_tree
 {
     DIR_ENTRY *first_entry;
     DIR_ENTRY *current_entry;
+    DIR_ENTRY *prev_dir;
     int curr_entry_nr;
     int num_of_entries;
 } FILE_TREE;

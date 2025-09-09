@@ -130,7 +130,6 @@ void print_entries(FILE_TREE *f_tree, WINDOW **explorer_window)
 
 void move_to_next_entry(FILE_TREE *f_tree, WINDOW **explorer_window)
 {
-    f_tree->current_entry = f_tree->current_entry->next;
     f_tree->curr_entry_nr++;
     *explorer_window = create_explorer_window(f_tree);
     focus_window(explorer_window, 3, "Explorer");
@@ -140,7 +139,6 @@ void move_to_next_entry(FILE_TREE *f_tree, WINDOW **explorer_window)
 
 void move_to_prev_entry(FILE_TREE *f_tree, WINDOW **explorer_window)
 {
-    f_tree->current_entry = f_tree->current_entry->prev;
     f_tree->curr_entry_nr--;
     *explorer_window = create_explorer_window(f_tree);
     focus_window(&*explorer_window, 3, "Explorer");

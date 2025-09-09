@@ -173,7 +173,8 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
 
     char *patterns[] = {
         ".",
-        "\\b(void|int|ssize_t|size_t|socklen_t|char|return|for|while|if|else|break|continue|bool|switch|struct|case|default)\\b",
+        "\\b(void|int|ssize_t|size_t|socklen_t|char|return|for|while|if|else|"
+        "break|continue|bool|switch|struct|case|default)\\b",
         "#(include|define)|NULL|=|\\+|\\-|\\*|\\&|<|>|;",
         "(?s)\\b([a-z0-9_]*)\\(.*\\)",
         "([a-z0-9_]*)\\(.*",
@@ -217,7 +218,8 @@ void print_line(LINE *current_line, int line_num, WINDOW **edit_window)
     pcre2_code *re[pattern_num];
     char *patterns[] = {
         ".",
-        "\\b(void|int|ssize_t|size_t|socklen_t|char|return|for|while|if|else|break|continue|bool|switch|struct|case|default)\\b",
+        "\\b(void|int|ssize_t|size_t|socklen_t|char|return|for|while|if|else|"
+        "break|continue|bool|switch|struct|case|default)\\b",
         "#(include|define)|NULL|=|\\+|\\-|\\*|\\&|<|>|;",
         "(?s)\\b([a-z0-9_]*)\\(.*\\)",
         "([a-z0-9_]*)\\(.*",
@@ -247,12 +249,16 @@ char *match_file_icon(pcre2_code *re, int subj_len, char *filename, char **icon)
     PCRE2_SPTR subject = (PCRE2_SPTR)filename;
     pcre2_match_data *md = pcre2_match_data_create_from_pattern(re, NULL);
     if (!md)
+    {
+        pcre2_match_data_free(md);
         return NULL;
+    }
 
     int rc = pcre2_match(re, subject, subj_len, 0, 0, md, NULL);
 
     if (rc > 0)
     {
+        pcre2_match_data_free(md);
         return *icon;
     }
 
@@ -288,9 +294,16 @@ ICON get_file_icon(char *filename)
         if (matched_icon.icon != NULL)
         {
             matched_icon.color = colors[i];
+
+            for (int i = 0; i < pattern_num; i++)
+                pcre2_code_free(re[i]);
             return matched_icon;
         }
     }
+
+    for (int i = 0; i < pattern_num; i++)
+        pcre2_code_free(re[i]);
+
     return matched_icon;
 }
 

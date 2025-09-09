@@ -119,9 +119,22 @@ void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree)
     DIR *dir = opendir(".");
 
     struct dirent *next = readdir(dir);
+    FILE *log_file = fopen("f_tree_creation_log.txt", "a");
 
-    DIR_ENTRY *prev_dir = initialize_dir_entry();
+
+    // DIR_ENTRY *prev_dir = initialize_dir_entry();
+    DIR_ENTRY *prev_dir = f_tree->prev_dir;
     DIR_ENTRY *curr_dir = initialize_dir_entry();
+    // DIR_ENTRY *tmp_dir = prev_dir;
+
+    char buf[40];
+    memset(buf, 0, 40);
+    buf[39] = '\0';
+    snprintf(buf, 40, "%p\n", prev_dir);
+    fwrite(buf, 40, 1, log_file);
+
+
+    mvwprintw(*explorer_window, 41, 2, "%p", prev_dir);
 
     if (f_tree->num_of_entries == 0)
     {
@@ -141,6 +154,13 @@ void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree)
         prev_dir->next = f_tree->current_entry;
         f_tree->current_entry->prev = prev_dir;
         f_tree->first_entry = prev_dir;
+
+        char buf2[40];
+        memset(buf2, 0, 40);
+        buf2[39] = '\0';
+        snprintf(buf2, 40, "%p\n", prev_dir);
+        fwrite(buf2, 40, 1, log_file);
+
         f_tree->num_of_entries++;
         rewinddir(dir);
 
@@ -158,6 +178,13 @@ void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree)
                 curr_dir->state = 'c';
                 curr_dir->prev = prev_dir;
                 prev_dir->next = curr_dir;
+
+                char buf3[40];
+                memset(buf3, 0, 40);
+                buf3[39] = '\0';
+                snprintf(buf3, 40, "%p\n", prev_dir);
+                fwrite(buf3, 40, 1, log_file);
+
                 prev_dir = curr_dir;
                 curr_dir = initialize_dir_entry();
                 f_tree->num_of_entries++;
@@ -178,18 +205,38 @@ void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree)
                 curr_dir->state = 'c';
                 curr_dir->prev = prev_dir;
                 prev_dir->next = curr_dir;
+
+                char buf4[40];
+                memset(buf4, 0, 40);
+                buf4[39] = '\0';
+                snprintf(buf4, 40, "%p\n", prev_dir);
+                fwrite(buf4, 40, 1, log_file);
+
                 prev_dir = curr_dir;
                 curr_dir = initialize_dir_entry();
                 f_tree->num_of_entries++;
-                f_tree->current_entry = f_tree->current_entry->next;
             }
             next = readdir(dir);
         }
 
-        f_tree->current_entry = f_tree->first_entry;
         rewinddir(dir);
     }
 
+    char buf5[40];
+    memset(buf5, 0, 40);
+    buf[39] = '\0';
+    snprintf(buf5, 40, "%p\n", prev_dir);
+    fwrite(buf5, 40, 1, log_file);
+
+
+    mvwprintw(*explorer_window, 42, 2, "%p", prev_dir);
+    mvwprintw(*explorer_window, 43, 2, "%p", f_tree->first_entry);
+    mvwprintw(*explorer_window, 44, 2, "%p", curr_dir);
+    mvwprintw(*explorer_window, 45, 2, "%p", curr_dir->prev);
+
+    // free(tmp_dir->name);
+    // free(tmp_dir->path);
+    // free(tmp_dir);
     free(curr_dir->name);
     free(curr_dir->path);
     free(curr_dir);
@@ -207,6 +254,8 @@ void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree)
     {
         f_tree->current_entry = f_tree->current_entry->next;
     }
+
+    mvwprintw(*explorer_window, 46, 2, "%p", f_tree->current_entry);
     if (f_tree->curr_entry_nr == 0)
     {
         f_tree->current_entry = f_tree->first_entry;
@@ -309,6 +358,10 @@ void open_sub_directory(char *dir_name, FILE_TREE *f_tree)
         }
         next = readdir(dir);
     }
+
+    free(curr_dir->name);
+    free(curr_dir->path);
+    free(curr_dir);
 
     prev_dir->next = next_orig_dir;
     if (f_tree->current_entry->num_of_entries > 0)
@@ -420,17 +473,8 @@ void recreate_editor_windows(APP_CONTEXT *ctx)
     doupdate();
 }
 
-void deallocate_course_view_memory(APP_CONTEXT *ctx)
+void free_section_data(APP_CONTEXT *ctx)
 {
-    deallocate_buffer(ctx->t_buffer);
-    deallocate_buffer(ctx->shell->term_buffer);
-    deallocate_it_buffer(ctx->rp_state->it_buffer);
-    deallocate_file_tree(ctx->file_tree);
-
-    free(ctx->user_data->name);
-    free(ctx->user_data->created_at);
-    free(ctx->user_data);
-
     for (int i = 0;
          i < ctx->rp_state->num_of_section_items[ctx->rp_state->curr_section];
          i++)
@@ -442,6 +486,19 @@ void deallocate_course_view_memory(APP_CONTEXT *ctx)
 
     free(ctx->rp_state->s_metadata->title);
     free(ctx->rp_state->s_metadata);
+}
+
+void deallocate_course_view_memory(APP_CONTEXT *ctx)
+{
+    deallocate_buffer(ctx->t_buffer);
+    deallocate_buffer(ctx->shell->term_buffer);
+    deallocate_it_buffer(ctx->rp_state->it_buffer);
+
+    free(ctx->user_data->name);
+    free(ctx->user_data->created_at);
+    free(ctx->user_data);
+
+    free_section_data(ctx);
 
     unpost_menu(ctx->start_menu);
     free_menu(ctx->start_menu);
@@ -455,4 +512,6 @@ void deallocate_course_view_memory(APP_CONTEXT *ctx)
     {
         delwin(ctx->course_windows[i]);
     }
+
+    deallocate_file_tree(ctx->file_tree);
 }

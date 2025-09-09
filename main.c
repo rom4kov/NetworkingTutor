@@ -40,6 +40,7 @@ int main(void)
     ctx->courses = get_course_data(ctx->db, ctx->num_of_courses);
     ctx->file = NULL;
     ctx->file_tree = initialize_file_tree();
+    ctx->file_tree->prev_dir = initialize_dir_entry();
     ctx->t_buffer = initialize_buffer();
     ctx->filename = (char *)calloc(30, sizeof(char));
     ctx->curr_file_path = (char *)calloc(30, sizeof(char));
@@ -356,7 +357,22 @@ int main(void)
     }
 
     sqlite3_db_release_memory(ctx->db);
-    sqlite3_close(ctx->db);
+
+    FILE *log_file = fopen("sqlite_log_file.txt", "a");
+    sqlite3_stmt *stmt;
+    while ((stmt = sqlite3_next_stmt(ctx->db, NULL)) != NULL) {
+        fprintf(stderr, "Leaked stmt: %s\n", sqlite3_sql(stmt));
+        const char *sql_msg = sqlite3_sql(stmt);
+        fwrite(sql_msg, strlen(sql_msg), 1, log_file);
+        sqlite3_finalize(stmt);
+    }
+
+    int rc = sqlite3_close(ctx->db);
+    if (rc != SQLITE_OK) {
+        const char *err_msg = sqlite3_errmsg(ctx->db);
+        fwrite(err_msg, strlen(err_msg), 1, log_file);
+    }
+    fclose(log_file);
 
     curs_set(1);
 
@@ -465,10 +481,12 @@ void free_memory(APP_CONTEXT *ctx)
     }
     free(ctx->courses);
 
+    free(ctx->file_tree);
     free(ctx->rp_state->course_progress);
     free(ctx->rp_state->completed_sections);
     free(ctx->rp_state->total_section_items);
     // free(ctx->rp_state->it_buffer);
     free(ctx->rp_state);
+    ctx->db = NULL;
     free(ctx);
 }

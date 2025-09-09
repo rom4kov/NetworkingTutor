@@ -76,10 +76,12 @@ int create_new_user(APP_CONTEXT *ctx, char *username)
 
     sqlite3_stmt *stmt;
     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
-    if (rc != SQLITE_OK)
-    {
-        sqlite3_finalize(stmt);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(ctx->db));
+        if (stmt) sqlite3_finalize(stmt);
+        return -1;
     }
+
 
     if (rc == SQLITE_OK)
     {
@@ -112,9 +114,10 @@ USER_DATA *get_user_data(sqlite3 *db, int user_id)
 
     sqlite3_stmt *stmt;
     int rc = sqlite3_prepare_v2(db, zSql, -1, &stmt, NULL);
-    if (rc != SQLITE_OK)
-    {
-        sqlite3_finalize(stmt);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(db));
+        if (stmt) sqlite3_finalize(stmt);
+        return NULL;
     }
 
     if (rc == SQLITE_OK)
@@ -140,9 +143,10 @@ int get_id_of_first_user(sqlite3 *db)
 
     sqlite3_stmt *stmt;
     rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
-    if (rc != SQLITE_OK)
-    {
-        return 0;
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(db));
+        if (stmt) sqlite3_finalize(stmt);
+        return -1;
     }
 
     if (sqlite3_step(stmt) == SQLITE_ROW)
@@ -163,9 +167,10 @@ int get_user_count(sqlite3 *db)
 
     sqlite3_stmt *stmt;
     rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
-    if (rc != SQLITE_OK)
-    {
-        return 0;
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(db));
+        if (stmt) sqlite3_finalize(stmt);
+        return -1;
     }
 
     int num_of_users = 0;
@@ -181,11 +186,11 @@ int get_user_count(sqlite3 *db)
 
 void seed_courses_data(sqlite3 *db, WINDOW *win, char *query)
 {
-    const char *course_details = read_sql_query(query);
+    const char *sql_query = read_sql_query(query);
 
     char *err_msg = 0;
 
-    int rc = sqlite3_exec(db, course_details, 0, 0, &err_msg);
+    int rc = sqlite3_exec(db, sql_query, 0, 0, &err_msg);
 
     if (rc != SQLITE_OK)
     {
@@ -195,7 +200,9 @@ void seed_courses_data(sqlite3 *db, WINDOW *win, char *query)
     else
     {
         mvwprintw(win, 2, 2, "Table courses created successfully\n");
+        sqlite3_free(err_msg);
     }
+
 }
 
 int get_num_of_courses(sqlite3 *db)
@@ -206,9 +213,10 @@ int get_num_of_courses(sqlite3 *db)
 
     sqlite3_stmt *stmt;
     rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
-    if (rc != SQLITE_OK)
-    {
-        return 0;
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(db));
+        if (stmt) sqlite3_finalize(stmt);
+        return -1;
     }
 
     int num_of_courses = 0;
@@ -230,6 +238,11 @@ COURSE *get_course_data(sqlite3 *db, int num_of_courses)
 
     sqlite3_stmt *stmt;
     rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(db));
+        if (stmt) sqlite3_finalize(stmt);
+        return NULL;
+    }
 
     sqlite3_reset(stmt);
     COURSE *course_data = malloc(sizeof(COURSE) * num_of_courses);
@@ -261,9 +274,10 @@ COURSE *get_course_by_id(sqlite3 *db, int course_id)
     sqlite3_stmt *stmt;
 
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
-    if (rc != SQLITE_OK)
-    {
-        sqlite3_finalize(stmt);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(db));
+        if (stmt) sqlite3_finalize(stmt);
+        return NULL;
     }
 
     if (rc == SQLITE_OK)
@@ -297,9 +311,10 @@ char *get_course_ascii_art(sqlite3 *db, int course_id)
 
     sqlite3_stmt *stmt;
     rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
-    if (rc != SQLITE_OK)
-    {
-        sqlite3_finalize(stmt);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(db));
+        if (stmt) sqlite3_finalize(stmt);
+        return NULL;
     }
 
     if (rc == SQLITE_OK)
@@ -326,10 +341,10 @@ COURSE *get_completed_courses(APP_CONTEXT *ctx, int *num_courses)
 
     sqlite3_stmt *stmt;
     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
-
-    if (rc != SQLITE_OK)
-    {
-        sqlite3_finalize(stmt);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(ctx->db));
+        if (stmt) sqlite3_finalize(stmt);
+        return NULL;
     }
 
     if (rc == SQLITE_OK)
@@ -375,9 +390,10 @@ SECTION_METADATA *get_section_metadata(APP_CONTEXT *ctx)
 
     sqlite3_stmt *stmt;
     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
-    if (rc != SQLITE_OK)
-    {
-        sqlite3_finalize(stmt);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(ctx->db));
+        if (stmt) sqlite3_finalize(stmt);
+        return NULL;
     }
 
     if (rc == SQLITE_OK)
@@ -394,6 +410,7 @@ SECTION_METADATA *get_section_metadata(APP_CONTEXT *ctx)
         section_metadata->has_separate_task = (bool)sqlite3_column_int(stmt, 2);
     }
 
+    sqlite3_finalize(stmt);
     return section_metadata;
 }
 
@@ -407,9 +424,10 @@ COURSE_SECTION *get_course_section_materials(sqlite3 *db, int course,
 
     sqlite3_stmt *stmt;
     rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
-    if (rc != SQLITE_OK)
-    {
-        sqlite3_finalize(stmt);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(db));
+        if (stmt) sqlite3_finalize(stmt);
+        return NULL;
     }
 
     if (rc == SQLITE_OK)
@@ -465,9 +483,9 @@ void get_total_course_sections(APP_CONTEXT *ctx)
 
     sqlite3_stmt *stmt;
     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
-    if (rc != SQLITE_OK)
-    {
-        sqlite3_finalize(stmt);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(ctx->db));
+        if (stmt) sqlite3_finalize(stmt);
     }
 
     if (rc == SQLITE_OK)
@@ -496,6 +514,10 @@ void update_user(sqlite3 *db, int id, char *name)
     const char *sql = "UPDATE users SET name = ? WHERE id = ?";
 
     rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(db));
+        if (res) sqlite3_finalize(res);
+    }
 
     if (rc == SQLITE_OK)
     {
@@ -526,6 +548,10 @@ void set_section_completed(APP_CONTEXT *ctx)
         "AND section_id = ?;";
 
     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &res, 0);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(ctx->db));
+        if (res) sqlite3_finalize(res);
+    }
 
     if (rc == SQLITE_OK)
     {
@@ -561,6 +587,10 @@ void get_completed_sections(APP_CONTEXT *ctx)
                       "course_id = ? AND section_completed = 1;";
 
     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(ctx->db));
+        if (stmt) sqlite3_finalize(stmt);
+    }
 
     if (rc == SQLITE_OK)
     {
@@ -591,6 +621,10 @@ int get_total_completed_sections(APP_CONTEXT *ctx)
                       "section_completed = 1;";
 
     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(ctx->db));
+        if (stmt) sqlite3_finalize(stmt);
+    }
 
     if (rc == SQLITE_OK)
     {
@@ -629,6 +663,10 @@ void set_items_completed(APP_CONTEXT *ctx)
           "items_completed = excluded.items_completed;";
 
     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &res, 0);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(ctx->db));
+        if (res) sqlite3_finalize(res);
+    }
 
     if (rc == SQLITE_OK)
     {
@@ -659,6 +697,10 @@ int get_total_completed_items(APP_CONTEXT *ctx)
     const char *sql = "SELECT items_completed FROM progress WHERE user_id = ?;";
 
     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(ctx->db));
+        if (stmt) sqlite3_finalize(stmt);
+    }
 
     if (rc == SQLITE_OK)
     {
@@ -688,6 +730,11 @@ int get_current_course(sqlite3 *db, int user_id)
 
     sqlite3_stmt *stmt;
     rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(db));
+        if (stmt) sqlite3_finalize(stmt);
+        return -1;
+    }
 
     if (rc == SQLITE_OK)
     {
@@ -714,9 +761,10 @@ char *get_course_name_by_id(sqlite3 *db, int course_id)
 
     sqlite3_stmt *stmt = NULL;
     rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
-    if (rc != SQLITE_OK)
-    {
-        sqlite3_finalize(stmt);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(db));
+        if (stmt) sqlite3_finalize(stmt);
+        return NULL;
     }
 
     if (rc == SQLITE_OK)
@@ -744,6 +792,10 @@ void set_course_completed(APP_CONTEXT *ctx)
         "VALUES (?, ?, ?);";
 
     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &res, 0);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(ctx->db));
+        if (res) sqlite3_finalize(res);
+    }
 
     if (rc == SQLITE_OK)
     {
@@ -771,10 +823,11 @@ void get_course_progress(APP_CONTEXT *ctx)
                       "user_id = ? AND course_id = ?";
 
     sqlite3_stmt *stmt;
+
     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
-    if (rc != SQLITE_OK)
-    {
-        return;
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(ctx->db));
+        if (stmt) sqlite3_finalize(stmt);
     }
 
     if (rc == SQLITE_OK)
@@ -803,9 +856,9 @@ void get_task(APP_CONTEXT *ctx)
 
     sqlite3_stmt *stmt;
     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
-    if (rc != SQLITE_OK)
-    {
-        sqlite3_finalize(stmt);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(ctx->db));
+        if (stmt) sqlite3_finalize(stmt);
     }
 
     if (rc == SQLITE_OK)
@@ -822,6 +875,8 @@ void get_task(APP_CONTEXT *ctx)
         (char *)malloc((strlen(task) + 1) * sizeof(char));
 
     ctx->rp_state->current_task = strdup(task);
+
+    sqlite3_finalize(stmt);
 }
 
 char *get_ascii_art(sqlite3 *db, char *ascii_art_name)
@@ -831,9 +886,9 @@ char *get_ascii_art(sqlite3 *db, char *ascii_art_name)
     char *ascii = NULL;
 
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
-    if (rc != SQLITE_OK)
-    {
+    if (rc != SQLITE_OK) {
         fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(db));
+        if (stmt) sqlite3_finalize(stmt);
         return NULL;
     }
 
@@ -859,9 +914,10 @@ char *get_end_of_course_msg(sqlite3 *db, int course_id)
 
     sqlite3_stmt *stmt;
     rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
-    if (rc != SQLITE_OK)
-    {
-        sqlite3_finalize(stmt);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(db));
+        if (stmt) sqlite3_finalize(stmt);
+        return NULL;
     }
 
     if (rc == SQLITE_OK)
@@ -874,21 +930,24 @@ char *get_end_of_course_msg(sqlite3 *db, int course_id)
     end_of_course_msg =
         (const unsigned char *)strdup((char *)sqlite3_column_text(stmt, 0));
 
+    sqlite3_finalize(stmt);
     return (char *)end_of_course_msg;
 }
 
 int get_num_of_completed_courses(APP_CONTEXT *ctx)
 {
     int rc = 0;
+    int num_completed_courses = 0;
 
     const char *sql =
         "SELECT COUNT(*) FROM completed_courses WHERE user_id = ?;";
 
     sqlite3_stmt *stmt;
     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
-    if (rc != SQLITE_OK)
-    {
-        sqlite3_finalize(stmt);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(ctx->db));
+        if (stmt) sqlite3_finalize(stmt);
+        return -1;
     }
 
     if (rc == SQLITE_OK)
@@ -898,7 +957,11 @@ int get_num_of_completed_courses(APP_CONTEXT *ctx)
 
     sqlite3_step(stmt);
 
-    return sqlite3_column_int(stmt, 0);
+    num_completed_courses = sqlite3_column_int(stmt, 0);
+
+    sqlite3_finalize(stmt);
+
+    return num_completed_courses;
 }
 
 void set_current_streak(APP_CONTEXT *ctx, int current_streak)
@@ -913,9 +976,9 @@ void set_current_streak(APP_CONTEXT *ctx, int current_streak)
 
     sqlite3_stmt *stmt;
     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
-    if (rc != SQLITE_OK)
-    {
-        sqlite3_finalize(stmt);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(ctx->db));
+        if (stmt) sqlite3_finalize(stmt);
     }
 
     if (rc == SQLITE_OK)
@@ -926,6 +989,9 @@ void set_current_streak(APP_CONTEXT *ctx, int current_streak)
     }
 
     sqlite3_step(stmt);
+
+    sqlite3_finalize(stmt);
+
     wrefresh(ctx->course_windows[2]);
 }
 
@@ -936,6 +1002,7 @@ int get_current_streak(APP_CONTEXT *ctx)
 
     char *c_date = malloc(20);
     char *cmp_date = malloc(20);
+    char *tmp_date = malloc(20);
 
     sqlite3_stmt *stmt = NULL;
 
@@ -944,6 +1011,11 @@ int get_current_streak(APP_CONTEXT *ctx)
         "ORDER BY section_completed_at DESC;";
 
     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(ctx->db));
+        if (stmt) sqlite3_finalize(stmt);
+        return -1;
+    }
 
     if (rc == SQLITE_OK)
     {
@@ -964,7 +1036,7 @@ int get_current_streak(APP_CONTEXT *ctx)
         if (date == NULL)
             break;
 
-        const char *tmp_date = (const char *)strdup((char *)date);
+        tmp_date = (char *)date;
         if (tmp_date == NULL || strcmp(tmp_date, "") == 0)
             break;
         strcpy(cmp_date, tmp_date);
@@ -979,6 +1051,9 @@ int get_current_streak(APP_CONTEXT *ctx)
         strcpy(c_date, tmp_date);
         i++;
     }
+
+    free(c_date);
+    free(cmp_date);
 
     sqlite3_finalize(stmt);
 
@@ -995,10 +1070,9 @@ int get_longest_streak(APP_CONTEXT *ctx)
     int longest_streak = 0;
 
     int rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
-    if (rc != SQLITE_OK)
-    {
-        fprintf(stderr, "sqlite3_prepare_v2 failed: %s\n",
-                sqlite3_errmsg(ctx->db));
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(ctx->db));
+        if (stmt) sqlite3_finalize(stmt);
         return 0;
     }
 
@@ -1036,10 +1110,10 @@ int get_course_completion_percentage(APP_CONTEXT *ctx, int course_id)
 
     sqlite3_stmt *stmt;
     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
-    if (rc != SQLITE_OK)
-    {
-        sqlite3_finalize(stmt);
-        return 1;
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(ctx->db));
+        if (stmt) sqlite3_finalize(stmt);
+        return 0;
     }
 
     if (rc == SQLITE_OK)
@@ -1060,10 +1134,10 @@ int get_course_completion_percentage(APP_CONTEXT *ctx, int course_id)
 
     sqlite3_stmt *stmt2;
     rc = sqlite3_prepare_v2(ctx->db, sql2, -1, &stmt2, NULL);
-    if (rc != SQLITE_OK)
-    {
-        sqlite3_finalize(stmt2);
-        return 1;
+    if (rc != SQLITE_OK) {
+        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(ctx->db));
+        if (stmt) sqlite3_finalize(stmt);
+        return 0;
     }
 
     if (rc == SQLITE_OK)

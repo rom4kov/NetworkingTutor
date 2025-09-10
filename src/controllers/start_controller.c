@@ -25,7 +25,7 @@ void go_to_course_by_id(APP_CONTEXT *ctx, int course_id)
         }
     }
     ctx->course_view_active = true;
-    ctx->first_course_draw = true;
+    // ctx->first_course_draw = true;
     ctx->course_needs_redraw = true;
     // for (int i = 0; i < START_WINDOW_COUNT; i++)
     // {
@@ -45,6 +45,7 @@ void go_to_course_by_id(APP_CONTEXT *ctx, int course_id)
 
     ctx->rp_state->lines_excess = 0;
     ctx->rp_state->lines_to_print = 0;
+
     deallocate_it_buffer(ctx->rp_state->it_buffer);
     ctx->rp_state->it_buffer = initialize_it_buffer();
 

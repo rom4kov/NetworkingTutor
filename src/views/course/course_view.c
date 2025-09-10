@@ -119,7 +119,7 @@ void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree)
     DIR *dir = opendir(".");
 
     struct dirent *next = readdir(dir);
-    FILE *log_file = fopen("f_tree_creation_log.txt", "a");
+    // FILE *log_file = fopen("f_tree_creation_log.txt", "a");
 
 
     // DIR_ENTRY *prev_dir = initialize_dir_entry();
@@ -127,14 +127,14 @@ void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree)
     DIR_ENTRY *curr_dir = initialize_dir_entry();
     // DIR_ENTRY *tmp_dir = prev_dir;
 
-    char buf[40];
-    memset(buf, 0, 40);
-    buf[39] = '\0';
-    snprintf(buf, 40, "%p\n", prev_dir);
-    fwrite(buf, 40, 1, log_file);
+    // char buf[40];
+    // memset(buf, 0, 40);
+    // buf[39] = '\0';
+    // snprintf(buf, 40, "%p\n", prev_dir);
+    // fwrite(buf, 40, 1, log_file);
 
 
-    mvwprintw(*explorer_window, 41, 2, "%p", prev_dir);
+    // mvwprintw(*explorer_window, 41, 2, "%p", prev_dir);
 
     if (f_tree->num_of_entries == 0)
     {
@@ -155,11 +155,11 @@ void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree)
         f_tree->current_entry->prev = prev_dir;
         f_tree->first_entry = prev_dir;
 
-        char buf2[40];
-        memset(buf2, 0, 40);
-        buf2[39] = '\0';
-        snprintf(buf2, 40, "%p\n", prev_dir);
-        fwrite(buf2, 40, 1, log_file);
+        // char buf2[40];
+        // memset(buf2, 0, 40);
+        // buf2[39] = '\0';
+        // snprintf(buf2, 40, "%p\n", prev_dir);
+        // fwrite(buf2, 40, 1, log_file);
 
         f_tree->num_of_entries++;
         rewinddir(dir);
@@ -179,11 +179,11 @@ void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree)
                 curr_dir->prev = prev_dir;
                 prev_dir->next = curr_dir;
 
-                char buf3[40];
-                memset(buf3, 0, 40);
-                buf3[39] = '\0';
-                snprintf(buf3, 40, "%p\n", prev_dir);
-                fwrite(buf3, 40, 1, log_file);
+                // char buf3[40];
+                // memset(buf3, 0, 40);
+                // buf3[39] = '\0';
+                // snprintf(buf3, 40, "%p\n", prev_dir);
+                // fwrite(buf3, 40, 1, log_file);
 
                 prev_dir = curr_dir;
                 curr_dir = initialize_dir_entry();
@@ -206,11 +206,11 @@ void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree)
                 curr_dir->prev = prev_dir;
                 prev_dir->next = curr_dir;
 
-                char buf4[40];
-                memset(buf4, 0, 40);
-                buf4[39] = '\0';
-                snprintf(buf4, 40, "%p\n", prev_dir);
-                fwrite(buf4, 40, 1, log_file);
+                // char buf4[40];
+                // memset(buf4, 0, 40);
+                // buf4[39] = '\0';
+                // snprintf(buf4, 40, "%p\n", prev_dir);
+                // fwrite(buf4, 40, 1, log_file);
 
                 prev_dir = curr_dir;
                 curr_dir = initialize_dir_entry();
@@ -221,18 +221,18 @@ void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree)
 
         rewinddir(dir);
     }
-
-    char buf5[40];
-    memset(buf5, 0, 40);
-    buf[39] = '\0';
-    snprintf(buf5, 40, "%p\n", prev_dir);
-    fwrite(buf5, 40, 1, log_file);
-
-
-    mvwprintw(*explorer_window, 42, 2, "%p", prev_dir);
-    mvwprintw(*explorer_window, 43, 2, "%p", f_tree->first_entry);
-    mvwprintw(*explorer_window, 44, 2, "%p", curr_dir);
-    mvwprintw(*explorer_window, 45, 2, "%p", curr_dir->prev);
+    //
+    // char buf5[40];
+    // memset(buf5, 0, 40);
+    // buf[39] = '\0';
+    // snprintf(buf5, 40, "%p\n", prev_dir);
+    // fwrite(buf5, 40, 1, log_file);
+    //
+    //
+    // mvwprintw(*explorer_window, 42, 2, "%p", prev_dir);
+    // mvwprintw(*explorer_window, 43, 2, "%p", f_tree->first_entry);
+    // mvwprintw(*explorer_window, 44, 2, "%p", curr_dir);
+    // mvwprintw(*explorer_window, 45, 2, "%p", curr_dir->prev);
 
     // free(tmp_dir->name);
     // free(tmp_dir->path);
@@ -490,6 +490,8 @@ void free_section_data(APP_CONTEXT *ctx)
 
 void deallocate_course_view_memory(APP_CONTEXT *ctx)
 {
+    // free_section_data(ctx);
+
     deallocate_buffer(ctx->t_buffer);
     deallocate_buffer(ctx->shell->term_buffer);
     deallocate_it_buffer(ctx->rp_state->it_buffer);
@@ -497,8 +499,6 @@ void deallocate_course_view_memory(APP_CONTEXT *ctx)
     free(ctx->user_data->name);
     free(ctx->user_data->created_at);
     free(ctx->user_data);
-
-    free_section_data(ctx);
 
     unpost_menu(ctx->start_menu);
     free_menu(ctx->start_menu);

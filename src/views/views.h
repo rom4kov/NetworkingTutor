@@ -47,7 +47,7 @@ void recreate_editor_windows(APP_CONTEXT *ctx);
 void add_line_break(COURSE_SECTION *c_sec_data, I_TEXT_BUFFER *tbuf,
                     I_LINE **curr_line, int i, int *j, int *k, int *line_number,
                     int *last_space_pos, bool overflow, bool *bl_point);
-void read_item_into_buffer(APP_CONTEXT *ctx);
+void read_items_into_buffer(APP_CONTEXT *ctx);
 void read_task_into_buffer(APP_CONTEXT *ctx);
 void read_end_of_course_page_into_buffer(APP_CONTEXT *ctx);
 void read_window_text_into_buffer(APP_CONTEXT *ctx, I_TEXT_BUFFER *header_tbuf,

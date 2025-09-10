@@ -277,13 +277,6 @@ void handle_course_input(APP_CONTEXT *ctx)
                 }
                 break;
             case '<':
-                if (ctx->rp_state->showing_end_of_course_page)
-                {
-                    ctx->rp_state->showing_end_of_course_page = false;
-                }
-                else {
-                    free_section_data(ctx);
-                }
                 if (ctx->rp_state->showing_test_results)
                 {
                     ctx->rp_state->showing_test_results = false;
@@ -307,11 +300,18 @@ void handle_course_input(APP_CONTEXT *ctx)
                 else if (ctx->rp_state->curr_section > 0 &&
                          ctx->rp_state->showing_test_results == false)
                 {
+                    if (!ctx->rp_state->showing_end_of_course_page)
+                    {
+                        free_section_data(ctx);
+                    }
+
                     ctx->rp_state
                         ->num_of_section_items[ctx->rp_state->curr_section] =
                         ctx->rp_state->curr_item;
                     ctx->rp_state->curr_section--;
+
                     get_course_progress(ctx);
+
                     ctx->rp_state->curr_item =
                         ctx->rp_state
                             ->course_progress[ctx->rp_state->curr_section] +
@@ -333,6 +333,10 @@ void handle_course_input(APP_CONTEXT *ctx)
                     wnoutrefresh(ctx->rp_state->inner_win);
                     doupdate();
                 }
+                if (ctx->rp_state->showing_end_of_course_page)
+                {
+                    ctx->rp_state->showing_end_of_course_page = false;
+                }
                 // log_course_instr_values(ctx);
                 // wrefresh(ctx->course_windows[2]);
                 break;
@@ -342,10 +346,11 @@ void handle_course_input(APP_CONTEXT *ctx)
                 if (ctx->rp_state->curr_section <
                     ctx->rp_state->sections_completed)
                 {
+                    free_section_data(ctx);
+
                     if (ctx->rp_state->curr_section - 1 <
                         ctx->rp_state->total_course_sections)
                     {
-                        free_section_data(ctx);
 
                         ctx->rp_state->showing_test_results = false;
                         ctx->rp_state->curr_section++;

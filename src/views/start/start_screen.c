@@ -51,8 +51,7 @@ WINDOW *create_navigation_window(APP_CONTEXT *ctx)
     WINDOW *navigation;
     navigation = newwin(3, WU * 7 + 4, 0, 0);
     draw_border(navigation, ctx->active_window_idx == 0 ? 3 : 2, "");
-    ctx->start_menu =
-        create_start_menu(navigation, ctx);
+    ctx->start_menu = create_start_menu(navigation, ctx);
 
     wattron(navigation, COLOR_PAIR(3));
     mvwprintw(navigation, 0, 2, " Navigation ");
@@ -355,7 +354,8 @@ void deallocate_start_screen_memory(APP_CONTEXT *ctx)
 
     unpost_menu(ctx->start_menu);
     free_menu(ctx->start_menu);
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 6; i++)
+    {
         free_item(ctx->nav_menu_items[i]);
     }
     free(ctx->nav_menu_items);

@@ -6,6 +6,7 @@
 #include <curses.h>
 #include <dirent.h>
 #include <form.h>
+#include <math.h>
 #include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -61,7 +62,7 @@ TEXT_BUFFER *initialize_buffer()
 {
     TEXT_BUFFER *text_buf = malloc(sizeof(TEXT_BUFFER));
 
-    text_buf->first_line = initialize_line();
+    text_buf->first_line = NULL;
     text_buf->current_line = text_buf->first_line;
     text_buf->num_of_lines = 0;
     text_buf->curr_line_nr = 0;
@@ -115,25 +116,53 @@ I_LINE *initialize_iline()
 
 void deallocate_buffer(TEXT_BUFFER *tbuf)
 {
-    if (!tbuf)
-        return;
+    if (!tbuf) return;
 
+    FILE *log_file = fopen("t_buffer_dealloc_log.txt", "a");
     LINE *current_line = tbuf->first_line;
-    while (current_line->next != NULL)
-    {
+    int i = 0;
+    while (current_line) {
+
+        char buf[40];
+        memset(buf, 0, 40);
+        buf[39] = '\0';
+        snprintf(buf, 40, "%p\n", current_line);
+        fwrite(buf, 40, 1, log_file);
+
         free(current_line->buf_);
-        current_line = current_line->next;
-        free(current_line->prev);
+        LINE *next = current_line->next;
+        free(current_line);
+        current_line = next;
+        i++;
     }
 
-    free(current_line->buf_);
-    free(current_line);
-    free(tbuf);
+    char buf[12];
+    memset(buf, 0, 12);
+    buf[11] = '\0';
+    snprintf(buf, 12, "%i\n", i);
+    fwrite(buf, 12, 1, log_file);
+
+    free(tbuf);  // <-- always free the buffer itself
+    fclose(log_file);
+    // if (!tbuf)
+    //     return;
+    //
+    // LINE *current_line = tbuf->first_line;
+    // while (current_line->next != NULL)
+    // {
+    //     free(current_line->buf_);
+    //     current_line = current_line->next;
+    //     free(current_line->prev);
+    // }
+    //
+    // free(current_line->buf_);
+    // free(current_line);
+    // free(tbuf);
 }
 
 void deallocate_it_buffer(I_TEXT_BUFFER *tbuf)
 {
-    if (!tbuf) return;
+    if (!tbuf || tbuf->num_of_lines == 0) return;
 
     I_LINE *current_line = tbuf->first_line;
     while (current_line) {
@@ -150,15 +179,16 @@ void deallocate_file_tree(FILE_TREE *f_tree)
 {
     DIR_ENTRY *curr_entry = f_tree->first_entry;
 
-    FILE *log_file = fopen("f_tree_dealloc_log.txt", "a");
+    // FILE *log_file = fopen("f_tree_dealloc_log.txt", "w");
     // int i = 0;
     while (curr_entry)
     {
-        char buf[40];
-        memset(buf, 0, 40);
-        buf[39] = '\0';
-        snprintf(buf, 40, "%p\n", curr_entry);
-        fwrite(buf, 40, 1, log_file);
+        // char buf[40];
+        // memset(buf, 0, 40);
+        // buf[39] = '\0';
+        // snprintf(buf, 40, "%p\n", curr_entry);
+        // fwrite(buf, 40, 1, log_file);
+
         free(curr_entry->name);
         free(curr_entry->path);
         DIR_ENTRY *next = curr_entry->next; 
@@ -166,7 +196,11 @@ void deallocate_file_tree(FILE_TREE *f_tree)
         curr_entry = next;
         // i++;
     }
-    fclose(log_file);
+    free(curr_entry);
+    // fclose(log_file);
+    // free(f_tree->prev_dir->name);
+    // free(f_tree->prev_dir->path);
+    // free(f_tree->prev_dir);
 
     f_tree->first_entry = NULL;
     f_tree->current_entry = NULL;
@@ -325,9 +359,9 @@ void read_file_into_buffer(FILE *file, TEXT_BUFFER *text_buf)
     char c;
     int i, j;
     i = j = 0;
-    unsigned short line_number = 0;
+    int line_number = 0;
 
-    LINE *prev_line = initialize_line();
+    LINE *prev_line = NULL;
     LINE *curr_line = initialize_line();
 
     while (fread(&c, sizeof(char), 1, file))
@@ -341,6 +375,7 @@ void read_file_into_buffer(FILE *file, TEXT_BUFFER *text_buf)
 
             if (text_buf->num_of_lines == 0)
             {
+                // text_buf->first_line = initialize_line();
                 prev_line = curr_line;
                 text_buf->first_line = prev_line;
                 text_buf->current_line = prev_line;
@@ -352,11 +387,14 @@ void read_file_into_buffer(FILE *file, TEXT_BUFFER *text_buf)
             else
             {
                 text_buf->num_of_lines++;
+                // if (j == 0)
+                //     prev_line = initialize_line();
                 prev_line->next = curr_line;
                 curr_line->prev = prev_line;
                 prev_line = curr_line;
                 curr_line = initialize_line();
             }
+            j++;
 
             continue;
         }
@@ -373,6 +411,11 @@ void read_file_into_buffer(FILE *file, TEXT_BUFFER *text_buf)
         text_buf->first_line = curr_line;
         text_buf->current_line = text_buf->first_line;
     }
+
+    // free(prev_line->buf_);
+    // free(prev_line);
+    free(curr_line->buf_);
+    free(curr_line);
 }
 
 void write_buffer_to_file(TEXT_BUFFER *tbuf, FILE *file, int y)

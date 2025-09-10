@@ -84,6 +84,7 @@ int main(void)
     ctx->shell->curr_buf_idx = 0;
     ctx->shell->term_buffer = initialize_buffer();
     ctx->shell->term_buffer->num_of_lines = 1;
+    ctx->shell->term_buffer->first_line = initialize_line();
     ctx->shell->term_buffer->first_line->buf_[0] = '>';
     ctx->shell->term_buffer->first_line->buf_[1] = ' ';
     ctx->shell->term_buffer->first_line->buf_[2] = '\0';
@@ -464,6 +465,8 @@ void free_memory(APP_CONTEXT *ctx)
             delwin(ctx->keybindings_windows[i]);
         }
     }
+    // free(ctx->rp_state->s_metadata->title);
+    // free(ctx->rp_state->s_metadata);
 
     CU_cleanup_registry();
 
@@ -481,7 +484,7 @@ void free_memory(APP_CONTEXT *ctx)
     }
     free(ctx->courses);
 
-    free(ctx->file_tree);
+    // free(ctx->file_tree);
     free(ctx->rp_state->course_progress);
     free(ctx->rp_state->completed_sections);
     free(ctx->rp_state->total_section_items);

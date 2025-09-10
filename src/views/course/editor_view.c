@@ -6,6 +6,7 @@
 #include <pcre.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -83,14 +84,38 @@ void print_matches(pcre2_code **re, int line_num, int j, size_t subject_length,
     PCRE2_SPTR subject = (PCRE2_SPTR)current_line->buf_;
     pcre2_match_data *md = pcre2_match_data_create_from_pattern(re[j], NULL);
     if (!md)
+    {
+        pcre2_match_data_free(md);
         return;
+    }
+    FILE *log_file = fopen("print_matches_log.txt", "a");
+
+
 
     int rc = pcre2_match(re[j], subject, subject_length, 0, 0, md, NULL);
     if (j == 4 && rc > 0)
     {
+        LINE *temp_line = NULL;
         char *extended_buf = calloc(500, sizeof(char));
-        LINE *temp_line = initialize_line();
+        // LINE *orig_temp_line = temp_line;
+
+        char buf[40];
+        memset(buf, 0, 40);
+        buf[39] = '\0';
+        snprintf(buf, 40, "%p\n", temp_line);
+        fwrite(buf, 40, 1, log_file);
+
         temp_line = current_line;
+
+        memset(buf, 0, 40);
+        buf[39] = '\0';
+        snprintf(buf, 40, "%p\n", temp_line);
+        fwrite(buf, 40, 1, log_file);
+
+        if (!temp_line) {
+            pcre2_match_data_free(md);
+            return;
+        }
 
         int i = 0;
         int paren_depth = 0;
@@ -105,6 +130,13 @@ void print_matches(pcre2_code **re, int line_num, int j, size_t subject_length,
             else if (temp_line->buf_[i] == '\0')
             {
                 temp_line = temp_line->next;
+
+                char buf[40];
+                memset(buf, 0, 40);
+                buf[39] = '\0';
+                snprintf(buf, 40, "%p - line: %s\n", temp_line, temp_line->buf_);
+                fwrite(buf, 40, 1, log_file);
+
                 if (temp_line != NULL)
                     strcat(extended_buf, temp_line->buf_);
                 i = 0;
@@ -118,18 +150,39 @@ void print_matches(pcre2_code **re, int line_num, int j, size_t subject_length,
             }
             i++;
         }
+
         if (!closing_bracket_reached)
+        {
+            free(extended_buf);
+            pcre2_match_data_free(md);
+            // free(orig_temp_line->buf_);
+            // free(orig_temp_line);
             return;
+        }
+
         extended_buf[strlen(extended_buf)] = '\0';
 
         subject_length = strlen(extended_buf);
 
         subject = (PCRE2_SPTR)extended_buf;
+        pcre2_match_data_free(md);
+
         md = pcre2_match_data_create_from_pattern(re[3], NULL);
+
         if (!md)
+        {
+            free(extended_buf);
+            // free(orig_temp_line->buf_);
+            // free(orig_temp_line);
+            pcre2_match_data_free(md);
             return;
+        }
+
         rc = pcre2_match(re[3], subject, subject_length, 0, 0, md, NULL);
+
         free(extended_buf);
+        // free(orig_temp_line->buf_);
+        // free(orig_temp_line);
     }
     int line_len = 0;
 
@@ -153,6 +206,9 @@ void print_matches(pcre2_code **re, int line_num, int j, size_t subject_length,
     }
 
     pcre2_match_data_free(md);
+    // free(orig_temp_line->buf_);
+    // free(orig_temp_line);
+    fclose(log_file);
 }
 
 void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,

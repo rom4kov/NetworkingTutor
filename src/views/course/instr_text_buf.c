@@ -64,7 +64,7 @@ void add_line_break(COURSE_SECTION *c_sec_data, I_TEXT_BUFFER *tbuf,
     }
 }
 
-void read_item_into_buffer(APP_CONTEXT *ctx)
+void read_items_into_buffer(APP_CONTEXT *ctx)
 {
     for (int i = 0;
          i < ctx->rp_state->num_of_section_items[ctx->rp_state->curr_section];
@@ -166,6 +166,9 @@ void read_item_into_buffer(APP_CONTEXT *ctx)
             {
                 overflow = false;
                 bl_point = false;
+                if (i == 0 && ctx->rp_state->it_buffer->num_of_lines == 0)
+                    ctx->rp_state->it_buffer->first_line = curr_line;
+
                 if (ctx->rp_state->course_section_data[i].syntax_hl == true)
                     curr_line->syntax_hl = true;
                 add_line_break(ctx->rp_state->course_section_data,
@@ -206,11 +209,12 @@ void read_item_into_buffer(APP_CONTEXT *ctx)
             ctx->rp_state->it_buffer->current_line->next = curr_line;
             curr_line->prev = ctx->rp_state->it_buffer->current_line;
             ctx->rp_state->it_buffer->current_line = curr_line;
-            // ctx->rp_state->it_buffer->first_line = malloc(sizeof(I_LINE));
-            // ctx->rp_state->it_buffer->first_line = ctx->rp_state->it_buffer->current_line;
             curr_line = initialize_iline();
 
-            curr_line->buf_ = strdup(ctx->current_course);
+            // curr_line->buf_ = strdup(ctx->current_course);
+
+            strncpy(curr_line->buf_, ctx->current_course,
+                    strlen(ctx->current_course));
             curr_line->centered = true;
             curr_line->style = A_BOLD | A_UNDERLINE;
             curr_line->line_num = line_number;
@@ -233,7 +237,10 @@ void read_item_into_buffer(APP_CONTEXT *ctx)
 
             curr_line = initialize_iline();
 
-            curr_line->buf_ = strdup(ctx->rp_state->s_metadata->title);
+            // curr_line->buf_ = strdup(ctx->rp_state->s_metadata->title);
+
+            strncpy(curr_line->buf_, ctx->rp_state->s_metadata->title,
+                    strlen(ctx->rp_state->s_metadata->title));
             curr_line->centered = true;
             curr_line->line_num = line_number;
             line_number++;

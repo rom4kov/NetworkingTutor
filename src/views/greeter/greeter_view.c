@@ -118,7 +118,7 @@ MENU *create_greeter_menu(APP_CONTEXT *ctx)
 WINDOW *create_start_options_popup()
 {
     WINDOW *start_opt_menu_win =
-        newwin(7, 50, (LINES / 2) - 4, (COLS / 2) - 25);
+        newwin(9, 50, (LINES / 2) - 4, (COLS / 2) - 25);
     return start_opt_menu_win;
 }
 
@@ -151,11 +151,15 @@ MENU *create_start_options_menu(APP_CONTEXT *ctx, WINDOW **start_opt_menu_win,
 
     wclear(*start_opt_menu_win);
     draw_border(*start_opt_menu_win, 2, "Choose an option");
+
     set_menu_win(menu, ctx->greeter_windows[2]);
     ctx->greeter_windows[3] = derwin(ctx->greeter_windows[2], 3, 42, 2, 7);
     set_menu_sub(menu, ctx->greeter_windows[3]);
     set_menu_fore(menu, A_BOLD | A_ITALIC);
     set_menu_mark(menu, " > ");
+
+    mvwprintw(ctx->greeter_windows[2], 6, 15,
+              " Press q to cancel ");
 
     post_menu(menu);
 
@@ -183,7 +187,7 @@ FORM *create_new_user_popup_form(APP_CONTEXT *ctx, char *label)
     mvwprintw(ctx->greeter_windows[4], 0, 2, "%s", label);
     mvwprintw(ctx->greeter_windows[4], 2, 3, "Your name: ");
     mvwprintw(ctx->greeter_windows[4], 4, 3,
-              "Press ENTER to confirm, q to cancel");
+              "Press ENTER to confirm, F1 to cancel");
 
     wmove(ctx->greeter_windows[4], 0, 0);
 

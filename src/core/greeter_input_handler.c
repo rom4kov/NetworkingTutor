@@ -202,7 +202,7 @@ void handle_new_user_input(APP_CONTEXT *ctx, bool *start_opt_menu_active)
                 ctx->rp_state->curr_section = 0;
                 ctx->rp_state->curr_item = 2;
                 break;
-            case 'q':
+            case KEY_F(1):
                 create_user_form_active = false;
 
                 ctx->active_window = ctx->greeter_windows[2];
@@ -212,7 +212,7 @@ void handle_new_user_input(APP_CONTEXT *ctx, bool *start_opt_menu_active)
 
                 update_panels();
                 doupdate();
-                deallocate_greeter_memory(ctx);
+                // deallocate_greeter_memory(ctx);
 
                 break;
             default:
@@ -271,12 +271,6 @@ void handle_user_select_win_input(APP_CONTEXT *ctx, bool *start_opt_menu_active,
                 break;
             case 'q':
                 user_select_menu_active = false;
-
-                for (int i = 0; i < ctx->num_of_users; i++)
-                {
-                    free(ctx->user_select_menu_strings[i]);
-                }
-                free(ctx->user_select_menu_strings);
 
                 if (continue_course)
                 {

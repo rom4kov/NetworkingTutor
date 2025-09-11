@@ -384,7 +384,6 @@ void read_window_text_into_buffer(APP_CONTEXT *ctx, I_TEXT_BUFFER *header_tbuf,
     if (win == 0)
     {
         first_str = get_ascii_art(ctx->db, "logo");
-        mvwprintw(ctx->start_windows[1], 1, 1, "%lu", strlen(first_str));
         second_str = add_text;
     }
     else if (win == 1)

@@ -94,4 +94,25 @@ void *popen_w_pid_ret(void *arguments);
 void *check_running_proc_for_output(void *args);
 void run_output_funcs(APP_CONTEXT *ctx, char buf[]);
 
-void free_memory(APP_CONTEXT *ctx);
+// cleanup functions
+void cleanup_init_state(APP_CONTEXT *ctx);
+void free_memory_for_exit(APP_CONTEXT *ctx);
+void free_memory_for_switch(APP_CONTEXT *ctx);
+void free_section_data(APP_CONTEXT *ctx);
+void cleanup_nav_menu(APP_CONTEXT *ctx);
+
+void cleanup_start_for_exit(APP_CONTEXT *ctx);
+void cleanup_start_for_switch(APP_CONTEXT *ctx);
+
+void cleanup_course_for_exit(APP_CONTEXT *ctx);
+void cleanup_course_for_switch(APP_CONTEXT *ctx);
+
+void cleanup_all_courses_for_exit(APP_CONTEXT *ctx);
+void cleanup_all_courses_for_switch(APP_CONTEXT *ctx);
+
+void cleanup_progress_for_exit(APP_CONTEXT *ctx);
+void cleanup_progress_for_switch(APP_CONTEXT *ctx);
+
+void cleanup_keybindings_for_exit(APP_CONTEXT *ctx);
+void cleanup_keybindings_for_switch(APP_CONTEXT *ctx);
+

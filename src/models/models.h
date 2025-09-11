@@ -134,6 +134,7 @@ typedef struct _pseudo_terminal
     int curr_buf_idx;
     bool terminal_active;
     bool terminal_focused;
+    bool cwd_allocated;
     atomic_bool executable_running;
     atomic_bool stop_executable;
     pid_t child_pid;

@@ -674,7 +674,6 @@ void set_items_completed(APP_CONTEXT *ctx)
         sqlite3_bind_int(res, 2, ctx->current_course_id);
         sqlite3_bind_int(res, 3, ctx->rp_state->curr_section);
         sqlite3_bind_int(res, 4, curr_item);
-        mvwprintw(ctx->course_windows[4], 1, 2, "rc: %i", rc);
     }
     else
     {

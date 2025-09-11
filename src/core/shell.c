@@ -133,21 +133,33 @@ void print_term_input(APP_CONTEXT *ctx)
 bool cmd_is_cd(APP_CONTEXT *ctx)
 {
     const char delim[] = " ";
+
     char *shell_buf = strdup(ctx->shell->buf);
+    char *orig_shell_buf = shell_buf;
 
     const char *first_cmd_part = strsep(&shell_buf, delim);
 
     if (strcmp(ctx->shell->buf, "cd") == 0)
     {
+        if (ctx->shell->cwd_allocated)
+            free(ctx->shell->cwd);
         ctx->shell->cwd = strdup("");
+        ctx->shell->cwd_allocated = true;
         chdir(ctx->shell->home_dir);
+        free(orig_shell_buf);
         return false;
     }
     else if (strcmp(first_cmd_part, "cd") == 0)
     {
+        if (ctx->shell->cwd_allocated)
+            free(ctx->shell->cwd);
         ctx->shell->cwd = strdup(strsep(&shell_buf, delim));
+        ctx->shell->cwd_allocated = true;
+        free(orig_shell_buf);
         return true;
     }
+
+    free(orig_shell_buf);
 
     return false;
 }
@@ -273,6 +285,8 @@ void submit_command(APP_CONTEXT *ctx)
     else
     {
         FILE *fp = popen(command, "r");
+        free(command);
+
         while (fread(&c, 1, 1, fp) == 1)
         {
             if (i < BUFSIZ - 1)
@@ -296,15 +310,21 @@ void submit_command(APP_CONTEXT *ctx)
         if (cmd_is_cd(ctx))
         {
             chdir(ctx->shell->cwd);
-            if (strcmp(get_cwd(), ctx->shell->home_dir) == 0)
+            char *cwd = get_cwd();
+            if (strcmp(cwd, ctx->shell->home_dir) == 0)
             {
+                if (ctx->shell->cwd_allocated)
+                    free(ctx->shell->cwd);
                 ctx->shell->cwd = strdup("");
             }
             else
             {
+                if (ctx->shell->cwd_allocated)
+                    free(ctx->shell->cwd);
                 ctx->shell->cwd = get_cwd_base_name();
                 ctx->shell->cwd[strlen(ctx->shell->cwd) - 1] = '\0';
             }
+            free(cwd);
         }
 
         ctx->shell->buf[ctx->shell->curr_buf_idx] = '\n';
@@ -346,7 +366,7 @@ void append_term_ouput_to_buf(char *buf, int buf_len, TEXT_BUFFER *term_buf,
     int k = 0;
     int line_number = 0;
 
-    LINE *curr_line = initialize_line();
+    LINE *curr_line = NULL;
 
     curr_line = term_buf->current_line;
 
@@ -418,6 +438,7 @@ void append_term_ouput_to_buf(char *buf, int buf_len, TEXT_BUFFER *term_buf,
     term_buf->current_line->next = NULL;
 
     char *new_prompt = malloc(cwd_len + 4);
+
     if (cwd_len > 0)
     {
         snprintf(new_prompt, cwd_len + 4, "%s > ", cwd);
@@ -429,6 +450,8 @@ void append_term_ouput_to_buf(char *buf, int buf_len, TEXT_BUFFER *term_buf,
         memcpy(term_buf->current_line->buf_, "> ", 2);
         term_buf->current_line->line_num = line_number;
     }
+
+    free(new_prompt);
 }
 
 void print_term_buf(WINDOW *term_win, TEXT_BUFFER *term_buf)

@@ -28,8 +28,7 @@ void handle_start_input(APP_CONTEXT *ctx)
                 ctx->active_window = ctx->start_windows[2];
                 draw_border(ctx->start_windows[1], 2, "Header");
                 ctx->start_windows[2] = create_course_preview_card(
-                    ctx, CARD_WIDTH * (ctx->active_window_idx - 2),
-                    ctx->active_window_idx, &ctx->courses[0]);
+                    ctx, 0, ctx->active_window_idx, &ctx->courses[0]);
                 doupdate();
                 break;
             case KEY_UP:
@@ -51,13 +50,6 @@ void handle_start_input(APP_CONTEXT *ctx)
                 ctx->active_window_idx = 0;
                 ctx->start_view_active = false;
                 ctx->start_needs_redraw = false;
-                // for (int i = 0; i < START_START_WINDOW_COUNT; i++)
-                // {
-                //     wclear(ctx->start_windows[i]);
-                //     wnoutrefresh(ctx->start_windows[i]);
-                //     delwin(ctx->start_windows[i]);
-                // }
-                // doupdate();
                 ctx->greeter_needs_redraw = true;
                 ctx->greeter_view_active = true;
                 break;
@@ -109,14 +101,14 @@ void handle_start_input(APP_CONTEXT *ctx)
                         ctx->start_windows[ctx->active_window_idx];
                     ctx->start_windows[ctx->active_window_idx + 1] =
                         create_course_preview_card(
-                            ctx, (CARD_WIDTH * (ctx->active_window_idx - 2)), ctx->active_window_idx,
+                            ctx, (CARD_WIDTH * (ctx->active_window_idx - 2)),
+                            ctx->active_window_idx,
                             &ctx->courses[ctx->active_window_idx - 2]);
                     ctx->start_windows[ctx->active_window_idx] =
                         create_course_preview_card(
-                            ctx, (CARD_WIDTH * (ctx->active_window_idx - 1)), ctx->active_window_idx + 1,
+                            ctx, (CARD_WIDTH * (ctx->active_window_idx - 1)),
+                            ctx->active_window_idx + 1,
                             &ctx->courses[ctx->active_window_idx - 1]);
-                    mvwprintw(ctx->start_windows[1], 1, 1, "%i", ctx->active_window_idx);
-                    wnoutrefresh(ctx->start_windows[1]);
                     doupdate();
                 }
                 break;
@@ -125,6 +117,7 @@ void handle_start_input(APP_CONTEXT *ctx)
                 ctx->active_window_idx = 1;
                 ctx->active_window = ctx->start_windows[1];
                 focus_window(&ctx->start_windows[1], 3, "");
+                // werase(ctx->start_windows[2]);
                 ctx->start_windows[this_win] = create_course_preview_card(
                     ctx, CARD_WIDTH * (this_win - 2), this_win,
                     &ctx->courses[this_win - 2]);
@@ -137,6 +130,8 @@ void handle_start_input(APP_CONTEXT *ctx)
                     cleanup_start_for_switch(ctx);
                     go_to_course_by_id(ctx, this_win - 1);
                 }
+                break;
+            default:
                 break;
         }
     }

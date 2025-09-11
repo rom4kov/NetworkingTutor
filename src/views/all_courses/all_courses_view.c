@@ -30,10 +30,13 @@ WINDOW *create_all_courses_container(APP_CONTEXT *ctx)
     WINDOW *all_courses_container =
         derwin(ctx->all_courses_windows[1], LINES - 10, COLS - 16, 6, 8);
 
+    char *all_courses_ascii = get_ascii_art(ctx->db, "all_courses");
+
     wattron(all_courses_container, A_BOLD);
-    mvwprintw(all_courses_container, 0, 0, "%s",
-              get_ascii_art(ctx->db, "all_courses"));
+    mvwprintw(all_courses_container, 0, 0, "%s", all_courses_ascii);
     wattroff(all_courses_container, A_BOLD);
+
+    free(all_courses_ascii);
 
     return all_courses_container;
 }

@@ -10,29 +10,36 @@ void go_to_course_by_id(APP_CONTEXT *ctx, int course_id)
     {
         ctx->greeter_view_active = false;
         ctx->greeter_needs_redraw = false;
-        for (int i = 0; i < GREETER_WINDOW_COUNT; i++) {
+        for (int i = 0; i < GREETER_WINDOW_COUNT; i++)
+        {
             wclear(ctx->greeter_windows[i]);
             delwin(ctx->greeter_windows[i]);
         }
         delwin(ctx->greeter_ascii_window);
     }
-    else if (ctx->start_view_active) {
+    else if (ctx->start_view_active)
+    {
         ctx->start_view_active = false;
         ctx->start_needs_redraw = false;
-        for (int i = 0; i < START_WINDOW_COUNT; i++) {
-            wclear(ctx->start_windows[i]);
-            delwin(ctx->start_windows[i]);
-        }
     }
+    else if (ctx->progress_view_active)
+    {
+        ctx->progress_view_active = false;
+        ctx->progress_needs_redraw = false;
+    }
+    else if (ctx->all_courses_view_active)
+    {
+        ctx->all_courses_view_active = false;
+        ctx->all_courses_needs_redraw = false;
+    }
+    else if (ctx->keybindings_view_active)
+    {
+        ctx->keybindings_view_active = false;
+        ctx->keybindings_needs_redraw = false;
+    }
+
     ctx->course_view_active = true;
-    // ctx->first_course_draw = true;
     ctx->course_needs_redraw = true;
-    // for (int i = 0; i < START_WINDOW_COUNT; i++)
-    // {
-    //     wclear(ctx->start_windows[i]);
-    //     wrefresh(ctx->start_windows[i]);
-    //     delwin(ctx->start_windows[i]);
-    // }
 
     ctx->current_course_id = course_id;
     ctx->current_course = ctx->courses[course_id - 1].name;

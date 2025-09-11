@@ -29,8 +29,6 @@ WINDOW *create_header_section(APP_CONTEXT *ctx);
 WINDOW *create_course_preview_card(APP_CONTEXT *ctx, int x_position,
                                    int curr_win_idx, COURSE *course);
 WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label);
-void cleanup_start_for_switch(APP_CONTEXT *ctx);
-void cleanup_start_for_exit(APP_CONTEXT *ctx);
 // void read_item_into_buffer(COURSE_SECTION *c_sec, TEXT_BUFFER *text_buf);
 
 
@@ -66,10 +64,6 @@ void print_window_content(I_TEXT_BUFFER *header_tbuf, WINDOW *win,
 
 void print_intro(APP_CONTEXT *ctx);
 void print_press_msg(RIGHT_PANEL_STATE *rps);
-
-void deallocate_course_view_memory(APP_CONTEXT *ctx);
-void free_section_data(APP_CONTEXT *ctx);
-void cleanup_nav_menu(APP_CONTEXT *ctx);
 
 void create_user_form(WINDOW *window, FORM **user_form, FIELD **fields);
 

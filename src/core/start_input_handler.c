@@ -47,6 +47,7 @@ void handle_start_input(APP_CONTEXT *ctx)
                 doupdate();
                 break;
             case '\n':
+                cleanup_start_for_switch(ctx);
                 ctx->active_window_idx = 0;
                 ctx->start_view_active = false;
                 ctx->start_needs_redraw = false;
@@ -133,7 +134,7 @@ void handle_start_input(APP_CONTEXT *ctx)
                 this_win = ctx->active_window_idx;
                 if (!ctx->courses[this_win - 2].locked)
                 {
-                    cleanup_nav_menu(ctx);
+                    cleanup_start_for_switch(ctx);
                     go_to_course_by_id(ctx, this_win - 1);
                 }
                 break;

@@ -293,6 +293,9 @@ void read_end_of_course_page_into_buffer(APP_CONTEXT *ctx)
     strncat(end_of_course_page_str, end_of_course_msg, msg_len);
     end_of_course_page_str[total - 1] = '\0';
 
+    free(end_of_course_ascii);
+    free(end_of_course_msg);
+
     int i, j, last_space_pos, k;
     i = j = last_space_pos = k = 0;
     int line_number = 0;

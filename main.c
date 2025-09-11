@@ -423,10 +423,10 @@ void initialize_colors()
 
 void free_memory(APP_CONTEXT *ctx)
 {
-    for (int i = 0; ctx->card_buffers[i] != NULL; i++)
-    {
-        deallocate_it_buffer(ctx->card_buffers[i]);
-    }
+    // for (int i = 0; ctx->card_buffers[i] != NULL; i++)
+    // {
+    //     deallocate_it_buffer(ctx->card_buffers[i]);
+    // }
 
     if (ctx->greeter_view_active)
     {
@@ -438,7 +438,7 @@ void free_memory(APP_CONTEXT *ctx)
     }
     else if (ctx->start_view_active)
     {
-        deallocate_start_screen_memory(ctx);
+        cleanup_start_for_exit(ctx);
     }
     else if (ctx->course_view_active)
     {

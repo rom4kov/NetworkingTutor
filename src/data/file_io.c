@@ -118,32 +118,36 @@ void deallocate_buffer(TEXT_BUFFER *tbuf)
 {
     if (!tbuf) return;
 
-    FILE *log_file = fopen("t_buffer_dealloc_log.txt", "a");
+    // FILE *log_file = fopen("t_buffer_dealloc_log.txt", "a");
     LINE *current_line = tbuf->first_line;
-    int i = 0;
+    // int i = 0;
     while (current_line) {
 
-        char buf[40];
-        memset(buf, 0, 40);
-        buf[39] = '\0';
-        snprintf(buf, 40, "%p\n", current_line);
-        fwrite(buf, 40, 1, log_file);
+        // char buf[40];
+        // memset(buf, 0, 40);
+        // buf[39] = '\0';
+        // snprintf(buf, 40, "%p\n", current_line);
+        // fwrite(buf, 40, 1, log_file);
 
         free(current_line->buf_);
         LINE *next = current_line->next;
         free(current_line);
         current_line = next;
-        i++;
+        // i++;
     }
 
-    char buf[12];
-    memset(buf, 0, 12);
-    buf[11] = '\0';
-    snprintf(buf, 12, "%i\n", i);
-    fwrite(buf, 12, 1, log_file);
+    tbuf->num_of_lines = 0;
+    tbuf->curr_line_nr = 0;
+    tbuf->current_col = 0;
+
+    // char buf[12];
+    // memset(buf, 0, 12);
+    // buf[11] = '\0';
+    // snprintf(buf, 12, "%i\n", i);
+    // fwrite(buf, 12, 1, log_file);
 
     free(tbuf);  // <-- always free the buffer itself
-    fclose(log_file);
+    // fclose(log_file);
     // if (!tbuf)
     //     return;
     //
@@ -171,6 +175,10 @@ void deallocate_it_buffer(I_TEXT_BUFFER *tbuf)
         free(current_line);
         current_line = next;
     }
+
+    tbuf->num_of_lines = 0;
+    tbuf->curr_line_nr = 0;
+    tbuf->current_col = 0;
 
     free(tbuf);  // <-- always free the buffer itself
 }

@@ -29,7 +29,8 @@ WINDOW *create_header_section(APP_CONTEXT *ctx);
 WINDOW *create_course_preview_card(APP_CONTEXT *ctx, int x_position,
                                    int curr_win_idx, COURSE *course);
 WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label);
-void deallocate_start_screen_memory(APP_CONTEXT *ctx);
+void cleanup_start_for_switch(APP_CONTEXT *ctx);
+void cleanup_start_for_exit(APP_CONTEXT *ctx);
 // void read_item_into_buffer(COURSE_SECTION *c_sec, TEXT_BUFFER *text_buf);
 
 

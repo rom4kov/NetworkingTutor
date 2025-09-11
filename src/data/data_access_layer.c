@@ -906,7 +906,7 @@ char *get_ascii_art(sqlite3 *db, char *ascii_art_name)
 
 char *get_end_of_course_msg(sqlite3 *db, int course_id)
 {
-    const unsigned char *end_of_course_msg = malloc(2048);
+    const unsigned char *end_of_course_msg = NULL;
 
     int rc = 0;
 

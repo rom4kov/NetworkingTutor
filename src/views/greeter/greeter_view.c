@@ -34,8 +34,7 @@ void create_greeter_screen(APP_CONTEXT *ctx)
     ctx->greeter_windows[4] = newwin(7, 60, (LINES / 2) - 5, (COLS / 2) - 30);
     ctx->greeter_panels[3] = new_panel(ctx->greeter_windows[4]);
     ctx->greeter_windows[5] = derwin(ctx->greeter_windows[4], 1, 42, 2, 14);
-    ctx->new_user_form =
-        create_new_user_popup_form(ctx, " Create new user ");
+    ctx->new_user_form = create_new_user_popup_form(ctx, " Create new user ");
 
     ctx->greeter_windows[6] =
         newwin(ctx->num_of_users * 2 + 5, 50, (LINES / 2) - 4, (COLS / 2) - 25);
@@ -158,8 +157,7 @@ MENU *create_start_options_menu(APP_CONTEXT *ctx, WINDOW **start_opt_menu_win,
     set_menu_fore(menu, A_BOLD | A_ITALIC);
     set_menu_mark(menu, " > ");
 
-    mvwprintw(ctx->greeter_windows[2], 6, 15,
-              " Press q to cancel ");
+    mvwprintw(ctx->greeter_windows[2], 6, 15, " Press q to cancel ");
 
     post_menu(menu);
 
@@ -241,7 +239,8 @@ MENU *create_user_selection_menu(APP_CONTEXT *ctx, int num_of_users)
     wclear(ctx->greeter_windows[6]);
     draw_border(ctx->greeter_windows[6], 2, "");
     mvwprintw(ctx->greeter_windows[6], 0, 3, " %s ", "Select a user");
-    mvwprintw(ctx->greeter_windows[6], num_of_users * 2 + 2, 15, " %s ", "Press q to cancel");
+    mvwprintw(ctx->greeter_windows[6], num_of_users * 2 + 2, 15, " %s ",
+              "Press q to cancel");
     set_menu_win(menu, ctx->greeter_windows[6]);
     set_menu_sub(menu, ctx->greeter_windows[7]);
     set_menu_fore(menu, A_BOLD | A_ITALIC);

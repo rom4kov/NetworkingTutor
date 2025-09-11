@@ -160,6 +160,8 @@ WINDOW *create_course_preview_card(APP_CONTEXT *ctx, int x_position,
     print_window_content(ctx->card_buffers[curr_win_idx - 2],
                          course_preview_card_inner, width - 2 + remainder);
 
+    deallocate_it_buffer(ctx->card_buffers[curr_win_idx - 2]);
+
     int start_x = 14;
     if (ctx->progress_view_active)
     {
@@ -339,7 +341,7 @@ void print_window_content(I_TEXT_BUFFER *header_tbuf, WINDOW *win,
     }
 }
 
-void cleanup_course_view_state(APP_CONTEXT *ctx)
+void cleanup_start_screen_state(APP_CONTEXT *ctx)
 {
     deallocate_buffer(ctx->t_buffer);
     deallocate_buffer(ctx->shell->term_buffer);
@@ -364,14 +366,38 @@ void cleanup_nav_menu(APP_CONTEXT *ctx)
     free(ctx->nav_menu_items);
 }
 
-void deallocate_start_screen_memory(APP_CONTEXT *ctx)
+void cleanup_start_for_exit(APP_CONTEXT *ctx)
 {
-    cleanup_course_view_state(ctx);
+    cleanup_start_screen_state(ctx);
 
     cleanup_nav_menu(ctx);
+
+    // for (int i = 0; ctx->card_buffers[i] != NULL; i++)
+    // {
+    //     deallocate_it_buffer(ctx->card_buffers[i]);
+    // }
 
     for (int i = 0; i < START_WINDOW_COUNT; i++)
     {
         delwin(ctx->start_windows[i]);
     }
 }
+
+void cleanup_start_for_switch(APP_CONTEXT *ctx)
+{
+    deallocate_it_buffer(ctx->intro_buffer);
+
+    cleanup_nav_menu(ctx);
+
+    // for (int i = 0; ctx->card_buffers[i] != NULL; i++)
+    // {
+    //     deallocate_it_buffer(ctx->card_buffers[i]);
+    // }
+
+    for (int i = 0; i < START_WINDOW_COUNT; i++)
+    {
+        delwin(ctx->start_windows[i]);
+    }
+}
+
+

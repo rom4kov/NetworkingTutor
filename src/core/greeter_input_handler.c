@@ -259,11 +259,14 @@ void handle_user_select_win_input(APP_CONTEXT *ctx, bool *start_opt_menu_active,
                 ctx->greeter_view_active = false;
                 if (continue_course)
                 {
+                    ctx->user_data =
+                        get_user_data(ctx->db, ctx->current_user_id);
                     go_to_course_by_id(ctx, ctx->current_course_id);
                 }
                 else
                 {
-                    ctx->user_data = get_user_data(ctx->db, ctx->current_user_id);
+                    ctx->user_data =
+                        get_user_data(ctx->db, ctx->current_user_id);
                     ctx->start_view_active = true;
                     ctx->start_needs_redraw = true;
                 }
@@ -278,7 +281,8 @@ void handle_user_select_win_input(APP_CONTEXT *ctx, bool *start_opt_menu_active,
                     hide_panel(ctx->greeter_panels[4]);
                     top_panel(ctx->greeter_panels[1]);
                 }
-                else {
+                else
+                {
                     ctx->active_window = ctx->greeter_windows[2];
                     hide_panel(ctx->greeter_panels[4]);
                     top_panel(ctx->greeter_panels[2]);

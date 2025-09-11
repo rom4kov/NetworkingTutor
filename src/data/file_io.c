@@ -162,7 +162,7 @@ void deallocate_buffer(TEXT_BUFFER *tbuf)
 
 void deallocate_it_buffer(I_TEXT_BUFFER *tbuf)
 {
-    if (!tbuf || tbuf->num_of_lines == 0) return;
+    if (!tbuf) return;
 
     I_LINE *current_line = tbuf->first_line;
     while (current_line) {

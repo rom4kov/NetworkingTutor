@@ -6,18 +6,19 @@
 
 void print_course_instructions(APP_CONTEXT *ctx)
 {
-    ctx->rp_state->course_section_data = get_course_section_materials(
-        ctx->db, ctx->current_course_id, ctx->rp_state->curr_section,
-        &ctx->rp_state->num_of_section_items[ctx->rp_state->curr_section]);
 
-    ctx->rp_state->s_metadata = get_section_metadata(ctx);
-
-    read_items_into_buffer(ctx);
     // log_course_instr_values(ctx);
     // wrefresh(ctx->course_windows[2]);
 
     if (ctx->rp_state->curr_section < ctx->rp_state->total_course_sections)
     {
+        ctx->rp_state->course_section_data = get_course_section_materials(
+            ctx->db, ctx->current_course_id, ctx->rp_state->curr_section,
+            &ctx->rp_state->num_of_section_items[ctx->rp_state->curr_section]);
+
+        ctx->rp_state->s_metadata = get_section_metadata(ctx);
+
+        read_items_into_buffer(ctx);
         print_next_course_item(ctx->rp_state);
 
         if (ctx->rp_state->showing_test_results)

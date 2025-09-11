@@ -68,6 +68,7 @@ void print_press_msg(RIGHT_PANEL_STATE *rps);
 
 void deallocate_course_view_memory(APP_CONTEXT *ctx);
 void free_section_data(APP_CONTEXT *ctx);
+void cleanup_nav_menu(APP_CONTEXT *ctx);
 
 void create_user_form(WINDOW *window, FORM **user_form, FIELD **fields);
 

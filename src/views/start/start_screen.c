@@ -51,7 +51,7 @@ WINDOW *create_navigation_window(APP_CONTEXT *ctx)
     WINDOW *navigation;
     navigation = newwin(3, WU * 7 + 4, 0, 0);
     draw_border(navigation, ctx->active_window_idx == 0 ? 3 : 2, "");
-    ctx->start_menu = create_start_menu(navigation, ctx);
+    ctx->start_menu = create_navigation_menu(navigation, ctx);
 
     wattron(navigation, COLOR_PAIR(3));
     mvwprintw(navigation, 0, 2, " Navigation ");
@@ -233,7 +233,7 @@ WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label)
     return ctx->rp_state->right_panel;
 }
 
-MENU *create_start_menu(WINDOW *nav_window, APP_CONTEXT *ctx)
+MENU *create_navigation_menu(WINDOW *nav_window, APP_CONTEXT *ctx)
 {
     const char *choices[] = {
         "Home",        "Current course", "All courses", "Account & Progress",
@@ -339,7 +339,7 @@ void print_window_content(I_TEXT_BUFFER *header_tbuf, WINDOW *win,
     }
 }
 
-void deallocate_start_screen_memory(APP_CONTEXT *ctx)
+void cleanup_course_view_state(APP_CONTEXT *ctx)
 {
     deallocate_buffer(ctx->t_buffer);
     deallocate_buffer(ctx->shell->term_buffer);
@@ -351,7 +351,10 @@ void deallocate_start_screen_memory(APP_CONTEXT *ctx)
     free(ctx->user_data->name);
     free(ctx->user_data->created_at);
     free(ctx->user_data);
+}
 
+void cleanup_nav_menu(APP_CONTEXT *ctx)
+{
     unpost_menu(ctx->start_menu);
     free_menu(ctx->start_menu);
     for (int i = 0; i < 6; i++)
@@ -359,6 +362,13 @@ void deallocate_start_screen_memory(APP_CONTEXT *ctx)
         free_item(ctx->nav_menu_items[i]);
     }
     free(ctx->nav_menu_items);
+}
+
+void deallocate_start_screen_memory(APP_CONTEXT *ctx)
+{
+    cleanup_course_view_state(ctx);
+
+    cleanup_nav_menu(ctx);
 
     for (int i = 0; i < START_WINDOW_COUNT; i++)
     {

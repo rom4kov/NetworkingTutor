@@ -488,7 +488,7 @@ void free_memory(APP_CONTEXT *ctx)
     free(ctx->rp_state->course_progress);
     free(ctx->rp_state->completed_sections);
     free(ctx->rp_state->total_section_items);
-    // free(ctx->rp_state->it_buffer);
+    free(ctx->rp_state->it_buffer);
     free(ctx->rp_state);
     ctx->db = NULL;
     free(ctx);

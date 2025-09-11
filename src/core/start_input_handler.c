@@ -133,6 +133,7 @@ void handle_start_input(APP_CONTEXT *ctx)
                 this_win = ctx->active_window_idx;
                 if (!ctx->courses[this_win - 2].locked)
                 {
+                    cleanup_nav_menu(ctx);
                     go_to_course_by_id(ctx, this_win - 1);
                 }
                 break;

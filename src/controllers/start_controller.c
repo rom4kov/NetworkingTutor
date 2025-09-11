@@ -34,7 +34,6 @@ void go_to_course_by_id(APP_CONTEXT *ctx, int course_id)
     //     delwin(ctx->start_windows[i]);
     // }
 
-    ctx->user_data = get_user_data(ctx->db, ctx->current_user_id);
     ctx->current_course_id = course_id;
     ctx->current_course = ctx->courses[course_id - 1].name;
 

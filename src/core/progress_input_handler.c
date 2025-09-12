@@ -2,6 +2,7 @@
 #include "../models/models.h"
 #include "../views/views.h"
 #include <curses.h>
+#include <form.h>
 #include <ncurses.h>
 
 void handle_progress_input(APP_CONTEXT *ctx)
@@ -43,21 +44,21 @@ void handle_progress_input(APP_CONTEXT *ctx)
                 break;
             case '\n':
                 form_driver(ctx->user_form, REQ_VALIDATION);
-                char *buf1 = field_buffer(&ctx->user_form_fields[0], 0);
+                char *buf1 = field_buffer(ctx->user_form_field[0], 0);
                 trim(&buf1);
-                update_user(ctx->db, 1, buf1);
+                update_user(ctx->db, ctx->current_user_id, buf1);
+                free(ctx->user_data->name);
+                free(ctx->user_data->created_at);
+                free(ctx->user_data);
+                ctx->user_data = get_user_data(ctx->db, ctx->current_user_id);
                 curs_set(0);
                 ctx->progress_view_active = true;
                 ctx->progress_needs_redraw = true;
                 ctx->user_form_active = false;
-                // unpost_form(ctx->user_form);
-                free_form(ctx->user_form);
-                free_field(&ctx->user_form_fields[0]);
-                free_field(&ctx->user_form_fields[1]);
                 break;
             case KEY_F(1):
+                set_field_buffer(ctx->user_form_field[0], 0, ctx->user_data->name);
                 curs_set(0);
-                mvwprintw(ctx->progress_windows[1], 1, 1, "%s", "F1 pressed");
                 ctx->user_form_active = false;
                 wrefresh(ctx->progress_windows[1]);
                 break;
@@ -99,6 +100,7 @@ void handle_progress_input(APP_CONTEXT *ctx)
                 break;
             case '\n':
                 ctx->user_form_active = true;
+                wmove(ctx->progress_windows[1], 10, 23);
                 curs_set(1);
                 break;
         }

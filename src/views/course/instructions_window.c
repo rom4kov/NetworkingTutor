@@ -20,6 +20,7 @@ void print_course_instructions(APP_CONTEXT *ctx)
 
         read_items_into_buffer(ctx);
         print_next_course_item(ctx->rp_state);
+        log_course_instr_values(ctx);
 
         if (ctx->rp_state->showing_test_results)
         {

@@ -19,10 +19,6 @@ void create_user_form(WINDOW *window, FORM **user_form, FIELD **fields)
     set_field_back(fields[0], A_UNDERLINE);
     field_opts_off(fields[0], O_AUTOSKIP);
 
-    // set_field_buffer(fields[1], 10, "hello");
-    set_field_back(fields[1], A_UNDERLINE);
-    field_opts_off(fields[1], O_AUTOSKIP);
-
     *user_form = new_form(fields);
 
     scale_form(*user_form, &rows, &cols);

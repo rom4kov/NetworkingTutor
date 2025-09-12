@@ -189,9 +189,6 @@ void handle_new_user_input(APP_CONTEXT *ctx, bool *start_opt_menu_active)
                 werase(ctx->greeter_windows[4]);
                 werase(ctx->greeter_windows[5]);
                 curs_set(0);
-                unpost_form(ctx->new_user_form);
-                free_form(ctx->new_user_form);
-                free_field(ctx->new_user_form_field[0]);
                 deallocate_greeter_memory(ctx);
                 doupdate();
                 ctx->greeter_view_active = false;

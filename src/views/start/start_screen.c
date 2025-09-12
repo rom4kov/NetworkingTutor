@@ -92,9 +92,9 @@ WINDOW *create_header_section(APP_CONTEXT *ctx)
               "Hello %s!", ctx->user_data->name);
 
     draw_border(header_window, 2, "Header");
-    wrefresh(header_window);
-    wrefresh(header_inner);
-    delwin(header_inner);
+    wnoutrefresh(header_window);
+    wnoutrefresh(header_inner);
+    // delwin(header_inner);
     return header_window;
 }
 

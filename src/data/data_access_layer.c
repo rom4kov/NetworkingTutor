@@ -72,6 +72,7 @@ int create_new_user(APP_CONTEXT *ctx, char *username)
 {
     int rc = 0;
 
+    char *datetime = NULL;
     const char *sql = "INSERT INTO users (name, created_at) VALUES (?, ?);";
 
     sqlite3_stmt *stmt;
@@ -85,7 +86,7 @@ int create_new_user(APP_CONTEXT *ctx, char *username)
 
     if (rc == SQLITE_OK)
     {
-        char *datetime = current_datetime();
+        datetime = current_datetime();
         sqlite3_bind_text(stmt, 1, username, strlen(username), NULL);
         sqlite3_bind_text(stmt, 2, datetime, strlen(datetime), NULL);
     }
@@ -102,6 +103,8 @@ int create_new_user(APP_CONTEXT *ctx, char *username)
     }
 
     sqlite3_finalize(stmt);
+
+    free(datetime);
 
     return (int)sqlite3_last_insert_rowid(ctx->db);
 }
@@ -336,7 +339,7 @@ COURSE *get_completed_courses(APP_CONTEXT *ctx, int *num_courses)
     int rc = 0;
 
     const char *sql =
-        "SELECT * FROM courses WHERE id IN (SELECT course_id FROM "
+        "SELECT id, name FROM courses WHERE id IN (SELECT course_id FROM "
         "progress WHERE user_id = ?);";
 
     sqlite3_stmt *stmt;
@@ -365,12 +368,12 @@ COURSE *get_completed_courses(APP_CONTEXT *ctx, int *num_courses)
     {
         const int id = sqlite3_column_int(stmt, 0);
         const unsigned char *name = sqlite3_column_text(stmt, 1);
-        const unsigned char *description = sqlite3_column_text(stmt, 2);
-        const unsigned char *ascii_logo = sqlite3_column_text(stmt, 3);
+        // const unsigned char *description = sqlite3_column_text(stmt, 2);
+        // const unsigned char *ascii_logo = sqlite3_column_text(stmt, 3);
         completed_courses[i].id = id;
         completed_courses[i].name = strdup((const char *)name);
-        completed_courses[i].short_desc = strdup((const char *)description);
-        completed_courses[i].ascii_logo = strdup((const char *)ascii_logo);
+        // completed_courses[i].short_desc = strdup((const char *)description);
+        // completed_courses[i].ascii_logo = strdup((const char *)ascii_logo);
         i++;
     }
 
@@ -575,6 +578,7 @@ void set_section_completed(APP_CONTEXT *ctx)
     }
 
     sqlite3_finalize(res);
+    free(curr_datetime);
 }
 
 void get_completed_sections(APP_CONTEXT *ctx)
@@ -784,6 +788,7 @@ void set_course_completed(APP_CONTEXT *ctx)
 {
     int rc = 0;
 
+    char *datetime = NULL;
     sqlite3_stmt *res;
 
     const char *sql =
@@ -798,7 +803,7 @@ void set_course_completed(APP_CONTEXT *ctx)
 
     if (rc == SQLITE_OK)
     {
-        char *datetime = current_datetime();
+        datetime = current_datetime();
         sqlite3_bind_int(res, 1, ctx->current_user_id);
         sqlite3_bind_int(res, 2, ctx->current_course_id);
         sqlite3_bind_text(res, 3, datetime, strlen(datetime), NULL);
@@ -812,6 +817,8 @@ void set_course_completed(APP_CONTEXT *ctx)
     sqlite3_step(res);
 
     sqlite3_finalize(res);
+
+    free(datetime);
 }
 
 void get_course_progress(APP_CONTEXT *ctx)
@@ -966,6 +973,7 @@ int get_num_of_completed_courses(APP_CONTEXT *ctx)
 void set_current_streak(APP_CONTEXT *ctx, int current_streak)
 {
     char *current_date_time = malloc(20);
+    char *orig_curr_datetime = current_date_time;
     current_date_time = current_datetime();
     char *current_date = strsep(&current_date_time, " ");
     int rc = 0;
@@ -991,6 +999,8 @@ void set_current_streak(APP_CONTEXT *ctx, int current_streak)
 
     sqlite3_finalize(stmt);
 
+    free(orig_curr_datetime);
+
     wrefresh(ctx->course_windows[2]);
 }
 
@@ -1002,6 +1012,7 @@ int get_current_streak(APP_CONTEXT *ctx)
     char *c_date = malloc(20);
     char *cmp_date = malloc(20);
     char *tmp_date = malloc(20);
+    char *orig_tmp_date = tmp_date;
 
     sqlite3_stmt *stmt = NULL;
 
@@ -1028,11 +1039,12 @@ int get_current_streak(APP_CONTEXT *ctx)
 
     char *current_date = current_datetime();
     strcpy(c_date, current_date);
+    free(current_date);
 
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
         const unsigned char *date = sqlite3_column_text(stmt, 0);
-        if (date == NULL)
+        if (date == NULL || strcmp(tmp_date, ""))
             break;
 
         tmp_date = (char *)date;
@@ -1051,12 +1063,13 @@ int get_current_streak(APP_CONTEXT *ctx)
         i++;
     }
 
-    free(c_date);
-    free(cmp_date);
-
     sqlite3_finalize(stmt);
 
-    return streak_length + 1;
+    free(c_date);
+    free(cmp_date);
+    free(orig_tmp_date);
+
+    return streak_length;
 }
 
 int get_longest_streak(APP_CONTEXT *ctx)
@@ -1126,7 +1139,10 @@ int get_course_completion_percentage(APP_CONTEXT *ctx, int course_id)
     }
 
     if (course_total_items == -1)
+    {
+        if (stmt) sqlite3_finalize(stmt);
         return 0;
+    }
 
     const char *sql2 = "SELECT items_completed FROM progress WHERE user_id = ? "
                        "AND course_id = ?;";
@@ -1136,6 +1152,7 @@ int get_course_completion_percentage(APP_CONTEXT *ctx, int course_id)
     if (rc != SQLITE_OK) {
         fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(ctx->db));
         if (stmt) sqlite3_finalize(stmt);
+        if (stmt2) sqlite3_finalize(stmt2);
         return 0;
     }
 

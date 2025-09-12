@@ -131,17 +131,17 @@ void print_entries(FILE_TREE *f_tree, WINDOW **explorer_window)
 void move_to_next_entry(FILE_TREE *f_tree, WINDOW **explorer_window)
 {
     f_tree->curr_entry_nr++;
+    delwin(*explorer_window);
     *explorer_window = create_explorer_window(f_tree);
     focus_window(explorer_window, 3, "Explorer");
-    wnoutrefresh(*explorer_window);
     doupdate();
 }
 
 void move_to_prev_entry(FILE_TREE *f_tree, WINDOW **explorer_window)
 {
     f_tree->curr_entry_nr--;
+    delwin(*explorer_window);
     *explorer_window = create_explorer_window(f_tree);
-    focus_window(&*explorer_window, 3, "Explorer");
-    wnoutrefresh(*explorer_window);
+    focus_window(explorer_window, 3, "Explorer");
     doupdate();
 }

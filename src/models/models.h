@@ -206,7 +206,7 @@ typedef struct _app_context
   ITEM *curr_item;
   FORM *new_user_form;
   FORM *user_form;
-  FIELD *user_form_fields;
+  FIELD *user_form_field[2];
   FIELD *new_user_form_field[2];
   FILE_TREE *file_tree;
   FILE *file;

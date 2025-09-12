@@ -15,6 +15,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 int main(void)
 {
@@ -74,8 +76,9 @@ int main(void)
     ctx->rp_state->total_section_items =
         (int *)calloc(MAX_COURSE_SECTIONS, sizeof(int));
     ctx->rp_state->total_course_sections = 0;
+    ctx->rp_state->showing_end_of_course_page = false;
 
-    ctx->user_form_fields = false;
+    // ctx->user_form_field = false;
 
     ctx->shell = calloc(1, sizeof(SHELL));
     ctx->shell->terminal_active = false;
@@ -93,6 +96,8 @@ int main(void)
     ctx->shell->term_buffer->scroll_offset = 0;
     ctx->shell->cwd = "";
     ctx->shell->cwd_allocated = false;
+    // mkdir("/home/romkov/Documents/ntutor/", 0777);
+    // chdir("/home/romkov/Documents/ntutor/");
     ctx->shell->home_dir = get_cwd();
 
     // seed_courses_data(ctx->db, ctx->greeter_windows[0],
@@ -169,15 +174,7 @@ int main(void)
             {
                 endwin();
                 refresh();
-                // for (int i = 0; i < START_WINDOW_COUNT; i++)
-                // {
-                //     if (ctx->start_windows[i] != NULL)
-                //     {
-                //         delwin(ctx->start_windows[i]);
-                //     }
-                // }
             }
-            // deallocate_it_buffer(ctx->intro_buffer);
             create_start_screen(ctx);
             ctx->active_window = ctx->start_windows[0];
             ctx->start_needs_redraw = false;
@@ -200,13 +197,6 @@ int main(void)
 
                 endwin();
                 refresh();
-                // for (int i = 0; i < COURSE_WINDOW_COUNT; i++)
-                // {
-                //     if (ctx->course_windows[i] != NULL)
-                //     {
-                //         delwin(ctx->course_windows[i]);
-                //     }
-                // }
             }
             create_course_view(ctx);
             ctx->active_window = ctx->course_windows[0];
@@ -232,13 +222,6 @@ int main(void)
 
                 endwin();
                 refresh();
-                // for (int i = 0; i < 4; i++)
-                // {
-                //     if (ctx->progress_windows[i] != NULL)
-                //     {
-                //         delwin(ctx->progress_windows[i]);
-                //     }
-                // }
             }
             create_progress_view(ctx);
             ctx->active_window = ctx->progress_windows[0];
@@ -255,13 +238,6 @@ int main(void)
 
                 endwin();
                 refresh();
-                // for (int i = 0; i < 3; i++)
-                // {
-                //     if (ctx->all_courses_windows[i] != NULL)
-                //     {
-                //         delwin(ctx->all_courses_windows[i]);
-                //     }
-                // }
             }
             create_all_courses_view(ctx);
             ctx->active_window = ctx->all_courses_windows[0];
@@ -278,13 +254,6 @@ int main(void)
 
                 endwin();
                 refresh();
-                // for (int i = 0; i < 3; i++)
-                // {
-                //     if (ctx->keybindings_windows[i] != NULL)
-                //     {
-                //         delwin(ctx->keybindings_windows[i]);
-                //     }
-                // }
             }
             create_keybindings_view(ctx);
             ctx->active_window = ctx->keybindings_windows[0];

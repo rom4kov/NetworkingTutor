@@ -119,20 +119,11 @@ void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree)
     DIR *dir = opendir(".");
 
     struct dirent *next = readdir(dir);
-    // FILE *log_file = fopen("f_tree_creation_log.txt", "a");
 
-    // DIR_ENTRY *prev_dir = initialize_dir_entry();
+    if (NULL == next) return;
+
     DIR_ENTRY *prev_dir = f_tree->prev_dir;
     DIR_ENTRY *curr_dir = initialize_dir_entry();
-    // DIR_ENTRY *tmp_dir = prev_dir;
-
-    // char buf[40];
-    // memset(buf, 0, 40);
-    // buf[39] = '\0';
-    // snprintf(buf, 40, "%p\n", prev_dir);
-    // fwrite(buf, 40, 1, log_file);
-
-    // mvwprintw(*explorer_window, 41, 2, "%p", prev_dir);
 
     if (f_tree->num_of_entries == 0)
     {
@@ -140,6 +131,7 @@ void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree)
                strcmp(next->d_name, "..") == 0 || next->d_type != 4)
         {
             next = readdir(dir);
+            if (NULL == next) return;
         }
         strncpy(prev_dir->name, next->d_name, 30);
         prev_dir->name[29] = '\0';
@@ -219,22 +211,7 @@ void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree)
 
         rewinddir(dir);
     }
-    //
-    // char buf5[40];
-    // memset(buf5, 0, 40);
-    // buf[39] = '\0';
-    // snprintf(buf5, 40, "%p\n", prev_dir);
-    // fwrite(buf5, 40, 1, log_file);
-    //
-    //
-    // mvwprintw(*explorer_window, 42, 2, "%p", prev_dir);
-    // mvwprintw(*explorer_window, 43, 2, "%p", f_tree->first_entry);
-    // mvwprintw(*explorer_window, 44, 2, "%p", curr_dir);
-    // mvwprintw(*explorer_window, 45, 2, "%p", curr_dir->prev);
-
-    // free(tmp_dir->name);
-    // free(tmp_dir->path);
-    // free(tmp_dir);
+        
     free(curr_dir->name);
     free(curr_dir->path);
     free(curr_dir);
@@ -274,10 +251,7 @@ WINDOW *create_progress_window(APP_CONTEXT *ctx)
     wattroff(progress_window, COLOR_PAIR(3));
 
     mvwprintw(progress_window, 1, 2, "Course: %s", ctx->current_course);
-    // char *progress_text = "Progress: Courses 0 -- Sections 0";
-    // mvwprintw(progress_window, 1,
-    //           ctx->rp_state->window_width - strlen(progress_text) - 2, "%s",
-    //           progress_text);
+
     mvwprintw(progress_window, 1, ctx->rp_state->window_width - 23,
               "Sections completed: %i", ctx->rp_state->sections_completed);
     wnoutrefresh(progress_window);

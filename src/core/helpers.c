@@ -216,6 +216,8 @@ int get_diff_time_in_days(char date1[], char date2[])
 {
     char *time1 = malloc(20);
     char *time2 = malloc(20);
+    char *orig_time1 = time1;
+    char *orig_time2 = time2;
     strcpy(time1, date1);
     strcpy(time2, date2);
 
@@ -247,8 +249,10 @@ int get_diff_time_in_days(char date1[], char date2[])
     time_diff_in_seconds = difftime(end_time, start_time);
 
     diff_in_days = (int)time_diff_in_seconds / (3600 * 24);
-    free(time1);
-    free(time2);
+
+    free(orig_time1);
+    free(orig_time2);
+
     return diff_in_days;
 }
 

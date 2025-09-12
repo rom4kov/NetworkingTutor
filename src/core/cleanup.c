@@ -1,16 +1,18 @@
 #include "../core/core.h"
 #include "../models/models.h"
 #include "../views/views.h"
+#include <curses.h>
+#include <form.h>
+#include <menu.h>
+#include <ncurses.h>
 
 void free_memory_for_exit(APP_CONTEXT *ctx)
 {
-    // for (int i = 0; ctx->card_buffers[i] != NULL; i++)
-    // {
-    //     deallocate_it_buffer(ctx->card_buffers[i]);
-    // }
-
     if (ctx->greeter_view_active)
     {
+        free(ctx->file_tree->prev_dir->name);
+        free(ctx->file_tree->prev_dir->path);
+        free(ctx->file_tree->prev_dir);
         deallocate_file_tree(ctx->file_tree);
         deallocate_buffer(ctx->t_buffer);
         deallocate_buffer(ctx->shell->term_buffer);
@@ -31,17 +33,11 @@ void free_memory_for_exit(APP_CONTEXT *ctx)
     }
     else if (ctx->progress_view_active)
     {
-        for (int i = 0; i < PROGRESS_WINDOW_COUNT; i++)
-        {
-            delwin(ctx->progress_windows[i]);
-        }
+        cleanup_progress_for_exit(ctx);
     }
     else if (ctx->keybindings_view_active)
     {
-        for (int i = 0; i < KEYBINDINGS_WINDOW_COUNT; i++)
-        {
-            delwin(ctx->keybindings_windows[i]);
-        }
+        cleanup_keybindings_for_exit(ctx);
     }
     // free(ctx->rp_state->s_metadata->title);
     // free(ctx->rp_state->s_metadata);
@@ -67,7 +63,7 @@ void free_memory_for_exit(APP_CONTEXT *ctx)
     free(ctx->rp_state->course_progress);
     free(ctx->rp_state->completed_sections);
     free(ctx->rp_state->total_section_items);
-    free(ctx->rp_state->it_buffer);
+    // free(ctx->rp_state->it_buffer);
     free(ctx->rp_state);
     ctx->db = NULL;
     free(ctx);
@@ -89,7 +85,7 @@ void free_memory_for_switch(APP_CONTEXT *ctx)
         cleanup_start_for_switch(ctx);
         ctx->start_view_active = false;
     }
-    else if (ctx->course_view_active && ctx->curr_nav_item != 2)
+    else if (ctx->course_view_active)
     {
         cleanup_course_for_switch(ctx);
         ctx->course_view_active = false;
@@ -115,7 +111,10 @@ void cleanup_init_state(APP_CONTEXT *ctx)
 {
     deallocate_buffer(ctx->t_buffer);
     deallocate_buffer(ctx->shell->term_buffer);
-    deallocate_it_buffer(ctx->intro_buffer);
+    if (ctx->start_view_active)
+    {
+        deallocate_it_buffer(ctx->intro_buffer);
+    }
     deallocate_it_buffer(ctx->rp_state->it_buffer);
     deallocate_file_tree(ctx->file_tree);
 
@@ -164,7 +163,7 @@ void cleanup_start_for_exit(APP_CONTEXT *ctx)
 
     cleanup_nav_menu(ctx);
 
-    for (int i = 0; i < START_WINDOW_COUNT; i++)
+    for (int i = 1; i < START_WINDOW_COUNT; i++)
     {
         delwin(ctx->start_windows[i]);
     }
@@ -181,12 +180,13 @@ void cleanup_start_for_switch(APP_CONTEXT *ctx)
         wclear(ctx->start_windows[i]);
         wnoutrefresh(ctx->start_windows[i]);
         delwin(ctx->start_windows[i]);
+        ctx->start_windows[i] = NULL;
     }
 }
 
 void cleanup_course_for_exit(APP_CONTEXT *ctx)
 {
-    free_section_data(ctx);
+    // free_section_data(ctx);
 
     cleanup_init_state(ctx);
 
@@ -200,7 +200,10 @@ void cleanup_course_for_exit(APP_CONTEXT *ctx)
 
 void cleanup_course_for_switch(APP_CONTEXT *ctx)
 {
-    free_section_data(ctx);
+    // if (!ctx->rp_state->showing_end_of_course_page)
+    // {
+    //     free_section_data(ctx);
+    // }
 
     cleanup_nav_menu(ctx);
 
@@ -209,6 +212,7 @@ void cleanup_course_for_switch(APP_CONTEXT *ctx)
         wclear(ctx->course_windows[i]);
         wnoutrefresh(ctx->course_windows[i]);
         delwin(ctx->course_windows[i]);
+        ctx->course_windows[i] = NULL;
     }
     doupdate();
 }
@@ -244,6 +248,10 @@ void cleanup_progress_for_exit(APP_CONTEXT *ctx)
 
     cleanup_nav_menu(ctx);
 
+    unpost_form(ctx->user_form);
+    free_form(ctx->user_form);
+    free_field(ctx->user_form_field[0]);
+
     for (int i = 0; i < PROGRESS_WINDOW_COUNT; i++)
     {
         delwin(ctx->progress_windows[i]);
@@ -253,6 +261,10 @@ void cleanup_progress_for_exit(APP_CONTEXT *ctx)
 void cleanup_progress_for_switch(APP_CONTEXT *ctx)
 {
     cleanup_nav_menu(ctx);
+
+    unpost_form(ctx->user_form);
+    free_form(ctx->user_form);
+    free_field(ctx->user_form_field[0]);
 
     for (int i = 0; i < PROGRESS_WINDOW_COUNT; i++)
     {

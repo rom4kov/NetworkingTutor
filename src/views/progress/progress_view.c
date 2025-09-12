@@ -6,6 +6,7 @@
 #include <form.h>
 #include <menu.h>
 #include <ncurses.h>
+#include <stdlib.h>
 
 #define WU COLS / 12 // WU for WIDTH_UNIT
 
@@ -17,7 +18,8 @@ void create_progress_view(APP_CONTEXT *ctx)
     ctx->progress_windows[2] = create_progress_stats_window(ctx);
 
     create_user_form(ctx->progress_windows[1], &ctx->user_form,
-                     &ctx->user_form_fields);
+                     ctx->user_form_field);
+    set_field_buffer(ctx->user_form_field[0], 0, ctx->user_data->name);
 
     wnoutrefresh(ctx->progress_windows[0]);
     wnoutrefresh(ctx->progress_windows[2]);
@@ -42,9 +44,13 @@ WINDOW *create_account_window(APP_CONTEXT *ctx)
 {
     WINDOW *account_window = newwin(LINES / 3 - 3, 79, 3, 0);
     WINDOW *account_title_win = derwin(account_window, 7, 40, 3, 8);
+
+    char *account_ascii = get_ascii_art(ctx->db, "account");
     wattron(account_title_win, A_BOLD);
-    mvwprintw(account_title_win, 0, 0, "%s", get_ascii_art(ctx->db, "account"));
+    mvwprintw(account_title_win, 0, 0, "%s", account_ascii);
     wattroff(account_title_win, A_BOLD);
+    free(account_ascii);
+
     draw_border(account_window, 2, NULL);
 
     wnoutrefresh(account_title_win);
@@ -55,10 +61,11 @@ void create_your_courses_window(APP_CONTEXT *ctx, WINDOW *win)
 {
     ctx->progress_windows[4] = derwin(win, 45, WU * 7 + 4, 6, 8);
 
+    char *your_courses_ascii = get_ascii_art(ctx->db, "your_courses");
     wattron(ctx->progress_windows[4], A_BOLD);
-    mvwprintw(ctx->progress_windows[4], 0, 0, "%s",
-              get_ascii_art(ctx->db, "your_courses"));
+    mvwprintw(ctx->progress_windows[4], 0, 0, "%s", your_courses_ascii);
     wattroff(ctx->progress_windows[4], A_BOLD);
+    free(your_courses_ascii);
 }
 
 WINDOW *create_progress_stats_window(APP_CONTEXT *ctx)
@@ -71,9 +78,11 @@ WINDOW *create_progress_stats_window(APP_CONTEXT *ctx)
 
     WINDOW *inner_stats_win = derwin(stats_window, LINES / 3 * 2 - 6, 67, 3, 8);
 
+    char *progress_ascii = get_ascii_art(ctx->db, "progress");
     wattron(inner_stats_win, A_BOLD);
-    mvwprintw(inner_stats_win, 0, 0, "%s", get_ascii_art(ctx->db, "progress"));
+    mvwprintw(inner_stats_win, 0, 0, "%s", progress_ascii);
     wattroff(inner_stats_win, A_BOLD);
+    free(progress_ascii);
 
     mvwprintw(inner_stats_win, 6, 0, "%s", "Name:");
     wattron(inner_stats_win, COLOR_PAIR(4));
@@ -85,12 +94,16 @@ WINDOW *create_progress_stats_window(APP_CONTEXT *ctx)
 
     mvwprintw(inner_stats_win, 10, 0, "%s", "Current streak: ");
     current_streak = get_current_streak(ctx);
+    if (current_streak == 0)
+        mvwprintw(inner_stats_win, 10, 16, "%s", "¯\\_(ツ)_/¯");
     for (int i = 0; i < current_streak; i++)
     {
-        mvwprintw(inner_stats_win, 10, 16 + i * 2, "%s", "");
+        mvwprintw(inner_stats_win, 10, 16 + i * 2, "%s", "🔥");
     }
     mvwprintw(inner_stats_win, 12, 0, "%s", "Longest streak:");
     longest_streak = get_longest_streak(ctx);
+    if (longest_streak == 0)
+        mvwprintw(inner_stats_win, 12, 16, "%s", "¯\\_(ツ)_/¯");
     for (int i = 0; i < longest_streak; i++)
     {
         mvwprintw(inner_stats_win, 12, 16 + i * 2, "%s", "");
@@ -142,6 +155,7 @@ WINDOW *create_progress_stats_window(APP_CONTEXT *ctx)
 
     mvwprintw(rank_window, 0, 0, "%s", rank_ascii);
     wnoutrefresh(rank_window);
+    free(rank_ascii);
 
     wnoutrefresh(inner_stats_win);
     delwin(inner_stats_win);
@@ -160,7 +174,9 @@ void print_completed_courses(APP_CONTEXT *ctx)
         {
             create_course_preview_card(ctx, 10 + (i * 46), 2 + i,
                                        &completed_courses[i]);
+            free(completed_courses[i].name);
         }
+        free(completed_courses);
     }
     else
     {
@@ -169,12 +185,4 @@ void print_completed_courses(APP_CONTEXT *ctx)
                   ((COLS - 80) - strlen(msg)) / 2, "%s", msg);
         wrefresh(ctx->progress_windows[3]);
     }
-}
-
-void print_your_courses_title(APP_CONTEXT *ctx)
-{
-    wattron(ctx->progress_windows[3], A_BOLD);
-    mvwprintw(ctx->progress_windows[3], 0, 0, "%s",
-              get_ascii_art(ctx->db, "your_courses"));
-    wattroff(ctx->progress_windows[3], A_BOLD);
 }

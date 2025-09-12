@@ -67,6 +67,16 @@ void go_to_course_by_id(APP_CONTEXT *ctx, int course_id)
         (ctx->rp_state->curr_section == 0 ? 1 : 0);
     if (ctx->rp_state->curr_item < 2)
         ctx->rp_state->curr_item = ctx->rp_state->curr_section == 0 ? 2 : 1;
-    ctx->rp_state->items_completed =
-        ctx->rp_state->course_progress[ctx->rp_state->sections_completed - 1];
+    if (ctx->rp_state->sections_completed < 1)
+    {
+        ctx->rp_state->items_completed = ctx->rp_state->course_progress[0];
+    }
+    else
+    {
+        ctx->rp_state->items_completed =
+            ctx->rp_state
+                ->course_progress[ctx->rp_state->sections_completed - 1];
+    }
+    // log_course_instr_values(ctx);
+    // wrefresh(ctx->course_windows[2]);
 }

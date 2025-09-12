@@ -37,7 +37,11 @@ void log_course_instr_values(APP_CONTEXT *ctx)
               "                    ");
     mvwprintw(ctx->course_windows[2], 10, EDITOR_WIDTH - 30, "%s",
               "                    ");
-    mvwprintw(ctx->course_windows[2], 11, EDITOR_WIDTH - 30, "%s",
+    mvwprintw(ctx->course_windows[2], 12, EDITOR_WIDTH - 30, "%s",
+              "                    ");
+    mvwprintw(ctx->course_windows[2], 13, EDITOR_WIDTH - 30, "%s",
+              "                    ");
+    mvwprintw(ctx->course_windows[2], 14, EDITOR_WIDTH - 30, "%s",
               "                    ");
     mvwprintw(ctx->course_windows[2], 2, EDITOR_WIDTH - 30, "curr_section %i",
               ctx->rp_state->curr_section);
@@ -61,6 +65,8 @@ void log_course_instr_values(APP_CONTEXT *ctx)
               "sections completed: %i", ctx->rp_state->sections_completed);
     mvwprintw(ctx->course_windows[2], 13, EDITOR_WIDTH - 30,
               "showing test results: %i", ctx->rp_state->showing_test_results);
+    mvwprintw(ctx->course_windows[2], 14, EDITOR_WIDTH - 30,
+              "course_progress: %i", ctx->rp_state->course_progress[ctx->rp_state->sections_completed - 1]);
 }
 
 void handle_course_input(APP_CONTEXT *ctx)

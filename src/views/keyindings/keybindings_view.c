@@ -29,10 +29,11 @@ WINDOW *create_keybindings_container(APP_CONTEXT *ctx)
     WINDOW *keybindings_container =
         derwin(ctx->keybindings_windows[1], LINES - 10, COLS - 16, 6, 8);
 
+    char *keybindings_ascii = get_ascii_art(ctx->db, "keybindings");
     wattron(keybindings_container, A_BOLD);
-    mvwprintw(keybindings_container, 0, 0, "%s",
-              get_ascii_art(ctx->db, "keybindings"));
+    mvwprintw(keybindings_container, 0, 0, "%s", keybindings_ascii);
     wattroff(keybindings_container, A_BOLD);
+    free(keybindings_ascii);
 
     wattron(keybindings_container, A_UNDERLINE | A_BOLD);
     mvwprintw(keybindings_container, 7, 0, "%s", "All views");

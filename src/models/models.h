@@ -179,10 +179,10 @@ typedef struct _app_context
   sqlite3 *db;
   WINDOW *greeter_screen;
   WINDOW *greeter_windows[GREETER_WINDOW_COUNT];
-  PANEL *greeter_panels[GREETER_PANEL_COUNT];
   WINDOW *greeter_ascii_window;
   WINDOW *start_windows[START_WINDOW_COUNT];
   WINDOW *course_windows[COURSE_WINDOW_COUNT];
+  WINDOW *explorer_popup_windows[EXPLORER_POPUP_WINDOW_COUNT];
   WINDOW *terminal_window;
   WINDOW *progress_windows[PROGRESS_WINDOW_COUNT];
   WINDOW *all_courses_windows[ALL_COURSES_WINDOW_COUNT];
@@ -190,6 +190,8 @@ typedef struct _app_context
   WINDOW *line_num_win;
   WINDOW *edit_window;
   WINDOW *active_window;
+  PANEL *greeter_panels[GREETER_PANEL_COUNT];
+  PANEL *explorer_panels[EXPLORER_PANEL_COUNT];
   USER_DATA *user_data;
   SHELL *shell;
   RIGHT_PANEL_STATE *rp_state;

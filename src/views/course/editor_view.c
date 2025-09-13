@@ -88,9 +88,7 @@ void print_matches(pcre2_code **re, int line_num, int j, size_t subject_length,
         pcre2_match_data_free(md);
         return;
     }
-    FILE *log_file = fopen("print_matches_log.txt", "a");
-
-
+    // FILE *log_file = fopen("print_matches_log.txt", "a");
 
     int rc = pcre2_match(re[j], subject, subject_length, 0, 0, md, NULL);
     if (j == 4 && rc > 0)
@@ -99,18 +97,18 @@ void print_matches(pcre2_code **re, int line_num, int j, size_t subject_length,
         char *extended_buf = calloc(500, sizeof(char));
         // LINE *orig_temp_line = temp_line;
 
-        char buf[40];
-        memset(buf, 0, 40);
-        buf[39] = '\0';
-        snprintf(buf, 40, "%p\n", temp_line);
-        fwrite(buf, 40, 1, log_file);
+        // char buf[40];
+        // memset(buf, 0, 40);
+        // buf[39] = '\0';
+        // snprintf(buf, 40, "%p\n", temp_line);
+        // fwrite(buf, 40, 1, log_file);
 
         temp_line = current_line;
 
-        memset(buf, 0, 40);
-        buf[39] = '\0';
-        snprintf(buf, 40, "%p\n", temp_line);
-        fwrite(buf, 40, 1, log_file);
+        // memset(buf, 0, 40);
+        // buf[39] = '\0';
+        // snprintf(buf, 40, "%p\n", temp_line);
+        // fwrite(buf, 40, 1, log_file);
 
         if (!temp_line) {
             pcre2_match_data_free(md);
@@ -131,11 +129,11 @@ void print_matches(pcre2_code **re, int line_num, int j, size_t subject_length,
             {
                 temp_line = temp_line->next;
 
-                char buf[40];
-                memset(buf, 0, 40);
-                buf[39] = '\0';
-                snprintf(buf, 40, "%p - line: %s\n", temp_line, temp_line->buf_);
-                fwrite(buf, 40, 1, log_file);
+                // char buf[40];
+                // memset(buf, 0, 40);
+                // buf[39] = '\0';
+                // snprintf(buf, 40, "%p - line: %s\n", temp_line, temp_line->buf_);
+                // fwrite(buf, 40, 1, log_file);
 
                 if (temp_line != NULL)
                     strcat(extended_buf, temp_line->buf_);
@@ -208,7 +206,7 @@ void print_matches(pcre2_code **re, int line_num, int j, size_t subject_length,
     pcre2_match_data_free(md);
     // free(orig_temp_line->buf_);
     // free(orig_temp_line);
-    fclose(log_file);
+    // fclose(log_file);
 }
 
 void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,

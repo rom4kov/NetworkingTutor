@@ -127,6 +127,8 @@ void handle_start_input(APP_CONTEXT *ctx)
                 this_win = ctx->active_window_idx;
                 if (!ctx->courses[this_win - 2].locked)
                 {
+                    mvwprintw(ctx->start_windows[1], 2, 2, "%s", "test");
+                    wrefresh(ctx->start_windows[1]);
                     cleanup_start_for_switch(ctx);
                     go_to_course_by_id(ctx, this_win - 1);
                 }

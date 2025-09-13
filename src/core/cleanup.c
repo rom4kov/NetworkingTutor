@@ -118,7 +118,6 @@ void cleanup_init_state(APP_CONTEXT *ctx)
     deallocate_it_buffer(ctx->rp_state->it_buffer);
     deallocate_file_tree(ctx->file_tree);
 
-    free(ctx->current_course);
     free(ctx->user_data->name);
     free(ctx->user_data->created_at);
     free(ctx->user_data);
@@ -186,7 +185,10 @@ void cleanup_start_for_switch(APP_CONTEXT *ctx)
 
 void cleanup_course_for_exit(APP_CONTEXT *ctx)
 {
-    // free_section_data(ctx);
+    if (!ctx->rp_state->showing_end_of_course_page)
+    {
+        free_section_data(ctx);
+    }
 
     cleanup_init_state(ctx);
 
@@ -200,10 +202,10 @@ void cleanup_course_for_exit(APP_CONTEXT *ctx)
 
 void cleanup_course_for_switch(APP_CONTEXT *ctx)
 {
-    // if (!ctx->rp_state->showing_end_of_course_page)
-    // {
-    //     free_section_data(ctx);
-    // }
+    if (!ctx->rp_state->showing_end_of_course_page)
+    {
+        free_section_data(ctx);
+    }
 
     cleanup_nav_menu(ctx);
 

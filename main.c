@@ -40,6 +40,7 @@ int main(void)
     ctx->rp_state = (RIGHT_PANEL_STATE *)malloc(sizeof(RIGHT_PANEL_STATE));
     ctx->num_of_courses = get_num_of_courses(ctx->db);
     ctx->courses = get_course_data(ctx->db, ctx->num_of_courses);
+    ctx->current_course = NULL;
     ctx->file = NULL;
     ctx->file_tree = initialize_file_tree();
     ctx->file_tree->prev_dir = initialize_dir_entry();
@@ -96,8 +97,8 @@ int main(void)
     ctx->shell->term_buffer->scroll_offset = 0;
     ctx->shell->cwd = "";
     ctx->shell->cwd_allocated = false;
-    // mkdir("/home/romkov/Documents/ntutor/", 0777);
-    // chdir("/home/romkov/Documents/ntutor/");
+    mkdir("/home/romkov/Documents/ntutor/", 0777);
+    chdir("/home/romkov/Documents/ntutor/");
     ctx->shell->home_dir = get_cwd();
 
     // seed_courses_data(ctx->db, ctx->greeter_windows[0],
@@ -329,21 +330,22 @@ int main(void)
 
     sqlite3_db_release_memory(ctx->db);
 
-    FILE *log_file = fopen("sqlite_log_file.txt", "a");
+    // FILE *log_file = fopen("sqlite_log_file.txt", "a");
     sqlite3_stmt *stmt;
     while ((stmt = sqlite3_next_stmt(ctx->db, NULL)) != NULL) {
-        fprintf(stderr, "Leaked stmt: %s\n", sqlite3_sql(stmt));
-        const char *sql_msg = sqlite3_sql(stmt);
-        fwrite(sql_msg, strlen(sql_msg), 1, log_file);
+        // fprintf(stderr, "Leaked stmt: %s\n", sqlite3_sql(stmt));
+        // const char *sql_msg = sqlite3_sql(stmt);
+        // fwrite(sql_msg, strlen(sql_msg), 1, log_file);
         sqlite3_finalize(stmt);
     }
 
-    int rc = sqlite3_close(ctx->db);
-    if (rc != SQLITE_OK) {
-        const char *err_msg = sqlite3_errmsg(ctx->db);
-        fwrite(err_msg, strlen(err_msg), 1, log_file);
-    }
-    fclose(log_file);
+    // int rc = sqlite3_close(ctx->db);
+    sqlite3_close(ctx->db);
+    // if (rc != SQLITE_OK) {
+    //     const char *err_msg = sqlite3_errmsg(ctx->db);
+    //     fwrite(err_msg, strlen(err_msg), 1, log_file);
+    // }
+    // fclose(log_file);
 
     curs_set(1);
 

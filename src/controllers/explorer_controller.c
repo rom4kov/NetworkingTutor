@@ -29,9 +29,7 @@ void handle_explorer_input(APP_CONTEXT *ctx)
 {
     bool new_file_form_active = false;
     bool del_file_form_active = false;
-    WINDOW *inner_win =
-        derwin(ctx->course_windows[1], 3, EXPLORER_WIDTH - 2, 1, 1);
-    WINDOW *form_window = derwin(inner_win, 1, EXPLORER_WIDTH - 4, 1, 1);
+
     FORM *new_file_form = NULL;
     FIELD *field[2];
 
@@ -68,20 +66,24 @@ void handle_explorer_input(APP_CONTEXT *ctx)
             wrefresh(ctx->course_windows[1]);
             break;
         case 'a':
-            create_new_file(ctx, &form_window, &inner_win,
+            create_new_file(ctx, &ctx->explorer_popup_windows[0],
+                            &ctx->explorer_popup_windows[1],
                             &new_file_form_active, &new_file_form, field);
             // log_ft_values(ctx);
             break;
         case 'r':
-            rename_file(ctx, &inner_win, &form_window, &new_file_form, field);
+            rename_file(ctx, &ctx->explorer_popup_windows[2],
+                        &ctx->explorer_popup_windows[3], &new_file_form, field);
             break;
         case 'd':
-            delete_file(ctx, &del_file_form_active, &inner_win, &form_window,
-                        &new_file_form, field);
+            delete_file(ctx, &del_file_form_active,
+                        &ctx->explorer_popup_windows[4],
+                        &ctx->explorer_popup_windows[5], &new_file_form, field);
             // log_ft_values(ctx);
             break;
         case 'm':
-            create_directory(ctx, &inner_win, &form_window, &new_file_form,
+            create_directory(ctx, &ctx->explorer_popup_windows[6],
+                             &ctx->explorer_popup_windows[7], &new_file_form,
                              field);
             // log_ft_values(ctx);
             break;

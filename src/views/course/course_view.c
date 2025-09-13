@@ -10,6 +10,7 @@
 #include <form.h>
 #include <menu.h>
 #include <ncurses.h>
+#include <panel.h>
 #include <sqlite3.h>
 #include <stdlib.h>
 #include <string.h>
@@ -27,6 +28,13 @@ void create_course_view(APP_CONTEXT *ctx)
     ctx->course_windows[3] =
         create_right_side_panel(ctx, " Course instructions ");
     ctx->course_windows[4] = create_progress_window(ctx);
+
+    create_explorer_popup_windows(ctx);
+    create_explorer_panels(ctx);
+
+    top_panel(ctx->explorer_panels[0]);
+    update_panels();
+    doupdate();
 
     ctx->line_num_win =
         derwin(ctx->course_windows[2], ctx->editor_height - 4, 3, 2, 1);
@@ -109,41 +117,63 @@ WINDOW *create_explorer_window(FILE_TREE *file_tree)
     mvwprintw(explorer_window, 0, 2, " Explorer ");
     wattroff(explorer_window, COLOR_PAIR(3));
 
-    create_explorer_menu(&explorer_window, file_tree);
+    create_file_tree(&explorer_window, file_tree);
 
     return explorer_window;
 }
 
-void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree)
+void create_file_tree(WINDOW **explorer_window, FILE_TREE *f_tree)
 {
     DIR *dir = opendir(".");
 
     struct dirent *next = readdir(dir);
 
-    if (NULL == next) return;
+    int num_of_entries = 0;
+    while (NULL != next)
+    {
+        num_of_entries++;
+        next = readdir(dir);
+    }
 
     DIR_ENTRY *prev_dir = f_tree->prev_dir;
     DIR_ENTRY *curr_dir = initialize_dir_entry();
 
+    // FILE *log_file = fopen("create_file_tree_log.txt", "a");
+    rewinddir(dir);
+    next = readdir(dir);
+
     if (f_tree->num_of_entries == 0)
     {
         while (strcmp(next->d_name, ".") == 0 ||
-               strcmp(next->d_name, "..") == 0 || next->d_type != 4)
+            strcmp(next->d_name, "..") == 0 || next->d_type != 4)
         {
             next = readdir(dir);
-            if (NULL == next) return;
         }
-        strncpy(prev_dir->name, next->d_name, 30);
-        prev_dir->name[29] = '\0';
-        strncpy(prev_dir->path, next->d_name, 30);
-        prev_dir->path[29] = '\0';
-        prev_dir->type = next->d_type;
-        prev_dir->state = 'c';
-        prev_dir->prev = NULL;
-        f_tree->current_entry = curr_dir;
-        prev_dir->next = f_tree->current_entry;
-        f_tree->current_entry->prev = prev_dir;
-        f_tree->first_entry = prev_dir;
+
+        if (num_of_entries > 3)
+        {
+            strncpy(prev_dir->name, next->d_name, 30);
+            prev_dir->name[29] = '\0';
+            strncpy(prev_dir->path, next->d_name, 30);
+            prev_dir->path[29] = '\0';
+            prev_dir->type = next->d_type;
+            prev_dir->state = 'c';
+            prev_dir->prev = NULL;
+            f_tree->current_entry = curr_dir;
+            prev_dir->next = f_tree->current_entry;
+            f_tree->current_entry->prev = prev_dir;
+            f_tree->first_entry = prev_dir;
+        }
+        else {
+            f_tree->first_entry = initialize_dir_entry();
+            strncpy(f_tree->first_entry->name, next->d_name, 30);
+            f_tree->first_entry->name[29] = '\0';
+            strncpy(f_tree->first_entry->path, next->d_name, 30);
+            f_tree->first_entry->path[29] = '\0';
+            f_tree->first_entry->type = next->d_type;
+            f_tree->first_entry->state = 'c';
+            f_tree->first_entry->prev = NULL;
+        }
 
         // char buf2[40];
         // memset(buf2, 0, 40);
@@ -211,7 +241,17 @@ void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree)
 
         rewinddir(dir);
     }
-        
+    // else if (f_tree->num_of_entries == 1)
+    // {
+    //     next = readdir(dir);
+    //     strncpy(f_tree->first_entry->name, next->d_name, 30);
+    //     f_tree->first_entry->name[29] = '\0';
+    //     strncpy(f_tree->first_entry->path, next->d_name, 30);
+    //     f_tree->first_entry->path[29] = '\0';
+    //     f_tree->first_entry->type = next->d_type;
+    //     f_tree->first_entry->state = 'c';
+    // }
+
     free(curr_dir->name);
     free(curr_dir->path);
     free(curr_dir);
@@ -230,7 +270,6 @@ void create_explorer_menu(WINDOW **explorer_window, FILE_TREE *f_tree)
         f_tree->current_entry = f_tree->current_entry->next;
     }
 
-    mvwprintw(*explorer_window, 46, 2, "%p", f_tree->current_entry);
     if (f_tree->curr_entry_nr == 0)
     {
         f_tree->current_entry = f_tree->first_entry;
@@ -336,9 +375,14 @@ void open_sub_directory(char *dir_name, FILE_TREE *f_tree)
     free(curr_dir);
 
     prev_dir->next = next_orig_dir;
+    if (f_tree->current_entry->num_of_entries > 1)
+    {
+        next_orig_dir->prev = prev_dir;
+    }
     if (f_tree->current_entry->num_of_entries > 0)
+    {
         prev_dir->last_in_sub_dir = true;
-    next_orig_dir->prev = prev_dir;
+    }
 
     DIR_ENTRY *entries_iterator = f_tree->current_entry;
 

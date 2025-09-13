@@ -81,7 +81,7 @@ void close_sub_directory(DIR_ENTRY *dir_to_close, int entries_in_dir,
                          FILE_TREE *f_tree);
 void open_or_close_dir(FILE_TREE *f_tree, WINDOW **explorer_window);
 void open_file_from_explorer(APP_CONTEXT *ctx, bool *new_file_form_active);
-void create_new_file(APP_CONTEXT *ctx, WINDOW **form_window, WINDOW **inner_win,
+void create_new_file(APP_CONTEXT *ctx, WINDOW **inner_win, WINDOW **form_window, 
                      bool *new_file_form_active, FORM **new_file_form,
                      FIELD **field);
 void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,

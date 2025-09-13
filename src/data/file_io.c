@@ -7,6 +7,7 @@
 #include <dirent.h>
 #include <form.h>
 #include <ncurses.h>
+#include <panel.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,11 +21,13 @@
 DIR_ENTRY *initialize_dir_entry()
 {
     DIR_ENTRY *d_entry = calloc(1, sizeof(DIR_ENTRY));
-    if (!d_entry) return NULL;
+    if (!d_entry)
+        return NULL;
 
     d_entry->name = (char *)malloc(50 * sizeof(char));
     d_entry->path = (char *)malloc(50 * sizeof(char));
-    if (!d_entry->name || !d_entry->path) {
+    if (!d_entry->name || !d_entry->path)
+    {
         free(d_entry->name);
         free(d_entry->path);
         free(d_entry);
@@ -115,12 +118,14 @@ I_LINE *initialize_iline()
 
 void deallocate_buffer(TEXT_BUFFER *tbuf)
 {
-    if (!tbuf) return;
+    if (!tbuf)
+        return;
 
     // FILE *log_file = fopen("t_buffer_dealloc_log.txt", "a");
     LINE *current_line = tbuf->first_line;
     // int i = 0;
-    while (current_line) {
+    while (current_line)
+    {
 
         // char buf[40];
         // memset(buf, 0, 40);
@@ -145,30 +150,17 @@ void deallocate_buffer(TEXT_BUFFER *tbuf)
     // snprintf(buf, 12, "%i\n", i);
     // fwrite(buf, 12, 1, log_file);
 
-    free(tbuf);  // <-- always free the buffer itself
-    // fclose(log_file);
-    // if (!tbuf)
-    //     return;
-    //
-    // LINE *current_line = tbuf->first_line;
-    // while (current_line->next != NULL)
-    // {
-    //     free(current_line->buf_);
-    //     current_line = current_line->next;
-    //     free(current_line->prev);
-    // }
-    //
-    // free(current_line->buf_);
-    // free(current_line);
-    // free(tbuf);
+    free(tbuf); // <-- always free the buffer itself
 }
 
 void deallocate_it_buffer(I_TEXT_BUFFER *tbuf)
 {
-    if (!tbuf) return;
+    if (!tbuf)
+        return;
 
     I_LINE *current_line = tbuf->first_line;
-    while (current_line) {
+    while (current_line)
+    {
         free(current_line->buf_);
         I_LINE *next = current_line->next;
         free(current_line);
@@ -179,7 +171,7 @@ void deallocate_it_buffer(I_TEXT_BUFFER *tbuf)
     tbuf->curr_line_nr = 0;
     tbuf->current_col = 0;
 
-    free(tbuf);  // <-- always free the buffer itself
+    free(tbuf);
 }
 
 void deallocate_file_tree(FILE_TREE *f_tree)
@@ -198,7 +190,7 @@ void deallocate_file_tree(FILE_TREE *f_tree)
 
         free(curr_entry->name);
         free(curr_entry->path);
-        DIR_ENTRY *next = curr_entry->next; 
+        DIR_ENTRY *next = curr_entry->next;
         free(curr_entry);
         curr_entry = next;
         // i++;
@@ -207,9 +199,9 @@ void deallocate_file_tree(FILE_TREE *f_tree)
     // free(curr_entry->path);
     free(curr_entry);
     // fclose(log_file);
-    free(f_tree->prev_dir->name);
-    free(f_tree->prev_dir->path);
-    free(f_tree->prev_dir);
+    // free(f_tree->prev_dir->name);
+    // free(f_tree->prev_dir->path);
+    // free(f_tree->prev_dir);
 
     f_tree->first_entry = NULL;
     f_tree->current_entry = NULL;
@@ -254,7 +246,6 @@ void open_new_file(APP_CONTEXT *ctx)
         printf("Could not open %s.\n", ctx->curr_file_path);
     }
 
-    // mvwprintw(ctx->edit_window, LINES - 9, 15, "check");
     if (ctx->file != NULL)
     {
         prepare_empty_file(&ctx->t_buffer);
@@ -495,8 +486,8 @@ void open_or_close_dir(FILE_TREE *f_tree, WINDOW **explorer_window)
         close_sub_directory(f_tree->current_entry,
                             f_tree->current_entry->num_of_entries, f_tree);
     }
-    wclear(*explorer_window);
-    *explorer_window = create_explorer_window(f_tree);
+    werase(*explorer_window);
+    create_file_tree(explorer_window, f_tree);
     focus_window(explorer_window, 3, "Explorer");
     doupdate();
 }
@@ -526,17 +517,22 @@ void open_file_from_explorer(APP_CONTEXT *ctx, bool *new_file_form_active)
     doupdate();
 }
 
-void create_new_file(APP_CONTEXT *ctx, WINDOW **form_window, WINDOW **inner_win,
+void create_new_file(APP_CONTEXT *ctx, WINDOW **inner_win, WINDOW **form_window,
                      bool *new_file_form_active, FORM **new_file_form,
                      FIELD **field)
 {
     create_new_file_input(inner_win, form_window, new_file_form, field,
                           "Create file");
 
+    top_panel(ctx->explorer_panels[1]);
+    update_panels();
+    doupdate();
+
     *new_file_form_active = true;
 
     while (*new_file_form_active)
     {
+        keypad(*inner_win, TRUE);
         ctx->key = wgetch(*inner_win);
 
         switch (ctx->key)
@@ -549,6 +545,7 @@ void create_new_file(APP_CONTEXT *ctx, WINDOW **form_window, WINDOW **inner_win,
                 if (buf && strlen(buf) > 0)
                 {
                     form_driver(*new_file_form, REQ_DEL_PREV);
+                    wrefresh(*inner_win);
                     wrefresh(*form_window);
                 }
                 break;
@@ -559,15 +556,17 @@ void create_new_file(APP_CONTEXT *ctx, WINDOW **form_window, WINDOW **inner_win,
                 strncpy(ctx->filename, field_buffer(field[0], 0), 30);
                 ctx->filename[29] = '\0';
 
-                if (ctx->file_tree->current_entry->state == 'o')
+                if (ctx->file_tree->num_of_entries == 0)
                 {
-
+                    strncpy(ctx->curr_file_path, field_buffer(field[0], 0), 30);
+                    ctx->curr_file_path[29] = '\0';
+                }
+                else if (ctx->file_tree->current_entry->state == 'o')
+                {
                     strcpy(ctx->curr_file_path,
                            ctx->file_tree->current_entry->path);
                     strcat(ctx->curr_file_path, "/");
                     strcat(ctx->curr_file_path, new_filename);
-                    mvwprintw(ctx->course_windows[3], 2, 50, "%s",
-                              ctx->file_tree->current_entry->path);
                 }
                 else if (ctx->file_tree->current_entry->parent_dir)
                 {
@@ -600,31 +599,54 @@ void create_new_file(APP_CONTEXT *ctx, WINDOW **form_window, WINDOW **inner_win,
                     fclose(ctx->file);
                 open_new_file(ctx);
 
-                DIR_ENTRY *current_entry = ctx->file_tree->current_entry;
+                DIR_ENTRY *current_entry = NULL;
+                if (ctx->file_tree->num_of_entries == 0)
+                {
+                    ctx->file_tree->first_entry = initialize_dir_entry();
+                    current_entry = ctx->file_tree->first_entry;
+                    ctx->file_tree->current_entry = ctx->file_tree->first_entry;
+                }
+                else
+                {
+                    current_entry = ctx->file_tree->current_entry;
+                }
 
                 create_new_entry_for_file(ctx, current_entry, new_filename, 8);
 
                 unpost_form(*new_file_form);
                 free_form(*new_file_form);
                 free_field(field[0]);
-                ctx->course_windows[1] = create_explorer_window(ctx->file_tree);
+
+                werase(ctx->course_windows[1]);
+                create_file_tree(&ctx->course_windows[1], ctx->file_tree);
                 focus_window(&ctx->course_windows[1], 2, "Explorer");
                 focus_window(&ctx->course_windows[2], 3, "Editor");
+
+                hide_panel(ctx->explorer_panels[1]);
+                top_panel(ctx->explorer_panels[0]);
+                update_panels();
+
                 curs_set(2);
                 wmove(ctx->edit_window, 0, 0);
-                wnoutrefresh(ctx->course_windows[1]);
+                // wnoutrefresh(ctx->course_windows[1]);
                 wnoutrefresh(ctx->line_num_win);
                 wnoutrefresh(ctx->edit_window);
                 doupdate();
                 break;
-            case 'q':
+            case KEY_F(1):
                 *new_file_form_active = false;
                 curs_set(0);
                 unpost_form(*new_file_form);
                 free_form(*new_file_form);
                 free_field(field[0]);
-                ctx->course_windows[1] = create_explorer_window(ctx->file_tree);
+
+                werase(ctx->course_windows[1]);
+                create_file_tree(&ctx->course_windows[1], ctx->file_tree);
                 focus_window(&ctx->course_windows[1], 3, "Explorer");
+
+                hide_panel(ctx->explorer_panels[1]);
+                top_panel(ctx->explorer_panels[0]);
+                update_panels();
                 doupdate();
                 break;
             default:
@@ -638,6 +660,18 @@ void create_new_file(APP_CONTEXT *ctx, WINDOW **form_window, WINDOW **inner_win,
 void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
                                char *new_filename, int type)
 {
+    DIR_ENTRY *new_entry = initialize_dir_entry();
+
+    if (ctx->file_tree->num_of_entries == 0)
+    {
+        strncpy(new_entry->name, new_filename, strlen(new_filename) + 1);
+        strncpy(new_entry->path, new_filename, strlen(new_filename) + 1);
+        new_entry->type = type;
+        ctx->file_tree->first_entry = new_entry;
+        ctx->file_tree->num_of_entries++;
+        return;
+    }
+
     if (current_entry->state == 'o')
     {
         ctx->file_tree->current_entry = current_entry;
@@ -649,21 +683,21 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
         else
             ctx->file_tree->current_entry = ctx->file_tree->first_entry;
 
-        while (ctx->file_tree->current_entry->type != 8 ||
-               ctx->file_tree->current_entry->name[0] > new_filename[0])
+        if (current_entry != ctx->file_tree->first_entry)
         {
-            ctx->file_tree->current_entry = ctx->file_tree->current_entry->next;
+            while (ctx->file_tree->current_entry->type != 8 ||
+                   ctx->file_tree->current_entry->name[0] > new_filename[0])
+            {
+                ctx->file_tree->current_entry =
+                    ctx->file_tree->current_entry->next;
+            }
         }
     }
 
-    DIR_ENTRY *new_entry = initialize_dir_entry();
     strncpy(new_entry->name, new_filename, strlen(new_filename) + 1);
-    // new_entry->name[strlen(new_entry->name) + 1] = '\0';
 
     if (current_entry->state == 'o')
     {
-        // mvwprintw(ctx->course_windows[3], 2, 50, "%s", current_entry->path);
-
         strcpy(new_entry->path, current_entry->path);
         strcat(new_entry->path, "/");
         strcat(new_entry->path, new_entry->name);
@@ -714,7 +748,6 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
     }
 
     new_entry->type = type;
-    wrefresh(ctx->course_windows[3]);
 
     new_entry->prev = ctx->file_tree->current_entry;
     if (ctx->file_tree->current_entry->next)
@@ -734,13 +767,6 @@ void delete_file(APP_CONTEXT *ctx, bool *del_file_form_active,
     if (ctx->file_tree->current_entry->type == 4 &&
         ctx->file_tree->current_entry->num_of_entries > 0)
     {
-        mvwprintw(ctx->course_windows[3], 15, 50, "%s",
-                  ctx->file_tree->current_entry->path);
-        mvwprintw(ctx->course_windows[3], 16, 50, "%i",
-                  ctx->file_tree->current_entry->num_of_entries);
-        mvwprintw(ctx->course_windows[3], 17, 50, "%i",
-                  ctx->file_tree->current_entry->type);
-        wrefresh(ctx->course_windows[3]);
         WINDOW *cannot_delete_win =
             derwin(ctx->course_windows[1], 3, EXPLORER_WIDTH - 2,
                    ctx->file_tree->curr_entry_nr + 1, 1);
@@ -756,11 +782,18 @@ void delete_file(APP_CONTEXT *ctx, bool *del_file_form_active,
     char *answer;
     strcpy(label, msg);
     strcat(label, filename);
+
     create_new_file_input(inner_win, form_window, new_file_form, field, label);
+
+    top_panel(ctx->explorer_panels[3]);
+    update_panels();
+    doupdate();
+
     *del_file_form_active = true;
 
     while (*del_file_form_active)
     {
+        keypad(*inner_win, TRUE);
         ctx->key = wgetch(*inner_win);
 
         switch (ctx->key)
@@ -804,9 +837,7 @@ void delete_file(APP_CONTEXT *ctx, bool *del_file_form_active,
 
                     if (ctx->file && ctx->file->_fileno > 0)
                         fclose(ctx->file);
-                    // mvwprintw(ctx->course_windows[3], 15, 50, "%s",
-                    //           ctx->file_tree->current_entry->path);
-                    // wrefresh(ctx->course_windows[3]);
+
                     remove(ctx->file_tree->current_entry->path);
 
                     remove_entry_from_file_tree(ctx->file_tree);
@@ -816,10 +847,14 @@ void delete_file(APP_CONTEXT *ctx, bool *del_file_form_active,
                     free_form(*new_file_form);
                     free_field(field[0]);
 
-                    wclear(ctx->course_windows[1]);
-                    ctx->course_windows[1] =
-                        create_explorer_window(ctx->file_tree);
-                    ctx->course_windows[2] = create_editor_window(ctx);
+                    werase(ctx->course_windows[1]);
+                    create_file_tree(&ctx->course_windows[1], ctx->file_tree);
+                    focus_window(&ctx->course_windows[1], 3, "Explorer");
+
+                    hide_panel(ctx->explorer_panels[3]);
+                    top_panel(ctx->explorer_panels[0]);
+                    update_panels();
+                    doupdate();
 
                     focus_window(&ctx->course_windows[2], 2, "Editor");
                     focus_window(&ctx->course_windows[1], 3, "Explorer");
@@ -839,22 +874,31 @@ void delete_file(APP_CONTEXT *ctx, bool *del_file_form_active,
                     unpost_form(*new_file_form);
                     free_form(*new_file_form);
                     free_field(field[0]);
-                    menu_driver(ctx->explorer_menu, REQ_NEXT_ITEM);
-                    ctx->course_windows[1] =
-                        create_explorer_window(ctx->file_tree);
+
+                    werase(ctx->course_windows[1]);
+                    create_file_tree(&ctx->course_windows[1], ctx->file_tree);
                     focus_window(&ctx->course_windows[1], 3, "Explorer");
+
+                    hide_panel(ctx->explorer_panels[3]);
+                    top_panel(ctx->explorer_panels[0]);
+                    update_panels();
                     doupdate();
                 }
                 break;
-            case 'q':
+            case KEY_F(1):
                 *del_file_form_active = false;
                 curs_set(0);
                 unpost_form(*new_file_form);
                 free_form(*new_file_form);
                 free_field(field[0]);
-                menu_driver(ctx->explorer_menu, REQ_NEXT_ITEM);
-                ctx->course_windows[1] = create_explorer_window(ctx->file_tree);
+
+                werase(ctx->course_windows[1]);
+                create_file_tree(&ctx->course_windows[1], ctx->file_tree);
                 focus_window(&ctx->course_windows[1], 3, "Explorer");
+
+                hide_panel(ctx->explorer_panels[3]);
+                top_panel(ctx->explorer_panels[0]);
+                update_panels();
                 doupdate();
                 break;
             default:
@@ -936,13 +980,19 @@ void rename_file(APP_CONTEXT *ctx, WINDOW **inner_win, WINDOW **form_window,
     char *filename = ctx->file_tree->current_entry->name;
     char *label = "Rename file";
     bool rename_file_form_active = true;
+
     create_new_file_input(inner_win, form_window, new_file_form, field, label);
     set_field_buffer(field[0], 0, filename);
     form_driver(*new_file_form, REQ_END_LINE);
-    wrefresh(*form_window);
+
+    wnoutrefresh(*form_window);
+    top_panel(ctx->explorer_panels[2]);
+    update_panels();
+    doupdate();
 
     while (rename_file_form_active)
     {
+        keypad(*inner_win, TRUE);
         ctx->key = wgetch(*inner_win);
 
         switch (ctx->key)
@@ -1006,7 +1056,7 @@ void rename_file(APP_CONTEXT *ctx, WINDOW **inner_win, WINDOW **form_window,
                 free_field(field[0]);
 
                 wclear(ctx->course_windows[1]);
-                ctx->course_windows[1] = create_explorer_window(ctx->file_tree);
+                create_file_tree(&ctx->course_windows[1], ctx->file_tree);
 
                 focus_window(&ctx->course_windows[2], 2, "Editor");
                 focus_window(&ctx->course_windows[1], 3, "Explorer");
@@ -1018,15 +1068,20 @@ void rename_file(APP_CONTEXT *ctx, WINDOW **inner_win, WINDOW **form_window,
                 doupdate();
 
                 break;
-            case 'q':
+            case KEY_F(1):
                 rename_file_form_active = false;
                 curs_set(0);
                 unpost_form(*new_file_form);
                 free_form(*new_file_form);
                 free_field(field[0]);
-                menu_driver(ctx->explorer_menu, REQ_NEXT_ITEM);
-                ctx->course_windows[1] = create_explorer_window(ctx->file_tree);
+
+                werase(ctx->course_windows[1]);
+                create_file_tree(&ctx->course_windows[1], ctx->file_tree);
                 focus_window(&ctx->course_windows[1], 3, "Explorer");
+
+                hide_panel(ctx->explorer_panels[2]);
+                top_panel(ctx->explorer_panels[0]);
+                update_panels();
                 doupdate();
                 break;
             default:
@@ -1043,9 +1098,13 @@ void create_directory(APP_CONTEXT *ctx, WINDOW **inner_win,
     bool make_dir_form_active = true;
     create_new_file_input(inner_win, form_window, new_file_form, field,
                           "Create directory");
+    top_panel(ctx->explorer_panels[4]);
+    update_panels();
+    doupdate();
 
     while (make_dir_form_active)
     {
+        keypad(*inner_win, TRUE);
         ctx->key = wgetch(*inner_win);
 
         switch (ctx->key)
@@ -1075,7 +1134,12 @@ void create_directory(APP_CONTEXT *ctx, WINDOW **inner_win,
                 ctx->active_window_idx = 1;
 
                 char *new_path;
-                if (ctx->file_tree->current_entry->state == 'o')
+                if (ctx->file_tree->num_of_entries == 0)
+                {
+                    new_path = malloc(strlen(new_dirname) + 1);
+                    strcpy(new_path, new_dirname);
+                }
+                else if (ctx->file_tree->current_entry->state == 'o')
                 {
                     new_path =
                         malloc(strlen(ctx->file_tree->current_entry->path) +
@@ -1083,14 +1147,6 @@ void create_directory(APP_CONTEXT *ctx, WINDOW **inner_win,
                     strcpy(new_path, ctx->file_tree->current_entry->path);
                     strcat(new_path, "/");
                     strcat(new_path, new_dirname);
-
-                    // mvwprintw(ctx->course_windows[3], 5, 2,
-                    //           "                  ");
-                    // mvwprintw(ctx->course_windows[3], 6, 2,
-                    //           "                  ");
-                    // mvwprintw(ctx->course_windows[3], 5, 2, "1");
-                    // mvwprintw(ctx->course_windows[3], 6, 2, "%s", new_path);
-                    // wrefresh(ctx->course_windows[3]);
                 }
                 else if (ctx->file_tree->current_entry->parent_dir)
                 {
@@ -1102,23 +1158,26 @@ void create_directory(APP_CONTEXT *ctx, WINDOW **inner_win,
                            ctx->file_tree->current_entry->parent_dir->path);
                     strcat(new_path, "/");
                     strcat(new_path, new_dirname);
-
-                    // mvwprintw(ctx->course_windows[3], 5, 2, "2");
-                    // mvwprintw(ctx->course_windows[3], 6, 2, "%s", new_path);
-                    // wrefresh(ctx->course_windows[3]);
                 }
                 else
                 {
                     new_path = malloc(sizeof(new_dirname) + 1);
                     strcpy(new_path, new_dirname);
-                    // mvwprintw(ctx->course_windows[3], 5, 2, "3");
-                    // mvwprintw(ctx->course_windows[3], 6, 2, "%s", new_path);
-                    // wrefresh(ctx->course_windows[3]);
                 }
 
                 mkdir(new_path, 0777);
 
-                DIR_ENTRY *current_entry = ctx->file_tree->current_entry;
+                DIR_ENTRY *current_entry = NULL;
+                if (ctx->file_tree->num_of_entries == 0)
+                {
+                    ctx->file_tree->first_entry = initialize_dir_entry();
+                    current_entry = ctx->file_tree->first_entry;
+                    ctx->file_tree->current_entry = ctx->file_tree->first_entry;
+                }
+                else
+                {
+                    current_entry = ctx->file_tree->current_entry;
+                }
 
                 create_new_entry_for_file(ctx, current_entry, new_dirname, 4);
 
@@ -1128,7 +1187,7 @@ void create_directory(APP_CONTEXT *ctx, WINDOW **inner_win,
                 free_field(field[0]);
 
                 wclear(ctx->course_windows[1]);
-                ctx->course_windows[1] = create_explorer_window(ctx->file_tree);
+                create_file_tree(&ctx->course_windows[1], ctx->file_tree);
 
                 focus_window(&ctx->course_windows[2], 2, "Editor");
                 focus_window(&ctx->course_windows[1], 3, "Explorer");
@@ -1140,16 +1199,20 @@ void create_directory(APP_CONTEXT *ctx, WINDOW **inner_win,
                 doupdate();
 
                 break;
-            case 'q':
+            case KEY_F(1):
                 make_dir_form_active = false;
                 curs_set(0);
                 unpost_form(*new_file_form);
                 free_form(*new_file_form);
                 free_field(field[0]);
-                menu_driver(ctx->explorer_menu, REQ_NEXT_ITEM);
-                ctx->course_windows[1] = create_explorer_window(ctx->file_tree);
-                wrefresh(ctx->course_windows[1]);
+
+                werase(ctx->course_windows[1]);
+                create_file_tree(&ctx->course_windows[1], ctx->file_tree);
                 focus_window(&ctx->course_windows[1], 3, "Explorer");
+
+                hide_panel(ctx->explorer_panels[4]);
+                top_panel(ctx->explorer_panels[0]);
+                update_panels();
                 doupdate();
                 break;
             default:

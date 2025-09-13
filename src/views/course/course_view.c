@@ -135,6 +135,8 @@ void create_file_tree(WINDOW **explorer_window, FILE_TREE *f_tree)
         next = readdir(dir);
     }
 
+    if (num_of_entries < 3) return;
+
     DIR_ENTRY *prev_dir = f_tree->prev_dir;
     DIR_ENTRY *curr_dir = initialize_dir_entry();
 

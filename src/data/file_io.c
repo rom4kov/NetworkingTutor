@@ -51,8 +51,6 @@ FILE_TREE *initialize_file_tree()
     FILE_TREE *f_tree = calloc(1, sizeof(FILE_TREE));
 
     f_tree->first_entry = NULL;
-    // f_tree->first_entry->name = (char *)malloc((50 * sizeof(char)));
-    // f_tree->first_entry->path = (char *)malloc((50 * sizeof(char)));
     f_tree->current_entry = NULL;
     f_tree->curr_entry_nr = 0;
     f_tree->num_of_entries = 0;
@@ -662,6 +660,7 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
 {
     DIR_ENTRY *new_entry = initialize_dir_entry();
 
+    // special case if no existing entries in file tree yet
     if (ctx->file_tree->num_of_entries == 0)
     {
         strncpy(new_entry->name, new_filename, strlen(new_filename) + 1);
@@ -672,6 +671,7 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
         return;
     }
 
+    // find correct position for new entry within file tree
     if (current_entry->state == 'o')
     {
         ctx->file_tree->current_entry = current_entry;
@@ -749,13 +749,34 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
 
     new_entry->type = type;
 
-    new_entry->prev = ctx->file_tree->current_entry;
-    if (ctx->file_tree->current_entry->next)
+    // link new entry inte file tree linked list
+    if (ctx->file_tree->num_of_entries > 1)
     {
-        new_entry->next = ctx->file_tree->current_entry->next;
-        ctx->file_tree->current_entry->next->prev = new_entry;
+        new_entry->prev = ctx->file_tree->current_entry;
+        if (ctx->file_tree->current_entry->next)
+        {
+            new_entry->next = ctx->file_tree->current_entry->next;
+            ctx->file_tree->current_entry->next->prev = new_entry;
+        }
+        ctx->file_tree->current_entry->next = new_entry;
     }
-    ctx->file_tree->current_entry->next = new_entry;
+    else // when there is only one existing entry so far
+    {
+        if (current_entry->type == 4)
+        {
+            new_entry->prev = current_entry;
+            current_entry->next = new_entry;
+            ctx->file_tree->first_entry = current_entry;
+            ctx->file_tree->current_entry = new_entry;
+        }
+        else if (current_entry->type == 8)
+        {
+            new_entry->next = current_entry;
+            current_entry->prev = new_entry;
+            ctx->file_tree->first_entry = new_entry;
+            ctx->file_tree->current_entry = current_entry;
+        }
+    }
 
     ctx->file_tree->num_of_entries++;
 }

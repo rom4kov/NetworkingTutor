@@ -385,8 +385,8 @@ void read_file_into_buffer(FILE *file, TEXT_BUFFER *text_buf)
             else
             {
                 text_buf->num_of_lines++;
-                // if (j == 0)
-                //     prev_line = initialize_line();
+                if (j == 0)
+                    prev_line = initialize_line();
                 prev_line->next = curr_line;
                 curr_line->prev = prev_line;
                 prev_line = curr_line;

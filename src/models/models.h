@@ -235,6 +235,7 @@ typedef struct _app_context
   int curr_line;
   int curr_col;
   int curr_nav_item;
+  int filename_len;
   bool running;
   bool greeter_needs_redraw;
   bool start_needs_redraw;
@@ -256,6 +257,7 @@ typedef struct _app_context
   bool first_keybindings_draw;
   bool editor_mode;
   bool explorer_mode;
+  bool file_modified;
   bool is_in_failure_list;
   bool user_form_active;
   bool terminal_active;

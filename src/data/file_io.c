@@ -219,22 +219,6 @@ void prepare_empty_file(TEXT_BUFFER **tbuf)
     (*tbuf)->num_of_lines = 1;
 }
 
-void print_buffer_label(APP_CONTEXT *ctx)
-{
-
-    mvwprintw(ctx->course_windows[2], 1, 4, "                                ");
-    ICON icon = get_file_icon((char *)ctx->filename);
-
-    wattron(ctx->course_windows[2], COLOR_PAIR(icon.color));
-    mvwprintw(ctx->course_windows[2], 1, 5, "%s", icon.icon);
-    wattroff(ctx->course_windows[2], COLOR_PAIR(icon.color));
-
-    wattron(ctx->course_windows[2], A_BOLD | COLOR_PAIR(1));
-    mvwprintw(ctx->course_windows[2], 1, 7, "%s", ctx->filename);
-    wattroff(ctx->course_windows[2], A_BOLD | COLOR_PAIR(1));
-    wrefresh(ctx->edit_window);
-}
-
 void open_new_file(APP_CONTEXT *ctx)
 {
     ctx->file = fopen(ctx->curr_file_path, "w+");
@@ -271,6 +255,7 @@ void open_file(APP_CONTEXT *ctx)
     ctx->file = fopen(ctx->file_tree->current_entry->path, "r+");
     strncpy(ctx->filename, ctx->file_tree->current_entry->name, 30);
     ctx->filename[29] = '\0';
+    ctx->filename_len = strlen(ctx->filename);
 
     if (ctx->file == NULL)
     {
@@ -553,6 +538,7 @@ void create_new_file(APP_CONTEXT *ctx, WINDOW **inner_win, WINDOW **form_window,
                 char *new_filename = field_buffer(field[0], 0);
                 strncpy(ctx->filename, field_buffer(field[0], 0), 30);
                 ctx->filename[29] = '\0';
+                ctx->filename_len = strlen(ctx->filename);
 
                 if (ctx->file_tree->num_of_entries == 0)
                 {
@@ -1067,6 +1053,7 @@ void rename_file(APP_CONTEXT *ctx, WINDOW **inner_win, WINDOW **form_window,
                     strncpy(ctx->filename, ctx->file_tree->current_entry->name,
                             30);
                     ctx->filename[29] = '\0';
+                    ctx->filename_len = strlen(ctx->filename);
 
                     print_buffer_label(ctx);
                 }

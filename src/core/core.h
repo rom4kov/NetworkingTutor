@@ -30,24 +30,30 @@ void move_to_end_of_line(TEXT_BUFFER *tbuf, WINDOW **edit_window,
 void insert_char(TEXT_BUFFER *tbuf, WINDOW **edit_window,
                  WINDOW **editor_window, int scroll_offset, int y, int x,
                  char ch, WINDOW **line_num_win, int *lines_to_print,
-                 int editor_height);
+                 int editor_height, int filename_len, bool *file_modified);
 void insert_tab(TEXT_BUFFER *tbuf, WINDOW **edit_window, WINDOW **editor_window,
                 int y, int x, WINDOW **line_num_win, int *lines_to_print,
-                int *scroll_offset, int editor_height);
+                int *scroll_offset, int editor_height, int filename_len, bool *file_modified);
+void delete_line(TEXT_BUFFER *tbuf, WINDOW **edit_window,
+                 WINDOW **editor_window, WINDOW **line_num_win, int y, int x,
+                 int *scroll_offset, int *lines_to_print, int editor_height,
+                 int filename_len, bool *file_modified);
 void bs_delete_line(TEXT_BUFFER *tbuf, WINDOW **edit_window,
                     WINDOW **editor_window, WINDOW **line_num_win, int y,
-                    int *scroll_offset, int *lines_to_print, int editor_height);
+                    int *scroll_offset, int *lines_to_print, int editor_height,
+                    int filename_len, bool *file_modified);
 void delete_char_or_line(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
                          WINDOW **edit_window, WINDOW **editor_window, int y,
                          int x, int *scroll_offset, int *lines_to_print,
-                         int editor_height);
+                         int editor_height, int filename_len, bool *file_modified);
 void bs_delete_char_or_line(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
                             WINDOW **edit_window, WINDOW **editor_window, int y,
                             int x, int *scroll_offset, int *lines_to_print,
-                            int editor_height);
+                            int editor_height, int filename_len, bool *file_modified);
 void insert_line(TEXT_BUFFER *tbuf, WINDOW **edit_window,
                  WINDOW **editor_window, WINDOW **line_num_win, int y, int x,
-                 int *scroll_offset, int *lines_to_print, int editor_height);
+                 int *scroll_offset, int *lines_to_print, int editor_height,
+                 int filename_len, bool *file_modified);
 
 // course instructions functions
 void complete_section(APP_CONTEXT *ctx);

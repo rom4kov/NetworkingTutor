@@ -1,3 +1,4 @@
+#include <curses.h>
 #define _XOPEN_SOURCE 500
 
 #include "../core/core.h"
@@ -39,25 +40,29 @@ void handle_editor_input(APP_CONTEXT *ctx)
             bs_delete_char_or_line(ctx->t_buffer, &ctx->line_num_win,
                                    &ctx->edit_window, &ctx->course_windows[2],
                                    ctx->y, ctx->x, &ctx->scroll_offset,
-                                   &ctx->lines_to_print, ctx->editor_height);
+                                   &ctx->lines_to_print, ctx->editor_height,
+                                   ctx->filename_len, &ctx->file_modified);
             break;
         case KEY_DC:
             delete_char_or_line(ctx->t_buffer, &ctx->line_num_win,
                                 &ctx->edit_window, &ctx->course_windows[2],
                                 ctx->y, ctx->x, &ctx->scroll_offset,
-                                &ctx->lines_to_print, ctx->editor_height);
+                                &ctx->lines_to_print, ctx->editor_height,
+                                ctx->filename_len, &ctx->file_modified);
             break;
         case 9:
             insert_tab(ctx->t_buffer, &ctx->edit_window,
                        &ctx->course_windows[2], ctx->y, ctx->x,
                        &ctx->line_num_win, &ctx->lines_to_print,
-                       &ctx->scroll_offset, ctx->editor_height);
+                       &ctx->scroll_offset, ctx->editor_height,
+                       ctx->filename_len, &ctx->file_modified);
             break;
         case 10:
             insert_line(ctx->t_buffer, &ctx->edit_window,
                         &ctx->course_windows[2], &ctx->line_num_win, ctx->y,
                         ctx->x, &ctx->scroll_offset, &ctx->lines_to_print,
-                        ctx->editor_height);
+                        ctx->editor_height, ctx->filename_len,
+                        &ctx->file_modified);
             break;
         case KEY_HOME:
             move_to_start_of_line(ctx->t_buffer, &ctx->edit_window,
@@ -78,12 +83,19 @@ void handle_editor_input(APP_CONTEXT *ctx)
             break;
         case KEY_F(10):
             write_buffer_to_file(ctx->t_buffer, ctx->file, ctx->y);
+            ctx->file_modified = false;
+            mvwprintw(ctx->course_windows[2], 1, 8 + ctx->filename_len, " ");
+            wnoutrefresh(ctx->course_windows[2]);
+            wmove(ctx->edit_window, ctx->y, ctx->x);
+            wnoutrefresh(ctx->edit_window);
+            doupdate();
             break;
         default:
             insert_char(ctx->t_buffer, &ctx->edit_window,
                         &ctx->course_windows[2], ctx->scroll_offset, ctx->y,
                         ctx->x, ctx->key, &ctx->line_num_win,
-                        &ctx->lines_to_print, ctx->editor_height);
+                        &ctx->lines_to_print, ctx->editor_height,
+                        ctx->filename_len, &ctx->file_modified);
             break;
     }
 }

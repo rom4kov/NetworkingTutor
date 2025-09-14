@@ -110,7 +110,8 @@ void print_matches(pcre2_code **re, int line_num, int j, size_t subject_length,
         // snprintf(buf, 40, "%p\n", temp_line);
         // fwrite(buf, 40, 1, log_file);
 
-        if (!temp_line) {
+        if (!temp_line)
+        {
             pcre2_match_data_free(md);
             return;
         }
@@ -132,8 +133,8 @@ void print_matches(pcre2_code **re, int line_num, int j, size_t subject_length,
                 // char buf[40];
                 // memset(buf, 0, 40);
                 // buf[39] = '\0';
-                // snprintf(buf, 40, "%p - line: %s\n", temp_line, temp_line->buf_);
-                // fwrite(buf, 40, 1, log_file);
+                // snprintf(buf, 40, "%p - line: %s\n", temp_line,
+                // temp_line->buf_); fwrite(buf, 40, 1, log_file);
 
                 if (temp_line != NULL)
                     strcat(extended_buf, temp_line->buf_);
@@ -359,6 +360,31 @@ ICON get_file_icon(char *filename)
         pcre2_code_free(re[i]);
 
     return matched_icon;
+}
+
+void print_buffer_label(APP_CONTEXT *ctx)
+{
+
+    mvwprintw(ctx->course_windows[2], 1, 4, "                                ");
+    ICON icon = get_file_icon((char *)ctx->filename);
+
+    wattron(ctx->course_windows[2], COLOR_PAIR(icon.color));
+    mvwprintw(ctx->course_windows[2], 1, 5, "%s", icon.icon);
+    wattroff(ctx->course_windows[2], COLOR_PAIR(icon.color));
+
+    wattron(ctx->course_windows[2], A_BOLD | COLOR_PAIR(1));
+    mvwprintw(ctx->course_windows[2], 1, 7, "%s", ctx->filename);
+    wattroff(ctx->course_windows[2], A_BOLD | COLOR_PAIR(1));
+    wrefresh(ctx->edit_window);
+}
+
+void print_modified_marker(WINDOW *editor_window, int filename_len,
+                           bool *file_modified)
+{
+    wattron(editor_window, A_BOLD | COLOR_PAIR(4));
+    mvwprintw(editor_window, 1, 8 + filename_len, "");
+    wattroff(editor_window, A_BOLD | COLOR_PAIR(4));
+    *file_modified = true;
 }
 
 void print_editor_meta_data(APP_CONTEXT *ctx)

@@ -31,7 +31,6 @@ WINDOW *create_course_preview_card(APP_CONTEXT *ctx, int x_position,
 WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label);
 // void read_item_into_buffer(COURSE_SECTION *c_sec, TEXT_BUFFER *text_buf);
 
-
 // course view
 void create_course_view(APP_CONTEXT *ctx);
 WINDOW *create_editor_window(APP_CONTEXT *ctx);
@@ -84,6 +83,9 @@ void print_line_nr(WINDOW **editor_window, TEXT_BUFFER *tbuf,
 char *match_file_icon(pcre2_code *re, int subj_len, char *filename, char *icon,
                       int color);
 ICON get_file_icon(char *filename);
+void print_buffer_label(APP_CONTEXT *ctx);
+void print_modified_marker(WINDOW *editor_window, int filename_len,
+                           bool *file_modified);
 
 void print_entries(FILE_TREE *f_tree, WINDOW **explorer_window);
 void move_to_next_entry(FILE_TREE *f_tree, WINDOW **explorer_window);

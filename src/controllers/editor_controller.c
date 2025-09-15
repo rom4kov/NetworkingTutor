@@ -4,6 +4,7 @@
 #include "../core/core.h"
 #include "../data/data_access_layer.h"
 #include "../models/models.h"
+#include "../views/views.h"
 #include "controllers.h"
 #include "utils.h"
 #include <ncurses.h>
@@ -85,6 +86,7 @@ void handle_editor_input(APP_CONTEXT *ctx)
             write_buffer_to_file(ctx->t_buffer, ctx->file, ctx->y);
             ctx->file_modified = false;
             mvwprintw(ctx->course_windows[2], 1, 8 + ctx->filename_len, " ");
+            print_file_metadata(ctx);
             wnoutrefresh(ctx->course_windows[2]);
             wmove(ctx->edit_window, ctx->y, ctx->x);
             wnoutrefresh(ctx->edit_window);

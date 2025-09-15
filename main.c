@@ -42,6 +42,9 @@ int main(void)
     ctx->courses = get_course_data(ctx->db, ctx->num_of_courses);
     ctx->current_course = NULL;
     ctx->file = NULL;
+    ctx->file_size = 0;
+    ctx->filename_len = 0;
+    ctx->file_modified = false;
     ctx->file_tree = initialize_file_tree();
     ctx->file_tree->prev_dir = initialize_dir_entry();
     ctx->t_buffer = initialize_buffer();
@@ -97,8 +100,12 @@ int main(void)
     ctx->shell->term_buffer->scroll_offset = 0;
     ctx->shell->cwd = "";
     ctx->shell->cwd_allocated = false;
-    mkdir("/home/romkov/Documents/ntutor/", 0777);
-    chdir("/home/romkov/Documents/ntutor/");
+    char *home_dir = getenv("HOME");
+    char proj_dir_buf[64];
+    snprintf(proj_dir_buf, strlen(home_dir) + 18, "%s/Documents/ntutor",
+             home_dir);
+    mkdir(proj_dir_buf, 0777);
+    chdir(proj_dir_buf);
     ctx->shell->home_dir = get_cwd();
 
     // seed_courses_data(ctx->db, ctx->greeter_windows[0],
@@ -194,7 +201,7 @@ int main(void)
                     ctx->rp_state->items_to_print =
                         ctx->rp_state->curr_item - 1;
 
-                ctx->rp_state->it_buffer = initialize_it_buffer();
+                // ctx->rp_state->it_buffer = initialize_it_buffer();
 
                 endwin();
                 refresh();
@@ -206,12 +213,15 @@ int main(void)
                 bool activate_editor = true;
                 reopen_file(ctx, activate_editor);
             }
+            wnoutrefresh(ctx->course_windows[4]);
             wnoutrefresh(ctx->course_windows[0]);
             wnoutrefresh(ctx->course_windows[1]);
             wnoutrefresh(ctx->line_num_win);
             wnoutrefresh(ctx->course_windows[2]);
+            wmove(ctx->edit_window,
+                  ctx->t_buffer->curr_line_nr - ctx->scroll_offset,
+                  ctx->t_buffer->current_col);
             wnoutrefresh(ctx->edit_window);
-            wnoutrefresh(ctx->course_windows[4]);
             doupdate();
             ctx->course_needs_redraw = false;
             ctx->first_course_draw = false;
@@ -332,7 +342,8 @@ int main(void)
 
     // FILE *log_file = fopen("sqlite_log_file.txt", "a");
     sqlite3_stmt *stmt;
-    while ((stmt = sqlite3_next_stmt(ctx->db, NULL)) != NULL) {
+    while ((stmt = sqlite3_next_stmt(ctx->db, NULL)) != NULL)
+    {
         // fprintf(stderr, "Leaked stmt: %s\n", sqlite3_sql(stmt));
         // const char *sql_msg = sqlite3_sql(stmt);
         // fwrite(sql_msg, strlen(sql_msg), 1, log_file);

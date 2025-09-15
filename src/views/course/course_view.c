@@ -124,6 +124,9 @@ WINDOW *create_explorer_window(FILE_TREE *file_tree)
 
 void create_file_tree(WINDOW **explorer_window, FILE_TREE *f_tree)
 {
+    mvwprintw(*explorer_window, LINES - 5, (EXPLORER_WIDTH - 16) / 2 - 1,
+              "Press ? for Keys");
+
     DIR *dir = opendir(".");
 
     struct dirent *next = readdir(dir);
@@ -135,19 +138,25 @@ void create_file_tree(WINDOW **explorer_window, FILE_TREE *f_tree)
         next = readdir(dir);
     }
 
-    if (num_of_entries < 3) return;
+    if (num_of_entries < 3)
+    {
+        wattron(*explorer_window, COLOR_PAIR(10));
+        mvwprintw(*explorer_window, 2, (EXPLORER_WIDTH - 16) / 2 - 1,
+                  "Nothing here yet");
+        wattroff(*explorer_window, COLOR_PAIR(10));
+        return;
+    }
 
     DIR_ENTRY *prev_dir = f_tree->prev_dir;
     DIR_ENTRY *curr_dir = initialize_dir_entry();
 
-    // FILE *log_file = fopen("create_file_tree_log.txt", "a");
     rewinddir(dir);
     next = readdir(dir);
 
     if (f_tree->num_of_entries == 0)
     {
         while (strcmp(next->d_name, ".") == 0 ||
-            strcmp(next->d_name, "..") == 0 || next->d_type != 4)
+               strcmp(next->d_name, "..") == 0 || next->d_type != 4)
         {
             next = readdir(dir);
         }
@@ -166,7 +175,8 @@ void create_file_tree(WINDOW **explorer_window, FILE_TREE *f_tree)
             f_tree->current_entry->prev = prev_dir;
             f_tree->first_entry = prev_dir;
         }
-        else {
+        else
+        {
             f_tree->first_entry = initialize_dir_entry();
             strncpy(f_tree->first_entry->name, next->d_name, 30);
             f_tree->first_entry->name[29] = '\0';
@@ -176,12 +186,6 @@ void create_file_tree(WINDOW **explorer_window, FILE_TREE *f_tree)
             f_tree->first_entry->state = 'c';
             f_tree->first_entry->prev = NULL;
         }
-
-        // char buf2[40];
-        // memset(buf2, 0, 40);
-        // buf2[39] = '\0';
-        // snprintf(buf2, 40, "%p\n", prev_dir);
-        // fwrite(buf2, 40, 1, log_file);
 
         f_tree->num_of_entries++;
         rewinddir(dir);
@@ -200,12 +204,6 @@ void create_file_tree(WINDOW **explorer_window, FILE_TREE *f_tree)
                 curr_dir->state = 'c';
                 curr_dir->prev = prev_dir;
                 prev_dir->next = curr_dir;
-
-                // char buf3[40];
-                // memset(buf3, 0, 40);
-                // buf3[39] = '\0';
-                // snprintf(buf3, 40, "%p\n", prev_dir);
-                // fwrite(buf3, 40, 1, log_file);
 
                 prev_dir = curr_dir;
                 curr_dir = initialize_dir_entry();
@@ -228,12 +226,6 @@ void create_file_tree(WINDOW **explorer_window, FILE_TREE *f_tree)
                 curr_dir->prev = prev_dir;
                 prev_dir->next = curr_dir;
 
-                // char buf4[40];
-                // memset(buf4, 0, 40);
-                // buf4[39] = '\0';
-                // snprintf(buf4, 40, "%p\n", prev_dir);
-                // fwrite(buf4, 40, 1, log_file);
-
                 prev_dir = curr_dir;
                 curr_dir = initialize_dir_entry();
                 f_tree->num_of_entries++;
@@ -243,22 +235,10 @@ void create_file_tree(WINDOW **explorer_window, FILE_TREE *f_tree)
 
         rewinddir(dir);
     }
-    // else if (f_tree->num_of_entries == 1)
-    // {
-    //     next = readdir(dir);
-    //     strncpy(f_tree->first_entry->name, next->d_name, 30);
-    //     f_tree->first_entry->name[29] = '\0';
-    //     strncpy(f_tree->first_entry->path, next->d_name, 30);
-    //     f_tree->first_entry->path[29] = '\0';
-    //     f_tree->first_entry->type = next->d_type;
-    //     f_tree->first_entry->state = 'c';
-    // }
 
     free(curr_dir->name);
     free(curr_dir->path);
     free(curr_dir);
-
-    mvwprintw(*explorer_window, LINES - 5, 2, "Press ? for Keys");
 
     f_tree->current_entry = f_tree->first_entry;
 

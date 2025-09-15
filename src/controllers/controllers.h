@@ -19,5 +19,5 @@ void print_term_buf(WINDOW *term_win, TEXT_BUFFER *term_buf);
 void handle_start_opts_menu_input(APP_CONTEXT *ctx, MENU *start_options_menu);
 void handle_new_user_input(APP_CONTEXT *ctx, bool *start_opt_menu_active);
 void handle_user_select_win_input(APP_CONTEXT *ctx, bool *start_opt_menu_active,
-                                  bool continue_course);
+                                  int menu_option);
 

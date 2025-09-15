@@ -251,7 +251,6 @@ void open_new_file(APP_CONTEXT *ctx)
 
 void open_file(APP_CONTEXT *ctx)
 {
-    int file_size = 0;
     ctx->file = fopen(ctx->file_tree->current_entry->path, "r+");
     strncpy(ctx->filename, ctx->file_tree->current_entry->name, 30);
     ctx->filename[29] = '\0';
@@ -264,17 +263,18 @@ void open_file(APP_CONTEXT *ctx)
 
     if (ctx->file != NULL)
     {
-        fseek(ctx->file, 0, SEEK_END);
-        file_size = ftell(ctx->file);
-        rewind(ctx->file);
+        print_file_metadata(ctx);
 
-        if (file_size == 0)
+        if (!ctx->file_modified)
         {
-            prepare_empty_file(&ctx->t_buffer);
-        }
-        else if (file_size > 0)
-        {
-            read_file_into_buffer(ctx->file, ctx->t_buffer);
+            if (ctx->file_size == 0)
+            {
+                prepare_empty_file(&ctx->t_buffer);
+            }
+            else if (ctx->file_size > 0)
+            {
+                read_file_into_buffer(ctx->file, ctx->t_buffer);
+            }
         }
 
         ctx->lines_to_print =
@@ -287,13 +287,6 @@ void open_file(APP_CONTEXT *ctx)
 
         print_buffer(ctx->t_buffer, &ctx->edit_window, &ctx->line_num_win,
                      &ctx->scroll_offset, ctx->lines_to_print);
-
-        if (file_size < 1000)
-            mvwprintw(ctx->course_windows[2], ctx->editor_height - 2, 2, "%iB",
-                      file_size);
-        else
-            mvwprintw(ctx->course_windows[2], ctx->editor_height - 2, 2,
-                      "%.1fk", (1.0 * file_size / 1000));
 
         mvwprintw(ctx->course_windows[2], ctx->editor_height - 2,
                   EDITOR_WIDTH - 7, "     ");
@@ -324,6 +317,8 @@ void reopen_file(APP_CONTEXT *ctx, bool activate_ed)
     {
         ctx->t_buffer->current_line = ctx->t_buffer->current_line->next;
     }
+    // print_buffer(ctx->t_buffer, &ctx->edit_window, &ctx->line_num_win,
+    //              &ctx->scroll_offset, ctx->lines_to_print);
     ctx->explorer_mode = false;
     ctx->editor_mode = activate_ed ? true : false;
     ctx->active_window_idx = 2;
@@ -334,7 +329,6 @@ void reopen_file(APP_CONTEXT *ctx, bool activate_ed)
     focus_window(&ctx->course_windows[2], border_color, "Editor");
     if (activate_ed)
         curs_set(2);
-    wmove(ctx->edit_window, curr_line - ctx->scroll_offset, curr_col);
 }
 
 void read_file_into_buffer(FILE *file, TEXT_BUFFER *text_buf)
@@ -914,6 +908,8 @@ void delete_file(APP_CONTEXT *ctx, bool *del_file_form_active,
                 break;
         }
     }
+
+    free(label);
 }
 
 void remove_entry_from_file_tree(FILE_TREE *f_tree)
@@ -1029,7 +1025,7 @@ void rename_file(APP_CONTEXT *ctx, WINDOW **inner_win, WINDOW **form_window,
                 if (strcmp(ctx->file_tree->current_entry->name, new_filename) !=
                     0)
                 {
-                    char *new_path;
+                    char *new_path = NULL;
                     if (ctx->file_tree->current_entry->parent_dir)
                     {
                         new_path = malloc(strlen(ctx->file_tree->current_entry
@@ -1056,6 +1052,7 @@ void rename_file(APP_CONTEXT *ctx, WINDOW **inner_win, WINDOW **form_window,
                     ctx->filename_len = strlen(ctx->filename);
 
                     print_buffer_label(ctx);
+                    free(new_path);
                 }
 
                 curs_set(0);
@@ -1141,7 +1138,7 @@ void create_directory(APP_CONTEXT *ctx, WINDOW **inner_win,
                 ctx->editor_mode = false;
                 ctx->active_window_idx = 1;
 
-                char *new_path;
+                char *new_path = NULL;
                 if (ctx->file_tree->num_of_entries == 0)
                 {
                     new_path = malloc(strlen(new_dirname) + 1);
@@ -1174,6 +1171,7 @@ void create_directory(APP_CONTEXT *ctx, WINDOW **inner_win,
                 }
 
                 mkdir(new_path, 0777);
+                free(new_path);
 
                 DIR_ENTRY *current_entry = NULL;
                 if (ctx->file_tree->num_of_entries == 0)

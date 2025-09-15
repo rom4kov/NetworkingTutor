@@ -236,6 +236,7 @@ typedef struct _app_context
   int curr_col;
   int curr_nav_item;
   int filename_len;
+  int file_size;
   bool running;
   bool greeter_needs_redraw;
   bool start_needs_redraw;

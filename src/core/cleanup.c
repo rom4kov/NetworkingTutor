@@ -5,6 +5,7 @@
 #include <form.h>
 #include <menu.h>
 #include <ncurses.h>
+#include <panel.h>
 
 void free_memory_for_exit(APP_CONTEXT *ctx)
 {
@@ -194,6 +195,16 @@ void cleanup_course_for_exit(APP_CONTEXT *ctx)
 
     cleanup_nav_menu(ctx);
 
+    for (int i = 0; i < EXPLORER_PANEL_COUNT; i++)
+    {
+        del_panel(ctx->explorer_panels[i]);
+    }
+
+    for (int i = 0; i < EXPLORER_POPUP_WINDOW_COUNT; i++)
+    {
+        delwin(ctx->explorer_popup_windows[i]);
+    }
+
     for (int i = 0; i < COURSE_WINDOW_COUNT; i++)
     {
         delwin(ctx->course_windows[i]);
@@ -208,6 +219,16 @@ void cleanup_course_for_switch(APP_CONTEXT *ctx)
     }
 
     cleanup_nav_menu(ctx);
+
+    for (int i = 0; i < EXPLORER_PANEL_COUNT; i++)
+    {
+        del_panel(ctx->explorer_panels[i]);
+    }
+
+    for (int i = 0; i < EXPLORER_POPUP_WINDOW_COUNT; i++)
+    {
+        delwin(ctx->explorer_popup_windows[i]);
+    }
 
     for (int i = 0; i < COURSE_WINDOW_COUNT; i++)
     {
@@ -224,6 +245,11 @@ void cleanup_all_courses_for_exit(APP_CONTEXT *ctx)
     cleanup_init_state(ctx);
 
     cleanup_nav_menu(ctx);
+
+    for (int i = 0; i < EXPLORER_PANEL_COUNT; i++)
+    {
+        del_panel(ctx->explorer_panels[i]);
+    }
 
     for (int i = 0; i < ALL_COURSES_WINDOW_COUNT; i++)
     {

@@ -16,14 +16,13 @@ void create_greeter_screen(APP_CONTEXT *ctx)
     // WINDOW *greeter_screen = newwin(LINES, COLS, 0, 0);
     ctx->num_of_users = get_user_count(ctx->db);
 
-    ctx->greeter_windows[0] = newwin(LINES, COLS, 0, 0);
-    ctx->greeter_panels[0] = new_panel(ctx->greeter_windows[0]);
-
-    ctx->greeter_windows[1] =
-        newwin(18, COLS / 6 + 2, (LINES / 5) * 2 + 1, (COLS - 35) / 2 - 3);
-    ctx->greeter_panels[1] = new_panel(ctx->greeter_windows[1]);
-
-    ctx->greeter_menu = create_greeter_menu(ctx);
+    ctx->greeter_windows[6] =
+        newwin(ctx->num_of_users * 2 + 5, 50, (LINES / 2) - 4, (COLS / 2) - 25);
+    ctx->greeter_panels[4] = new_panel(ctx->greeter_windows[6]);
+    ctx->greeter_windows[7] =
+        derwin(ctx->greeter_windows[6], ctx->num_of_users * 2, 44, 2, 2);
+    ctx->greeter_user_select_menu =
+        create_user_selection_menu(ctx, ctx->num_of_users);
 
     ctx->greeter_windows[2] = create_start_options_popup();
     ctx->greeter_panels[2] = new_panel(ctx->greeter_windows[2]);
@@ -36,13 +35,16 @@ void create_greeter_screen(APP_CONTEXT *ctx)
     ctx->greeter_windows[5] = derwin(ctx->greeter_windows[4], 1, 42, 2, 14);
     ctx->new_user_form = create_new_user_popup_form(ctx, " Create new user ");
 
-    ctx->greeter_windows[6] =
-        newwin(ctx->num_of_users * 2 + 5, 50, (LINES / 2) - 4, (COLS / 2) - 25);
-    ctx->greeter_panels[4] = new_panel(ctx->greeter_windows[6]);
-    ctx->greeter_windows[7] =
-        derwin(ctx->greeter_windows[6], ctx->num_of_users * 2, 44, 2, 2);
-    ctx->greeter_user_select_menu =
-        create_user_selection_menu(ctx, ctx->num_of_users);
+    ctx->greeter_windows[0] = newwin(LINES, COLS, 0, 0);
+    ctx->greeter_panels[0] = new_panel(ctx->greeter_windows[0]);
+
+    ctx->greeter_windows[1] =
+        newwin(16, COLS / 6 + 2, (LINES / 5) * 2 + 1, (COLS - 35) / 2 - 3);
+    ctx->greeter_panels[1] = new_panel(ctx->greeter_windows[1]);
+
+    ctx->greeter_menu = create_greeter_menu(ctx);
+
+
 
     ctx->greeter_ascii_window =
         derwin(ctx->greeter_windows[0], 10, 71, LINES / 5, (COLS - 71) / 2 + 2);
@@ -59,13 +61,13 @@ void create_greeter_screen(APP_CONTEXT *ctx)
     char *msg = "Welcome to";
     char *msg2 = "󰒍 NetworkingTutor v0.0.1";
     mvwprintw(ctx->greeter_windows[0], (LINES / 5) - 1,
-              (COLS - strlen(msg)) / 2, "%s", msg);
+              (COLS - strlen(msg)) / 2 - 1, "%s", msg);
 
     wattroff(ctx->greeter_windows[0], COLOR_PAIR(3) | A_BOLD);
 
     wattron(ctx->greeter_windows[0], COLOR_PAIR(3));
-    mvwprintw(ctx->greeter_windows[0], (LINES / 2) + 14,
-              (COLS - strlen(msg2)) / 2 + 2, msg2, LINES, COLS);
+    mvwprintw(ctx->greeter_windows[0], (LINES / 2) + 12,
+              (COLS - strlen(msg2)) / 2, msg2, LINES, COLS);
     wattroff(ctx->greeter_windows[0], COLOR_PAIR(3));
     wnoutrefresh(ctx->greeter_ascii_window);
 
@@ -82,13 +84,15 @@ void create_greeter_screen(APP_CONTEXT *ctx)
 
 MENU *create_greeter_menu(APP_CONTEXT *ctx)
 {
-    const char *choices[] = {
-        "   🛫 Start new learning path", " 👉 Continue where you left off",
-        "     👤 Create new account",    "          🚀 Progress",
-        "            Settings",       "            Shortcuts",
-        "            🚪 Quit",           (char *)NULL};
+    const char *choices[] = {"          🚀 Start",
+                             "👉 Continue where you left off",
+                             "      📚 See all courses",
+                             "         📈 Progress",
+                             "          Keybindings",
+                             "           🚪 Quit",
+                             (char *)NULL};
 
-    ctx->greeter_menu_items = (ITEM **)calloc(8, sizeof(ITEM *));
+    ctx->greeter_menu_items = (ITEM **)calloc(7, sizeof(ITEM *));
 
     for (int i = 0; choices[i] != NULL; i++)
     {
@@ -100,7 +104,7 @@ MENU *create_greeter_menu(APP_CONTEXT *ctx)
     set_menu_spacing(menu, 0, 2, 2);
 
     set_menu_win(menu, ctx->greeter_windows[1]);
-    set_menu_sub(menu, derwin(ctx->greeter_windows[1], 16, COLS / 6, 1, 1));
+    set_menu_sub(menu, derwin(ctx->greeter_windows[1], 14, COLS / 6, 1, 1));
     set_menu_fore(menu, A_BOLD | A_ITALIC);
     set_menu_mark(menu, " > ");
 

@@ -387,8 +387,16 @@ void print_modified_marker(WINDOW *editor_window, int filename_len,
     *file_modified = true;
 }
 
-void print_editor_meta_data(APP_CONTEXT *ctx)
+void print_file_metadata(APP_CONTEXT *ctx)
 {
-    mvwprintw(ctx->course_windows[2], LINES - 5, EDITOR_WIDTH, "%i",
-              ctx->t_buffer->curr_line_nr);
+    fseek(ctx->file, 0, SEEK_END);
+    ctx->file_size = ftell(ctx->file);
+    rewind(ctx->file);
+
+    if (ctx->file_size < 1000)
+        mvwprintw(ctx->course_windows[2], ctx->editor_height - 2, 2, "%iB",
+                  ctx->file_size);
+    else
+        mvwprintw(ctx->course_windows[2], ctx->editor_height - 2, 2,
+                  "%.1fk", (1.0 * ctx->file_size / 1000));
 }

@@ -402,9 +402,9 @@ void handle_course_input(APP_CONTEXT *ctx)
                 {
                     wclear(ctx->rp_state->right_panel);
                     wclear(ctx->rp_state->inner_win);
-                    // ctx->rp_state->showing_test_results = true;
+
                     ctx->rp_state->ready_to_test = true;
-                    // ctx->rp_state->curr_item = 0;
+
                     get_task(ctx);
                     wattron(ctx->rp_state->inner_win, A_BOLD | A_UNDERLINE);
                     mvwprintw(ctx->rp_state->inner_win, 0, 0,
@@ -421,8 +421,6 @@ void handle_course_input(APP_CONTEXT *ctx)
                         ctx->rp_state->right_panel, LINES - 5,
                         (ctx->rp_state->window_width - strlen(press_enter)) / 2,
                         "%s", press_enter);
-                    // mvwprintw(ctx->course_windows[2], 10, 5, "sec compl: %i",
-                    //           ctx->rp_state->sections_completed);
 
                     focus_window(&ctx->rp_state->right_panel, 3,
                                  "Course Instructions");
@@ -507,8 +505,6 @@ void handle_course_input(APP_CONTEXT *ctx)
                 ctx->active_window_idx = 2;
                 ctx->editor_mode = false;
                 recreate_editor_windows(ctx);
-                mvwprintw(ctx->rp_state->inner_win, 4, 3, "e_mode: %i", ctx->editor_mode);
-                wrefresh(ctx->rp_state->inner_win);
                 wmove(ctx->edit_window,
                       ctx->t_buffer->curr_line_nr - ctx->scroll_offset,
                       ctx->t_buffer->current_col);

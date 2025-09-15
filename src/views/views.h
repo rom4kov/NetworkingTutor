@@ -86,6 +86,7 @@ ICON get_file_icon(char *filename);
 void print_buffer_label(APP_CONTEXT *ctx);
 void print_modified_marker(WINDOW *editor_window, int filename_len,
                            bool *file_modified);
+void print_file_metadata(APP_CONTEXT *ctx);
 
 void print_entries(FILE_TREE *f_tree, WINDOW **explorer_window);
 void move_to_next_entry(FILE_TREE *f_tree, WINDOW **explorer_window);

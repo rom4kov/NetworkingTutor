@@ -61,7 +61,7 @@ void handle_greeter_input(APP_CONTEXT *ctx)
                     update_panels();
                     doupdate();
                     handle_user_select_win_input(ctx, &start_opt_menu_active,
-                                                 true);
+                                                 1);
                 }
                 else
                 {
@@ -80,7 +80,43 @@ void handle_greeter_input(APP_CONTEXT *ctx)
                     deallocate_greeter_memory(ctx);
                 }
             }
-            else if (item_index(curr_item) == 6)
+            else if (item_index(curr_item) == 2)
+            {
+                if (ctx->num_of_users > 1)
+                {
+                    ctx->active_window = ctx->greeter_windows[6];
+                    top_panel(ctx->greeter_panels[4]);
+                    update_panels();
+                    doupdate();
+                    handle_user_select_win_input(ctx, &start_opt_menu_active,
+                                                 2);
+                }
+            }
+            else if (item_index(curr_item) == 3)
+            {
+                if (ctx->num_of_users > 1)
+                {
+                    ctx->active_window = ctx->greeter_windows[6];
+                    top_panel(ctx->greeter_panels[4]);
+                    update_panels();
+                    doupdate();
+                    handle_user_select_win_input(ctx, &start_opt_menu_active,
+                                                 3);
+                }
+            }
+            else if (item_index(curr_item) == 4)
+            {
+                if (ctx->num_of_users > 1)
+                {
+                    ctx->active_window = ctx->greeter_windows[6];
+                    top_panel(ctx->greeter_panels[4]);
+                    update_panels();
+                    doupdate();
+                    handle_user_select_win_input(ctx, &start_opt_menu_active,
+                                                 4);
+                }
+            }
+            else if (item_index(curr_item) == 5)
             {
                 ctx->greeter_view_active = false;
                 ctx->running = false;
@@ -221,7 +257,7 @@ void handle_new_user_input(APP_CONTEXT *ctx, bool *start_opt_menu_active)
 }
 
 void handle_user_select_win_input(APP_CONTEXT *ctx, bool *start_opt_menu_active,
-                                  bool continue_course)
+                                  int menu_option)
 {
     ITEM *curr_item = NULL;
 
@@ -252,26 +288,48 @@ void handle_user_select_win_input(APP_CONTEXT *ctx, bool *start_opt_menu_active,
                 wclear(ctx->greeter_windows[0]);
                 wrefresh(ctx->greeter_windows[0]);
 
+                ctx->greeter_needs_redraw = false;
                 ctx->greeter_view_active = false;
-                if (continue_course)
-                {
-                    ctx->user_data =
-                        get_user_data(ctx->db, ctx->current_user_id);
-                    go_to_course_by_id(ctx, ctx->current_course_id);
-                }
-                else
+                if (menu_option == 0)
                 {
                     ctx->user_data =
                         get_user_data(ctx->db, ctx->current_user_id);
                     ctx->start_view_active = true;
                     ctx->start_needs_redraw = true;
                 }
+                else if (menu_option == 1)
+                {
+                    ctx->user_data =
+                        get_user_data(ctx->db, ctx->current_user_id);
+                    go_to_course_by_id(ctx, ctx->current_course_id);
+                }
+                else if (menu_option == 2)
+                {
+                    ctx->user_data =
+                        get_user_data(ctx->db, ctx->current_user_id);
+                    ctx->all_courses_view_active = true;
+                    ctx->all_courses_needs_redraw = true;
+                }
+                else if (menu_option == 3)
+                {
+                    ctx->user_data =
+                        get_user_data(ctx->db, ctx->current_user_id);
+                    ctx->progress_view_active = true;
+                    ctx->progress_needs_redraw = true;
+                }
+                else if (menu_option == 4)
+                {
+                    ctx->user_data =
+                        get_user_data(ctx->db, ctx->current_user_id);
+                    ctx->keybindings_view_active = true;
+                    ctx->keybindings_needs_redraw = true;
+                }
                 deallocate_greeter_memory(ctx);
                 break;
             case 'q':
                 user_select_menu_active = false;
 
-                if (continue_course)
+                if (menu_option == 1)
                 {
                     ctx->active_window = ctx->greeter_windows[1];
                     hide_panel(ctx->greeter_panels[4]);
@@ -288,8 +346,6 @@ void handle_user_select_win_input(APP_CONTEXT *ctx, bool *start_opt_menu_active,
                 doupdate();
                 break;
             default:
-                // form_driver(new_file_form, ctx->key);
-                // wrefresh(form_window);
                 break;
         }
     }

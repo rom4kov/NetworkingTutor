@@ -3,14 +3,13 @@
 #include "../../views/views.h"
 #include "../tests.h"
 #include "http_server_tests.h"
+
 #include <CUnit/CUError.h>
 #include <CUnit/CUnit.h>
 #include <CUnit/TestDB.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-
-#define PCRE2_CODE_UNIT_WIDTH 8
 #include <pcre2.h>
 
 int server_c_contains_bind_syscall(char *path)

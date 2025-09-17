@@ -37,6 +37,7 @@ int main(void)
     memset(ctx, 0, sizeof(APP_CONTEXT));
 
     ctx->db = create_database();
+
     ctx->rp_state = (RIGHT_PANEL_STATE *)malloc(sizeof(RIGHT_PANEL_STATE));
     ctx->num_of_courses = get_num_of_courses(ctx->db);
     ctx->courses = get_course_data(ctx->db, ctx->num_of_courses);
@@ -82,8 +83,6 @@ int main(void)
     ctx->rp_state->total_course_sections = 0;
     ctx->rp_state->showing_end_of_course_page = false;
 
-    // ctx->user_form_field = false;
-
     ctx->shell = calloc(1, sizeof(SHELL));
     ctx->shell->terminal_active = false;
     ctx->shell->executable_running = false;
@@ -100,13 +99,6 @@ int main(void)
     ctx->shell->term_buffer->scroll_offset = 0;
     ctx->shell->cwd = "";
     ctx->shell->cwd_allocated = false;
-    char *home_dir = getenv("HOME");
-    char proj_dir_buf[64];
-    snprintf(proj_dir_buf, strlen(home_dir) + 18, "%s/Documents/ntutor",
-             home_dir);
-    mkdir(proj_dir_buf, 0777);
-    chdir(proj_dir_buf);
-    ctx->shell->home_dir = get_cwd();
 
     // seed_courses_data(ctx->db, ctx->greeter_windows[0],
     //                   "SQL/create_courses_table.sql");
@@ -201,7 +193,8 @@ int main(void)
                     ctx->rp_state->items_to_print =
                         ctx->rp_state->curr_item - 1;
 
-                // ctx->rp_state->it_buffer = initialize_it_buffer();
+                deallocate_it_buffer(ctx->rp_state->it_buffer);
+                ctx->rp_state->it_buffer = initialize_it_buffer();
 
                 endwin();
                 refresh();
@@ -211,7 +204,7 @@ int main(void)
             if (ctx->file && ctx->file->_fileno > 0)
             {
                 bool activate_editor = true;
-                reopen_file(ctx, activate_editor);
+                reprint_editor_buffer(ctx, activate_editor);
             }
             wnoutrefresh(ctx->course_windows[4]);
             wnoutrefresh(ctx->course_windows[0]);

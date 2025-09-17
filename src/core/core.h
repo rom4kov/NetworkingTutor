@@ -107,6 +107,9 @@ void free_memory_for_switch(APP_CONTEXT *ctx);
 void free_section_data(APP_CONTEXT *ctx);
 void cleanup_nav_menu(APP_CONTEXT *ctx);
 
+void cleanup_greeter_for_exit(APP_CONTEXT *ctx);
+void cleanup_greeter_for_switch(APP_CONTEXT *ctx);
+
 void cleanup_start_for_exit(APP_CONTEXT *ctx);
 void cleanup_start_for_switch(APP_CONTEXT *ctx);
 

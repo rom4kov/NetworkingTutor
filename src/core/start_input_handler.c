@@ -117,13 +117,13 @@ void handle_start_input(APP_CONTEXT *ctx)
                 ctx->active_window_idx = 1;
                 ctx->active_window = ctx->start_windows[1];
                 focus_window(&ctx->start_windows[1], 3, "");
-                // werase(ctx->start_windows[2]);
+
                 ctx->start_windows[this_win] = create_course_preview_card(
                     ctx, CARD_WIDTH * (this_win - 2), this_win,
                     &ctx->courses[this_win - 2]);
                 doupdate();
                 break;
-            case '\n': // Enter / Return key
+            case '\n':
                 this_win = ctx->active_window_idx;
                 if (!ctx->courses[this_win - 2].locked)
                 {

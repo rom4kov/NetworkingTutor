@@ -52,6 +52,8 @@ void print_course_instructions(APP_CONTEXT *ctx)
         ctx->rp_state->showing_end_of_course_page = true;
         print_course_complete(ctx);
     }
+    // log_course_instr_values(ctx);
+    // wrefresh(ctx->course_windows[2]);
 }
 
 void print_next_course_item(RIGHT_PANEL_STATE *rp_state)

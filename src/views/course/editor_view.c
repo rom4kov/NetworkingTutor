@@ -1,20 +1,16 @@
+#include "../../../ntutor.h"
 #include "../../data/data_access_layer.h"
 #include "../../models/models.h"
+#include "../../views/views.h"
 
 #include <curses.h>
 #include <ncurses.h>
-#include <pcre.h>
+#include <pcre2.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#define PCRE2_CODE_UNIT_WIDTH 8
-#include <pcre2.h>
-
-#define WU COLS / 12 // WU for WIDTH_UNIT
-#define EDITOR_WIDTH ((WU * 7 + 4) - (WU + WU / 2))
 
 void update_line_numbers(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
                          int *scroll_offset, int lines_to_print)
@@ -375,7 +371,6 @@ void print_buffer_label(APP_CONTEXT *ctx)
     wattron(ctx->course_windows[2], A_BOLD | COLOR_PAIR(1));
     mvwprintw(ctx->course_windows[2], 1, 7, "%s", ctx->filename);
     wattroff(ctx->course_windows[2], A_BOLD | COLOR_PAIR(1));
-    wrefresh(ctx->edit_window);
 }
 
 void print_modified_marker(WINDOW *editor_window, int filename_len,
@@ -397,6 +392,11 @@ void print_file_metadata(APP_CONTEXT *ctx)
         mvwprintw(ctx->course_windows[2], ctx->editor_height - 2, 2, "%iB",
                   ctx->file_size);
     else
-        mvwprintw(ctx->course_windows[2], ctx->editor_height - 2, 2,
-                  "%.1fk", (1.0 * ctx->file_size / 1000));
+        mvwprintw(ctx->course_windows[2], ctx->editor_height - 2, 2, "%.1fk",
+                  (1.0 * ctx->file_size / 1000));
+
+    mvwprintw(ctx->course_windows[2], ctx->editor_height - 2, EDITOR_WIDTH - 7,
+              "     ");
+    print_cursor_position(&ctx->course_windows[2], ctx->t_buffer,
+                          ctx->editor_height);
 }

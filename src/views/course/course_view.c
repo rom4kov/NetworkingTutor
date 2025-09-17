@@ -315,7 +315,7 @@ void open_sub_directory(char *dir_name, FILE_TREE *f_tree)
             prev_dir->next = curr_dir;
             prev_dir = curr_dir;
             curr_dir = initialize_dir_entry();
-            f_tree->current_entry->num_of_entries++;
+            f_tree->current_entry->num_of_open_entries++;
             f_tree->num_of_entries++;
         }
         next = readdir(dir);
@@ -346,7 +346,7 @@ void open_sub_directory(char *dir_name, FILE_TREE *f_tree)
             prev_dir->next = curr_dir;
             prev_dir = curr_dir;
             curr_dir = initialize_dir_entry();
-            f_tree->current_entry->num_of_entries++;
+            f_tree->current_entry->num_of_open_entries++;
             f_tree->num_of_entries++;
         }
         next = readdir(dir);
@@ -357,11 +357,11 @@ void open_sub_directory(char *dir_name, FILE_TREE *f_tree)
     free(curr_dir);
 
     prev_dir->next = next_orig_dir;
-    if (f_tree->current_entry->num_of_entries > 1)
+    if (f_tree->current_entry->num_of_open_entries > 1)
     {
         next_orig_dir->prev = prev_dir;
     }
-    if (f_tree->current_entry->num_of_entries > 0)
+    if (f_tree->current_entry->num_of_open_entries > 0)
     {
         prev_dir->last_in_sub_dir = true;
     }
@@ -370,8 +370,8 @@ void open_sub_directory(char *dir_name, FILE_TREE *f_tree)
 
     while (entries_iterator->parent_dir)
     {
-        entries_iterator->parent_dir->num_of_entries +=
-            f_tree->current_entry->num_of_entries;
+        entries_iterator->parent_dir->num_of_open_entries +=
+            f_tree->current_entry->num_of_open_entries;
         entries_iterator = entries_iterator->parent_dir;
     }
 
@@ -418,12 +418,12 @@ void close_sub_directory(DIR_ENTRY *dir_to_close, int entries_in_dir,
 
     while (entries_iterator->parent_dir)
     {
-        entries_iterator->parent_dir->num_of_entries -=
-            dir_to_close->num_of_entries;
+        entries_iterator->parent_dir->num_of_open_entries -=
+            dir_to_close->num_of_open_entries;
         entries_iterator = entries_iterator->parent_dir;
     }
 
-    dir_to_close->num_of_entries -= entries_in_dir;
+    dir_to_close->num_of_open_entries -= entries_in_dir;
 }
 
 void print_no_open_file_msg(APP_CONTEXT *ctx)
@@ -465,7 +465,7 @@ void recreate_editor_windows(APP_CONTEXT *ctx)
     if (ctx->file && ctx->file->_fileno > 0)
     {
         bool activate_editor = false;
-        reopen_file(ctx, activate_editor);
+        reprint_editor_buffer(ctx, activate_editor);
     }
     print_no_open_file_msg(ctx);
     doupdate();

@@ -1,8 +1,10 @@
 #define _POSIX_C_SOURCE 200809L
+#include "../../../ntutor.h"
 #include "../../data/data_access_layer.h"
 #include "../../views/views.h"
 #include "../tests.h"
 #include "http_server_tests.h"
+
 #include <CUnit/CUError.h>
 #include <CUnit/CUnit.h>
 #include <CUnit/TestDB.h>
@@ -12,8 +14,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-
-#define PCRE2_CODE_UNIT_WIDTH 8
 #include <pcre2.h>
 
 int server_c_contains_listen_syscall(char *path)

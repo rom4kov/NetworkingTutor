@@ -11,14 +11,7 @@ void free_memory_for_exit(APP_CONTEXT *ctx)
 {
     if (ctx->greeter_view_active)
     {
-        free(ctx->file_tree->prev_dir->name);
-        free(ctx->file_tree->prev_dir->path);
-        free(ctx->file_tree->prev_dir);
-        deallocate_file_tree(ctx->file_tree);
-        deallocate_buffer(ctx->t_buffer);
-        deallocate_buffer(ctx->shell->term_buffer);
-        deallocate_it_buffer(ctx->rp_state->it_buffer);
-        deallocate_greeter_memory(ctx);
+        cleanup_greeter_for_exit(ctx);
     }
     else if (ctx->start_view_active)
     {
@@ -74,11 +67,7 @@ void free_memory_for_switch(APP_CONTEXT *ctx)
 {
     if (ctx->greeter_view_active)
     {
-        deallocate_file_tree(ctx->file_tree);
-        deallocate_buffer(ctx->t_buffer);
-        deallocate_buffer(ctx->shell->term_buffer);
-        deallocate_it_buffer(ctx->rp_state->it_buffer);
-        deallocate_greeter_memory(ctx);
+        cleanup_greeter_for_switch(ctx);
         ctx->greeter_view_active = false;
     }
     else if (ctx->start_view_active)
@@ -121,6 +110,7 @@ void cleanup_init_state(APP_CONTEXT *ctx)
 
     free(ctx->user_data->name);
     free(ctx->user_data->created_at);
+    free(ctx->user_data->home_dir);
     free(ctx->user_data);
 }
 
@@ -154,6 +144,110 @@ void free_section_data(APP_CONTEXT *ctx)
     {
         free(ctx->rp_state->s_metadata->title);
         free(ctx->rp_state->s_metadata);
+    }
+}
+
+void cleanup_greeter_for_exit(APP_CONTEXT *ctx)
+{
+    free(ctx->file_tree->prev_dir->name);
+    free(ctx->file_tree->prev_dir->path);
+    free(ctx->file_tree->prev_dir);
+    deallocate_file_tree(ctx->file_tree);
+    deallocate_buffer(ctx->t_buffer);
+    deallocate_buffer(ctx->shell->term_buffer);
+    deallocate_it_buffer(ctx->rp_state->it_buffer);
+
+    unpost_menu(ctx->greeter_menu);
+    unpost_menu(ctx->greeter_start_opts_menu);
+    unpost_form(ctx->new_user_form);
+    unpost_menu(ctx->greeter_user_select_menu);
+    free_menu(ctx->greeter_menu);
+    free_menu(ctx->greeter_start_opts_menu);
+    free_form(ctx->new_user_form);
+    free_menu(ctx->greeter_user_select_menu);
+
+    free_field(ctx->new_user_form_field[0]);
+
+    for (int i = 0; ctx->greeter_menu_items[i] != NULL; i++)
+    {
+        free_item(ctx->greeter_menu_items[i]);
+    }
+    free(ctx->greeter_menu_items);
+
+    for (int i = 0; ctx->greeter_start_opts_menu_items[i] != NULL; i++)
+    {
+        free_item(ctx->greeter_start_opts_menu_items[i]);
+    }
+    free(ctx->greeter_start_opts_menu_items);
+
+    for (int i = 0; ctx->greeter_user_select_menu_items[i] != NULL; i++)
+    {
+        free_item(ctx->greeter_user_select_menu_items[i]);
+    }
+    free(ctx->greeter_user_select_menu_items);
+
+    for (int i = 0; i < ctx->num_of_users; i++)
+    {
+        free(ctx->user_select_menu_strings[i]);
+    }
+    free(ctx->user_select_menu_strings);
+
+    for (int i = 0; i < GREETER_PANEL_COUNT; i++)
+    {
+        del_panel(ctx->greeter_panels[i]);
+    }
+
+    for (int i = 0; i < GREETER_WINDOW_COUNT; i++)
+    {
+        delwin(ctx->greeter_windows[i]);
+    }
+}
+
+void cleanup_greeter_for_switch(APP_CONTEXT *ctx)
+{
+    unpost_menu(ctx->greeter_menu);
+    unpost_menu(ctx->greeter_start_opts_menu);
+    unpost_form(ctx->new_user_form);
+    unpost_menu(ctx->greeter_user_select_menu);
+    free_menu(ctx->greeter_menu);
+    free_menu(ctx->greeter_start_opts_menu);
+    free_form(ctx->new_user_form);
+    free_menu(ctx->greeter_user_select_menu);
+
+    free_field(ctx->new_user_form_field[0]);
+
+    for (int i = 0; ctx->greeter_menu_items[i] != NULL; i++)
+    {
+        free_item(ctx->greeter_menu_items[i]);
+    }
+    free(ctx->greeter_menu_items);
+
+    for (int i = 0; ctx->greeter_start_opts_menu_items[i] != NULL; i++)
+    {
+        free_item(ctx->greeter_start_opts_menu_items[i]);
+    }
+    free(ctx->greeter_start_opts_menu_items);
+
+    for (int i = 0; ctx->greeter_user_select_menu_items[i] != NULL; i++)
+    {
+        free_item(ctx->greeter_user_select_menu_items[i]);
+    }
+    free(ctx->greeter_user_select_menu_items);
+
+    for (int i = 0; i < ctx->num_of_users; i++)
+    {
+        free(ctx->user_select_menu_strings[i]);
+    }
+    free(ctx->user_select_menu_strings);
+
+    for (int i = 0; i < GREETER_PANEL_COUNT; i++)
+    {
+        del_panel(ctx->greeter_panels[i]);
+    }
+
+    for (int i = 0; i < GREETER_WINDOW_COUNT; i++)
+    {
+        delwin(ctx->greeter_windows[i]);
     }
 }
 

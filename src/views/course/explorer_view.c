@@ -163,6 +163,32 @@ void print_entries(FILE_TREE *f_tree, WINDOW **explorer_window)
     wattroff(*explorer_window, COLOR_PAIR(11));
 }
 
+void create_keybinds_window(WINDOW **explorer_window)
+{
+    wclear(*explorer_window);
+
+    WINDOW *kb_window =
+        derwin(*explorer_window, LINES - 5, EXPLORER_WIDTH - 4, 1, 2);
+
+    char *keybindings =
+        "Press:\n\nUP or DOWN key to move between entries\n\nENTER to open a "
+        "file or directory\n\n'a' to create a "
+        "new file\n\n'm' to create a "
+        "directory\n\n'r' to rename a "
+        "file or directory\n\n'd' to delete a file or directory";
+
+    char *kb_wrapped = wrap_text(keybindings, EXPLORER_WIDTH - 6);
+
+    wattron(kb_window, A_BOLD);
+    mvwprintw(kb_window, 1, 0, "File Explorer");
+    mvwprintw(kb_window, 2, 0, "Keybindings");
+    wattroff(kb_window, A_BOLD);
+
+    mvwprintw(kb_window, 4, 0, "%s", kb_wrapped);
+    focus_window(explorer_window, 3, "Explorer");
+    wrefresh(kb_window);
+}
+
 void move_to_next_entry(FILE_TREE *f_tree, WINDOW **explorer_window)
 {
     f_tree->curr_entry_nr++;

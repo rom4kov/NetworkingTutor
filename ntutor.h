@@ -6,8 +6,8 @@
 #define COLOR_TEALGREEN 19
 #define COLOR_BERMUDA 20
 
-#define GREETER_WINDOW_COUNT 8
-#define GREETER_PANEL_COUNT 8
+#define GREETER_WINDOW_COUNT 9
+#define GREETER_PANEL_COUNT 9
 #define START_WINDOW_COUNT 6
 #define COURSE_WINDOW_COUNT 5
 #define EXPLORER_POPUP_WINDOW_COUNT 8
@@ -19,13 +19,15 @@
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 #define CTRLD 4
-#define EDITOR_WIDTH ((WU * 7 + 4) - (WU + WU / 2))
 
-#define WINDOW_COUNT 4
 #define WU COLS / 12 // WU for WIDTH_UNIT
 #define WIDTH_REMAINDER COLS % WU
-#define EXPLORER_WIDTH WU + WU / 2
-#define EDIT_WIN_WIDTH WU * 5 + WU / 2
+#define EXPLORER_WIDTH WU + (WU / 2)
+#define EDITOR_WIDTH ((WU * 7 + 4) - (WU + (WU / 2)))
+#define EDIT_WIN_WIDTH (WU * 5) + (WU / 2)
+#define EDIT_MAX (WU * 5) + (WU / 2) + 4
 #define SHELL_WINDOW_IDX 4
 
 #define MAX_COURSE_SECTIONS 16
+
+#define PCRE2_CODE_UNIT_WIDTH 8

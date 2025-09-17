@@ -18,6 +18,7 @@ typedef struct _user_data
 {
     char *name;
     char *created_at;
+    char *home_dir;
 } USER_DATA;
 
 typedef struct _course_data
@@ -111,6 +112,7 @@ typedef struct _dir_entry
     int type;
     int indent_level;
     int num_of_entries;
+    int num_of_open_entries;
     char state;
     bool last_in_sub_dir;
 } DIR_ENTRY;
@@ -212,6 +214,8 @@ typedef struct _app_context
   FIELD *new_user_form_field[2];
   FILE_TREE *file_tree;
   FILE *file;
+  char *user_home_dir;
+  char *docs_dir;
   char *filename;
   char *curr_file_path;
   char *current_course;

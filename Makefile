@@ -1,6 +1,6 @@
 CC = gcc
-CFLAGS = -g -Wall -Wextra -std=c17
-LDFLAGS = -lpanel -lmenu -lform -lsqlite3 -lpcre2-8 -lncursesw -lcunit -lm
+CFLAGS = -g -Wall -Wextra -std=c17 -DPCRE2_CODE_UNIT_WIDTH=8
+LDFLAGS = -lpanelw -lmenuw -lformw -lsqlite3 -lpcre2-8 -lncursesw -lcunit -lm
 INC=-Isrc/
 
 TARGET = main

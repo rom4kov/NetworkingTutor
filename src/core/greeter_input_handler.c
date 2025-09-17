@@ -9,9 +9,7 @@
 #include <ncurses.h>
 #include <panel.h>
 #include <string.h>
-
-#define WU COLS / 12 // WU for WIDTH_UNIT
-#define EXPLORER_WIDTH WU + WU / 2
+#include <unistd.h>
 
 void handle_greeter_input(APP_CONTEXT *ctx)
 {
@@ -74,10 +72,14 @@ void handle_greeter_input(APP_CONTEXT *ctx)
                         wrefresh(ctx->greeter_windows[1]);
                         break;
                     }
-                    int current_course_id =
-                        get_current_course(ctx->db, user_id);
-                    go_to_course_by_id(ctx, current_course_id);
-                    deallocate_greeter_memory(ctx);
+                    ctx->current_user_id = get_id_of_first_user(ctx->db);
+                    ctx->current_course_id =
+                        get_current_course(ctx->db, ctx->current_user_id);
+                    ctx->user_data =
+                        get_user_data(ctx->db, ctx->current_user_id);
+                    chdir(ctx->user_data->home_dir);
+                    go_to_course_by_id(ctx, ctx->current_course_id);
+                    // deallocate_greeter_memory(ctx);
                 }
             }
             else if (item_index(curr_item) == 2)
@@ -90,6 +92,22 @@ void handle_greeter_input(APP_CONTEXT *ctx)
                     doupdate();
                     handle_user_select_win_input(ctx, &start_opt_menu_active,
                                                  2);
+                }
+                else if (ctx->num_of_users == 1)
+                {
+                    ctx->greeter_needs_redraw = false;
+                    ctx->greeter_view_active = false;
+                    ctx->all_courses_needs_redraw = true;
+                    ctx->all_courses_view_active = true;
+                    ctx->current_user_id = get_id_of_first_user(ctx->db);
+                    ctx->current_course_id =
+                        get_current_course(ctx->db, ctx->current_user_id);
+                    ctx->user_data =
+                        get_user_data(ctx->db, ctx->current_user_id);
+                    chdir(ctx->user_data->home_dir);
+                    ctx->current_course_id = 1;
+                    ctx->current_course = ctx->courses[0].name;
+                    // deallocate_greeter_memory(ctx);
                 }
             }
             else if (item_index(curr_item) == 3)
@@ -216,6 +234,10 @@ void handle_new_user_input(APP_CONTEXT *ctx, bool *start_opt_menu_active)
 
                 ctx->current_user_id = create_new_user(ctx, username);
                 ctx->user_data = get_user_data(ctx->db, ctx->current_user_id);
+
+                create_app_root_dir(ctx);
+                ctx->shell->home_dir = get_cwd();
+
                 ctx->current_course_id = 1;
                 ctx->current_course = ctx->courses[0].name;
 
@@ -224,7 +246,7 @@ void handle_new_user_input(APP_CONTEXT *ctx, bool *start_opt_menu_active)
                 werase(ctx->greeter_windows[4]);
                 werase(ctx->greeter_windows[5]);
                 curs_set(0);
-                deallocate_greeter_memory(ctx);
+                cleanup_greeter_for_switch(ctx);
                 doupdate();
                 ctx->greeter_view_active = false;
                 ctx->start_view_active = true;
@@ -294,37 +316,45 @@ void handle_user_select_win_input(APP_CONTEXT *ctx, bool *start_opt_menu_active,
                 {
                     ctx->user_data =
                         get_user_data(ctx->db, ctx->current_user_id);
+                    chdir(ctx->user_data->home_dir);
                     ctx->start_view_active = true;
                     ctx->start_needs_redraw = true;
                 }
-                else if (menu_option == 1)
+                else if (ctx->num_of_users > 0)
                 {
-                    ctx->user_data =
-                        get_user_data(ctx->db, ctx->current_user_id);
-                    go_to_course_by_id(ctx, ctx->current_course_id);
+                    if (menu_option == 1)
+                    {
+                        ctx->user_data =
+                            get_user_data(ctx->db, ctx->current_user_id);
+                        chdir(ctx->user_data->home_dir);
+                        go_to_course_by_id(ctx, ctx->current_course_id);
+                    }
+                    else if (menu_option == 2)
+                    {
+                        ctx->user_data =
+                            get_user_data(ctx->db, ctx->current_user_id);
+                        chdir(ctx->user_data->home_dir);
+                        ctx->all_courses_view_active = true;
+                        ctx->all_courses_needs_redraw = true;
+                    }
+                    else if (menu_option == 3)
+                    {
+                        ctx->user_data =
+                            get_user_data(ctx->db, ctx->current_user_id);
+                        chdir(ctx->user_data->home_dir);
+                        ctx->progress_view_active = true;
+                        ctx->progress_needs_redraw = true;
+                    }
+                    else if (menu_option == 4)
+                    {
+                        ctx->user_data =
+                            get_user_data(ctx->db, ctx->current_user_id);
+                        chdir(ctx->user_data->home_dir);
+                        ctx->keybindings_view_active = true;
+                        ctx->keybindings_needs_redraw = true;
+                    }
                 }
-                else if (menu_option == 2)
-                {
-                    ctx->user_data =
-                        get_user_data(ctx->db, ctx->current_user_id);
-                    ctx->all_courses_view_active = true;
-                    ctx->all_courses_needs_redraw = true;
-                }
-                else if (menu_option == 3)
-                {
-                    ctx->user_data =
-                        get_user_data(ctx->db, ctx->current_user_id);
-                    ctx->progress_view_active = true;
-                    ctx->progress_needs_redraw = true;
-                }
-                else if (menu_option == 4)
-                {
-                    ctx->user_data =
-                        get_user_data(ctx->db, ctx->current_user_id);
-                    ctx->keybindings_view_active = true;
-                    ctx->keybindings_needs_redraw = true;
-                }
-                deallocate_greeter_memory(ctx);
+                cleanup_greeter_for_switch(ctx);
                 break;
             case 'q':
                 user_select_menu_active = false;

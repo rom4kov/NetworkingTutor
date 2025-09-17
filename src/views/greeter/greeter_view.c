@@ -13,7 +13,6 @@
 
 void create_greeter_screen(APP_CONTEXT *ctx)
 {
-    // WINDOW *greeter_screen = newwin(LINES, COLS, 0, 0);
     ctx->num_of_users = get_user_count(ctx->db);
 
     ctx->greeter_windows[6] =
@@ -23,6 +22,10 @@ void create_greeter_screen(APP_CONTEXT *ctx)
         derwin(ctx->greeter_windows[6], ctx->num_of_users * 2, 44, 2, 2);
     ctx->greeter_user_select_menu =
         create_user_selection_menu(ctx, ctx->num_of_users);
+
+    ctx->greeter_windows[8] =
+        newwin(5, 50, (LINES / 2) - 4, (COLS / 2) - 25);
+    ctx->greeter_panels[5] = new_panel(ctx->greeter_windows[8]);
 
     ctx->greeter_windows[2] = create_start_options_popup();
     ctx->greeter_panels[2] = new_panel(ctx->greeter_windows[2]);
@@ -254,52 +257,4 @@ MENU *create_user_selection_menu(APP_CONTEXT *ctx, int num_of_users)
 
     wnoutrefresh(ctx->greeter_windows[6]);
     return menu;
-}
-
-void deallocate_greeter_memory(APP_CONTEXT *ctx)
-{
-    unpost_menu(ctx->greeter_menu);
-    unpost_menu(ctx->greeter_start_opts_menu);
-    unpost_form(ctx->new_user_form);
-    unpost_menu(ctx->greeter_user_select_menu);
-    free_menu(ctx->greeter_menu);
-    free_menu(ctx->greeter_start_opts_menu);
-    free_form(ctx->new_user_form);
-    free_menu(ctx->greeter_user_select_menu);
-
-    free_field(ctx->new_user_form_field[0]);
-
-    for (int i = 0; ctx->greeter_menu_items[i] != NULL; i++)
-    {
-        free_item(ctx->greeter_menu_items[i]);
-    }
-    free(ctx->greeter_menu_items);
-
-    for (int i = 0; ctx->greeter_start_opts_menu_items[i] != NULL; i++)
-    {
-        free_item(ctx->greeter_start_opts_menu_items[i]);
-    }
-    free(ctx->greeter_start_opts_menu_items);
-
-    for (int i = 0; ctx->greeter_user_select_menu_items[i] != NULL; i++)
-    {
-        free_item(ctx->greeter_user_select_menu_items[i]);
-    }
-    free(ctx->greeter_user_select_menu_items);
-
-    for (int i = 0; i < ctx->num_of_users; i++)
-    {
-        free(ctx->user_select_menu_strings[i]);
-    }
-    free(ctx->user_select_menu_strings);
-
-    for (int i = 0; i < GREETER_PANEL_COUNT; i++)
-    {
-        del_panel(ctx->greeter_panels[i]);
-    }
-
-    for (int i = 0; i < GREETER_WINDOW_COUNT; i++)
-    {
-        delwin(ctx->greeter_windows[i]);
-    }
 }

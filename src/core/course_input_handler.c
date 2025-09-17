@@ -11,12 +11,6 @@
 #include <stdbool.h>
 #include <string.h>
 
-#define WINDOW_COUNT 4
-#define WU COLS / 12 // WU for WIDTH_UNIT
-#define EDIT_MAX WU * 7 + 4
-
-#define SHELL_WINDOW_IDX 4
-
 void log_course_instr_values(APP_CONTEXT *ctx)
 {
     mvwprintw(ctx->course_windows[2], 2, EDITOR_WIDTH - 30, "%s",
@@ -43,6 +37,10 @@ void log_course_instr_values(APP_CONTEXT *ctx)
               "                    ");
     mvwprintw(ctx->course_windows[2], 14, EDITOR_WIDTH - 30, "%s",
               "                    ");
+    mvwprintw(ctx->course_windows[2], 15, EDITOR_WIDTH - 30, "%s",
+              "                    ");
+    mvwprintw(ctx->course_windows[2], 16, EDITOR_WIDTH - 30, "%s",
+              "                    ");
     mvwprintw(ctx->course_windows[2], 2, EDITOR_WIDTH - 30, "curr_section %i",
               ctx->rp_state->curr_section);
     mvwprintw(ctx->course_windows[2], 3, EDITOR_WIDTH - 30, "nosi %i",
@@ -55,18 +53,25 @@ void log_course_instr_values(APP_CONTEXT *ctx)
               ctx->rp_state->total_section_items[ctx->rp_state->curr_section]);
     mvwprintw(ctx->course_windows[2], 7, EDITOR_WIDTH - 30,
               "total course sections %i", ctx->rp_state->total_course_sections);
-    mvwprintw(ctx->course_windows[2], 8, EDITOR_WIDTH - 30, "has_test %i",
-              ctx->rp_state->s_metadata->has_test);
-    mvwprintw(ctx->course_windows[2], 9, EDITOR_WIDTH - 30, "test_mode: %i",
+    if (ctx->rp_state->s_metadata)
+    {
+        mvwprintw(ctx->course_windows[2], 8, EDITOR_WIDTH - 30, "has_test %i",
+                  ctx->rp_state->s_metadata->has_test);
+        mvwprintw(ctx->course_windows[2], 9, EDITOR_WIDTH - 30, "has sep task: %i",
+                  ctx->rp_state->s_metadata->has_separate_task);
+    }
+    mvwprintw(ctx->course_windows[2], 10, EDITOR_WIDTH - 30, "test_mode: %i",
               ctx->rp_state->showing_test_results);
-    mvwprintw(ctx->course_windows[2], 10, EDITOR_WIDTH - 30, "has sep task: %i",
-              ctx->rp_state->s_metadata->has_separate_task);
     mvwprintw(ctx->course_windows[2], 12, EDITOR_WIDTH - 30,
               "sections completed: %i", ctx->rp_state->sections_completed);
     mvwprintw(ctx->course_windows[2], 13, EDITOR_WIDTH - 30,
               "showing test results: %i", ctx->rp_state->showing_test_results);
     mvwprintw(ctx->course_windows[2], 14, EDITOR_WIDTH - 30,
               "course_progress: %i", ctx->rp_state->course_progress[ctx->rp_state->sections_completed - 1]);
+    mvwprintw(ctx->course_windows[2], 15, EDITOR_WIDTH - 30,
+              "lines_to_print: %i", ctx->lines_to_print);
+    mvwprintw(ctx->course_windows[2], 16, EDITOR_WIDTH - 30,
+              "t_buf num_of_lines: %i", ctx->t_buffer->num_of_lines);
 }
 
 void handle_course_input(APP_CONTEXT *ctx)
@@ -327,7 +332,6 @@ void handle_course_input(APP_CONTEXT *ctx)
 
                     wclear(ctx->rp_state->inner_win);
 
-                    // free_section_data(ctx);
                     deallocate_it_buffer(ctx->rp_state->it_buffer);
                     ctx->rp_state->it_buffer = initialize_it_buffer();
 

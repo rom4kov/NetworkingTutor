@@ -1,8 +1,7 @@
+#include "../../ntutor.h"
 #include "../data/data_access_layer.h"
 #include "form.h"
 
-#include <pcre.h>
-#define PCRE2_CODE_UNIT_WIDTH 8
 #include <CUnit/TestRun.h>
 #include <curses.h>
 #include <menu.h>
@@ -20,7 +19,6 @@ MENU *create_start_options_menu(APP_CONTEXT *ctx, WINDOW **start_opt_menu_win,
                                 int num_of_users);
 FORM *create_new_user_popup_form(APP_CONTEXT *ctx, char *label);
 MENU *create_user_selection_menu(APP_CONTEXT *ctx, int num_of_users);
-void deallocate_greeter_memory(APP_CONTEXT *ctx);
 
 // start screen
 void create_start_screen(APP_CONTEXT *ctx);
@@ -78,10 +76,9 @@ void print_buffer(TEXT_BUFFER *tbuf, WINDOW **edit_window,
                   WINDOW **line_num_win, int *scroll_offset,
                   int lines_to_print);
 void print_line(LINE *current_line, int line_num, WINDOW **edit_window);
-void print_line_nr(WINDOW **editor_window, TEXT_BUFFER *tbuf,
+void print_cursor_position(WINDOW **editor_window, TEXT_BUFFER *tbuf,
                    int editor_height);
-char *match_file_icon(pcre2_code *re, int subj_len, char *filename, char *icon,
-                      int color);
+char *match_file_icon(pcre2_code *re, int subj_len, char *filename, char **icon);
 ICON get_file_icon(char *filename);
 void print_buffer_label(APP_CONTEXT *ctx);
 void print_modified_marker(WINDOW *editor_window, int filename_len,

@@ -8,8 +8,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-
-#define PCRE2_CODE_UNIT_WIDTH 8
 #include <pcre2.h>
 
 int server_c_file_exists(char *path)

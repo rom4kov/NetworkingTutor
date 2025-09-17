@@ -6,7 +6,6 @@
 #include "../models/models.h"
 #include "../views/views.h"
 #include "controllers.h"
-#include "utils.h"
 #include <ncurses.h>
 #include <unistd.h>
 

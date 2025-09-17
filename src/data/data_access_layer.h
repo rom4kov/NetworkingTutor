@@ -13,6 +13,7 @@ sqlite3 *create_database();
 char *read_sql_query(char *filename);
 int create_new_user(APP_CONTEXT *ctx, char *username);
 USER_DATA *get_user_data(sqlite3 *db, int user_id);
+void set_user_home_dir(APP_CONTEXT *ctx);
 int get_id_of_first_user(sqlite3 *db);
 int get_user_count(sqlite3 *db);
 
@@ -71,7 +72,7 @@ void prepare_empty_file(TEXT_BUFFER **tbuf);
 void print_buffer_label(APP_CONTEXT *ctx);
 void open_new_file(APP_CONTEXT *ctx);
 void open_file(APP_CONTEXT *ctx);
-void reopen_file(APP_CONTEXT *ctx, bool activate_ed);
+void reprint_editor_buffer(APP_CONTEXT *ctx, bool activate_ed);
 void read_file_into_buffer(FILE *file, TEXT_BUFFER *text_buf);
 void write_buffer_to_file(TEXT_BUFFER *tbuf, FILE *file, int y);
 void create_new_file_input(WINDOW **inner_win, WINDOW **form_window,
@@ -96,3 +97,4 @@ void create_directory(APP_CONTEXT *ctx, WINDOW **inner_win,
                       WINDOW **form_window, FORM **new_file_form,
                       FIELD **field);
 void create_keybinds_window(WINDOW **explorer_window);
+void create_app_root_dir(APP_CONTEXT *ctx); 

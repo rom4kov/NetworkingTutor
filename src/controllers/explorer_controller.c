@@ -21,7 +21,7 @@ void log_ft_values(APP_CONTEXT *ctx)
               ctx->file_tree->num_of_entries);
     mvwprintw(ctx->course_windows[3], 7, 45, "                       ");
     mvwprintw(ctx->course_windows[3], 7, 45, "%i",
-              ctx->file_tree->current_entry->num_of_entries);
+              ctx->file_tree->current_entry->num_of_open_entries);
     wrefresh(ctx->course_windows[3]);
 }
 

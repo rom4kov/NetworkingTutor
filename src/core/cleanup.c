@@ -38,7 +38,6 @@ void free_memory_for_exit(APP_CONTEXT *ctx)
 
     CU_cleanup_registry();
 
-    free(ctx->shell->home_dir);
     if (ctx->shell->cwd_allocated)
         free(ctx->shell->cwd);
     free(ctx->shell);

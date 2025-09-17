@@ -215,7 +215,6 @@ typedef struct _app_context
   FILE_TREE *file_tree;
   FILE *file;
   char *user_home_dir;
-  char *docs_dir;
   char *filename;
   char *curr_file_path;
   char *current_course;

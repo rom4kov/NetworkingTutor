@@ -236,7 +236,6 @@ void handle_new_user_input(APP_CONTEXT *ctx, bool *start_opt_menu_active)
                 ctx->user_data = get_user_data(ctx->db, ctx->current_user_id);
 
                 create_app_root_dir(ctx);
-                ctx->shell->home_dir = get_cwd();
 
                 ctx->current_course_id = 1;
                 ctx->current_course = ctx->courses[0].name;

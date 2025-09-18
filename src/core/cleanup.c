@@ -275,6 +275,9 @@ void cleanup_start_for_switch(APP_CONTEXT *ctx)
         delwin(ctx->start_windows[i]);
         ctx->start_windows[i] = NULL;
     }
+
+    ctx->start_view_active = false;
+    ctx->start_needs_redraw = false;
 }
 
 void cleanup_course_for_exit(APP_CONTEXT *ctx)
@@ -330,6 +333,10 @@ void cleanup_course_for_switch(APP_CONTEXT *ctx)
         delwin(ctx->course_windows[i]);
         ctx->course_windows[i] = NULL;
     }
+
+    ctx->course_view_active = false;
+    ctx->course_needs_redraw = false;
+
     doupdate();
 }
 
@@ -360,6 +367,10 @@ void cleanup_all_courses_for_switch(APP_CONTEXT *ctx)
         wnoutrefresh(ctx->all_courses_windows[i]);
         delwin(ctx->all_courses_windows[i]);
     }
+
+    ctx->all_courses_view_active = false;
+    ctx->all_courses_needs_redraw = false;
+
     doupdate();
 }
 
@@ -393,6 +404,10 @@ void cleanup_progress_for_switch(APP_CONTEXT *ctx)
         wnoutrefresh(ctx->progress_windows[i]);
         delwin(ctx->progress_windows[i]);
     }
+
+    ctx->progress_view_active = false;
+    ctx->progress_needs_redraw = false;
+
     doupdate();
 }
 
@@ -418,5 +433,9 @@ void cleanup_keybindings_for_switch(APP_CONTEXT *ctx)
         wnoutrefresh(ctx->keybindings_windows[i]);
         delwin(ctx->keybindings_windows[i]);
     }
+
+    ctx->keybindings_view_active = false;
+    ctx->keybindings_needs_redraw = false;
+
     doupdate();
 }

@@ -43,6 +43,11 @@ void create_start_screen(APP_CONTEXT *ctx)
         create_course_preview_card(ctx, CARD_WIDTH * 2, 4, &ctx->courses[2]);
     ctx->start_windows[5] = create_right_side_panel(ctx, " Details ");
 
+    char *home_env = getenv("HOME");
+    mvwprintw(ctx->start_windows[5], LINES - 7, 2, "%s", ctx->user_data->home_dir);
+    mvwprintw(ctx->start_windows[5], LINES - 6, 2, "%s", ctx->user_home_dir);
+    mvwprintw(ctx->start_windows[5], LINES - 5, 2, "%s", home_env);
+
     wrefresh(ctx->start_windows[5]);
 }
 

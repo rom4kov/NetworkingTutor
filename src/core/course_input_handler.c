@@ -69,7 +69,7 @@ void log_course_instr_values(APP_CONTEXT *ctx)
     mvwprintw(ctx->course_windows[2], 14, EDITOR_WIDTH - 30,
               "course_progress: %i", ctx->rp_state->course_progress[ctx->rp_state->sections_completed - 1]);
     mvwprintw(ctx->course_windows[2], 15, EDITOR_WIDTH - 30,
-              "lines_to_print: %i", ctx->lines_to_print);
+              "t_buffer->lines_to_print: %i", ctx->t_buffer->lines_to_print);
     mvwprintw(ctx->course_windows[2], 16, EDITOR_WIDTH - 30,
               "t_buf num_of_lines: %i", ctx->t_buffer->num_of_lines);
 }

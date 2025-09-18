@@ -41,6 +41,12 @@ void go_to_course_by_id(APP_CONTEXT *ctx, int course_id)
     ctx->course_view_active = true;
     ctx->course_needs_redraw = true;
 
+    if (course_id != ctx->current_course_id)
+    {
+        deallocate_buffer(ctx->t_buffer);
+        ctx->t_buffer = initialize_buffer();
+    }
+
     ctx->current_course_id = course_id;
     ctx->current_course = ctx->courses[course_id - 1].name;
 
@@ -49,13 +55,10 @@ void go_to_course_by_id(APP_CONTEXT *ctx, int course_id)
         ctx->rp_state->course_progress[i] = 0;
     }
 
-    ctx->lines_to_print = 0;
     ctx->rp_state->lines_excess = 0;
     ctx->rp_state->lines_to_print = 0;
 
-    deallocate_buffer(ctx->t_buffer);
     deallocate_it_buffer(ctx->rp_state->it_buffer);
-    ctx->t_buffer = initialize_buffer();
     ctx->rp_state->it_buffer = initialize_it_buffer();
 
     get_course_progress(ctx);

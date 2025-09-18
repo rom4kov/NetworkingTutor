@@ -575,7 +575,7 @@ void print_cursor_position(WINDOW **editor_window, TEXT_BUFFER *tbuf, int editor
     if (tbuf->current_col > 98)
         offset++;
 
-    mvwprintw(*editor_window, editor_height - 2, EDITOR_WIDTH - 18, "                  ");
+    mvwprintw(*editor_window, editor_height - 2, EDITOR_WIDTH - 14, "             ");
     mvwprintw(*editor_window, editor_height - 2, EDITOR_WIDTH - offset,
               "%i%% %i:%i", pc, tbuf->curr_line_nr + 1, tbuf->current_col + 1);
     wnoutrefresh(*editor_window);

@@ -77,6 +77,7 @@ void handle_greeter_input(APP_CONTEXT *ctx)
                         get_current_course(ctx->db, ctx->current_user_id);
                     ctx->user_data =
                         get_user_data(ctx->db, ctx->current_user_id);
+		    
                     chdir(ctx->user_data->home_dir);
                     go_to_course_by_id(ctx, ctx->current_course_id);
                     // deallocate_greeter_memory(ctx);
@@ -181,8 +182,7 @@ void handle_start_opts_menu_input(APP_CONTEXT *ctx, MENU *start_options_menu)
                     top_panel(ctx->greeter_panels[4]);
                     update_panels();
                     doupdate();
-                    handle_user_select_win_input(ctx, &start_opt_menu_active,
-                                                 false);
+                    handle_user_select_win_input(ctx, &start_opt_menu_active, 0);
                 }
                 break;
             case 'q':

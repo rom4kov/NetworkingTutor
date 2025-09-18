@@ -27,40 +27,40 @@ void handle_editor_input(APP_CONTEXT *ctx)
         case KEY_DOWN:
             move_down(ctx->t_buffer, &ctx->line_num_win, &ctx->edit_window,
                       &ctx->course_windows[2], ctx->y, ctx->x,
-                      &ctx->scroll_offset, ctx->lines_to_print,
+                      &ctx->scroll_offset, ctx->t_buffer->lines_to_print,
                       ctx->editor_height);
             break;
         case KEY_UP:
             move_up(ctx->t_buffer, &ctx->line_num_win, &ctx->edit_window,
                     &ctx->course_windows[2], ctx->y, ctx->x,
-                    &ctx->scroll_offset, &ctx->lines_to_print,
+                    &ctx->scroll_offset, &ctx->t_buffer->lines_to_print,
                     ctx->editor_height);
             break;
         case KEY_BACKSPACE:
             bs_delete_char_or_line(ctx->t_buffer, &ctx->line_num_win,
                                    &ctx->edit_window, &ctx->course_windows[2],
                                    ctx->y, ctx->x, &ctx->scroll_offset,
-                                   &ctx->lines_to_print, ctx->editor_height,
+                                   &ctx->t_buffer->lines_to_print, ctx->editor_height,
                                    ctx->filename_len, &ctx->file_modified);
             break;
         case KEY_DC:
             delete_char_or_line(ctx->t_buffer, &ctx->line_num_win,
                                 &ctx->edit_window, &ctx->course_windows[2],
                                 ctx->y, ctx->x, &ctx->scroll_offset,
-                                &ctx->lines_to_print, ctx->editor_height,
+                                &ctx->t_buffer->lines_to_print, ctx->editor_height,
                                 ctx->filename_len, &ctx->file_modified);
             break;
         case 9:
             insert_tab(ctx->t_buffer, &ctx->edit_window,
                        &ctx->course_windows[2], ctx->y, ctx->x,
-                       &ctx->line_num_win, &ctx->lines_to_print,
+                       &ctx->line_num_win, &ctx->t_buffer->lines_to_print,
                        &ctx->scroll_offset, ctx->editor_height,
                        ctx->filename_len, &ctx->file_modified);
             break;
         case 10:
             insert_line(ctx->t_buffer, &ctx->edit_window,
                         &ctx->course_windows[2], &ctx->line_num_win, ctx->y,
-                        ctx->x, &ctx->scroll_offset, &ctx->lines_to_print,
+                        ctx->x, &ctx->scroll_offset, &ctx->t_buffer->lines_to_print,
                         ctx->editor_height, ctx->filename_len,
                         &ctx->file_modified);
             break;
@@ -95,7 +95,7 @@ void handle_editor_input(APP_CONTEXT *ctx)
             insert_char(ctx->t_buffer, &ctx->edit_window,
                         &ctx->course_windows[2], ctx->scroll_offset, ctx->y,
                         ctx->x, ctx->key, &ctx->line_num_win,
-                        &ctx->lines_to_print, ctx->editor_height,
+                        &ctx->t_buffer->lines_to_print, ctx->editor_height,
                         ctx->filename_len, &ctx->file_modified);
             break;
     }

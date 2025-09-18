@@ -3,7 +3,7 @@
 #include "../data/data_access_layer.h"
 #include "../models/models.h"
 #include "../views/views.h"
-#include <asm-generic/errno-base.h>
+#include <errno.h>
 #include <curses.h>
 #include <dirent.h>
 #include <fcntl.h>
@@ -65,6 +65,7 @@ TEXT_BUFFER *initialize_buffer()
     text_buf->num_of_lines = 0;
     text_buf->curr_line_nr = 0;
     text_buf->current_col = 0;
+    text_buf->lines_to_print = 1;
 
     return text_buf;
 }
@@ -243,10 +244,10 @@ void open_new_file(APP_CONTEXT *ctx)
         prepare_empty_file(&ctx->t_buffer);
         print_file_metadata(ctx);
 
-        ctx->lines_to_print = 1;
+        ctx->t_buffer->lines_to_print = 1;
 
         print_buffer(ctx->t_buffer, &ctx->edit_window, &ctx->line_num_win,
-                     &ctx->scroll_offset, ctx->lines_to_print);
+                     &ctx->scroll_offset, ctx->t_buffer->lines_to_print);
         mvwprintw(ctx->edit_window, LINES - 7, EDIT_MAX - 15, "     ");
         mvwprintw(ctx->edit_window, LINES - 7, EDIT_MAX - 15, "0 : 0");
 
@@ -278,19 +279,22 @@ void open_file(APP_CONTEXT *ctx)
         ctx->file_size = ftell(ctx->file);
         rewind(ctx->file);
 
-        if (!ctx->file_modified)
+        mvwprintw(ctx->course_windows[3], LINES - 6, 3, "file_size: %i", ctx->file_size);
+        mvwprintw(ctx->course_windows[3], LINES - 7, 3, "nol: %i", ctx->t_buffer->num_of_lines);
+
+        if (ctx->file_size == 0)
         {
-            if (ctx->file_size == 0)
-            {
-                prepare_empty_file(&ctx->t_buffer);
-            }
-            else if (ctx->file_size > 0)
-            {
-                read_file_into_buffer(ctx->file, ctx->t_buffer);
-            }
+            prepare_empty_file(&ctx->t_buffer);
+        }
+        else if (ctx->file_size > 0)
+        {
+            read_file_into_buffer(ctx->file, ctx->t_buffer);
         }
 
-        ctx->lines_to_print =
+        mvwprintw(ctx->course_windows[3], LINES - 6, 30, "file_size: %i", ctx->file_size);
+        mvwprintw(ctx->course_windows[3], LINES - 7, 30, "nol: %i", ctx->t_buffer->num_of_lines);
+
+        ctx->t_buffer->lines_to_print =
             ctx->t_buffer->num_of_lines > (ctx->editor_height - 4)
                 ? (ctx->editor_height - 4)
                 : ctx->t_buffer->num_of_lines;
@@ -299,7 +303,7 @@ void open_file(APP_CONTEXT *ctx)
             ctx->t_buffer->num_of_lines = 1;
 
         print_buffer(ctx->t_buffer, &ctx->edit_window, &ctx->line_num_win,
-                     &ctx->scroll_offset, ctx->lines_to_print);
+                     &ctx->scroll_offset, ctx->t_buffer->lines_to_print);
 
         rewind(ctx->file);
 
@@ -313,9 +317,25 @@ void open_file(APP_CONTEXT *ctx)
 
 void reprint_editor_buffer(APP_CONTEXT *ctx, bool activate_ed)
 {
+    // deallocate_buffer(ctx->t_buffer);
+    // open_file(ctx);
+    mvwprintw(ctx->course_windows[3], LINES - 11, 30, "fsz: %i", ctx->file_size);
+    mvwprintw(ctx->course_windows[3], LINES - 10, 30, "nol: %i", ctx->t_buffer->num_of_lines);
+    if (ctx->file_size == 0 && ctx->t_buffer->num_of_lines == 0)
+    {
+        mvwprintw(ctx->course_windows[3], LINES - 9, 30, "%i", ctx->t_buffer->num_of_lines);
+	    prepare_empty_file(&ctx->t_buffer);
+        ctx->t_buffer->lines_to_print = 1;
+    }
     print_buffer_label(ctx);
+
+    mvwprintw(ctx->course_windows[3], LINES - 6, 3, "file_size: %i", ctx->file_size);
+    mvwprintw(ctx->course_windows[3], LINES - 7, 3, "nol: %i", ctx->t_buffer->num_of_lines);
+    // mvwprintw(ctx->course_windows[3], LINES - 8, 3, "%i", ctx->t_buffer->first_line->length);
+    wrefresh(ctx->course_windows[3]);
+
     print_buffer(ctx->t_buffer, &ctx->edit_window, &ctx->line_num_win,
-                 &ctx->scroll_offset, ctx->lines_to_print);
+                 &ctx->scroll_offset, ctx->t_buffer->lines_to_print);
     print_file_metadata(ctx);
 
     ctx->explorer_mode = false;
@@ -534,9 +554,13 @@ void create_new_file(APP_CONTEXT *ctx, WINDOW **inner_win, WINDOW **form_window,
 
                 char *new_filename = field_buffer(field[0], 0);
                 trim(&new_filename);
-                strncpy(ctx->filename, new_filename, 30);
-                ctx->filename[29] = '\0';
-                ctx->filename_len = strlen(ctx->filename);
+                int filename_len = strlen(new_filename);
+                memset(ctx->filename, 0, filename_len);
+                strncpy(ctx->filename, new_filename, strlen(new_filename));
+                mvwprintw(ctx->course_windows[3], LINES - 11, 20, "len: %lu", strlen(new_filename));
+
+                ctx->filename[filename_len] = '\0';
+                ctx->filename_len = filename_len;
 
                 if (ctx->file_tree->num_of_entries == 0)
                 {
@@ -568,7 +592,7 @@ void create_new_file(APP_CONTEXT *ctx, WINDOW **inner_win, WINDOW **form_window,
                     strncpy(ctx->curr_file_path, field_buffer(field[0], 0), 30);
                     ctx->curr_file_path[29] = '\0';
                 }
-
+                mvwprintw(ctx->course_windows[3], LINES - 9, 50, "new_filename3: %s", new_filename);
                 trim(&ctx->curr_file_path);
                 *new_file_form_active = false;
                 ctx->explorer_mode = false;
@@ -592,7 +616,10 @@ void create_new_file(APP_CONTEXT *ctx, WINDOW **inner_win, WINDOW **form_window,
                 {
                     current_entry = ctx->file_tree->current_entry;
                 }
-                create_new_entry_for_file(ctx, current_entry, new_filename, 8);
+                mvwprintw(ctx->course_windows[3], LINES - 7, 20, "new_filename: %s", new_filename);
+                mvwprintw(ctx->course_windows[3], LINES - 6, 20, "ctx->filename: %s", ctx->filename);
+                mvwprintw(ctx->course_windows[3], LINES - 5, 20, "ctx->filename_len: %i", ctx->filename_len);
+                create_new_entry_for_file(ctx, current_entry, 8);
 
                 unpost_form(*new_file_form);
                 free_form(*new_file_form);
@@ -639,15 +666,15 @@ void create_new_file(APP_CONTEXT *ctx, WINDOW **inner_win, WINDOW **form_window,
 }
 
 void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
-                               char *new_filename, int type)
+                               int type)
 {
     DIR_ENTRY *new_entry = initialize_dir_entry();
 
     // special case if no existing entries in file tree yet
     if (ctx->file_tree->num_of_entries == 0)
     {
-        strncpy(new_entry->name, new_filename, strlen(new_filename) + 1);
-        strncpy(new_entry->path, new_filename, strlen(new_filename) + 1);
+        strncpy(new_entry->name, ctx->filename, strlen(ctx->filename) + 1);
+        strncpy(new_entry->path, ctx->filename, strlen(ctx->filename) + 1);
         new_entry->type = type;
         ctx->file_tree->first_entry = new_entry;
         ctx->file_tree->num_of_entries++;
@@ -668,7 +695,7 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
 
         if (type == 4)
         {
-            while (ctx->file_tree->current_entry->next->next &&
+            while (ctx->file_tree->current_entry->next &&
                    ((ctx->file_tree->current_entry->type == 4 ||
                      ctx->file_tree->current_entry->indent_level >
                          current_entry->indent_level)))
@@ -687,7 +714,7 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
                     ((ctx->file_tree->current_entry->type != 8 ||
                       ctx->file_tree->current_entry->indent_level >
                           current_entry->indent_level) ||
-                     ctx->file_tree->current_entry->name[0] > new_filename[0]))
+                     ctx->file_tree->current_entry->name[0] > ctx->filename[0]))
                 {
                     ctx->file_tree->current_entry =
                         ctx->file_tree->current_entry->next;
@@ -696,7 +723,7 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
         }
     }
 
-    strncpy(new_entry->name, new_filename, strlen(new_filename) + 1);
+    strncpy(new_entry->name, ctx->filename, strlen(ctx->filename) + 1);
 
     if (current_entry->state == 'o')
     {
@@ -870,6 +897,8 @@ void delete_file(APP_CONTEXT *ctx, bool *del_file_form_active,
                     remove(ctx->file_tree->current_entry->path);
 
                     remove_entry_from_file_tree(ctx->file_tree);
+		    mvwprintw(ctx->course_windows[3], 0, 30, "%s", 
+				    ctx->file_tree->current_entry->name);
 
                     curs_set(0);
                     unpost_form(*new_file_form);
@@ -891,6 +920,7 @@ void delete_file(APP_CONTEXT *ctx, bool *del_file_form_active,
                     wnoutrefresh(ctx->course_windows[1]);
                     wnoutrefresh(ctx->line_num_win);
                     wnoutrefresh(ctx->course_windows[2]);
+                    wnoutrefresh(ctx->course_windows[3]);
                     wnoutrefresh(ctx->edit_window);
                     doupdate();
                 }
@@ -957,9 +987,9 @@ void remove_entry_from_file_tree(FILE_TREE *f_tree)
     }
     else if (entry_to_remove->prev == NULL)
     {
-        f_tree->curr_entry_nr++;
         f_tree->current_entry = entry_to_remove->next;
         f_tree->current_entry->prev = NULL;
+	f_tree->first_entry = f_tree->current_entry;
     }
     else if (entry_to_remove->next == NULL)
     {
@@ -1213,7 +1243,7 @@ void create_directory(APP_CONTEXT *ctx, WINDOW **inner_win,
                     current_entry = ctx->file_tree->current_entry;
                 }
 
-                create_new_entry_for_file(ctx, current_entry, new_dirname, 4);
+                create_new_entry_for_file(ctx, current_entry, 4);
 
                 curs_set(0);
                 unpost_form(*new_file_form);
@@ -1296,6 +1326,7 @@ void create_app_root_dir(APP_CONTEXT *ctx)
     }
 
     ctx->user_home_dir = proj_dir_buf;
+    ctx->home_env = home_dir;
 
     set_user_home_dir(ctx);
 

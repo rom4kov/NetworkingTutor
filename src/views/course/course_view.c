@@ -33,7 +33,7 @@ void create_course_view(APP_CONTEXT *ctx)
     create_explorer_panels(ctx);
 
     top_panel(ctx->explorer_panels[0]);
-    update_panels();
+    // update_panels();
     doupdate();
 
     ctx->line_num_win =
@@ -235,6 +235,26 @@ void create_file_tree(WINDOW **explorer_window, FILE_TREE *f_tree)
 
         rewinddir(dir);
     }
+    // else if (f_tree->num_of_entries == 1)
+    // {
+	   //  while (strcmp(next->d_name, ".") == 0 ||
+			 //    strcmp(next->d_name, "..") == 0 || next->d_type != 4)
+    //     {
+    //         next = readdir(dir);
+    //     }
+    //
+    //     // f_tree->first_entry = initialize_dir_entry();
+    //     strncpy(f_tree->first_entry->name, next->d_name, 30);
+    //     f_tree->first_entry->name[29] = '\0';
+    //     strncpy(f_tree->first_entry->path, next->d_name, 30);
+    //     f_tree->first_entry->path[29] = '\0';
+    //     f_tree->first_entry->type = next->d_type;
+    //     // if (f_tree->first_entry->state == 'c')
+    //     //     f_tree->first_entry->state = 'o';
+    //     // else
+    //     //     f_tree->first_entry->state = 'c';
+    //     f_tree->first_entry->prev = NULL;
+    // }
 
     free(curr_dir->name);
     free(curr_dir->path);
@@ -257,6 +277,9 @@ void create_file_tree(WINDOW **explorer_window, FILE_TREE *f_tree)
         f_tree->current_entry = f_tree->first_entry;
     }
 
+    mvwprintw(*explorer_window, 25, 2, "%i", f_tree->num_of_entries);
+    mvwprintw(*explorer_window, 26, 2, "%c", f_tree->first_entry->state);
+    mvwprintw(*explorer_window, 27, 2, "%s", f_tree->first_entry->name);
     wnoutrefresh(*explorer_window);
     closedir(dir);
 }
@@ -357,7 +380,7 @@ void open_sub_directory(char *dir_name, FILE_TREE *f_tree)
     free(curr_dir);
 
     prev_dir->next = next_orig_dir;
-    if (f_tree->current_entry->num_of_open_entries > 1)
+    if (f_tree->current_entry->num_of_open_entries > 1 && next_orig_dir)
     {
         next_orig_dir->prev = prev_dir;
     }

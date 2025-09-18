@@ -86,7 +86,7 @@ void create_new_file(APP_CONTEXT *ctx, WINDOW **inner_win, WINDOW **form_window,
                      bool *new_file_form_active, FORM **new_file_form,
                      FIELD **field);
 void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
-                               char *new_filename, int type);
+                               int type);
 void remove_entry_from_file_tree(FILE_TREE *f_tree);
 void delete_file(APP_CONTEXT *ctx, bool *del_file_form_active,
                  WINDOW **inner_win, WINDOW **form_window, FORM **new_file_form,

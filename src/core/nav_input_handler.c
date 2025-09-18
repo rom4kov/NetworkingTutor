@@ -80,6 +80,8 @@ void handle_nav_input(APP_CONTEXT *ctx)
             }
             else if (ctx->curr_nav_item == 1) {
                 free_memory_for_switch(ctx);
+                // ctx->course_view_active = true;
+                // ctx->course_needs_redraw = true;
                 go_to_course_by_id(ctx, ctx->current_course_id);
             }
             else if (ctx->curr_nav_item == 2) {

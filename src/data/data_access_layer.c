@@ -139,33 +139,37 @@ void set_user_home_dir(APP_CONTEXT *ctx)
 
 USER_DATA *get_user_data(sqlite3 *db, int user_id)
 {
-    const char *zSql = "SELECT * FROM users WHERE id = ?;";
+	const char *zSql = "SELECT * FROM users WHERE id = ?;";
 
-    USER_DATA *user_data = malloc(sizeof(USER_DATA));
+	USER_DATA *user_data = malloc(sizeof(USER_DATA));
 
-    sqlite3_stmt *stmt;
-    int rc = sqlite3_prepare_v2(db, zSql, -1, &stmt, NULL);
-    if (rc != SQLITE_OK)
-    {
-        fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(db));
-        if (stmt)
-            sqlite3_finalize(stmt);
-        return NULL;
-    }
+	sqlite3_stmt *stmt;
+	int rc = sqlite3_prepare_v2(db, zSql, -1, &stmt, NULL);
+	if (rc != SQLITE_OK)
+	{
+		fprintf(stderr, "prepare failed: %s\n", sqlite3_errmsg(db));
+		if (stmt)
+			sqlite3_finalize(stmt);
+		return NULL;
+	}
 
-    if (rc == SQLITE_OK)
-    {
-        sqlite3_bind_int(stmt, 1, user_id);
-    }
-    sqlite3_step(stmt);
+	if (rc == SQLITE_OK)
+	{
+		sqlite3_bind_int(stmt, 1, user_id);
+	}
+	sqlite3_step(stmt);
 
-    user_data->name = strdup((const char *)sqlite3_column_text(stmt, 1));
-    user_data->created_at = strdup((const char *)sqlite3_column_text(stmt, 2));
-    user_data->home_dir = strdup((const char *)sqlite3_column_text(stmt, 3));
+	const unsigned char *name = sqlite3_column_text(stmt, 1);
+	const unsigned char *created_at = sqlite3_column_text(stmt, 2);
+	const unsigned char *home_dir = sqlite3_column_text(stmt, 3);
 
-    sqlite3_finalize(stmt);
+	user_data->name = name ? strdup((const char*)name) : NULL;
+	user_data->created_at = created_at ? strdup((const char*)created_at) : NULL;
+	user_data->home_dir = home_dir ? strdup((const char*)home_dir) : NULL;
 
-    return user_data;
+	sqlite3_finalize(stmt);
+
+	return user_data;
 }
 
 int get_id_of_first_user(sqlite3 *db)

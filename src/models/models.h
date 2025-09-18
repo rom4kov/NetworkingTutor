@@ -81,10 +81,11 @@ typedef struct text_buffer
 {
     LINE *first_line;
     LINE *current_line;
-    unsigned short curr_line_nr;
-    unsigned short current_col;
-    unsigned short num_of_lines;
-    unsigned short scroll_offset;
+    int curr_line_nr;
+    int current_col;
+    int num_of_lines;
+    int scroll_offset;
+    int lines_to_print;
 } TEXT_BUFFER;
 
 typedef struct instructions_text_buffer
@@ -215,6 +216,7 @@ typedef struct _app_context
   FILE_TREE *file_tree;
   FILE *file;
   char *user_home_dir;
+  char *home_env;
   char *filename;
   char *curr_file_path;
   char *current_course;

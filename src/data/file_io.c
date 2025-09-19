@@ -279,8 +279,8 @@ void open_file(APP_CONTEXT *ctx)
         ctx->file_size = ftell(ctx->file);
         rewind(ctx->file);
 
-        mvwprintw(ctx->course_windows[3], LINES - 6, 3, "file_size: %i", ctx->file_size);
-        mvwprintw(ctx->course_windows[3], LINES - 7, 3, "nol: %i", ctx->t_buffer->num_of_lines);
+        // mvwprintw(ctx->course_windows[3], LINES - 6, 3, "file_size: %i", ctx->file_size);
+        // mvwprintw(ctx->course_windows[3], LINES - 7, 3, "nol: %i", ctx->t_buffer->num_of_lines);
 
         if (ctx->file_size == 0)
         {
@@ -291,8 +291,8 @@ void open_file(APP_CONTEXT *ctx)
             read_file_into_buffer(ctx->file, ctx->t_buffer);
         }
 
-        mvwprintw(ctx->course_windows[3], LINES - 6, 30, "file_size: %i", ctx->file_size);
-        mvwprintw(ctx->course_windows[3], LINES - 7, 30, "nol: %i", ctx->t_buffer->num_of_lines);
+        // mvwprintw(ctx->course_windows[3], LINES - 6, 30, "file_size: %i", ctx->file_size);
+        // mvwprintw(ctx->course_windows[3], LINES - 7, 30, "nol: %i", ctx->t_buffer->num_of_lines);
 
         ctx->t_buffer->lines_to_print =
             ctx->t_buffer->num_of_lines > (ctx->editor_height - 4)
@@ -319,8 +319,8 @@ void reprint_editor_buffer(APP_CONTEXT *ctx, bool activate_ed)
 {
     // deallocate_buffer(ctx->t_buffer);
     // open_file(ctx);
-    mvwprintw(ctx->course_windows[3], LINES - 11, 30, "fsz: %i", ctx->file_size);
-    mvwprintw(ctx->course_windows[3], LINES - 10, 30, "nol: %i", ctx->t_buffer->num_of_lines);
+    // mvwprintw(ctx->course_windows[3], LINES - 11, 30, "fsz: %i", ctx->file_size);
+    // mvwprintw(ctx->course_windows[3], LINES - 10, 30, "nol: %i", ctx->t_buffer->num_of_lines);
     if (ctx->file_size == 0 && ctx->t_buffer->num_of_lines == 0)
     {
         mvwprintw(ctx->course_windows[3], LINES - 9, 30, "%i", ctx->t_buffer->num_of_lines);
@@ -329,8 +329,8 @@ void reprint_editor_buffer(APP_CONTEXT *ctx, bool activate_ed)
     }
     print_buffer_label(ctx);
 
-    mvwprintw(ctx->course_windows[3], LINES - 6, 3, "file_size: %i", ctx->file_size);
-    mvwprintw(ctx->course_windows[3], LINES - 7, 3, "nol: %i", ctx->t_buffer->num_of_lines);
+    // mvwprintw(ctx->course_windows[3], LINES - 6, 3, "file_size: %i", ctx->file_size);
+    // mvwprintw(ctx->course_windows[3], LINES - 7, 3, "nol: %i", ctx->t_buffer->num_of_lines);
     // mvwprintw(ctx->course_windows[3], LINES - 8, 3, "%i", ctx->t_buffer->first_line->length);
     wrefresh(ctx->course_windows[3]);
 
@@ -555,9 +555,9 @@ void create_new_file(APP_CONTEXT *ctx, WINDOW **inner_win, WINDOW **form_window,
                 char *new_filename = field_buffer(field[0], 0);
                 trim(&new_filename);
                 int filename_len = strlen(new_filename);
-                memset(ctx->filename, 0, filename_len);
-                strncpy(ctx->filename, new_filename, strlen(new_filename));
-                mvwprintw(ctx->course_windows[3], LINES - 11, 20, "len: %lu", strlen(new_filename));
+                // memset(ctx->filename, 0, filename_len);
+                // strncpy(ctx->filename, new_filename, strlen(new_filename));
+                // mvwprintw(ctx->course_windows[3], LINES - 11, 20, "len: %lu", strlen(new_filename));
 
                 ctx->filename[filename_len] = '\0';
                 ctx->filename_len = filename_len;
@@ -592,7 +592,7 @@ void create_new_file(APP_CONTEXT *ctx, WINDOW **inner_win, WINDOW **form_window,
                     strncpy(ctx->curr_file_path, field_buffer(field[0], 0), 30);
                     ctx->curr_file_path[29] = '\0';
                 }
-                mvwprintw(ctx->course_windows[3], LINES - 9, 50, "new_filename3: %s", new_filename);
+                // mvwprintw(ctx->course_windows[3], LINES - 9, 50, "new_filename3: %s", new_filename);
                 trim(&ctx->curr_file_path);
                 *new_file_form_active = false;
                 ctx->explorer_mode = false;
@@ -616,9 +616,9 @@ void create_new_file(APP_CONTEXT *ctx, WINDOW **inner_win, WINDOW **form_window,
                 {
                     current_entry = ctx->file_tree->current_entry;
                 }
-                mvwprintw(ctx->course_windows[3], LINES - 7, 20, "new_filename: %s", new_filename);
-                mvwprintw(ctx->course_windows[3], LINES - 6, 20, "ctx->filename: %s", ctx->filename);
-                mvwprintw(ctx->course_windows[3], LINES - 5, 20, "ctx->filename_len: %i", ctx->filename_len);
+                // mvwprintw(ctx->course_windows[3], LINES - 7, 20, "new_filename: %s", new_filename);
+                // mvwprintw(ctx->course_windows[3], LINES - 6, 20, "ctx->filename: %s", ctx->filename);
+                // mvwprintw(ctx->course_windows[3], LINES - 5, 20, "ctx->filename_len: %i", ctx->filename_len);
                 create_new_entry_for_file(ctx, current_entry, 8);
 
                 unpost_form(*new_file_form);

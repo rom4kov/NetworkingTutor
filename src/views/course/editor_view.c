@@ -61,25 +61,26 @@ void compile_patterns(pcre2_code **re, int p_codes_num, char **pattern_str)
     int errcode;
     PCRE2_SIZE erroffset;
     PCRE2_UCHAR buffer[256];
-    
-    FILE *log_file = fopen("pcre2compile_log.txt", "a");
+
+    // FILE *log_file = fopen("pcre2compile_log.txt", "a");
 
     for (int i = 0; i < p_codes_num; i++)
     {
         PCRE2_SPTR pattern = (PCRE2_SPTR)pattern_str[i];
         re[i] = pcre2_compile(pattern, PCRE2_ZERO_TERMINATED, PCRE2_UCP,
                               &errcode, &erroffset, NULL);
-	if (re[i] == NULL) {
-		pcre2_get_error_message(errcode, buffer, sizeof(buffer));
-		// fprintf(stderr, "PCRE2 compilation failed at offset %d: %s\n",
-		//		(int)erroffset, buffer);
-		char buf[512];
-		memset(buf, 0, 512);
-		buf[511] = '\0';
-		snprintf(buf, 512, "PCRE2 compilation failed at offset %d: %s\n", (int)erroffset, buffer);
-		fwrite(buf, 512, 1, log_file);
-		fclose(log_file);
-	}
+        if (re[i] == NULL)
+        {
+            pcre2_get_error_message(errcode, buffer, sizeof(buffer));
+            // fprintf(stderr, "PCRE2 compilation failed at offset %d: %s\n",
+            //		(int)erroffset, buffer);
+            // char buf[512];
+            // memset(buf, 0, 512);
+            // buf[511] = '\0';
+            // snprintf(buf, 512, "PCRE2 compilation failed at offset %d: %s\n",
+            // (int)erroffset, buffer); fwrite(buf, 512, 1, log_file);
+            // fclose(log_file);
+        }
     }
 }
 
@@ -88,9 +89,10 @@ void print_matches(pcre2_code **re, int line_num, int j, size_t subject_length,
                    int color)
 {
     PCRE2_SPTR subject = (PCRE2_SPTR)current_line->buf_;
-    if (re[j] == NULL) {
-	    // fprintf(stderr, "ERROR: re[%d] is NULL in print_matches()\n", j);
-	    return;
+    if (re[j] == NULL)
+    {
+        // fprintf(stderr, "ERROR: re[%d] is NULL in print_matches()\n", j);
+        return;
     }
 
     pcre2_match_data *md = pcre2_match_data_create_from_pattern(re[j], NULL);

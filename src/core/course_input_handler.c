@@ -154,8 +154,10 @@ void handle_course_input(APP_CONTEXT *ctx)
                 if (!ctx->shell->terminal_active)
                 {
                     ctx->shell->terminal_active = true;
+                    ctx->shell->terminal_focused = true;
                     ctx->active_window_idx = SHELL_WINDOW_IDX;
                     recreate_editor_windows(ctx);
+                    curs_set(2);
 
                     ctx->terminal_window = create_terminal_window(ctx);
                     print_term_buf(ctx->shell->term_inner_win,

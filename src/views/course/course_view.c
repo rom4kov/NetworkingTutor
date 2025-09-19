@@ -89,7 +89,8 @@ WINDOW *create_terminal_window(APP_CONTEXT *ctx)
 {
     WINDOW *terminal_window =
         newwin(10, EDITOR_WIDTH, LINES - 10, EXPLORER_WIDTH);
-    draw_border(terminal_window, 3, " Terminal ");
+    int color = ctx->active_window_idx == SHELL_WINDOW_IDX ? 3 : 2;
+    draw_border(terminal_window, color, " Terminal ");
 
     wattron(terminal_window, COLOR_PAIR(3));
     mvwprintw(terminal_window, 0, 2, " Terminal ");
@@ -98,11 +99,11 @@ WINDOW *create_terminal_window(APP_CONTEXT *ctx)
     ctx->shell->term_inner_win =
         derwin(terminal_window, 8, EDITOR_WIDTH - 3, 1, 2);
 
-    ctx->active_window_idx = SHELL_WINDOW_IDX;
-    ctx->shell->terminal_focused = true;
-    ctx->shell->terminal_active = true;
+    // ctx->active_window_idx = SHELL_WINDOW_IDX;
+    // ctx->shell->terminal_focused = true;
+    // ctx->shell->terminal_active = true;
 
-    curs_set(2);
+    // curs_set(2);
 
     wrefresh(terminal_window);
     return terminal_window;
@@ -277,10 +278,10 @@ void create_file_tree(WINDOW **explorer_window, FILE_TREE *f_tree)
         f_tree->current_entry = f_tree->first_entry;
     }
 
-    mvwprintw(*explorer_window, 25, 2, "%i", f_tree->num_of_entries);
-    mvwprintw(*explorer_window, 26, 2, "%c", f_tree->first_entry->state);
-    mvwprintw(*explorer_window, 27, 2, "%s", f_tree->first_entry->name);
-    wnoutrefresh(*explorer_window);
+    // mvwprintw(*explorer_window, 25, 2, "%i", f_tree->num_of_entries);
+    // mvwprintw(*explorer_window, 26, 2, "%c", f_tree->first_entry->state);
+    // mvwprintw(*explorer_window, 27, 2, "%s", f_tree->first_entry->name);
+    // wnoutrefresh(*explorer_window);
     closedir(dir);
 }
 

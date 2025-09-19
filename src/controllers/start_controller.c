@@ -83,6 +83,7 @@ void go_to_course_by_id(APP_CONTEXT *ctx, int course_id)
             ctx->rp_state
                 ->course_progress[ctx->rp_state->sections_completed - 1];
     }
+    curs_set(0);
     // log_course_instr_values(ctx);
     // wrefresh(ctx->course_windows[2]);
 }

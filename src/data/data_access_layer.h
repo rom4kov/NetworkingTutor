@@ -98,3 +98,4 @@ void create_directory(APP_CONTEXT *ctx, WINDOW **inner_win,
                       FIELD **field);
 void create_keybinds_window(WINDOW **explorer_window);
 void create_app_root_dir(APP_CONTEXT *ctx); 
+void change_to_user_dir(APP_CONTEXT *ctx);

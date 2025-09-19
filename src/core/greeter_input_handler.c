@@ -78,7 +78,7 @@ void handle_greeter_input(APP_CONTEXT *ctx)
                     ctx->user_data =
                         get_user_data(ctx->db, ctx->current_user_id);
 		    
-                    chdir(ctx->user_data->home_dir);
+                    change_to_user_dir(ctx);
                     go_to_course_by_id(ctx, ctx->current_course_id);
                     // deallocate_greeter_memory(ctx);
                 }
@@ -105,7 +105,7 @@ void handle_greeter_input(APP_CONTEXT *ctx)
                         get_current_course(ctx->db, ctx->current_user_id);
                     ctx->user_data =
                         get_user_data(ctx->db, ctx->current_user_id);
-                    chdir(ctx->user_data->home_dir);
+                    change_to_user_dir(ctx);
                     ctx->current_course_id = 1;
                     ctx->current_course = ctx->courses[0].name;
                     // deallocate_greeter_memory(ctx);
@@ -315,7 +315,7 @@ void handle_user_select_win_input(APP_CONTEXT *ctx, bool *start_opt_menu_active,
                 {
                     ctx->user_data =
                         get_user_data(ctx->db, ctx->current_user_id);
-                    chdir(ctx->user_data->home_dir);
+                    change_to_user_dir(ctx);
                     ctx->start_view_active = true;
                     ctx->start_needs_redraw = true;
                 }
@@ -325,14 +325,14 @@ void handle_user_select_win_input(APP_CONTEXT *ctx, bool *start_opt_menu_active,
                     {
                         ctx->user_data =
                             get_user_data(ctx->db, ctx->current_user_id);
-                        chdir(ctx->user_data->home_dir);
+                        change_to_user_dir(ctx);
                         go_to_course_by_id(ctx, ctx->current_course_id);
                     }
                     else if (menu_option == 2)
                     {
                         ctx->user_data =
                             get_user_data(ctx->db, ctx->current_user_id);
-                        chdir(ctx->user_data->home_dir);
+                        change_to_user_dir(ctx);
                         ctx->all_courses_view_active = true;
                         ctx->all_courses_needs_redraw = true;
                     }
@@ -340,7 +340,7 @@ void handle_user_select_win_input(APP_CONTEXT *ctx, bool *start_opt_menu_active,
                     {
                         ctx->user_data =
                             get_user_data(ctx->db, ctx->current_user_id);
-                        chdir(ctx->user_data->home_dir);
+                        change_to_user_dir(ctx);
                         ctx->progress_view_active = true;
                         ctx->progress_needs_redraw = true;
                     }
@@ -348,7 +348,7 @@ void handle_user_select_win_input(APP_CONTEXT *ctx, bool *start_opt_menu_active,
                     {
                         ctx->user_data =
                             get_user_data(ctx->db, ctx->current_user_id);
-                        chdir(ctx->user_data->home_dir);
+                        change_to_user_dir(ctx);
                         ctx->keybindings_view_active = true;
                         ctx->keybindings_needs_redraw = true;
                     }

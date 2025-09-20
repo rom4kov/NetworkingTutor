@@ -8,6 +8,7 @@
 #include <curses.h>
 #include <menu.h>
 #include <ncurses.h>
+#include <panel.h>
 #include <stdbool.h>
 #include <string.h>
 
@@ -157,25 +158,45 @@ void handle_course_input(APP_CONTEXT *ctx)
                     ctx->shell->terminal_focused = true;
                     ctx->active_window_idx = SHELL_WINDOW_IDX;
                     recreate_editor_windows(ctx);
-                    curs_set(2);
 
-                    ctx->terminal_window = create_terminal_window(ctx);
+                    // ctx->terminal_window = create_terminal_window(ctx);
+                    // ctx->explorer_panels[9] = new_panel(ctx->terminal_window);
+                    // top_panel(ctx->explorer_panels[9]);
+
+                    ctx->active_window_idx = SHELL_WINDOW_IDX;
+                    toggle_terminal(ctx);
+
                     print_term_buf(ctx->shell->term_inner_win,
                                    ctx->shell->term_buffer);
                     wmove(ctx->shell->term_inner_win, 0, 2);
+
+                    update_panels();
+                    curs_set(2);
                     wnoutrefresh(ctx->course_windows[2]);
                     wnoutrefresh(ctx->shell->term_inner_win);
+
                     doupdate();
                 }
                 else
                 {
                     curs_set(0);
                     ctx->shell->terminal_active = false;
+                    ctx->shell->terminal_focused = false;
+                    ctx->active_window_idx = 2;
                     recreate_editor_windows(ctx);
+                    // hide_panel(ctx->explorer_panels[9]);
+
+                    ctx->active_window_idx = 2;
+                    toggle_terminal(ctx);
+
                     wmove(ctx->edit_window,
                           ctx->t_buffer->curr_line_nr - ctx->scroll_offset,
                           ctx->t_buffer->current_col);
-                    wrefresh(ctx->edit_window);
+                    wnoutrefresh(ctx->edit_window);
+                    wnoutrefresh(ctx->terminal_window);
+                    wnoutrefresh(ctx->course_windows[2]);
+                    update_panels();
+                    doupdate();
                 }
                 break;
             case 10:
@@ -511,6 +532,7 @@ void handle_course_input(APP_CONTEXT *ctx)
                 ctx->active_window_idx = 2;
                 ctx->editor_mode = false;
                 recreate_editor_windows(ctx);
+                toggle_terminal(ctx);
                 wmove(ctx->edit_window,
                       ctx->t_buffer->curr_line_nr - ctx->scroll_offset,
                       ctx->t_buffer->current_col);

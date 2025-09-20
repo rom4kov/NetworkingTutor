@@ -203,7 +203,7 @@ int main(void)
             ctx->active_window = ctx->course_windows[0];
             if (ctx->file && ctx->file->_fileno > 0)
             {
-                bool activate_editor = true;
+                bool activate_editor = ctx->editor_mode ? true : false;
                 reprint_editor_buffer(ctx, activate_editor);
             }
             wnoutrefresh(ctx->course_windows[4]);

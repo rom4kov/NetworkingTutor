@@ -28,12 +28,14 @@ void create_course_view(APP_CONTEXT *ctx)
     ctx->course_windows[3] =
         create_right_side_panel(ctx, " Course instructions ");
     ctx->course_windows[4] = create_progress_window(ctx);
+    ctx->terminal_window = create_terminal_window(ctx);
 
     create_explorer_popup_windows(ctx);
     create_explorer_panels(ctx);
 
     top_panel(ctx->explorer_panels[0]);
-    // update_panels();
+    hide_panel(ctx->explorer_panels[9]);
+    update_panels();
     doupdate();
 
     ctx->line_num_win =
@@ -45,7 +47,6 @@ void create_course_view(APP_CONTEXT *ctx)
 
     if (ctx->shell->terminal_active)
     {
-        ctx->terminal_window = create_terminal_window(ctx);
         print_term_buf(ctx->shell->term_inner_win, ctx->shell->term_buffer);
         wnoutrefresh(ctx->terminal_window);
         wnoutrefresh(ctx->shell->term_inner_win);
@@ -80,9 +81,36 @@ WINDOW *create_editor_window(APP_CONTEXT *ctx)
     mvwprintw(editor_window, 0, 2, " Editor ");
     wattroff(editor_window, COLOR_PAIR(3));
 
-    wnoutrefresh(editor_window);
-
     return editor_window;
+}
+
+void resize_editor_window(APP_CONTEXT *ctx)
+{
+    if (!ctx->shell->terminal_active)
+    {
+        ctx->editor_height = LINES - 3;
+    }
+    else
+    {
+        ctx->editor_height = LINES - 13;
+    }
+
+    wresize(ctx->course_windows[2], ctx->editor_height, EDITOR_WIDTH);
+    ctx->line_num_win =
+        derwin(ctx->course_windows[2], ctx->editor_height - 4, 3, 2, 1);
+    ctx->edit_window = derwin(ctx->course_windows[2], ctx->editor_height - 4,
+                              WU * 5 + (WU / 2) - 2, 2, 5);
+    wresize(ctx->line_num_win, ctx->editor_height - 4, 3);
+    wresize(ctx->edit_window, ctx->editor_height - 4, WU * 5 + (WU / 2) - 2);
+
+    unsigned short border_color =
+        (ctx->shell->terminal_active || ctx->course_needs_redraw) ? 2 : 3;
+
+    draw_border(ctx->course_windows[2], border_color, "Editor");
+
+    wattron(ctx->course_windows[2], COLOR_PAIR(3));
+    mvwprintw(ctx->course_windows[2], 0, 2, " Editor ");
+    wattroff(ctx->course_windows[2], COLOR_PAIR(3));
 }
 
 WINDOW *create_terminal_window(APP_CONTEXT *ctx)
@@ -99,14 +127,28 @@ WINDOW *create_terminal_window(APP_CONTEXT *ctx)
     ctx->shell->term_inner_win =
         derwin(terminal_window, 8, EDITOR_WIDTH - 3, 1, 2);
 
-    // ctx->active_window_idx = SHELL_WINDOW_IDX;
-    // ctx->shell->terminal_focused = true;
-    // ctx->shell->terminal_active = true;
-
-    // curs_set(2);
-
-    wrefresh(terminal_window);
     return terminal_window;
+}
+
+void toggle_terminal(APP_CONTEXT *ctx)
+{
+    if (ctx->shell->terminal_active)
+    {
+        int color = ctx->active_window_idx == SHELL_WINDOW_IDX ? 3 : 2;
+        mvwprintw(ctx->course_windows[1], 10, 2, "bcolor: %i", color);
+        wrefresh(ctx->course_windows[1]);
+        draw_border(ctx->terminal_window, color, " Terminal ");
+        wattron(ctx->terminal_window, COLOR_PAIR(3));
+        mvwprintw(ctx->terminal_window, 0, 2, " Terminal ");
+        wattroff(ctx->terminal_window, COLOR_PAIR(3));
+
+        wnoutrefresh(ctx->terminal_window);
+        top_panel(ctx->explorer_panels[9]);
+    }
+    else
+    {
+        hide_panel(ctx->explorer_panels[9]);
+    }
 }
 
 WINDOW *create_explorer_window(FILE_TREE *file_tree)
@@ -238,8 +280,8 @@ void create_file_tree(WINDOW **explorer_window, FILE_TREE *f_tree)
     }
     // else if (f_tree->num_of_entries == 1)
     // {
-	   //  while (strcmp(next->d_name, ".") == 0 ||
-			 //    strcmp(next->d_name, "..") == 0 || next->d_type != 4)
+    //  while (strcmp(next->d_name, ".") == 0 ||
+    //    strcmp(next->d_name, "..") == 0 || next->d_type != 4)
     //     {
     //         next = readdir(dir);
     //     }
@@ -478,13 +520,8 @@ void recreate_editor_windows(APP_CONTEXT *ctx)
     wclear(ctx->course_windows[2]);
     wclear(ctx->edit_window);
     wclear(ctx->line_num_win);
-    wrefresh(ctx->course_windows[2]);
-    delwin(ctx->course_windows[2]);
-    ctx->course_windows[2] = create_editor_window(ctx);
-    ctx->line_num_win =
-        derwin(ctx->course_windows[2], ctx->editor_height - 4, 3, 2, 1);
-    ctx->edit_window = derwin(ctx->course_windows[2], ctx->editor_height - 4,
-                              WU * 5 + (WU / 2) - 2, 2, 5);
+
+    resize_editor_window(ctx);
 
     if (ctx->file && ctx->file->_fileno > 0)
     {
@@ -492,5 +529,4 @@ void recreate_editor_windows(APP_CONTEXT *ctx)
         reprint_editor_buffer(ctx, activate_editor);
     }
     print_no_open_file_msg(ctx);
-    doupdate();
 }

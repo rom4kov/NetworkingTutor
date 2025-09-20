@@ -87,6 +87,9 @@ void handle_explorer_input(APP_CONTEXT *ctx)
                              field);
             // log_ft_values(ctx);
             break;
+        case 'u':
+            update_file_explorer(ctx);
+            break;
         case '?':
             create_keybinds_window(&ctx->course_windows[1]);
             break;

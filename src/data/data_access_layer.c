@@ -1266,11 +1266,6 @@ int get_course_completion_percentage(APP_CONTEXT *ctx, int course_id)
         completion_percentage =
             (1.0 * total_items_completed / course_total_items) * 100;
 
-    // mvwprintw(ctx->start_windows[1], 3, 4 * course_id, "%i",
-    // course_total_items); mvwprintw(ctx->start_windows[1], 4, 4 * course_id,
-    // "%i", total_items_completed); mvwprintw(ctx->start_windows[1], 5, 4 *
-    // course_id, "%i", completion_percentage); wrefresh(ctx->start_windows[1]);
-
     sqlite3_finalize(stmt);
     sqlite3_finalize(stmt2);
 

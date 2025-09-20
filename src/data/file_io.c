@@ -337,20 +337,19 @@ void reprint_editor_buffer(APP_CONTEXT *ctx, bool activate_ed)
     // ctx->file_size); mvwprintw(ctx->course_windows[3], LINES - 7, 3, "nol:
     // %i", ctx->t_buffer->num_of_lines); mvwprintw(ctx->course_windows[3],
     // LINES - 8, 3, "%i", ctx->t_buffer->first_line->length);
-    wrefresh(ctx->course_windows[3]);
+    // wrefresh(ctx->course_windows[3]);
 
     print_buffer(ctx->t_buffer, &ctx->edit_window, &ctx->line_num_win,
                  &ctx->scroll_offset, ctx->t_buffer->lines_to_print);
     print_file_metadata(ctx);
 
     ctx->explorer_mode = false;
-    ctx->editor_mode = activate_ed ? true : false;
-    ctx->active_window_idx = 2;
+    // ctx->active_window_idx = ctx->editor_mode ? 2 : 0;
 
-    focus_window(&ctx->course_windows[0], 2, "Explorer");
+    // if (ctx->editor_mode)
+    //     focus_window(&ctx->course_windows[0], ctx->editor_mode ? 2 : 3, "");
 
-    unsigned short border_color =
-        (ctx->shell->terminal_active || ctx->first_course_draw) ? 2 : 3;
+    unsigned short border_color = ctx->active_window_idx == 2 ? 3 : 2;
 
     focus_window(&ctx->course_windows[2], border_color, "Editor");
     if (activate_ed)
@@ -474,54 +473,6 @@ void create_new_file_input(WINDOW **inner_win, WINDOW **form_window,
     post_form(*new_file_form);
 }
 
-void open_or_close_dir(FILE_TREE *f_tree, WINDOW **explorer_window)
-{
-    char *curr_path = return_trimmed(f_tree->current_entry->path);
-
-    if (f_tree->current_entry->state == 'c')
-    {
-        f_tree->current_entry->state = 'o';
-        open_sub_directory(curr_path, f_tree);
-    }
-    else if (f_tree->current_entry->state == 'o')
-    {
-        f_tree->current_entry->state = 'c';
-        close_sub_directory(f_tree->current_entry,
-                            f_tree->current_entry->num_of_open_entries, f_tree);
-    }
-    werase(*explorer_window);
-    create_file_tree(explorer_window, f_tree);
-
-    focus_window(explorer_window, 3, "Explorer");
-    doupdate();
-}
-
-void open_file_from_explorer(APP_CONTEXT *ctx, bool *new_file_form_active)
-{
-    deallocate_buffer(ctx->t_buffer);
-    ctx->t_buffer = initialize_buffer();
-    ctx->scroll_offset = 0;
-    if (ctx->file && ctx->file->_fileno > 0)
-        fclose(ctx->file);
-    open_file(ctx);
-
-    *new_file_form_active = false;
-    ctx->explorer_mode = false;
-    ctx->editor_mode = true;
-    ctx->active_window_idx = 2;
-    focus_window(&ctx->course_windows[1], 2, "Explorer");
-    focus_window(&ctx->course_windows[2], 3, "Editor");
-    curs_set(2);
-    // print_cursor_position(&ctx->edit_window, ctx->t_buffer,
-    // ctx->editor_height);
-    wmove(ctx->edit_window, 0, 0);
-    wnoutrefresh(ctx->course_windows[1]);
-    wnoutrefresh(ctx->line_num_win);
-    wnoutrefresh(ctx->course_windows[2]);
-    wnoutrefresh(ctx->edit_window);
-    doupdate();
-}
-
 void create_new_file(APP_CONTEXT *ctx, WINDOW **inner_win, WINDOW **form_window,
                      bool *new_file_form_active, FORM **new_file_form,
                      FIELD **field)
@@ -529,6 +480,7 @@ void create_new_file(APP_CONTEXT *ctx, WINDOW **inner_win, WINDOW **form_window,
     create_new_file_input(inner_win, form_window, new_file_form, field,
                           "Create file");
 
+    // hide_panel(ctx->explorer_panels[9]);
     top_panel(ctx->explorer_panels[1]);
     update_panels();
     doupdate();
@@ -560,8 +512,8 @@ void create_new_file(APP_CONTEXT *ctx, WINDOW **inner_win, WINDOW **form_window,
             char *new_filename = field_buffer(field[0], 0);
             trim(&new_filename);
             int filename_len = strlen(new_filename);
-            // memset(ctx->filename, 0, filename_len);
-            // strncpy(ctx->filename, new_filename, strlen(new_filename));
+            memset(ctx->filename, 0, filename_len);
+            strncpy(ctx->filename, new_filename, strlen(new_filename));
             // mvwprintw(ctx->course_windows[3], LINES - 11, 20, "len: %lu",
             // strlen(new_filename));
 
@@ -906,8 +858,6 @@ void delete_file(APP_CONTEXT *ctx, bool *del_file_form_active,
                 remove(ctx->file_tree->current_entry->path);
 
                 remove_entry_from_file_tree(ctx->file_tree);
-                mvwprintw(ctx->course_windows[3], 0, 30, "%s",
-                          ctx->file_tree->current_entry->name);
 
                 curs_set(0);
                 unpost_form(*new_file_form);
@@ -1169,6 +1119,7 @@ void create_directory(APP_CONTEXT *ctx, WINDOW **inner_win,
 
     create_new_file_input(inner_win, form_window, new_file_form, field,
                           "Create directory");
+
     top_panel(ctx->explorer_panels[4]);
     update_panels();
     doupdate();

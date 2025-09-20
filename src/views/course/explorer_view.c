@@ -40,6 +40,7 @@ void create_explorer_panels(APP_CONTEXT *ctx)
     ctx->explorer_panels[6] = new_panel(ctx->course_windows[2]);
     ctx->explorer_panels[7] = new_panel(ctx->course_windows[3]);
     ctx->explorer_panels[8] = new_panel(ctx->course_windows[4]);
+    ctx->explorer_panels[9] = new_panel(ctx->terminal_window);
 }
 
 void print_entries(FILE_TREE *f_tree, WINDOW **explorer_window)
@@ -187,24 +188,4 @@ void create_keybinds_window(WINDOW **explorer_window)
     mvwprintw(kb_window, 4, 0, "%s", kb_wrapped);
     focus_window(explorer_window, 3, "Explorer");
     wrefresh(kb_window);
-}
-
-void move_to_next_entry(FILE_TREE *f_tree, WINDOW **explorer_window)
-{
-    f_tree->curr_entry_nr++;
-    f_tree->current_entry = f_tree->current_entry->next;
-    werase(*explorer_window);
-    create_file_tree(explorer_window, f_tree);
-    focus_window(explorer_window, 3, "Explorer");
-    doupdate();
-}
-
-void move_to_prev_entry(FILE_TREE *f_tree, WINDOW **explorer_window)
-{
-    f_tree->curr_entry_nr--;
-    f_tree->current_entry = f_tree->current_entry->prev;
-    werase(*explorer_window);
-    create_file_tree(explorer_window, f_tree);
-    focus_window(explorer_window, 3, "Explorer");
-    doupdate();
 }

@@ -10,6 +10,9 @@ void handle_course_input(APP_CONTEXT *ctx);
 void handle_progress_input(APP_CONTEXT *ctx);
 void handle_nav_input(APP_CONTEXT *ctx);
 
+// explorer functions
+void update_file_explorer(APP_CONTEXT *ctx);
+
 // editor functions
 void move_down(TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **edit_window,
                WINDOW **editor_window, int y, int x, int *scroll_offset,

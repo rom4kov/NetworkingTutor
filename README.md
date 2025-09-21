@@ -77,11 +77,12 @@ them has been completed so far.
 
 #### **Keybindings view**
 The last view lists all keybindings needed to use the program.
+  
+#### <ins>Basic architecture and code design of the project</ins>
 
-<br/>
-#### <ins>**Basic architecture and code design of the project**</ins>
 The project is build around several core mechanisms and design principles: 
-1. a global input loop, that listens for key presses from the user at a central
+
+1. A global input loop, that listens for key presses from the user at a central
 place in the code and delegates the input to special handler functions based on
 which view and window is currently active.
 
@@ -101,7 +102,7 @@ grouped by their domain like 'editor.c' or 'explorer.c'. There are also two spec
 files in a 'data' directory managing how file I/O and interaction with the SQLite
 database is being processed.
 
-<br/>
+  
 #### <ins>**Not on the number of availabe courses**</ins>
 Since this is something like an MVP / POC there's only one complete course availabe
 as of now ("Build an HTTP server in C"). The follow-up courses will be added in the

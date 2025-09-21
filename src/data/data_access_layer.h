@@ -68,7 +68,7 @@ I_LINE *initialize_iline();
 void deallocate_buffer(TEXT_BUFFER *tbuf);
 void deallocate_it_buffer(I_TEXT_BUFFER *tbuf);
 void deallocate_file_tree(FILE_TREE *f_tree);
-void prepare_empty_file(TEXT_BUFFER **tbuf);
+void prepare_empty_file(TEXT_BUFFER *tbuf);
 void print_buffer_label(APP_CONTEXT *ctx);
 void open_new_file(APP_CONTEXT *ctx);
 void open_file(APP_CONTEXT *ctx);

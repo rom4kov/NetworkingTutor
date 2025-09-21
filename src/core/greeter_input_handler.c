@@ -354,17 +354,17 @@ void handle_user_select_win_input(APP_CONTEXT *ctx, bool *start_opt_menu_active,
             case 'q':
                 user_select_menu_active = false;
 
-                if (menu_option == 1)
-                {
-                    ctx->active_window = ctx->greeter_windows[1];
-                    hide_panel(ctx->greeter_panels[4]);
-                    top_panel(ctx->greeter_panels[1]);
-                }
-                else
+                if (menu_option == 0)
                 {
                     ctx->active_window = ctx->greeter_windows[2];
                     hide_panel(ctx->greeter_panels[4]);
                     top_panel(ctx->greeter_panels[2]);
+                }
+                else
+                {
+                    ctx->active_window = ctx->greeter_windows[1];
+                    hide_panel(ctx->greeter_panels[4]);
+                    top_panel(ctx->greeter_panels[1]);
                 }
 
                 update_panels();

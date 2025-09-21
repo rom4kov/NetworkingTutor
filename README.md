@@ -132,7 +132,7 @@ This should output 10.45.
 Once dependencies are installed, clone the repository and build the program:
 
 ```bash
-git clone https://github.com/yourusername/networkingtutor.git
+git clone https://github.com/rom4kov/NetworkingTutor.git
 cd networkingtutor
 make
 ```

@@ -3,7 +3,7 @@ CFLAGS = -g -Wall -Wextra -std=c17 -DPCRE2_CODE_UNIT_WIDTH=8 -I/usr/local/includ
 LDFLAGS = -L/usr/local/lib -lpanelw -lmenuw -lformw -lsqlite3 -lpcre2-8 -lncursesw -lcunit -lm
 INC=-Isrc/
 
-TARGET = main
+TARGET = ntutor
 
 SRC = $(wildcard *.c) $(wildcard src/**/*.c) $(wildcard src/**/**/*.c)
 

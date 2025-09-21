@@ -4,7 +4,7 @@ VALUES
     (
         1,
         1,
-        "1. Go to the file explorer, press ENTER to activate it and create a directory called 'http_server.@
+        "1. Go to the file explorer, press ENTER to activate it and create a directory called 'http_server'.@
 2. Inside that directory, create a file called 'answers.txt'.@
 3. Switch to the editor (press ENTER to activate).@
 4. In the editor, write down the three layers of the OSI model relevant to how an HTTP server operates.@@

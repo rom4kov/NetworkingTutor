@@ -34,8 +34,8 @@ int answers_file_contains_correct_answers(char *path)
     }
 
     if (strcasestr(buf_line->buf_, "Layer 7, Application, HTTP") == NULL ||
-        strcasestr(buf_line->next->buf_, "Layer 4, Transport, TCP") == NULL ||
-        strcasestr(buf_line->next->next->buf_, "Layer 3, Network, IP") == NULL)
+        (buf_line->next && strcasestr(buf_line->next->buf_, "Layer 4, Transport, TCP") == NULL) ||
+        (buf_line->next->next && strcasestr(buf_line->next->next->buf_, "Layer 3, Network, IP") == NULL))
     {
         return 1;
     }

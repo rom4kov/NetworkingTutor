@@ -89,7 +89,7 @@ LINE *initialize_line()
 
     line->buf_ = calloc(100, sizeof(char));
     line->line_num = 0;
-    line->length = 1;
+    line->length = 2;
     line->prev = NULL;
     line->next = NULL;
 
@@ -219,15 +219,16 @@ void deallocate_file_tree(FILE_TREE *f_tree)
     free(f_tree);
 }
 
-void prepare_empty_file(TEXT_BUFFER **tbuf)
+void prepare_empty_file(TEXT_BUFFER *tbuf)
 {
-    (*tbuf)->first_line = initialize_line();
-    (*tbuf)->first_line->buf_[0] = ' ';
-    (*tbuf)->first_line->buf_[1] = '\n';
-    (*tbuf)->first_line->length = 1;
-    (*tbuf)->current_line = (*tbuf)->first_line;
-    (*tbuf)->current_line->length = 1;
-    (*tbuf)->num_of_lines = 1;
+    tbuf->first_line = initialize_line();
+    tbuf->first_line->buf_[0] = ' ';
+    tbuf->first_line->buf_[1] = '\n';
+    tbuf->first_line->buf_[2] = '\0';
+    tbuf->first_line->length = 3;
+    tbuf->current_line = tbuf->first_line;
+    tbuf->current_line->length = 3;
+    tbuf->num_of_lines = 1;
 }
 
 void open_new_file(APP_CONTEXT *ctx)
@@ -241,7 +242,8 @@ void open_new_file(APP_CONTEXT *ctx)
 
     if (ctx->file != NULL)
     {
-        prepare_empty_file(&ctx->t_buffer);
+        prepare_empty_file(ctx->t_buffer);
+        // prepare_empty_file(ctx->t_buffer);
         print_file_metadata(ctx);
 
         ctx->t_buffer->lines_to_print = 1;
@@ -285,7 +287,7 @@ void open_file(APP_CONTEXT *ctx)
 
         if (ctx->file_size == 0)
         {
-            prepare_empty_file(&ctx->t_buffer);
+            prepare_empty_file(ctx->t_buffer);
         }
         else if (ctx->file_size > 0)
         {
@@ -328,7 +330,7 @@ void reprint_editor_buffer(APP_CONTEXT *ctx, bool activate_ed)
     {
         mvwprintw(ctx->course_windows[3], LINES - 9, 30, "%i",
                   ctx->t_buffer->num_of_lines);
-        prepare_empty_file(&ctx->t_buffer);
+        prepare_empty_file(ctx->t_buffer);
         ctx->t_buffer->lines_to_print = 1;
     }
     print_buffer_label(ctx);

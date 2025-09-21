@@ -257,7 +257,7 @@ void insert_tab(TEXT_BUFFER *tbuf, WINDOW **edit_window, WINDOW **editor_window,
     tbuf->current_line->length += move_len;
     memset(&tbuf->current_line->buf_[x], 32, move_len * sizeof(char));
     tbuf->current_col += move_len;
-    // print_line(tbuf->current_line->buf_, tbuf->curr_line_nr, edit_window);
+
     print_buffer(tbuf, edit_window, line_num_win, scroll_offset,
                  *lines_to_print);
     print_cursor_position(editor_window, tbuf, editor_height);
@@ -269,163 +269,6 @@ void insert_tab(TEXT_BUFFER *tbuf, WINDOW **edit_window, WINDOW **editor_window,
     wmove(*edit_window, y, x + move_len);
     wnoutrefresh(*edit_window);
     doupdate();
-}
-
-void delete_line(TEXT_BUFFER *tbuf, WINDOW **edit_window,
-                 WINDOW **editor_window, WINDOW **line_num_win, int y, int x,
-                 int *scroll_offset, int *lines_to_print, int editor_height,
-                 int filename_len, bool *file_modified)
-{
-    if (tbuf->curr_line_nr + 1 < tbuf->num_of_lines)
-    {
-        memmove(&tbuf->current_line->buf_[tbuf->current_line->length - 1],
-                tbuf->current_line->next->buf_,
-                tbuf->current_line->next->length);
-        free(tbuf->current_line->next->buf_);
-        tbuf->current_line->length += (tbuf->current_line->next->length - 1);
-        if (tbuf->curr_line_nr + 2 < tbuf->num_of_lines)
-        {
-            tbuf->current_line->next->next->prev = tbuf->current_line;
-            tbuf->current_line->next = tbuf->current_line->next->next;
-        }
-        if (tbuf->curr_line_nr < tbuf->num_of_lines - 1)
-            if (tbuf->num_of_lines - *scroll_offset < (editor_height - 4))
-            {
-                *lines_to_print -= 1;
-            }
-        tbuf->num_of_lines--;
-        // if (tbuf->num_of_lines - *scroll_offset < editor_height - 7 &&
-        //     *scroll_offset + *lines_to_print > tbuf->num_of_lines)
-        //     *lines_to_print -= 1;
-        curs_set(0);
-        print_buffer(tbuf, edit_window, line_num_win, scroll_offset,
-                     *lines_to_print);
-        // log_values(edit_window, *scroll_offset, tbuf, *lines_to_print, y, x);
-        print_cursor_position(editor_window, tbuf, editor_height);
-        if (file_modified)
-        {
-            print_modified_marker(*editor_window, filename_len, file_modified);
-        }
-        wnoutrefresh(*editor_window);
-        wmove(*edit_window, y, x);
-        curs_set(2);
-        wnoutrefresh(*line_num_win);
-        wnoutrefresh(*edit_window);
-        doupdate();
-    }
-}
-
-void delete_char_or_line(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
-                         WINDOW **edit_window, WINDOW **editor_window, int y,
-                         int x, int *scroll_offset, int *lines_to_print,
-                         int editor_height, int filename_len,
-                         bool *file_modified)
-{
-    if (x + 1 < tbuf->current_line->length)
-    {
-        memmove(&tbuf->current_line->buf_[x], &tbuf->current_line->buf_[x + 1],
-                tbuf->current_line->length - x);
-        tbuf->current_line->length--;
-        mvwprintw(*edit_window, y, tbuf->current_line->length - 1, " ");
-        // print_line(tbuf->current_line->buf_,
-        //            tbuf->curr_line_nr - *scroll_offset, edit_window);
-        print_buffer(tbuf, edit_window, line_num_win, scroll_offset,
-                     *lines_to_print);
-        // log_values(edit_window, *scroll_offset, tbuf, 0, y, x);
-        print_cursor_position(editor_window, tbuf, editor_height);
-        if (file_modified)
-        {
-            print_modified_marker(*editor_window, filename_len, file_modified);
-        }
-        wnoutrefresh(*editor_window);
-        wmove(*edit_window, y, x);
-        wnoutrefresh(*edit_window);
-    }
-    else
-    {
-        delete_line(tbuf, edit_window, editor_window, line_num_win, y, x,
-                    scroll_offset, lines_to_print, editor_height, filename_len,
-                    file_modified);
-    }
-}
-
-void bs_delete_line(TEXT_BUFFER *tbuf, WINDOW **edit_window,
-                    WINDOW **editor_window, WINDOW **line_num_win, int y,
-                    int *scroll_offset, int *lines_to_print, int editor_height,
-                    int filename_len, bool *file_modified)
-{
-    curs_set(0);
-    memmove(
-        &tbuf->current_line->prev->buf_[tbuf->current_line->prev->length - 1],
-        tbuf->current_line->buf_, tbuf->current_line->length);
-    tbuf->current_line->prev->next = tbuf->current_line->next;
-    int prev_length = tbuf->current_line->prev->length;
-    if (y + 1 < tbuf->num_of_lines - *scroll_offset)
-    {
-        tbuf->current_line->next->prev = tbuf->current_line->prev;
-    }
-    free(tbuf->current_line->buf_);
-    tbuf->current_line->prev->length += tbuf->current_line->length - 1;
-    tbuf->current_line = tbuf->current_line->prev;
-    tbuf->num_of_lines--;
-    tbuf->curr_line_nr--;
-    tbuf->current_col = tbuf->current_line->length;
-    if (tbuf->num_of_lines - *scroll_offset < editor_height - 4 &&
-        *scroll_offset + *lines_to_print > tbuf->num_of_lines)
-        *lines_to_print -= 1;
-    // else
-    //     *scroll_offset -= 1;
-    print_buffer(tbuf, edit_window, line_num_win, scroll_offset,
-                 *lines_to_print);
-    // log_values(edit_window, *scroll_offset, tbuf, *lines_to_print, y, 0);
-    print_cursor_position(editor_window, tbuf, editor_height);
-    if (file_modified)
-    {
-        print_modified_marker(*editor_window, filename_len, file_modified);
-    }
-    wnoutrefresh(*editor_window);
-    wmove(*edit_window, y - 1, prev_length < 2 ? 0 : prev_length - 1);
-    curs_set(2);
-    wnoutrefresh(*line_num_win);
-    wnoutrefresh(*edit_window);
-    doupdate();
-}
-
-void bs_delete_char_or_line(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
-                            WINDOW **edit_window, WINDOW **editor_window, int y,
-                            int x, int *scroll_offset, int *lines_to_print,
-                            int editor_height, int filename_len,
-                            bool *file_modified)
-{
-    if (x > 0)
-    {
-        memmove(&tbuf->current_line->buf_[x - 1], &tbuf->current_line->buf_[x],
-                tbuf->current_line->length - x);
-        memset(&tbuf->current_line->buf_[tbuf->current_line->length - 1], '\0',
-               1);
-        tbuf->current_line->length--;
-        tbuf->current_col--;
-        mvwprintw(*edit_window, y, tbuf->current_line->length - 1, " ");
-        // print_line(tbuf->current_line->buf_,
-        //            tbuf->curr_line_nr - *scroll_offset, edit_window);
-        print_buffer(tbuf, edit_window, line_num_win, scroll_offset,
-                     *lines_to_print);
-        print_cursor_position(editor_window, tbuf, editor_height);
-        if (file_modified)
-        {
-            print_modified_marker(*editor_window, filename_len, file_modified);
-        }
-        wnoutrefresh(*editor_window);
-        wmove(*edit_window, y, x - 1);
-        wnoutrefresh(*edit_window);
-        doupdate();
-    }
-    else if (x == 0 && y > 0)
-    {
-        bs_delete_line(tbuf, edit_window, editor_window, line_num_win, y,
-                       scroll_offset, lines_to_print, editor_height,
-                       filename_len, file_modified);
-    }
 }
 
 void insert_line(TEXT_BUFFER *tbuf, WINDOW **edit_window,
@@ -535,6 +378,163 @@ void insert_line(TEXT_BUFFER *tbuf, WINDOW **edit_window,
     wnoutrefresh(*line_num_win);
     wnoutrefresh(*edit_window);
     doupdate();
+}
+
+void delete_line(TEXT_BUFFER *tbuf, WINDOW **edit_window,
+                 WINDOW **editor_window, WINDOW **line_num_win, int y, int x,
+                 int *scroll_offset, int *lines_to_print, int editor_height,
+                 int filename_len, bool *file_modified)
+{
+    if (tbuf->curr_line_nr + 1 < tbuf->num_of_lines)
+    {
+        memmove(&tbuf->current_line->buf_[tbuf->current_line->length - 1],
+                tbuf->current_line->next->buf_,
+                tbuf->current_line->next->length);
+        free(tbuf->current_line->next->buf_);
+        tbuf->current_line->length += (tbuf->current_line->next->length - 1);
+        if (tbuf->curr_line_nr + 2 < tbuf->num_of_lines)
+        {
+            tbuf->current_line->next->next->prev = tbuf->current_line;
+            tbuf->current_line->next = tbuf->current_line->next->next;
+        }
+        if (tbuf->curr_line_nr < tbuf->num_of_lines - 1)
+            if (tbuf->num_of_lines - *scroll_offset < (editor_height - 4))
+            {
+                *lines_to_print -= 1;
+            }
+        tbuf->num_of_lines--;
+        // if (tbuf->num_of_lines - *scroll_offset < editor_height - 7 &&
+        //     *scroll_offset + *lines_to_print > tbuf->num_of_lines)
+        //     *lines_to_print -= 1;
+        curs_set(0);
+        print_buffer(tbuf, edit_window, line_num_win, scroll_offset,
+                     *lines_to_print);
+        // log_values(edit_window, *scroll_offset, tbuf, *lines_to_print, y, x);
+        print_cursor_position(editor_window, tbuf, editor_height);
+        if (file_modified)
+        {
+            print_modified_marker(*editor_window, filename_len, file_modified);
+        }
+        wnoutrefresh(*editor_window);
+        wmove(*edit_window, y, x);
+        curs_set(2);
+        wnoutrefresh(*line_num_win);
+        wnoutrefresh(*edit_window);
+        doupdate();
+    }
+}
+
+void delete_char_or_line(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
+                         WINDOW **edit_window, WINDOW **editor_window, int y,
+                         int x, int *scroll_offset, int *lines_to_print,
+                         int editor_height, int filename_len,
+                         bool *file_modified)
+{
+    if (x + 1 < tbuf->current_line->length)
+    {
+        memmove(&tbuf->current_line->buf_[x], &tbuf->current_line->buf_[x + 1],
+                tbuf->current_line->length - x);
+        tbuf->current_line->length--;
+        mvwprintw(*edit_window, y, tbuf->current_line->length - 1, " ");
+        // print_line(tbuf->current_line->buf_,
+        //            tbuf->curr_line_nr - *scroll_offset, edit_window);
+        print_buffer(tbuf, edit_window, line_num_win, scroll_offset,
+                     *lines_to_print);
+        // log_values(edit_window, *scroll_offset, tbuf, 0, y, x);
+        print_cursor_position(editor_window, tbuf, editor_height);
+        if (file_modified)
+        {
+            print_modified_marker(*editor_window, filename_len, file_modified);
+        }
+        wnoutrefresh(*editor_window);
+        wmove(*edit_window, y, x);
+        wnoutrefresh(*edit_window);
+        doupdate();
+    }
+    else
+    {
+        delete_line(tbuf, edit_window, editor_window, line_num_win, y, x,
+                    scroll_offset, lines_to_print, editor_height, filename_len,
+                    file_modified);
+    }
+}
+
+void bs_delete_line(TEXT_BUFFER *tbuf, WINDOW **edit_window,
+                    WINDOW **editor_window, WINDOW **line_num_win, int y,
+                    int *scroll_offset, int *lines_to_print, int editor_height,
+                    int filename_len, bool *file_modified)
+{
+    curs_set(0);
+    memmove(
+        &tbuf->current_line->prev->buf_[tbuf->current_line->prev->length - 1],
+        tbuf->current_line->buf_, tbuf->current_line->length);
+    tbuf->current_line->prev->next = tbuf->current_line->next;
+    int prev_length = tbuf->current_line->prev->length;
+    if (y + 1 < tbuf->num_of_lines - *scroll_offset)
+    {
+        tbuf->current_line->next->prev = tbuf->current_line->prev;
+    }
+    free(tbuf->current_line->buf_);
+    tbuf->current_line->prev->length += tbuf->current_line->length - 1;
+    tbuf->current_line = tbuf->current_line->prev;
+    tbuf->num_of_lines--;
+    tbuf->curr_line_nr--;
+    tbuf->current_col = tbuf->current_line->length;
+    if (tbuf->num_of_lines - *scroll_offset < editor_height - 4 &&
+        *scroll_offset + *lines_to_print > tbuf->num_of_lines)
+        *lines_to_print -= 1;
+    // else
+    //     *scroll_offset -= 1;
+    print_buffer(tbuf, edit_window, line_num_win, scroll_offset,
+                 *lines_to_print);
+    // log_values(edit_window, *scroll_offset, tbuf, *lines_to_print, y, 0);
+    print_cursor_position(editor_window, tbuf, editor_height);
+    if (file_modified)
+    {
+        print_modified_marker(*editor_window, filename_len, file_modified);
+    }
+    wnoutrefresh(*editor_window);
+    wmove(*edit_window, y - 1, prev_length < 2 ? 0 : prev_length - 1);
+    curs_set(2);
+    wnoutrefresh(*line_num_win);
+    wnoutrefresh(*edit_window);
+    doupdate();
+}
+
+void bs_delete_char_or_line(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
+                            WINDOW **edit_window, WINDOW **editor_window, int y,
+                            int x, int *scroll_offset, int *lines_to_print,
+                            int editor_height, int filename_len,
+                            bool *file_modified)
+{
+    if (x > 0)
+    {
+        memmove(&tbuf->current_line->buf_[x - 1], &tbuf->current_line->buf_[x],
+                tbuf->current_line->length - x);
+        memset(&tbuf->current_line->buf_[tbuf->current_line->length - 1], '\0',
+               1);
+        tbuf->current_line->length--;
+        tbuf->current_col--;
+        mvwprintw(*edit_window, y, tbuf->current_line->length - 1, " ");
+
+        print_buffer(tbuf, edit_window, line_num_win, scroll_offset,
+                     *lines_to_print);
+        print_cursor_position(editor_window, tbuf, editor_height);
+        if (file_modified)
+        {
+            print_modified_marker(*editor_window, filename_len, file_modified);
+        }
+        wnoutrefresh(*editor_window);
+        wmove(*edit_window, y, x - 1);
+        wnoutrefresh(*edit_window);
+        doupdate();
+    }
+    else if (x == 0 && y > 0)
+    {
+        bs_delete_line(tbuf, edit_window, editor_window, line_num_win, y,
+                       scroll_offset, lines_to_print, editor_height,
+                       filename_len, file_modified);
+    }
 }
 
 void log_values(WINDOW **edit_window, int scroll_offset, TEXT_BUFFER *tbuf,

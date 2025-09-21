@@ -159,10 +159,6 @@ void handle_course_input(APP_CONTEXT *ctx)
                     ctx->active_window_idx = SHELL_WINDOW_IDX;
                     recreate_editor_windows(ctx);
 
-                    // ctx->terminal_window = create_terminal_window(ctx);
-                    // ctx->explorer_panels[9] = new_panel(ctx->terminal_window);
-                    // top_panel(ctx->explorer_panels[9]);
-
                     ctx->active_window_idx = SHELL_WINDOW_IDX;
                     toggle_terminal(ctx);
 
@@ -184,7 +180,6 @@ void handle_course_input(APP_CONTEXT *ctx)
                     ctx->shell->terminal_focused = false;
                     ctx->active_window_idx = 2;
                     recreate_editor_windows(ctx);
-                    // hide_panel(ctx->explorer_panels[9]);
 
                     ctx->active_window_idx = 2;
                     toggle_terminal(ctx);

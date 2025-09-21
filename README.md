@@ -26,7 +26,7 @@ assignments. It also features a window that shows the course material and
 instructions. The same window also displays the test results for submitted code 
 assignments.
 
-##### Course view
+##### **Course view**
 ###### File explorer:
 The builtin file explorer allows the user to create, open, rename and delete
 files and directories. When creating files in the terminal or otherwise the
@@ -55,22 +55,21 @@ A small status window in the bottom right of the course view displays the curren
 course's name and the number of completed sections in that course. It's functionality
 will be expanded in the future.
 
-##### All courses view
+##### **All courses view**
 There's a special view for displaying all courses that are planned to be available
 in the future but are still work in progress.
 
-##### Account & progress view
+##### **Account & progress view**
 Another view shows account details and the current progress of the user. The progress
 details include the number of completed courses, course sections and items (paragraphs),
 as well as collected points and the current rank of the user based on collected points.
 This view also shows which courses have been started and what percentage of
 them has been completed so far.
 
-##### Keybindings view
+##### **Keybindings view**
 The last view lists all keybindings needed to use the program.
 
-
-##### Basic architecture and code design of the project
+##### <ins>**Basic architecture and code design of the project**</ins>
 The project is build around several core mechanisms: 
 1. a global input loop, that listens for key presses from the user at a central
 place in the code and delegates the input to special handler functions based on

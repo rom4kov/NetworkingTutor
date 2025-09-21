@@ -42,10 +42,6 @@ void free_memory_for_exit(APP_CONTEXT *ctx)
     free(ctx->filename);
     free(ctx->curr_file_path);
 
-    free(ctx->file_tree->prev_dir->name);
-    free(ctx->file_tree->prev_dir->path);
-    free(ctx->file_tree->prev_dir);
-
     for (int i = 0; i < ctx->num_of_courses; i++) {
         free(ctx->courses[i].name);
         free(ctx->courses[i].short_desc);
@@ -290,6 +286,10 @@ void cleanup_course_for_exit(APP_CONTEXT *ctx)
     cleanup_init_state(ctx);
 
     cleanup_nav_menu(ctx);
+
+    free(ctx->file_tree->prev_dir->name);
+    free(ctx->file_tree->prev_dir->path);
+    free(ctx->file_tree->prev_dir);
 
     for (int i = 0; i < EXPLORER_PANEL_COUNT; i++)
     {

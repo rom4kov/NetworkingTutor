@@ -25,21 +25,42 @@ assignments. It also features a window that shows the course material and
 instructions. The same window also displays the test results for submitted code 
 assignments.
 
-##### File explorer:
+##### Course view
+###### File explorer:
 The builtin file explorer allows the user to create, open, rename and delete
 files and directories. When creating files in the terminal or otherwise the
 file explorer can be updated to show these externally created content.
 
-##### Editor:
+###### Editor:
 The editor is a very simple text editor. The user can navigate using the arrow keys,
 the TAB key for indentation etc. There basic syntax highlighting for C code, some
 metadata in a status line, and the name of the file and modification state displayed
 in a buffer label at the top.
 
-##### Terminal:
+###### Terminal:
 The Terminal can be toggled on and off. It's not a real terminal with the ability
 to run fully interactive programs but more like a command execution window. Simple
 compiling, testing and debugging the code written in the editor is its main purpose.
 
-Instructions window:
+###### Instructions window:
+Here the user is shown course materials like step-by-step explanations of the topic 
+at hand and instructions on how to implement the project details and features.
+Course material can be uncovered paragraph by paragraph. The window is scrollable and
+it's possible to navigate between course sections. This is also the place where
+test results are shown for submitted coding assignments.
 
+###### Status bar
+A small status window in the bottom right of the course view displays the current
+course's name and the number of completed sections in that course. It's functionality
+will be exppanded in the future.
+
+##### All courses view
+There's a special view for displaying all courses that are planned to be available
+in the future but are still work in progress.
+
+##### Account & progress view
+Another view shows account details and the current progress of the user. The progress
+details include the number of completed courses, course sections and items (paragraphs),
+as well as collected points and the current rank of the user based on collected points.
+This view also shows which courses have been started and what percentage of
+them has been completed so far.

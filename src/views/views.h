@@ -106,7 +106,7 @@ void print_no_courses_started_msg(WINDOW *win, int height, int width);
 // all courses view
 void create_all_courses_view(APP_CONTEXT *ctx);
 WINDOW *create_all_courses_screen();
-WINDOW *create_all_courses_container(APP_CONTEXT *ctx);
+WINDOW *create_all_courses_title_window(APP_CONTEXT *ctx);
 void print_all_courses(APP_CONTEXT *ctx);
 
 // keybindings view

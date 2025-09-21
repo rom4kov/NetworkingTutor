@@ -124,10 +124,20 @@ WINDOW *create_course_preview_card(APP_CONTEXT *ctx, int x_position,
     }
     else if (ctx->progress_view_active || ctx->all_courses_view_active)
     {
-        height = LINES / 3 + 2;
-        y_position = course->id < 6 ? 12 : (13 + height);
+
+        if (ctx->progress_view_active)
+        {
+            height = LINES / 3 + 2;
+            y_position = course->id < 6 ? 12 : (13 + height);
+        }
+        else
+        {
+            height = LINES / 3 + 3;
+            y_position = course->id < 6 ? 9 : (10 + height);
+        }
+
         x_add = ctx->progress_view_active ? 80 : 0;
-        width = CARD_WIDTH - (ctx->progress_view_active ? 2 : 4);
+        width = CARD_WIDTH - (ctx->progress_view_active ? 2 : 0);
     }
 
     WINDOW *course_preview_card_outer =
@@ -200,9 +210,6 @@ WINDOW *create_course_preview_card(APP_CONTEXT *ctx, int x_position,
 
     wnoutrefresh(course_preview_card_outer);
     wnoutrefresh(course_preview_card_inner);
-    // doupdate();
-
-    // delwin(course_preview_card_inner);
 
     return course_preview_card_outer;
 }

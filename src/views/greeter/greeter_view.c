@@ -235,6 +235,7 @@ MENU *create_user_selection_menu(APP_CONTEXT *ctx, int num_of_users)
     {
         free((void *)users[i]->name);
         free((void *)users[i]->created_at);
+        free((void *)users[i]->home_dir);
         free(users[i]);
     }
     free(users);

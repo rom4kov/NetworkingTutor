@@ -33,8 +33,6 @@ void free_memory_for_exit(APP_CONTEXT *ctx)
     {
         cleanup_keybindings_for_exit(ctx);
     }
-    // free(ctx->rp_state->s_metadata->title);
-    // free(ctx->rp_state->s_metadata);
 
     CU_cleanup_registry();
 
@@ -43,7 +41,10 @@ void free_memory_for_exit(APP_CONTEXT *ctx)
     free(ctx->shell);
     free(ctx->filename);
     free(ctx->curr_file_path);
-    // free(ctx->user_data);
+
+    free(ctx->file_tree->prev_dir->name);
+    free(ctx->file_tree->prev_dir->path);
+    free(ctx->file_tree->prev_dir);
 
     for (int i = 0; i < ctx->num_of_courses; i++) {
         free(ctx->courses[i].name);
@@ -52,11 +53,10 @@ void free_memory_for_exit(APP_CONTEXT *ctx)
     }
     free(ctx->courses);
 
-    // free(ctx->file_tree);
     free(ctx->rp_state->course_progress);
     free(ctx->rp_state->completed_sections);
     free(ctx->rp_state->total_section_items);
-    // free(ctx->rp_state->it_buffer);
+
     free(ctx->rp_state);
     ctx->db = NULL;
     free(ctx);

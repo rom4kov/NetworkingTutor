@@ -93,23 +93,25 @@ WINDOW *create_keybindings_container(APP_CONTEXT *ctx)
               "Rename a file or directory: 'r' key");
     mvwprintw(keybindings_container, 21, 65, "%s",
               "Delete file or directory: 'd' key");
+    mvwprintw(keybindings_container, 23, 65, "%s",
+              "Update file explorer: 'u' key");
 
     wattron(keybindings_container, A_UNDERLINE | A_BOLD);
-    mvwprintw(keybindings_container, 24, 65, "%s",
+    mvwprintw(keybindings_container, 27, 65, "%s",
               "Course instructions window");
     wattroff(keybindings_container, A_UNDERLINE | A_BOLD);
 
-    mvwprintw(keybindings_container, 26, 65, "%s",
+    mvwprintw(keybindings_container, 29, 65, "%s",
               "Scroll up and down: up and down keys ↑ ↓");
-    mvwprintw(keybindings_container, 28, 65, "%s",
+    mvwprintw(keybindings_container, 31, 65, "%s",
               "Move between completed course sections: '<' and '>' keys");
-    mvwprintw(keybindings_container, 30, 65, "%s",
+    mvwprintw(keybindings_container, 33, 65, "%s",
               "Show next paragraph / text item: space key");
-    mvwprintw(keybindings_container, 32, 65, "%s",
+    mvwprintw(keybindings_container, 35, 65, "%s",
               "Show separate task if there is one: 't' key");
-    mvwprintw(keybindings_container, 34, 65, "%s",
+    mvwprintw(keybindings_container, 37, 65, "%s",
               "Submit your the code you've written: 's' key");
-    mvwprintw(keybindings_container, 36, 65, "%s",
+    mvwprintw(keybindings_container, 39, 65, "%s",
               "Complete current section and go to next one: ENTER");
 
     wattron(keybindings_container, A_UNDERLINE | A_BOLD);
@@ -130,6 +132,26 @@ WINDOW *create_keybindings_container(APP_CONTEXT *ctx)
               "Stop a running executable: F2");
     mvwprintw(keybindings_container, 20, 135, "%s",
               "Get out of terminal window: F1");
+    wattron(keybindings_container, A_UNDERLINE);
+    mvwprintw(keybindings_container, 23, 135, "%s",
+              "Note on the built-in terminal");
+    wattroff(keybindings_container, A_UNDERLINE);
+    mvwprintw(keybindings_container, 25, 135, "%s",
+              "This terminal is a simplified command output window.");
+    mvwprintw(keybindings_container, 27, 135, "%s",
+              "It is not a full interactive shell and does not support programs");
+    mvwprintw(keybindings_container, 29, 135, "%s",
+              "that require direct terminal control (e.g. editors like vim or");
+    mvwprintw(keybindings_container, 31, 135, "%s",
+              "process viewers like htop).");
+    mvwprintw(keybindings_container, 33, 135, "%s",
+              "Its purpose is to let you compile your code (e.g. using gcc),");
+    mvwprintw(keybindings_container, 35, 135, "%s",
+              "run your programs, and inspect their output or errors. This way,");
+    mvwprintw(keybindings_container, 37, 135, "%s",
+              "you can quickly test and debug your assignments before submitting");
+    mvwprintw(keybindings_container, 39, 135, "%s",
+              "them or analyzing unit test results.");
 
     return keybindings_container;
 }

@@ -135,8 +135,6 @@ void toggle_terminal(APP_CONTEXT *ctx)
     if (ctx->shell->terminal_active)
     {
         int color = ctx->active_window_idx == SHELL_WINDOW_IDX ? 3 : 2;
-        mvwprintw(ctx->course_windows[1], 10, 2, "bcolor: %i", color);
-        wrefresh(ctx->course_windows[1]);
         draw_border(ctx->terminal_window, color, " Terminal ");
         wattron(ctx->terminal_window, COLOR_PAIR(3));
         mvwprintw(ctx->terminal_window, 0, 2, " Terminal ");

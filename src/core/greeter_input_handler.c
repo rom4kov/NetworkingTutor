@@ -80,7 +80,6 @@ void handle_greeter_input(APP_CONTEXT *ctx)
 		    
                     change_to_user_dir(ctx);
                     go_to_course_by_id(ctx, ctx->current_course_id);
-                    // deallocate_greeter_memory(ctx);
                 }
             }
             else if (item_index(curr_item) == 2)
@@ -108,7 +107,6 @@ void handle_greeter_input(APP_CONTEXT *ctx)
                     change_to_user_dir(ctx);
                     ctx->current_course_id = 1;
                     ctx->current_course = ctx->courses[0].name;
-                    // deallocate_greeter_memory(ctx);
                 }
             }
             else if (item_index(curr_item) == 3)
@@ -265,8 +263,6 @@ void handle_new_user_input(APP_CONTEXT *ctx, bool *start_opt_menu_active)
 
                 update_panels();
                 doupdate();
-                // deallocate_greeter_memory(ctx);
-
                 break;
             default:
                 form_driver(ctx->new_user_form, ctx->key);

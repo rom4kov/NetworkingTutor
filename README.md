@@ -113,13 +113,11 @@ sudo apt install libncurses-dev libncursesw5-dev libsqlite3-dev libcunit1-dev li
 1. Download the source archive from the [PCRE2 project page](https://www.pcre.org/).  
 2. Extract the archive and build the library:
    ```bash
-```
    tar -xvf pcre2-10.45.tar.gz
    cd pcre2-10.45
    ./configure
    make
    sudo make install
-```
 
 #### Verify the installation:
 
@@ -133,7 +131,7 @@ This should output 10.45.
 
 Once dependencies are installed, clone the repository and build the program:
 
-```
+```bash
 git clone https://github.com/yourusername/networkingtutor.git
 cd networkingtutor
 make
@@ -145,7 +143,7 @@ This will create the ntutor executable in the project root directory.
 
 Start the program by running:
 
-```
+```bash
 ./ntutor
 ```
 

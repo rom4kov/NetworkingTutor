@@ -631,7 +631,7 @@ void set_section_completed(APP_CONTEXT *ctx)
     if (rc == SQLITE_DONE)
     {
         int current_streak = get_current_streak(ctx);
-        if (current_streak > 1)
+        if (current_streak > 0)
             set_current_streak(ctx, current_streak);
     }
 
@@ -1129,6 +1129,12 @@ int get_current_streak(APP_CONTEXT *ctx)
 
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
+        if (i == 0 && sqlite3_column_text(stmt, 0) != NULL)
+        {
+            streak_length++;
+            mvwprintw(ctx->progress_windows[3], 150, 1, "%s", "null row");
+            wrefresh(ctx->progress_windows[3]);
+        }
         const unsigned char *date = sqlite3_column_text(stmt, 0);
         if (date == NULL || strcmp(tmp_date, ""))
             break;

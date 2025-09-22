@@ -652,25 +652,59 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
     else
     {
         if (current_entry->parent_dir)
-            ctx->file_tree->current_entry = current_entry->parent_dir;
+        {
+            int parent_indent_level = current_entry->indent_level;
+
+            ctx->file_tree->current_entry = current_entry->parent_dir->next;
+
+            if (type == 4)
+            {
+                while (ctx->file_tree->current_entry->next &&
+                       (ctx->file_tree->current_entry->type == 4 ||
+                        ctx->file_tree->current_entry->indent_level >=
+                            parent_indent_level + 1))
+                {
+                    ctx->file_tree->current_entry =
+                        ctx->file_tree->current_entry->next;
+                }
+                ctx->file_tree->current_entry =
+                    ctx->file_tree->current_entry->prev;
+            }
+            else if (type == 8)
+            {
+                if (current_entry != ctx->file_tree->first_entry)
+                {
+                    while (ctx->file_tree->current_entry->next &&
+                           ((ctx->file_tree->current_entry->type != 8 ||
+                             ctx->file_tree->current_entry->indent_level >=
+                                 parent_indent_level + 1) ||
+                            ctx->file_tree->current_entry->name[0] >
+                                ctx->filename[0]))
+                    {
+                        ctx->file_tree->current_entry =
+                            ctx->file_tree->current_entry->next;
+                    }
+                }
+            }
+        }
         else
+        {
             ctx->file_tree->current_entry = ctx->file_tree->first_entry;
 
-        if (type == 4)
-        {
-            while (ctx->file_tree->current_entry->next &&
-                   ((ctx->file_tree->current_entry->type == 4 ||
-                     ctx->file_tree->current_entry->indent_level >
-                         current_entry->indent_level)))
+            if (type == 4)
             {
+                while (ctx->file_tree->current_entry->next &&
+                       (ctx->file_tree->current_entry->type == 4 ||
+                        ctx->file_tree->current_entry->indent_level >
+                            current_entry->indent_level))
+                {
+                    ctx->file_tree->current_entry =
+                        ctx->file_tree->current_entry->next;
+                }
                 ctx->file_tree->current_entry =
-                    ctx->file_tree->current_entry->next;
+                    ctx->file_tree->current_entry->prev;
             }
-            ctx->file_tree->current_entry = ctx->file_tree->current_entry->prev;
-        }
-        else if (type == 8)
-        {
-            if (current_entry != ctx->file_tree->first_entry)
+            else if (type == 8)
             {
                 while (
                     ctx->file_tree->current_entry->next &&
@@ -745,7 +779,7 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
 
     new_entry->type = type;
 
-    // link new entry inte file tree linked list
+    // link new entry into file tree linked list
     if (ctx->file_tree->num_of_entries > 1)
     {
         new_entry->prev = ctx->file_tree->current_entry;
@@ -1309,12 +1343,13 @@ void create_app_root_dir(APP_CONTEXT *ctx)
 }
 
 void change_to_user_dir(APP_CONTEXT *ctx)
-{ 
+{
     if (dir_exists(ctx->user_data->home_dir))
     {
         chdir(ctx->user_data->home_dir);
     }
-    else {
+    else
+    {
         create_app_root_dir(ctx);
     }
 }

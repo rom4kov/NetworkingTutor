@@ -89,7 +89,7 @@ LINE *initialize_line()
 
     line->buf_ = calloc(100, sizeof(char));
     line->line_num = 0;
-    line->length = 2;
+    line->length = 1;
     line->prev = NULL;
     line->next = NULL;
 
@@ -225,9 +225,9 @@ void prepare_empty_file(TEXT_BUFFER *tbuf)
     tbuf->first_line->buf_[0] = ' ';
     tbuf->first_line->buf_[1] = '\n';
     tbuf->first_line->buf_[2] = '\0';
-    tbuf->first_line->length = 3;
+    tbuf->first_line->length = 2;
     tbuf->current_line = tbuf->first_line;
-    tbuf->current_line->length = 3;
+    tbuf->current_line->length = 2;
     tbuf->num_of_lines = 1;
 }
 
@@ -258,6 +258,8 @@ void open_new_file(APP_CONTEXT *ctx)
         print_buffer_label(ctx);
     }
 
+    chdir(ctx->prev_dir);
+
     wnoutrefresh(ctx->line_num_win);
     wnoutrefresh(ctx->course_windows[2]);
     doupdate();
@@ -265,14 +267,32 @@ void open_new_file(APP_CONTEXT *ctx)
 
 void open_file(APP_CONTEXT *ctx)
 {
+    // char file_to_open[128];
+    // int cwd_len = strlen(ctx->shell->cwd);
+    // int c_entry_name_len = strlen(ctx->file_tree->current_entry->name);
+    // mvwprintw(ctx->course_windows[3], 0, 30, "%s", ctx->shell->cwd);
+    // mvwprintw(ctx->course_windows[3], 0, 45, "%i", cwd_len);
+    // if (cwd_len > 0)
+    // {
+    //     snprintf(file_to_open, cwd_len + 2 + c_entry_name_len, "%s/%s", ctx->shell->cwd,
+    //              ctx->file_tree->current_entry->name);
+    //     ctx->file = fopen(file_to_open, "r+");
+    //     mvwprintw(ctx->course_windows[3], 1, 30, "%s", file_to_open);
+    // }
+    // else
+    // {
     ctx->file = fopen(ctx->file_tree->current_entry->path, "r+");
+    //     mvwprintw(ctx->course_windows[3], 0, 55, "%s", ctx->shell->cwd);
+    // }
+
     strncpy(ctx->filename, ctx->file_tree->current_entry->name, 30);
     ctx->filename[29] = '\0';
     ctx->filename_len = strlen(ctx->filename);
 
     if (ctx->file == NULL)
     {
-        printf("Could not open %s.\n", ctx->file_tree->current_entry->path);
+        mvwprintw(ctx->course_windows[4], 1, 1, "Could not open %s.\n",
+                  ctx->file_tree->current_entry->path);
     }
 
     if (ctx->file != NULL)
@@ -314,6 +334,8 @@ void open_file(APP_CONTEXT *ctx)
         print_buffer_label(ctx);
         print_file_metadata(ctx);
     }
+
+    chdir(ctx->prev_dir);
 
     wnoutrefresh(ctx->course_windows[3]);
     doupdate();
@@ -1334,6 +1356,7 @@ void create_app_root_dir(APP_CONTEXT *ctx)
 
     ctx->user_home_dir = proj_dir_buf;
     ctx->home_env = home_dir;
+    ctx->prev_dir = strdup(ctx->user_home_dir);
 
     set_user_home_dir(ctx);
 

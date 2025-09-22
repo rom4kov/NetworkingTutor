@@ -95,6 +95,14 @@ void handle_explorer_input(APP_CONTEXT *ctx)
             break;
         case KEY_F(1):
             wrefresh(ctx->course_windows[1]);
+            mvwprintw(ctx->course_windows[3], 0, 30, "%lu", strlen(ctx->shell->cwd));
+            mvwprintw(ctx->course_windows[3], 0, 35, "%s", ctx->shell->cwd);
+            mvwprintw(ctx->course_windows[3], 1, 30, "%s", ctx->prev_dir);
+            wrefresh(ctx->course_windows[3]);
+            // if (strlen(ctx->shell->cwd) > 0)
+            // {
+            chdir(ctx->prev_dir);
+            // }
             ctx->explorer_mode = false;
             break;
     }

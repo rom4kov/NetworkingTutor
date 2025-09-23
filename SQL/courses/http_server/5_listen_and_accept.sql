@@ -215,7 +215,7 @@ VALUES
         1,
         5,
         "What accept() does",
-        "@Once the socket is listening, we can call accept() to accept one of
+        "@Once the socket is listening, we can call accept() to accept one of 
 the pending connections from the queue.@
 @
 The accept() function does block until a connection attempt is made by a client.
@@ -264,7 +264,7 @@ VALUES
 @
 • sockfd: the socket file descriptor from socket()@
 • addr: a pointer to a struct sockaddr that will be filled in with the client’s
-address the connection request.@
+address@
 • addrlen: a pointer to the size of that structure@
 @
 Since we don’t know in advance whether the client will use IPv4 or IPv6, we

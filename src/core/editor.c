@@ -126,10 +126,7 @@ void move_up(TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **edit_window,
         tbuf->current_line = tbuf->current_line->prev;
         tbuf->curr_line_nr--;
         tbuf->current_col = tbuf->current_line->length - 1;
-        mvwprintw(*edit_window, editor_height - 5, EDITOR_WIDTH - 7,
-                  "         ");
-        mvwprintw(*edit_window, editor_height - 5, EDITOR_WIDTH - 7, "%i : %i",
-                  tbuf->curr_line_nr, tbuf->current_col);
+
         if (tbuf->curr_line_nr < *scroll_offset)
         {
             curs_set(0);

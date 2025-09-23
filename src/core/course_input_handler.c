@@ -106,9 +106,9 @@ void handle_course_input(APP_CONTEXT *ctx)
                 doupdate();
                 break;
             case 10:
-                free(ctx->prev_dir);
-                ctx->prev_dir = get_cwd();
-                chdir(ctx->user_data->home_dir);
+                // free(ctx->prev_dir);
+                // ctx->prev_dir = get_cwd();
+                // chdir(ctx->user_data->home_dir);
                 ctx->explorer_mode = true;
                 break;
         }
@@ -203,7 +203,7 @@ void handle_course_input(APP_CONTEXT *ctx)
                 if (ctx->file)
                     curs_set(2);
                 if (ctx->file)
-                    wmove(ctx->edit_window, ctx->t_buffer->curr_line_nr,
+                    wmove(ctx->edit_window, ctx->t_buffer->curr_line_nr - ctx->scroll_offset,
                           ctx->t_buffer->current_col);
                 else
                     wmove(ctx->edit_window, 0, 0);
@@ -519,6 +519,9 @@ void handle_course_input(APP_CONTEXT *ctx)
                 break;
             case '\n':
                 ctx->shell->terminal_focused = true;
+
+                chdir(ctx->shell_local_cwd);
+
                 int nol = ctx->shell->term_buffer->num_of_lines;
                 wmove(ctx->shell->term_inner_win, nol < 8 ? nol - 1 : 7,
                       ctx->shell->term_buffer->current_col);

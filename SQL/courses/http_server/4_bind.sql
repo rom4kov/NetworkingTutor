@@ -81,7 +81,7 @@ VALUES
         1,
         4,
         "Why bind()?",
-        "@The socket descriptor returned by socket() is just a file descriptor
+        "@The socket descriptor returned by socket() is just a file descriptor 
 — it doesn’t yet represent a real, usable network endpoint. To make it usable
 (i.e., to allow the OS to associate it with a specific port and IP address),
 we need to call bind().",
@@ -125,7 +125,7 @@ VALUES
         1,
         4,
         "Historical sketch of the bind() syscall",
-        "@The bind() system call was introduced with the BSD sockets API in
+        "@The bind() system call was introduced with the BSD sockets API in 
 4.2BSD (1983). Its design reflects the Unix philosophy: just as open()
 associates a file descriptor with a file path, bind() associates a socket
 with a specific IP address and port.",
@@ -169,7 +169,7 @@ VALUES
         1,
         4,
         "Implementing bind()",
-        "@The call to bind is actually fairly easy to implement. This is what
+        "@The call to bind is actually fairly easy to implement. This is what 
 its prototype looks like:",
         6,
         0
@@ -237,8 +237,9 @@ VALUES
         1,
         4,
         "Use setsockopt() to allow reuse of local addresses",
-        '@Sometimes bind() fails with an "Address already in use" error.
-This can happen if the port was recently used by another process or hasn''t yet been released by the kernel.
+        '@Sometimes bind() fails with an "Address already in use" error. 
+This can happen if the port was recently used by another process or hasn''t
+yet been released by the kernel.
 @
 To fix this, add the following after your socket() call and before bind():@',
         9,
@@ -264,7 +265,7 @@ VALUES
     perror("setsockopt");@
     exit(EXIT_FAILURE);@
 }@',
-        9,
+        10,
         1
     );
 
@@ -284,7 +285,7 @@ VALUES
         "",
         "This tells the OS it’s okay to reuse the port, even if it's in a
 TIME_WAIT state.@",
-        10,
+        11,
         0
     );
 
@@ -302,12 +303,12 @@ VALUES
         1,
         4,
         "Picking the Right Address: Iterating Over getaddrinfo() Results",
-        "@There's one feature of getaddrinfo we haven't taken advantage of yet.
+        "@There's one feature of getaddrinfo we haven't taken advantage of yet. 
 getaddrinfo() doesn’t return just one address — it returns a linked list of
 address candidates. Some of them may not work (e.g., unsupported address family
 , already-used port, etc.), so the common approach is to loop through the
 list until one succeeds.",
-        11,
+        12,
         0
     );
 
@@ -329,8 +330,8 @@ VALUES
 linked list of addresses in the addrinfo struct, using something like addr
 = addr->ai_next in the increment expression of the loop. Inside the loop, you
 typically call socket(), setsockopt(), and bind() with the appropriate
-arguments.@",
-        12,
+arguments.",
+        13,
         0
     );
 
@@ -352,8 +353,8 @@ VALUES
 error-handling block for each of these functions, so that the loop immediately
 proceeds to the next address if one of the functions fails. A break statement
 is usually placed at the end of the loop to exit it as soon as a working address
-struct has been found.",
-        12,
+struct has been found.@",
+        14,
         0
     );
 
@@ -371,13 +372,13 @@ VALUES
         1,
         4,
         "You task",
-        "@Do the following to complete your implementation of bind and integrate it
+        "@Do the following to complete your implementation of bind and integrate it 
 into the code you've written so far:@
 @
 • Implement bind() using the correct fields from the addrinfo struct@
 • Add setsockopt() to handle address reuse@
 • Wrap socket(), setsockopt(), and bind() in a loop over the addrinfo linked list@
 • Add proper error handling for all system calls",
-        13,
+        15,
         0
     );

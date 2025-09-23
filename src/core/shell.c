@@ -146,6 +146,7 @@ bool cmd_is_cd(APP_CONTEXT *ctx)
         ctx->shell->cwd = strdup("");
         ctx->shell->cwd_allocated = true;
         chdir(ctx->user_data->home_dir);
+        ctx->shell_local_cwd = ctx->user_home_dir;
         free(orig_shell_buf);
         return false;
     }
@@ -311,6 +312,10 @@ void submit_command(APP_CONTEXT *ctx)
         {
             chdir(ctx->shell->cwd);
             char *cwd = get_cwd();
+
+            free(ctx->shell_local_cwd);
+            ctx->shell_local_cwd = strdup(cwd);
+
             if (strcmp(cwd, ctx->user_data->home_dir) == 0)
             {
                 if (ctx->shell->cwd_allocated)
@@ -574,6 +579,7 @@ void *check_running_proc_for_output(void *arg)
         }
         else if (n == 0)
         {
+            run_output_funcs(args->ctx, "");
             args->ctx->shell->executable_running = false;
             break;
         }

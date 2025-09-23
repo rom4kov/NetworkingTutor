@@ -107,7 +107,7 @@ void print_matches(pcre2_code **re, int line_num, int j, size_t subject_length,
     if (j == 4 && rc > 0)
     {
         LINE *temp_line = NULL;
-        char *extended_buf = calloc(500, sizeof(char));
+        char *extended_buf = calloc(1024, sizeof(char));
         // LINE *orig_temp_line = temp_line;
 
         // char buf[40];

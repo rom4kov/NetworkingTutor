@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 void create_course_view(APP_CONTEXT *ctx)
 {
@@ -322,6 +323,22 @@ WINDOW *create_progress_window(APP_CONTEXT *ctx)
               "Sections completed: %i", ctx->rp_state->sections_completed);
     wnoutrefresh(progress_window);
     return progress_window;
+}
+
+void update_progress_window(APP_CONTEXT *ctx)
+{
+    werase(ctx->course_windows[4]);
+    draw_border(ctx->course_windows[4], 2, " Progress ");
+
+    wattron(ctx->course_windows[4], COLOR_PAIR(3));
+    mvwprintw(ctx->course_windows[4], 0, 2, " Status ");
+    wattroff(ctx->course_windows[4], COLOR_PAIR(3));
+
+    mvwprintw(ctx->course_windows[4], 1, 2, "Course: %s", ctx->current_course);
+
+    mvwprintw(ctx->course_windows[4], 1, ctx->rp_state->window_width - 23,
+              "Sections completed: %i", ctx->rp_state->sections_completed);
+    wnoutrefresh(ctx->course_windows[4]);
 }
 
 void open_sub_directory(char *dir_name, FILE_TREE *f_tree)

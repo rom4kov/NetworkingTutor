@@ -39,6 +39,7 @@ void create_explorer_popup_windows(APP_CONTEXT *ctx);
 void create_explorer_panels(APP_CONTEXT *ctx);
 void create_file_tree(WINDOW **explorer_window, FILE_TREE *f_tree);
 WINDOW *create_progress_window(APP_CONTEXT *ctx);
+void update_progress_window(APP_CONTEXT *ctx);
 void print_no_open_file_msg(APP_CONTEXT *ctx);
 void log_course_instr_values(APP_CONTEXT *ctx);
 void recreate_editor_windows(APP_CONTEXT *ctx);

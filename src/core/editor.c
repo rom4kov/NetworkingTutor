@@ -89,7 +89,7 @@ void move_up(TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **edit_window,
     if (tbuf->curr_line_nr == 0)
         return;
 
-    if (y == 0 && *lines_to_print < editor_height - 4 && *scroll_offset > 0)
+    if (y == 0 && *lines_to_print < editor_height - 5 && *scroll_offset > 0)
         *lines_to_print += 1;
 
     if (x + 1 < tbuf->current_line->prev->length)
@@ -126,9 +126,9 @@ void move_up(TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **edit_window,
         tbuf->current_line = tbuf->current_line->prev;
         tbuf->curr_line_nr--;
         tbuf->current_col = tbuf->current_line->length - 1;
-        mvwprintw(*edit_window, editor_height - 4, EDITOR_WIDTH - 7,
+        mvwprintw(*edit_window, editor_height - 5, EDITOR_WIDTH - 7,
                   "         ");
-        mvwprintw(*edit_window, editor_height - 4, EDITOR_WIDTH - 7, "%i : %i",
+        mvwprintw(*edit_window, editor_height - 5, EDITOR_WIDTH - 7, "%i : %i",
                   tbuf->curr_line_nr, tbuf->current_col);
         if (tbuf->curr_line_nr < *scroll_offset)
         {

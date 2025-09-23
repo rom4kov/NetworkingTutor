@@ -260,8 +260,6 @@ void open_new_file(APP_CONTEXT *ctx)
         print_buffer_label(ctx);
     }
 
-    chdir(ctx->prev_dir);
-
     wnoutrefresh(ctx->line_num_win);
     wnoutrefresh(ctx->course_windows[2]);
     doupdate();
@@ -336,8 +334,6 @@ void open_file(APP_CONTEXT *ctx)
         print_buffer_label(ctx);
         print_file_metadata(ctx);
     }
-
-    chdir(ctx->prev_dir);
 
     wnoutrefresh(ctx->course_windows[3]);
     doupdate();
@@ -1369,7 +1365,7 @@ void create_app_root_dir(APP_CONTEXT *ctx)
 
     ctx->user_home_dir = proj_dir_buf;
     ctx->home_env = home_dir;
-    ctx->prev_dir = strdup(ctx->user_home_dir);
+    ctx->shell_local_cwd = strdup(ctx->user_home_dir);
 
     set_user_home_dir(ctx);
 

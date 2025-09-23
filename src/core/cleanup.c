@@ -107,6 +107,8 @@ void cleanup_init_state(APP_CONTEXT *ctx)
     free(ctx->user_data->created_at);
     free(ctx->user_data->home_dir);
     free(ctx->user_data);
+
+    free(ctx->shell_local_cwd);
 }
 
 void cleanup_nav_menu(APP_CONTEXT *ctx)

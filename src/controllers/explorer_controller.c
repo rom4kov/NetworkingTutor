@@ -96,7 +96,7 @@ void handle_explorer_input(APP_CONTEXT *ctx)
         break;
     case KEY_F(1):
         wrefresh(ctx->course_windows[1]);
-        chdir(ctx->prev_dir);
+        // chdir(ctx->prev_dir);
         ctx->explorer_mode = false;
         break;
     }

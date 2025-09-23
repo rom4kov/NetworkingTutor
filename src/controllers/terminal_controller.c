@@ -5,6 +5,7 @@
 #include "../views/views.h"
 #include <curses.h>
 #include <signal.h>
+#include <unistd.h>
 
 void handle_terminal_input(APP_CONTEXT *ctx)
 {
@@ -30,6 +31,7 @@ void handle_terminal_input(APP_CONTEXT *ctx)
             break;
         case KEY_F(1):
             curs_set(0);
+            chdir(ctx->user_data->home_dir);
             ctx->shell->terminal_focused = false;
             break;
         case KEY_F(2):

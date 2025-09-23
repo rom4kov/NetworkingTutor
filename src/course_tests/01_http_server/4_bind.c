@@ -227,8 +227,8 @@ int bind_syscall_works()
         return 1;
     }
 
-    remove("http_server/server_modified2.c");
-    remove("http_server/server_modified2");
+    // remove("http_server/server_modified2.c");
+    // remove("http_server/server_modified2");
 
     int rc;
     fread(&rc, 1, 1, fp3);
@@ -252,32 +252,32 @@ void test_if_server_c_contains_bind_syscall(void)
 
 void test_if_server_c_contains_fprintf_or_perror()
 {
-    bool is_socket_call_is_present = false;
+    bool fprintf_of_or_perror_used = false;
     if (server_c_contains_fprintf_or_perror("http_server/server.c", 4) == 0)
     {
-        is_socket_call_is_present = true;
+        fprintf_of_or_perror_used = true;
     }
-    CU_ASSERT(is_socket_call_is_present);
+    CU_ASSERT(fprintf_of_or_perror_used);
 }
 
 void test_if_server_c_has_working_for_loop_for_picking_addr(void)
 {
-    bool is_socket_call_is_present = false;
+    bool for_loop_for_picking_addr_works = false;
     if (server_c_has_working_for_loop_for_picking_addr() == 0)
     {
-        is_socket_call_is_present = true;
+        for_loop_for_picking_addr_works = true;
     }
-    CU_ASSERT(is_socket_call_is_present);
+    CU_ASSERT(for_loop_for_picking_addr_works);
 }
 
 void test_if_bind_syscall_in_server_c_works(void)
 {
-    bool is_socket_call_is_present = false;
+    bool bind_syscall_works_in_server_c = false;
     if (bind_syscall_works() == 0)
     {
-        is_socket_call_is_present = true;
+        bind_syscall_works_in_server_c = true;
     }
-    CU_ASSERT(is_socket_call_is_present);
+    CU_ASSERT(bind_syscall_works_in_server_c);
 }
 
 void register_section4_tests(APP_CONTEXT *ctx)

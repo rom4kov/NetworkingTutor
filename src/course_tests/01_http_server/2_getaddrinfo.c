@@ -353,12 +353,12 @@ void test_if_server_c_file_returns_correct_results_from_getaddrinfo(void)
 
 void test_if_server_c_file_uses_freeaddrinfo_for_results(void)
 {
-    bool does_server_c_file_uses_freeaddrinfo_for_results = false;
+    bool does_server_c_file_use_freeaddrinfo_for_results = false;
     if (server_c_file_uses_freeaddrinfo_for_results() == 0)
     {
-        does_server_c_file_uses_freeaddrinfo_for_results = true;
+        does_server_c_file_use_freeaddrinfo_for_results = true;
     }
-    CU_ASSERT(does_server_c_file_uses_freeaddrinfo_for_results);
+    CU_ASSERT(does_server_c_file_use_freeaddrinfo_for_results);
 }
 
 void register_section2_tests(APP_CONTEXT *ctx)

@@ -108,8 +108,6 @@ void handle_course_input(APP_CONTEXT *ctx)
             case 10:
                 free(ctx->prev_dir);
                 ctx->prev_dir = get_cwd();
-                mvwprintw(ctx->course_windows[3], 40, 30, "%s", ctx->prev_dir);
-                wrefresh(ctx->course_windows[3]);
                 chdir(ctx->user_data->home_dir);
                 ctx->explorer_mode = true;
                 break;

@@ -34,7 +34,7 @@ VALUES
         1,
         2,
         "The Old Way: Manually Filling a sockaddr_in Struct",
-        "There is an old and a new way of achieving this. Historically,
+        "@There is an old and a new way of achieving this. Historically,
 programmers manually filled a sockaddr_in struct like this:",
         1,
         0
@@ -54,12 +54,12 @@ VALUES
         1,
         2,
         "",
-        "#include <netinet/in.h>@
+        "@#include <netinet/in.h>@
 @
 struct sockaddr_in addr;@
 addr.sin_family = AF_INET;@
 addr.sin_port = htons(8080);@
-addr.sin_addr.s_addr = INADDR_ANY;",
+addr.sin_addr.s_addr = INADDR_ANY;@",
         2,
         1
     );
@@ -97,13 +97,13 @@ VALUES
         1,
         2,
         "",
-        "// From the man page for `sockaddr_in`:@
+        "@// From the man page for `sockaddr_in`:@
 @
 struct sockaddr_in {@
     sa_family_t     sin_family;     /* AF_INET */@
     in_port_t       sin_port;       /* Port number */@
     struct in_addr  sin_addr;       /* IPv4 address */@
-};",
+};@",
         4,
         1
     );
@@ -141,9 +141,9 @@ VALUES
         1,
         2,
         "",
-        "struct in_addr {@
+        "@struct in_addr {@
     uint32_t s_addr;@
-};",
+};@",
         6,
         1
     );
@@ -181,14 +181,14 @@ VALUES
         1,
         2,
         "",
-        "// Same man page as `sockaddr_in`:@
+        "@// Same man page as `sockaddr_in`:@
 @
 #include <sys/socket.h>@
 @
 struct sockaddr {@
   sa_family_t     sa_family;      /* Address family */@
   char            sa_data[];      /* Socket address */@
-};",
+};@",
         8,
         1
     );
@@ -436,10 +436,7 @@ To complete the test for this section, your implementation must:@
 • Store the return value and check for errors@
 • If an error occurs, use fprintf to print a descriptive message using
 gai_strerror() to stderr@
-• Copy the resulting addrinfo struct into a newly malloc'ed one (i.e., don't
-return the original directly)@
 • Free the original result using freeaddrinfo()@
-• Return your copy of the result@
 @
 Hint: If you get stuck or you're not sure about something, take a look at the
 example in the getaddrinfo man page (man getaddrinfo). It includes a complete

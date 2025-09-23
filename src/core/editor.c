@@ -89,7 +89,7 @@ void move_up(TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **edit_window,
     if (tbuf->curr_line_nr == 0)
         return;
 
-    if (y == 0 && *lines_to_print < editor_height - 7 && *scroll_offset > 0)
+    if (y == 0 && *lines_to_print < editor_height - 4 && *scroll_offset > 0)
         *lines_to_print += 1;
 
     if (x + 1 < tbuf->current_line->prev->length)

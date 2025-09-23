@@ -171,6 +171,7 @@ void create_file_tree(WINDOW **explorer_window, FILE_TREE *f_tree)
     DIR *dir = opendir(".");
 
     struct dirent *next = readdir(dir);
+    struct dirent *test_next = NULL;
 
     int num_of_entries = 0;
     while (NULL != next)
@@ -196,10 +197,13 @@ void create_file_tree(WINDOW **explorer_window, FILE_TREE *f_tree)
 
     if (f_tree->num_of_entries == 0)
     {
+
         while (strcmp(next->d_name, ".") == 0 ||
-               strcmp(next->d_name, "..") == 0 || next->d_type != 4)
+            strcmp(next->d_name, "..") == 0 || next->d_type != 4)
         {
-            next = readdir(dir);
+            test_next = readdir(dir);
+            if (NULL == test_next) break;
+            else next = test_next;
         }
 
         if (num_of_entries > 3)
@@ -226,6 +230,7 @@ void create_file_tree(WINDOW **explorer_window, FILE_TREE *f_tree)
             f_tree->first_entry->type = next->d_type;
             f_tree->first_entry->state = 'c';
             f_tree->first_entry->prev = NULL;
+            f_tree->current_entry = f_tree->first_entry;
         }
 
         f_tree->num_of_entries++;
@@ -276,26 +281,6 @@ void create_file_tree(WINDOW **explorer_window, FILE_TREE *f_tree)
 
         rewinddir(dir);
     }
-    // else if (f_tree->num_of_entries == 1)
-    // {
-    //  while (strcmp(next->d_name, ".") == 0 ||
-    //    strcmp(next->d_name, "..") == 0 || next->d_type != 4)
-    //     {
-    //         next = readdir(dir);
-    //     }
-    //
-    //     // f_tree->first_entry = initialize_dir_entry();
-    //     strncpy(f_tree->first_entry->name, next->d_name, 30);
-    //     f_tree->first_entry->name[29] = '\0';
-    //     strncpy(f_tree->first_entry->path, next->d_name, 30);
-    //     f_tree->first_entry->path[29] = '\0';
-    //     f_tree->first_entry->type = next->d_type;
-    //     // if (f_tree->first_entry->state == 'c')
-    //     //     f_tree->first_entry->state = 'o';
-    //     // else
-    //     //     f_tree->first_entry->state = 'c';
-    //     f_tree->first_entry->prev = NULL;
-    // }
 
     free(curr_dir->name);
     free(curr_dir->path);
@@ -318,10 +303,6 @@ void create_file_tree(WINDOW **explorer_window, FILE_TREE *f_tree)
         f_tree->current_entry = f_tree->first_entry;
     }
 
-    // mvwprintw(*explorer_window, 25, 2, "%i", f_tree->num_of_entries);
-    // mvwprintw(*explorer_window, 26, 2, "%c", f_tree->first_entry->state);
-    // mvwprintw(*explorer_window, 27, 2, "%s", f_tree->first_entry->name);
-    // wnoutrefresh(*explorer_window);
     closedir(dir);
 }
 

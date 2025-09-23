@@ -35,22 +35,23 @@ void handle_explorer_input(APP_CONTEXT *ctx)
 
     switch (ctx->key)
     {
-        case KEY_DOWN:
-            if (ctx->file_tree->curr_entry_nr <
-                ctx->file_tree->num_of_entries - 1)
-            {
-                move_to_next_entry(ctx->file_tree, &ctx->course_windows[1]);
-                // log_ft_values(ctx);
-            }
-            break;
-        case KEY_UP:
-            if (ctx->file_tree->curr_entry_nr > 0)
-            {
-                move_to_prev_entry(ctx->file_tree, &ctx->course_windows[1]);
-                // log_ft_values(ctx);
-            }
-            break;
-        case 10:
+    case KEY_DOWN:
+        if (ctx->file_tree->curr_entry_nr < ctx->file_tree->num_of_entries - 1)
+        {
+            move_to_next_entry(ctx->file_tree, &ctx->course_windows[1]);
+            // log_ft_values(ctx);
+        }
+        break;
+    case KEY_UP:
+        if (ctx->file_tree->curr_entry_nr > 0)
+        {
+            move_to_prev_entry(ctx->file_tree, &ctx->course_windows[1]);
+            // log_ft_values(ctx);
+        }
+        break;
+    case 10:
+        if (ctx->file_tree->current_entry)
+        {
             if (ctx->file_tree->current_entry->type == 4)
             {
                 open_or_close_dir(ctx->file_tree, &ctx->course_windows[1]);
@@ -64,46 +65,39 @@ void handle_explorer_input(APP_CONTEXT *ctx)
                 break;
             }
             wrefresh(ctx->course_windows[1]);
-            break;
-        case 'a':
-            create_new_file(ctx, &ctx->explorer_popup_windows[0],
-                            &ctx->explorer_popup_windows[1],
-                            &new_file_form_active, &new_file_form, field);
-            // log_ft_values(ctx);
-            break;
-        case 'r':
-            rename_file(ctx, &ctx->explorer_popup_windows[2],
-                        &ctx->explorer_popup_windows[3], &new_file_form, field);
-            break;
-        case 'd':
-            delete_file(ctx, &del_file_form_active,
-                        &ctx->explorer_popup_windows[4],
-                        &ctx->explorer_popup_windows[5], &new_file_form, field);
-            // log_ft_values(ctx);
-            break;
-        case 'm':
-            create_directory(ctx, &ctx->explorer_popup_windows[6],
-                             &ctx->explorer_popup_windows[7], &new_file_form,
-                             field);
-            // log_ft_values(ctx);
-            break;
-        case 'u':
-            update_file_explorer(ctx);
-            break;
-        case '?':
-            create_keybinds_window(&ctx->course_windows[1]);
-            break;
-        case KEY_F(1):
-            wrefresh(ctx->course_windows[1]);
-            mvwprintw(ctx->course_windows[3], 0, 30, "%lu", strlen(ctx->shell->cwd));
-            mvwprintw(ctx->course_windows[3], 0, 35, "%s", ctx->shell->cwd);
-            mvwprintw(ctx->course_windows[3], 1, 30, "%s", ctx->prev_dir);
-            wrefresh(ctx->course_windows[3]);
-            // if (strlen(ctx->shell->cwd) > 0)
-            // {
-            chdir(ctx->prev_dir);
-            // }
-            ctx->explorer_mode = false;
-            break;
+        }
+        break;
+    case 'a':
+        create_new_file(ctx, &ctx->explorer_popup_windows[0],
+                        &ctx->explorer_popup_windows[1], &new_file_form_active,
+                        &new_file_form, field);
+        // log_ft_values(ctx);
+        break;
+    case 'r':
+        rename_file(ctx, &ctx->explorer_popup_windows[2],
+                    &ctx->explorer_popup_windows[3], &new_file_form, field);
+        break;
+    case 'd':
+        delete_file(ctx, &del_file_form_active, &ctx->explorer_popup_windows[4],
+                    &ctx->explorer_popup_windows[5], &new_file_form, field);
+        // log_ft_values(ctx);
+        break;
+    case 'm':
+        create_directory(ctx, &ctx->explorer_popup_windows[6],
+                         &ctx->explorer_popup_windows[7], &new_file_form,
+                         field);
+        // log_ft_values(ctx);
+        break;
+    case 'u':
+        update_file_explorer(ctx);
+        break;
+    case '?':
+        create_keybinds_window(&ctx->course_windows[1]);
+        break;
+    case KEY_F(1):
+        wrefresh(ctx->course_windows[1]);
+        chdir(ctx->prev_dir);
+        ctx->explorer_mode = false;
+        break;
     }
 }

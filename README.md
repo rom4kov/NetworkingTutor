@@ -94,15 +94,16 @@ Make sure the following packages are installed on your system:
 - **SQLite**
 - **PCRE2 version 10.45 or newer** ← **important!**
 - **CUnit**
+- **valgrind**
 
 ##### Arch Linux:
 ```
-sudo pacman -S ncurses sqlite pcre2 cunit
+sudo pacman -S ncurses sqlite pcre2 cunit valgrind
 ```
 
 ##### Linux Mint:
 ```
-sudo apt install libncurses-dev libncursesw5-dev libsqlite3-dev libcunit1-dev libpcre2-dev
+sudo apt install libncurses-dev libncursesw5-dev libsqlite3-dev libcunit1-dev libpcre2-dev valgrind
 ```
 
 

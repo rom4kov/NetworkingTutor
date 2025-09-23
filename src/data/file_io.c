@@ -187,6 +187,8 @@ void deallocate_file_tree(FILE_TREE *f_tree)
 {
     DIR_ENTRY *curr_entry = f_tree->first_entry;
 
+    if (NULL == curr_entry) return;
+
     // FILE *log_file = fopen("f_tree_dealloc_log.txt", "w");
     // int i = 0;
     while (curr_entry)
@@ -686,6 +688,7 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
                         ctx->file_tree->current_entry->indent_level >=
                             parent_indent_level + 1))
                 {
+                    if (NULL == ctx->file_tree->current_entry->next) break;
                     ctx->file_tree->current_entry =
                         ctx->file_tree->current_entry->next;
                 }
@@ -703,6 +706,7 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
                             ctx->file_tree->current_entry->name[0] >
                                 ctx->filename[0]))
                     {
+                        if (NULL == ctx->file_tree->current_entry->next) break;
                         ctx->file_tree->current_entry =
                             ctx->file_tree->current_entry->next;
                     }
@@ -720,6 +724,7 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
                         ctx->file_tree->current_entry->indent_level >
                             current_entry->indent_level))
                 {
+                    if (NULL == ctx->file_tree->current_entry->next) break;
                     ctx->file_tree->current_entry =
                         ctx->file_tree->current_entry->next;
                 }
@@ -735,6 +740,7 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
                           current_entry->indent_level) ||
                      ctx->file_tree->current_entry->name[0] > ctx->filename[0]))
                 {
+                    if (NULL == ctx->file_tree->current_entry->next) break;
                     ctx->file_tree->current_entry =
                         ctx->file_tree->current_entry->next;
                 }
@@ -805,7 +811,7 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
     if (ctx->file_tree->num_of_entries > 1)
     {
         new_entry->prev = ctx->file_tree->current_entry;
-        if (ctx->file_tree->current_entry->next)
+        if (ctx->file_tree->current_entry && ctx->file_tree->current_entry->next)
         {
             new_entry->next = ctx->file_tree->current_entry->next;
             ctx->file_tree->current_entry->next->prev = new_entry;
@@ -999,8 +1005,15 @@ void remove_entry_from_file_tree(FILE_TREE *f_tree)
 
     if (entry_to_remove->prev == NULL && entry_to_remove->next == NULL)
     {
+        // free(f_tree->current_entry->name);
+        // free(f_tree->current_entry->path);
+        // free(f_tree->current_entry);
         f_tree->current_entry = NULL; // List becomes empty
         f_tree->curr_entry_nr = 0;
+        // free(f_tree->first_entry->name);
+        // free(f_tree->first_entry->path);
+        // free(f_tree->first_entry);
+        f_tree->first_entry = NULL; // List becomes empty
     }
     else if (entry_to_remove->prev == NULL)
     {

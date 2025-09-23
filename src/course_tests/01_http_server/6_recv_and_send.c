@@ -226,6 +226,7 @@ int send_function_works()
     FILE *fp = popen("perl -nE 'say $1 if /\\b(\\w+)\\s*=\\s*send\\s*\\(/' "
                      "http_server/server.c",
                      "r");
+
     if (fp == NULL)
     {
         perror("popen failed");
@@ -330,42 +331,42 @@ int send_function_works()
 
 void test_if_server_c_contains_recv_function(void)
 {
-    bool is_socket_call_is_present = false;
+    bool is_recv_call_present = false;
     if (server_c_contains_recv_function("http_server/server.c") == 0)
     {
-        is_socket_call_is_present = true;
+        is_recv_call_present = true;
     }
-    CU_ASSERT(is_socket_call_is_present);
+    CU_ASSERT(is_recv_call_present);
 }
 
 void test_if_server_c_contains_send_function(void)
 {
-    bool is_socket_call_is_present = false;
+    bool is_send_call_present = false;
     if (server_c_contains_send_function("http_server/server.c") == 0)
     {
-        is_socket_call_is_present = true;
+        is_send_call_present = true;
     }
-    CU_ASSERT(is_socket_call_is_present);
+    CU_ASSERT(is_send_call_present);
 }
 
 void test_if_recv_works_in_server_c_file(void)
 {
-    bool is_socket_call_is_present = false;
+    bool recv_call_works = false;
     if (recv_function_works() == 0)
     {
-        is_socket_call_is_present = true;
+        recv_call_works = true;
     }
-    CU_ASSERT(is_socket_call_is_present);
+    CU_ASSERT(recv_call_works);
 }
 
 void test_if_send_works_in_server_c_file(void)
 {
-    bool is_socket_call_is_present = false;
+    bool send_call_works = false;
     if (send_function_works() == 0)
     {
-        is_socket_call_is_present = true;
+        send_call_works = true;
     }
-    CU_ASSERT(is_socket_call_is_present);
+    CU_ASSERT(send_call_works);
 }
 
 void register_section6_tests(APP_CONTEXT *ctx)
@@ -441,22 +442,4 @@ void register_section6_tests(APP_CONTEXT *ctx)
         const char *err_msg = CU_get_error_msg();
         mvwprintw(ctx->course_windows[4], 1, 1, "%s", err_msg);
     }
-    //
-    // CU_add_test(ctx->sp[5], "listen error handling in server.c file works",
-    //             (CU_TestFunc)test_if_listen_error_handling_works);
-    // ctx->ec = CU_get_error();
-    // if (ctx->ec != CUE_SUCCESS)
-    // {
-    //     const char *err_msg = CU_get_error_msg();
-    //     mvwprintw(ctx->course_windows[4], 1, 1, "%s", err_msg);
-    // }
-    //
-    // CU_add_test(ctx->sp[5], "accept error handling in server.c file works",
-    //             (CU_TestFunc)test_if_accept_error_handling_works);
-    // ctx->ec = CU_get_error();
-    // if (ctx->ec != CUE_SUCCESS)
-    // {
-    //     const char *err_msg = CU_get_error_msg();
-    //     mvwprintw(ctx->course_windows[4], 1, 1, "%s", err_msg);
-    // }
 }

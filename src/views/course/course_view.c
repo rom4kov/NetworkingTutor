@@ -114,22 +114,28 @@ void resize_editor_window(APP_CONTEXT *ctx)
     mvwprintw(ctx->course_windows[2], 0, 2, " Editor ");
     wattroff(ctx->course_windows[2], COLOR_PAIR(3));
 
-    if (ctx->t_buffer->num_of_lines > (ctx->editor_height - 4))
+    if (ctx->file)
     {
-        ctx->t_buffer->lines_to_print = ctx->editor_height - 4;
-        if (ctx->t_buffer->curr_line_nr - ctx->scroll_offset > ctx->editor_height - 5)
+        if (ctx->t_buffer->num_of_lines > (ctx->editor_height - 4))
         {
-            ctx->t_buffer->curr_line_nr = ctx->scroll_offset + ctx->editor_height - 5;
+            ctx->t_buffer->lines_to_print = ctx->editor_height - 4;
+            if (ctx->t_buffer->curr_line_nr - ctx->scroll_offset >
+                ctx->editor_height - 4)
+            {
+                ctx->t_buffer->curr_line_nr =
+                    ctx->scroll_offset + ctx->editor_height - 5;
+            }
         }
-    }
-    else {
-        ctx->t_buffer->lines_to_print = ctx->t_buffer->num_of_lines;
-    }
+        else
+        {
+            ctx->t_buffer->lines_to_print = ctx->t_buffer->num_of_lines;
+        }
 
-    print_buffer_label(ctx);
-    print_buffer(ctx->t_buffer, &ctx->edit_window, &ctx->line_num_win,
-                 &ctx->scroll_offset, ctx->t_buffer->lines_to_print);
-    print_file_metadata(ctx);
+        print_buffer_label(ctx);
+        print_buffer(ctx->t_buffer, &ctx->edit_window, &ctx->line_num_win,
+                     &ctx->scroll_offset, ctx->t_buffer->lines_to_print);
+        print_file_metadata(ctx);
+    }
 }
 
 WINDOW *create_terminal_window(APP_CONTEXT *ctx)
@@ -218,11 +224,13 @@ void create_file_tree(WINDOW **explorer_window, FILE_TREE *f_tree)
     {
 
         while (strcmp(next->d_name, ".") == 0 ||
-            strcmp(next->d_name, "..") == 0 || next->d_type != 4)
+               strcmp(next->d_name, "..") == 0 || next->d_type != 4)
         {
             test_next = readdir(dir);
-            if (NULL == test_next) break;
-            else next = test_next;
+            if (NULL == test_next)
+                break;
+            else
+                next = test_next;
         }
 
         if (num_of_entries > 3)

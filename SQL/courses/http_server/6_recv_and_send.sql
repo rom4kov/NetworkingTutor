@@ -505,7 +505,9 @@ VALUES
         "@
 • Implement recv() and send()@
 • Check the received data for a valid HTTP GET request@
-• Send a proper HTTP response containing an HTML <h1>Hello, world!</h1>",
+• Send a proper HTTP response containing an HTML <h1>Hello, world!</h1>@
+• save the return value of send() in a variable that you declare at the
+beginning of the main function (important for the test to work)",
         21,
         0
     );

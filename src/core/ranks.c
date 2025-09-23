@@ -27,7 +27,7 @@ Rank determine_rank(int points) {
     if (points >= 800) return RANK_PROTOCOL_KENSEI;
     if (points >= 600) return RANK_ROUTER_RONIN;
     if (points >= 400) return RANK_PARSER_NINJA;
-    if (points >= 270) return RANK_HTTP_BUSHI;
+    if (points >= 269) return RANK_HTTP_BUSHI;
     if (points >= 68) return RANK_SOCKET_APPRENTICE;
     if (points >= 39) return RANK_ADDRESSINFO_DESHI;
     if (points >= 18) return RANK_LAYER_SHIKOMI;

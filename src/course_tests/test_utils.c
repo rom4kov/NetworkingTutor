@@ -60,7 +60,7 @@ void *connect_to_server(void *arg)
 void *connect_to_server_and_check_response(void *arg)
 {
     int *port = (int *)arg;
-    char buf[512];
+    char buf[1024];
     bool *response_ok = malloc(sizeof(bool));
 
     napms(500);
@@ -86,8 +86,8 @@ void *connect_to_server_and_check_response(void *arg)
         if (connect(sock, (struct sockaddr *)&addr, sizeof(addr)) == 0)
         {
             send(sock, "GET / HTTP/1.1\r\n", 16, 0);
-            recv(sock, buf, 512, 0);
-            fprintf(stdout, "Response: %s", buf);
+            recv(sock, buf, 1024, 0);
+            // fprintf(stdout, "Response: %s", buf);
             if (strncmp(buf, "HTTP/1.1", 8) == 0)
             {
                 *response_ok = true;
@@ -99,7 +99,7 @@ void *connect_to_server_and_check_response(void *arg)
         close(sock);
         napms(100);
     }
-    fprintf(stderr, "connect timeout, port: %i\n", *port);
+    // fprintf(stderr, "connect timeout, port: %i\n", *port);
 
     *response_ok = false;
     return (void *)response_ok;

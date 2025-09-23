@@ -1097,12 +1097,13 @@ int get_current_streak(APP_CONTEXT *ctx)
     char *cmp_date = malloc(20);
     char *tmp_date = malloc(20);
     char *orig_tmp_date = tmp_date;
+    const unsigned char *date;
 
     sqlite3_stmt *stmt = NULL;
 
     const char *sql =
         "SELECT section_completed_at FROM progress WHERE user_id = ? "
-        "ORDER BY section_completed_at DESC;";
+        "AND section_completed = 1 ORDER BY section_completed_at DESC;";
 
     rc = sqlite3_prepare_v2(ctx->db, sql, -1, &stmt, NULL);
     if (rc != SQLITE_OK)
@@ -1125,27 +1126,22 @@ int get_current_streak(APP_CONTEXT *ctx)
 
     char *current_date = current_datetime();
     strcpy(c_date, current_date);
-    free(current_date);
 
     while (sqlite3_step(stmt) == SQLITE_ROW)
     {
-        if (i == 0 && sqlite3_column_text(stmt, 0) != NULL)
-        {
-            streak_length++;
-            mvwprintw(ctx->progress_windows[3], 150, 1, "%s", "null row");
-            wrefresh(ctx->progress_windows[3]);
-        }
-        const unsigned char *date = sqlite3_column_text(stmt, 0);
-        if (date == NULL || strcmp(tmp_date, ""))
-            break;
+        date = sqlite3_column_text(stmt, 0);
 
+        if (date == NULL)
+        {
+            continue;
+        }
+        //
         tmp_date = (char *)date;
-        if (tmp_date == NULL || strcmp(tmp_date, "") == 0)
-            break;
         strcpy(cmp_date, tmp_date);
+
         if ((diff = get_diff_time_in_days(cmp_date, c_date)) > 1)
         {
-            break;
+            streak_length = 0;
         }
         else if (diff == 1)
         {
@@ -1155,9 +1151,15 @@ int get_current_streak(APP_CONTEXT *ctx)
         i++;
     }
 
+    if (i == 1 && (diff = get_diff_time_in_days(c_date, current_date)) == 0)
+    {
+        streak_length = 1;
+    }
+
     sqlite3_finalize(stmt);
 
     free(c_date);
+    free(current_date);
     free(cmp_date);
     free(orig_tmp_date);
 

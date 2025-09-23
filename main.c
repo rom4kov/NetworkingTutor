@@ -124,8 +124,8 @@ int main(void)
     //                   "SQL/courses/http_server/4_bind.sql");
     // seed_courses_data(ctx->db, ctx->greeter_windows[0],
     //                   "SQL/courses/http_server/5_listen_and_accept.sql");
-    // seed_courses_data(ctx->db, ctx->greeter_windows[0],
-    //                   "SQL/courses/http_server/6_recv_and_send.sql");
+    seed_courses_data(ctx->db, ctx->greeter_windows[0],
+                      "SQL/courses/http_server/6_recv_and_send.sql");
     // seed_courses_data(ctx->db, ctx->greeter_windows[0],
     //                   "SQL/create_users_table.sql");
     // seed_courses_data(ctx->db, ctx->greeter_windows[0],

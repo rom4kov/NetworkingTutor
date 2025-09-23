@@ -113,7 +113,7 @@ VALUES
 returned by accept(). We use the recv() function from the socket API for this.
 In its default blocking mode, recv() will check whether the socket has any
 incoming data, and if not, it will wait until data is available before returning.",
-        5,
+        4,
         0
     );
 
@@ -134,7 +134,7 @@ VALUES
         "This waiting happens because the kernel puts the calling process to
 sleep and wakes it up only when new data arrives for that socket, avoiding
 busy-waiting and unnecessary CPU usage. The function looks like this:",
-        6,
+        5,
         1
     );
 
@@ -155,7 +155,7 @@ VALUES
         "@#include <sys/socket.h>@
 @
 ssize_t recv(int socket, void *buffer, size_t length, int flags);@",
-        7,
+        6,
         1
     );
 
@@ -179,7 +179,7 @@ VALUES
 • buffer: a pointer to memory where the received data will be stored@
 • length: the size of that buffer in bytes@
 • flags: special options (we don't need any here, so pass 0)",
-        8,
+        7,
         0
     );
 
@@ -199,8 +199,9 @@ VALUES
         "",
         "For our purposes, a buffer of 512 to 4096 bytes is typical. In this
 project we only need to read the first line of the request — the HTTP request
-line — so 512 bytes is plenty.",
-        9,
+line — so 512 bytes is plenty. You can also make it 1024, if you'd like to print
+out and see the whole HTTP request message from the client in the terminal.",
+        8,
         0
     );
 
@@ -220,7 +221,7 @@ VALUES
         "",
         "Because the buffer is only used inside this function, we can declare
 it on the stack rather than allocating it dynamically with malloc():",
-        10,
+        9,
         0
     );
 
@@ -239,7 +240,7 @@ VALUES
         6,
         "",
         "@char buf[512];@",
-        11,
+        10,
         1
     );
 
@@ -260,8 +261,8 @@ VALUES
         "Call recv() and store the return value in a variable. This return
 value is the number of bytes received, or -1 if there was an error.@
 We’ll only send a response if recv() succeeds and the message is a valid HTTP
-request.",
-        12,
+request.@",
+        11,
         0
     );
 
@@ -279,8 +280,9 @@ VALUES
         1,
         6,
         "Sending data with send()",
-        '@The last step to get a minimal HTTP server running is to send a
+        '@The last step to get a minimal HTTP server running is to send a 
 response back to the client.@
+@
 First, check that:@
 @
 1. recv() did not return -1@
@@ -350,7 +352,7 @@ VALUES
         1,
         6,
         "A minimal HTTP response",
-        "@If the request is valid, we can respond with:@
+        "@If the request is valid, we can respond with the string:@
 @
 HTTP/1.1 200 OK\n\n@
 @
@@ -378,7 +380,7 @@ VALUES
         1,
         6,
         "Note: Spec vs. Reality - HTTP Line Endings",
-        "@The HTTP/1.1 specification (RFC 7230) requires that every line in
+        "@The HTTP/1.1 specification (RFC 7230) requires that every line in 
 a response header, including the status line and the final blank line, be
 terminated with a carriage return + line feed (\r\n). For example:@
 @

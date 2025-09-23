@@ -265,7 +265,8 @@ VALUES
 • sockfd: the socket file descriptor from socket()@
 • addr: a pointer to a struct sockaddr that will be filled in with the client’s
 address@
-• addrlen: a pointer to the size of that structure@
+• addrlen: a pointer to the size of that structure. Get it with the sizeof() 
+operator, store it in a variable and pass it to accept.@
 @
 Since we don’t know in advance whether the client will use IPv4 or IPv6, we
 declare the address with type sockaddr_storage, which is large enough for

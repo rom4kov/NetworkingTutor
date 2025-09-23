@@ -63,8 +63,7 @@ This window presents the course materials: explanations of key concepts,
 step-by-step implementation guidance, and assignment instructions. Text is
 revealed progressively, and the window is scrollable with navigation between
 sections. After code is submitted, this window also displays test results
-, which are implemented using the lightweight [CUnit](http://cunit.sourceforge
-.net/) testing framework.
+, which are implemented using the lightweight [CUnit](http://cunit.sourceforge.net/) testing framework.
 
 #### Status Bar
 A small status display in the bottom right of the course view shows the active

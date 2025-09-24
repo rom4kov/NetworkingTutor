@@ -27,7 +27,7 @@ higher user ranks within the built-in gamification system.
 ---
 
 ### **Start View**
-<img width="1922" height="1079" alt="screenshot_2025-09-24-040509" src="https://github.com/user-attachments/assets/a65790fe-7d06-47dc-8941-41fa78a4c14d" />
+<img width="1920" height="1079" alt="screenshot_2025-09-24-040745" src="https://github.com/user-attachments/assets/c6fdb699-3e2f-4ece-a674-116dbd968350" />
 
 After creating an account, the user is greeted with a start screen that provides
 a welcome message, an overview of how to use the program, and summaries of

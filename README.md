@@ -13,7 +13,10 @@ being rigorous, combining educational material with hands-on projects and
 a layer of gamification to keep users motivated.
 
 The first available course, *Build a Simple HTTP Server in C*, introduces
-students to a classic project for solidifying the basics of C while learning the foundations of internet communication. Later courses (currently planned but not yet fully implemented) extend this foundation with modules on HTTP parsing, routing, and additional features of network servers.
+students to a classic project for solidifying the basics of C while learning 
+the foundations of internet communication. Later courses (currently planned 
+but not yet fully implemented) extend this foundation with modules on HTTP 
+parsing, routing, and additional features of network servers.
 
 Each course is divided into sections that present core concepts and culminate
 in coding assignments. Students must submit their solutions to automated
@@ -24,6 +27,7 @@ higher user ranks within the built-in gamification system.
 ---
 
 ### **Start View**
+<img width="1922" height="1079" alt="screenshot_2025-09-24-040509" src="https://github.com/user-attachments/assets/a65790fe-7d06-47dc-8941-41fa78a4c14d" />
 
 After creating an account, the user is greeted with a start screen that provides
 a welcome message, an overview of how to use the program, and summaries of

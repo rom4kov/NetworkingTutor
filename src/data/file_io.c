@@ -187,7 +187,8 @@ void deallocate_file_tree(FILE_TREE *f_tree)
 {
     DIR_ENTRY *curr_entry = f_tree->first_entry;
 
-    if (NULL == curr_entry) return;
+    if (NULL == curr_entry)
+        return;
 
     // FILE *log_file = fopen("f_tree_dealloc_log.txt", "w");
     // int i = 0;
@@ -274,7 +275,8 @@ void open_file(APP_CONTEXT *ctx)
     // mvwprintw(ctx->course_windows[3], 0, 45, "%i", cwd_len);
     // if (cwd_len > 0)
     // {
-    //     snprintf(file_to_open, cwd_len + 2 + c_entry_name_len, "%s/%s", ctx->shell->cwd,
+    //     snprintf(file_to_open, cwd_len + 2 + c_entry_name_len, "%s/%s",
+    //     ctx->shell->cwd,
     //              ctx->file_tree->current_entry->name);
     //     ctx->file = fopen(file_to_open, "r+");
     //     mvwprintw(ctx->course_windows[3], 1, 30, "%s", file_to_open);
@@ -619,7 +621,7 @@ void create_new_file(APP_CONTEXT *ctx, WINDOW **inner_win, WINDOW **form_window,
 
             curs_set(2);
             wmove(ctx->edit_window, 0, 0);
-            // wnoutrefresh(ctx->course_windows[1]);
+
             wnoutrefresh(ctx->line_num_win);
             wnoutrefresh(ctx->edit_window);
             doupdate();
@@ -684,7 +686,8 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
                         ctx->file_tree->current_entry->indent_level >=
                             parent_indent_level + 1))
                 {
-                    if (NULL == ctx->file_tree->current_entry->next) break;
+                    if (NULL == ctx->file_tree->current_entry->next)
+                        break;
                     ctx->file_tree->current_entry =
                         ctx->file_tree->current_entry->next;
                 }
@@ -702,7 +705,8 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
                             ctx->file_tree->current_entry->name[0] >
                                 ctx->filename[0]))
                     {
-                        if (NULL == ctx->file_tree->current_entry->next) break;
+                        if (NULL == ctx->file_tree->current_entry->next)
+                            break;
                         ctx->file_tree->current_entry =
                             ctx->file_tree->current_entry->next;
                     }
@@ -720,7 +724,8 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
                         ctx->file_tree->current_entry->indent_level >
                             current_entry->indent_level))
                 {
-                    if (NULL == ctx->file_tree->current_entry->next) break;
+                    if (NULL == ctx->file_tree->current_entry->next)
+                        break;
                     ctx->file_tree->current_entry =
                         ctx->file_tree->current_entry->next;
                 }
@@ -736,7 +741,8 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
                           current_entry->indent_level) ||
                      ctx->file_tree->current_entry->name[0] > ctx->filename[0]))
                 {
-                    if (NULL == ctx->file_tree->current_entry->next) break;
+                    if (NULL == ctx->file_tree->current_entry->next)
+                        break;
                     ctx->file_tree->current_entry =
                         ctx->file_tree->current_entry->next;
                 }
@@ -762,10 +768,10 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
         while (entries_iterator)
         {
             entries_iterator->num_of_open_entries++;
-            entries_iterator->num_of_entries++;
+            entries_iterator->num_of_entries += 1;
             entries_iterator = entries_iterator->parent_dir;
         }
-        wrefresh(ctx->edit_window);
+        // wrefresh(ctx->edit_window);
 
         new_entry->indent_level = current_entry->indent_level + 1;
 
@@ -795,8 +801,8 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
     }
     else
     {
-        strncpy(new_entry->path, ctx->filename, sizeof(ctx->filename) + 1);
-        new_entry->path[sizeof(new_entry->path) + 1] = '\0';
+        strncpy(new_entry->path, ctx->filename, strlen(ctx->filename) + 1);
+        new_entry->path[strlen(new_entry->path) + 1] = '\0';
         new_entry->indent_level = current_entry->indent_level;
         new_entry->parent_dir = current_entry->parent_dir;
     }
@@ -807,7 +813,8 @@ void create_new_entry_for_file(APP_CONTEXT *ctx, DIR_ENTRY *current_entry,
     if (ctx->file_tree->num_of_entries > 1)
     {
         new_entry->prev = ctx->file_tree->current_entry;
-        if (ctx->file_tree->current_entry && ctx->file_tree->current_entry->next)
+        if (ctx->file_tree->current_entry &&
+            ctx->file_tree->current_entry->next)
         {
             new_entry->next = ctx->file_tree->current_entry->next;
             ctx->file_tree->current_entry->next->prev = new_entry;
@@ -839,17 +846,29 @@ void delete_file(APP_CONTEXT *ctx, bool *del_file_form_active,
                  WINDOW **inner_win, WINDOW **form_window, FORM **new_file_form,
                  FIELD **field)
 {
-    wrefresh(ctx->edit_window);
-    if (ctx->file_tree->current_entry->type == 4 &&
-        ctx->file_tree->current_entry->num_of_entries > 0)
+    if (ctx->file_tree->current_entry->type == 4)
     {
-        WINDOW *cannot_delete_win =
-            derwin(ctx->course_windows[1], 3, EXPLORER_WIDTH - 2,
-                   ctx->file_tree->curr_entry_nr + 1, 1);
-        draw_border(cannot_delete_win, 2, "");
-        mvwprintw(cannot_delete_win, 1, 1, "Dir. not empty");
-        wrefresh(cannot_delete_win);
-        return;
+        DIR *dir = opendir(ctx->file_tree->current_entry->path);
+
+        struct dirent *next = readdir(dir);
+
+        int num_of_entries = 0;
+        while (NULL != next)
+        {
+            num_of_entries++;
+            next = readdir(dir);
+        }
+
+        if (num_of_entries > 2)
+        {
+            WINDOW *cannot_delete_win =
+                derwin(ctx->course_windows[1], 3, EXPLORER_WIDTH - 2,
+                       ctx->file_tree->curr_entry_nr + 1, 1);
+            draw_border(cannot_delete_win, 2, "");
+            mvwprintw(cannot_delete_win, 1, 1, "Dir. not empty");
+            wrefresh(cannot_delete_win);
+            return;
+        }
     }
 
     char *filename = ctx->file_tree->current_entry->name;
@@ -1217,6 +1236,10 @@ void create_directory(APP_CONTEXT *ctx, WINDOW **inner_win,
             strcpy(ctx->filename, new_dirname);
             trim(&ctx->filename);
 
+            // mvwprintw(ctx->course_windows[0], 0, 20, "%s", new_dirname);
+            // mvwprintw(ctx->course_windows[0], 0, 35, "%s", ctx->filename);
+            // wrefresh(ctx->course_windows[0]);
+
             make_dir_form_active = false;
             ctx->explorer_mode = true;
             ctx->editor_mode = false;
@@ -1252,6 +1275,9 @@ void create_directory(APP_CONTEXT *ctx, WINDOW **inner_win,
                 strcpy(new_path, new_dirname);
             }
 
+            // mvwprintw(ctx->course_windows[0], 2, 20, "%s", new_path);
+            // wrefresh(ctx->course_windows[0]);
+
             mkdir(new_path, 0777);
             free(new_path);
 
@@ -1266,6 +1292,9 @@ void create_directory(APP_CONTEXT *ctx, WINDOW **inner_win,
             {
                 current_entry = ctx->file_tree->current_entry;
             }
+
+            // mvwprintw(ctx->course_windows[0], 2, 20, "%s", ctx->filename);
+            // wrefresh(ctx->course_windows[0]);
 
             create_new_entry_for_file(ctx, current_entry, 4);
 
@@ -1366,6 +1395,7 @@ void create_app_root_dir(APP_CONTEXT *ctx)
     ctx->user_home_dir = proj_dir_buf;
     ctx->home_env = home_dir;
     ctx->shell_local_cwd = strdup(ctx->user_home_dir);
+    ctx->user_data->home_dir = strdup(ctx->user_home_dir);
 
     set_user_home_dir(ctx);
 

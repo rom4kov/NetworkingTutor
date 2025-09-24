@@ -21,3 +21,4 @@ void handle_new_user_input(APP_CONTEXT *ctx, bool *start_opt_menu_active);
 void handle_user_select_win_input(APP_CONTEXT *ctx, bool *start_opt_menu_active,
                                   int menu_option);
 
+void handle_instr_window_input(APP_CONTEXT *ctx);

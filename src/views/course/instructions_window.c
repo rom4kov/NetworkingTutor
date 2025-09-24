@@ -6,7 +6,6 @@
 
 void print_course_instructions(APP_CONTEXT *ctx)
 {
-
     // log_course_instr_values(ctx);
     // wrefresh(ctx->course_windows[2]);
 

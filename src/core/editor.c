@@ -30,15 +30,15 @@ void move_down(TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **edit_window,
             *scroll_offset += 1;
             print_buffer(tbuf, edit_window, line_num_win, scroll_offset,
                          lines_to_print);
-            // log_values(edit_window, *scroll_offset, tbuf, lines_to_print, y,
-            // x, editor_height);
+            // log_editor_values(edit_window, *scroll_offset, tbuf, lines_to_print, y,
+
             print_cursor_position(editor_window, tbuf, editor_height);
             wmove(*edit_window, y, x);
             curs_set(2);
         }
         else
         {
-            // log_values(edit_window, *scroll_offset, tbuf, lines_to_print, y,
+            // log_editor_values(edit_window, *scroll_offset, tbuf, lines_to_print, y,
             // x, editor_height);
             print_cursor_position(editor_window, tbuf, editor_height);
             wmove(*edit_window, y + 1, x);
@@ -56,7 +56,7 @@ void move_down(TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **edit_window,
             *scroll_offset += 1;
             print_buffer(tbuf, edit_window, line_num_win, scroll_offset,
                          lines_to_print);
-            // log_values(edit_window, *scroll_offset, tbuf, lines_to_print, y,
+            // log_editor_values(edit_window, *scroll_offset, tbuf, lines_to_print, y,
             // x, editor_height);
             print_cursor_position(editor_window, tbuf, editor_height);
             wmove(*edit_window, y, tbuf->current_line->length - 1);
@@ -65,7 +65,7 @@ void move_down(TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **edit_window,
         else
         {
             curs_set(0);
-            // log_values(edit_window, *scroll_offset, tbuf, lines_to_print, y,
+            // log_editor_values(edit_window, *scroll_offset, tbuf, lines_to_print, y,
             // x, editor_height);
             print_cursor_position(editor_window, tbuf, editor_height);
             wmove(*edit_window, y + 1, tbuf->current_line->length - 1);
@@ -99,7 +99,7 @@ void move_up(TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **edit_window,
             *scroll_offset -= 1;
             print_buffer(tbuf, edit_window, line_num_win, scroll_offset,
                          *lines_to_print);
-            // log_values(edit_window, *scroll_offset, tbuf, *lines_to_print, y,
+            // log_editor_values(edit_window, *scroll_offset, tbuf, *lines_to_print, y,
             // x, editor_height);
             print_cursor_position(editor_window, tbuf, editor_height);
             wmove(*edit_window, y, x);
@@ -108,7 +108,7 @@ void move_up(TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **edit_window,
         else
         {
             curs_set(0);
-            // log_values(edit_window, *scroll_offset, tbuf, *lines_to_print, y,
+            // log_editor_values(edit_window, *scroll_offset, tbuf, *lines_to_print, y,
             // x, editor_height);
             print_cursor_position(editor_window, tbuf, editor_height);
             wmove(*edit_window, y - 1, x);
@@ -127,7 +127,7 @@ void move_up(TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **edit_window,
             *scroll_offset -= 1;
             print_buffer(tbuf, edit_window, line_num_win, scroll_offset,
                          *lines_to_print);
-            // log_values(edit_window, *scroll_offset, tbuf, *lines_to_print, y,
+            // log_editor_values(edit_window, *scroll_offset, tbuf, *lines_to_print, y,
             // x, editor_height);
             print_cursor_position(editor_window, tbuf, editor_height);
             wmove(*edit_window, y, tbuf->current_line->length - 1);
@@ -136,7 +136,7 @@ void move_up(TEXT_BUFFER *tbuf, WINDOW **line_num_win, WINDOW **edit_window,
         else
         {
             curs_set(0);
-            // log_values(edit_window, *scroll_offset, tbuf, *lines_to_print, y,
+            // log_editor_values(edit_window, *scroll_offset, tbuf, *lines_to_print, y,
             // x, editor_height);
             print_cursor_position(editor_window, tbuf, editor_height);
             wmove(*edit_window, y - 1, tbuf->current_line->length - 1);
@@ -216,7 +216,7 @@ void insert_char(TEXT_BUFFER *tbuf, WINDOW **edit_window,
 
     print_buffer(tbuf, edit_window, line_num_win, &scroll_offset,
                  *lines_to_print);
-    // log_values(edit_window, scroll_offset, tbuf, 0, y, x);
+    // log_editor_values(edit_window, scroll_offset, tbuf, 0, y, x);
     print_cursor_position(editor_window, tbuf, editor_height);
     if (file_modified)
     {
@@ -296,7 +296,7 @@ void insert_line(TEXT_BUFFER *tbuf, WINDOW **edit_window,
             print_modified_marker(*editor_window, filename_len, file_modified);
         }
         wnoutrefresh(*editor_window);
-        // log_values(edit_window, *scroll_offset, tbuf, *lines_to_print, y, x);
+        // log_editor_values(edit_window, *scroll_offset, tbuf, *lines_to_print, y, x);
         if (y < editor_height - 6)
         {
             print_cursor_position(editor_window, tbuf, editor_height);
@@ -344,7 +344,7 @@ void insert_line(TEXT_BUFFER *tbuf, WINDOW **edit_window,
             print_modified_marker(*editor_window, filename_len, file_modified);
         }
         wnoutrefresh(*editor_window);
-        // log_values(edit_window, *scroll_offset, tbuf, *lines_to_print, y, x);
+        // log_editor_values(edit_window, *scroll_offset, tbuf, *lines_to_print, y, x);
         if (y < (editor_height - 5) && *lines_to_print < (editor_height - 3))
         {
             print_cursor_position(editor_window, tbuf, editor_height);
@@ -389,7 +389,7 @@ void delete_line(TEXT_BUFFER *tbuf, WINDOW **edit_window,
         curs_set(0);
         print_buffer(tbuf, edit_window, line_num_win, scroll_offset,
                      *lines_to_print);
-        // log_values(edit_window, *scroll_offset, tbuf, *lines_to_print, y, x);
+        // log_editor_values(edit_window, *scroll_offset, tbuf, *lines_to_print, y, x);
         print_cursor_position(editor_window, tbuf, editor_height);
         if (file_modified)
         {
@@ -419,7 +419,7 @@ void delete_char_or_line(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
 
         print_buffer(tbuf, edit_window, line_num_win, scroll_offset,
                      *lines_to_print);
-        // log_values(edit_window, *scroll_offset, tbuf, 0, y, x);
+        // log_editor_values(edit_window, *scroll_offset, tbuf, 0, y, x);
         print_cursor_position(editor_window, tbuf, editor_height);
         if (file_modified)
         {
@@ -465,7 +465,7 @@ void bs_delete_line(TEXT_BUFFER *tbuf, WINDOW **edit_window,
 
     print_buffer(tbuf, edit_window, line_num_win, scroll_offset,
                  *lines_to_print);
-    // log_values(edit_window, *scroll_offset, tbuf, *lines_to_print, y, 0);
+    // log_editor_values(edit_window, *scroll_offset, tbuf, *lines_to_print, y, 0);
     print_cursor_position(editor_window, tbuf, editor_height);
     if (file_modified)
     {
@@ -513,27 +513,6 @@ void bs_delete_char_or_line(TEXT_BUFFER *tbuf, WINDOW **line_num_win,
                        scroll_offset, lines_to_print, editor_height,
                        filename_len, file_modified);
     }
-}
-
-void log_values(WINDOW **edit_window, int scroll_offset, TEXT_BUFFER *tbuf,
-                int lines_to_print, int y, int x, int editor_height)
-{
-    mvwprintw(*edit_window, editor_height - 13, EDIT_MAX - 15, "        ");
-    mvwprintw(*edit_window, editor_height - 12, EDIT_MAX - 15, "        ");
-    mvwprintw(*edit_window, editor_height - 11, EDIT_MAX - 15, "        ");
-    mvwprintw(*edit_window, editor_height - 10, EDIT_MAX - 15, "        ");
-    mvwprintw(*edit_window, editor_height - 9, EDIT_MAX - 15, "        ");
-    mvwprintw(*edit_window, editor_height - 8, EDIT_MAX - 15, "        ");
-    mvwprintw(*edit_window, editor_height - 13, EDIT_MAX - 15, "y:  %i", y);
-    mvwprintw(*edit_window, editor_height - 12, EDIT_MAX - 15, "x:  %i", x);
-    mvwprintw(*edit_window, editor_height - 11, EDIT_MAX - 15, "so:  %i",
-              scroll_offset);
-    mvwprintw(*edit_window, editor_height - 10, EDIT_MAX - 15, "nol: %i",
-              tbuf->num_of_lines);
-    mvwprintw(*edit_window, editor_height - 9, EDIT_MAX - 15, "ltp: %i",
-              lines_to_print);
-    mvwprintw(*edit_window, editor_height - 8, EDIT_MAX - 15, "cln: %i",
-              tbuf->curr_line_nr);
 }
 
 void print_cursor_position(WINDOW **editor_window, TEXT_BUFFER *tbuf, int editor_height)

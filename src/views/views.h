@@ -33,6 +33,7 @@ WINDOW *create_right_side_panel(APP_CONTEXT *ctx, char *label);
 void create_course_view(APP_CONTEXT *ctx);
 WINDOW *create_editor_window(APP_CONTEXT *ctx);
 WINDOW *create_terminal_window(APP_CONTEXT *ctx);
+void print_term_buf(WINDOW *term_win, TEXT_BUFFER *term_buf);
 void toggle_terminal(APP_CONTEXT *ctx);
 WINDOW *create_explorer_window(FILE_TREE *file_tree);
 void create_explorer_popup_windows(APP_CONTEXT *ctx);

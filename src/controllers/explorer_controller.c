@@ -14,17 +14,6 @@
 
 #define WU COLS / 12 // WU for WIDTH_UNIT
 
-void log_ft_values(APP_CONTEXT *ctx)
-{
-    mvwprintw(ctx->course_windows[3], 6, 45, "                       ");
-    mvwprintw(ctx->course_windows[3], 6, 45, "%i",
-              ctx->file_tree->num_of_entries);
-    mvwprintw(ctx->course_windows[3], 7, 45, "                       ");
-    mvwprintw(ctx->course_windows[3], 7, 45, "%i",
-              ctx->file_tree->current_entry->num_of_open_entries);
-    wrefresh(ctx->course_windows[3]);
-}
-
 void handle_explorer_input(APP_CONTEXT *ctx)
 {
     bool new_file_form_active = false;

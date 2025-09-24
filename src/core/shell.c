@@ -2,6 +2,7 @@
 #include "../controllers/controllers.h"
 #include "../core/core.h"
 #include "../models/models.h"
+#include "../views/views.h"
 
 #include <asm-generic/errno-base.h>
 #include <curses.h>

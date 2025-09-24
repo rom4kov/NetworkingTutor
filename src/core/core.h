@@ -69,6 +69,7 @@ void focus_window(WINDOW **window, int color_pair, char *label);
 void focus_instructions_window(RIGHT_PANEL_STATE *rps, int color_pair,
                                char *label);
 
+// utils
 const char* get_rank_name(Rank rank);
 Rank determine_rank(int points);
 Rank get_next_rank(Rank r);
@@ -82,7 +83,7 @@ char *current_datetime();
 int get_diff_time_in_days(char date1[], char date2[]);
 int suppress_stdout(void);
 int restore_stdout(int saved_stdout);
-void log_values(WINDOW **edit_window, int scroll_offset, TEXT_BUFFER *tbuf,
+void log_editor_values(WINDOW **edit_window, int scroll_offset, TEXT_BUFFER *tbuf,
                 int lines_to_print, int y, int x, int editor_height);
 void log_course_instr_values(APP_CONTEXT *ctx);
 

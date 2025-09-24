@@ -196,15 +196,6 @@ into a comprehensive learning tool for network programming.
 
 ---
 
-### **Use of AI Tools**
-
-In the development of NetworkingTutor, I occasionally consulted AI-based
-tools such as ChatGPT and Claude. They were used for advice, debugging assistance,
-and limited code review. All core code and design decisions, however, were
-written and implemented by me.
-
----
-
 ### **Platform Support**
 
 NetworkingTutor has been tested on **Arch Linux** and **Linux Mint**.  

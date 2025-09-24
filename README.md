@@ -1,5 +1,5 @@
 # NetworkingTutor
-#### Video Demo: https://youtube.com/2se83kjd7
+#### Video Demo: [https://youtube.com/2se83kjd7](https://youtu.be/YWNfvbsoCuA)
 #### Description:
 
 **NetworkingTutor** is a text-based, IDE-like learning environment designed

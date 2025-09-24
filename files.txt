@@ -1,2 +1,0 @@
-file 'image_video.mp4'
-file 'new_cs50_video.mkv'

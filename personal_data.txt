@@ -1,5 +1,0 @@
-Project: NetworkingTutor
-Name: Roman Kowert
-GitHub / edX: rom4kov, r-kowert
-City & Country: Berlin, Germany
-Video date: 09/22/2025

@@ -1,3 +1,0 @@
-Layer 7, Application, HTTP
-Layer 4, Transport, TCP
-Layer 3, Network, IP

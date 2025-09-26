@@ -198,7 +198,7 @@ into a comprehensive learning tool for network programming.
 
 ### **Platform Support**
 
-NetworkingTutor has been tested on **Arch Linux** and **Linux Mint**.  
+NetworkingTutor has been tested on **Arch Linux**, **Ubuntu** and **Linux Mint**.  
 The program has not yet been ported or tested on macOS or Windows.
 
 ---

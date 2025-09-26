@@ -139,7 +139,7 @@ Once dependencies are installed, clone the repository and build the program:
 
 ```bash
 git clone https://github.com/rom4kov/NetworkingTutor.git
-cd networkingtutor
+cd NetworkingTutor
 make
 ```
 

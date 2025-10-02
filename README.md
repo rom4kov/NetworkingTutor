@@ -155,6 +155,9 @@ Start the program by running:
 ./ntutor
 ```
 
+💡 Note: NetworkingTutor works best with the **Ghostty** terminal emulator. Other terminal emulators, like **Alacritty**, generally work as well but may occasionally be less smooth or display some characters differently.
+
+
 ---
 
 ### **Architecture and Design**

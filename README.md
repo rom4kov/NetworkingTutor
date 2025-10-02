@@ -10,8 +10,7 @@ a layer of gamification to keep users motivated.
 
 https://github.com/user-attachments/assets/023925d3-6d94-4b06-a270-c99dc5fd1c68
 
-#### Another Video Demo with some explanation (bad audio for now, will make a better one later): 
-[https://youtube.com/2se83kjd7](https://youtu.be/YWNfvbsoCuA)
+#### Another Video Demo with some explanation (bad audio for now, will make a better one later): [https://youtube.com/2se83kjd7](https://youtu.be/YWNfvbsoCuA)
 
 The first available course, *Build a Simple HTTP Server in C*, introduces
 students to a classic project for solidifying the basics of C while learning 

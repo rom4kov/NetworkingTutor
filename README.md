@@ -1,7 +1,10 @@
 # NetworkingTutor
-<img width="1921" height="1080" alt="screenshot_2025-09-24-040308" src="https://github.com/user-attachments/assets/85dc0803-616c-4243-b37f-e98fdef45aab" />
 
-#### Video Demo: [https://youtube.com/2se83kjd7](https://youtu.be/YWNfvbsoCuA)
+https://github.com/user-attachments/assets/023925d3-6d94-4b06-a270-c99dc5fd1c68
+
+#### Video Demo (bad audio for now, will make a better one later): 
+[https://youtube.com/2se83kjd7](https://youtu.be/YWNfvbsoCuA)
+
 #### Description:
 
 **NetworkingTutor** is a text-based, IDE-like learning environment designed
@@ -76,6 +79,7 @@ A small status display in the bottom right of the course view shows the active
 course and the number of completed sections. Its role is minor in the current
 version but provides a foundation for future expansion.
 
+<img width="1921" height="1080" alt="screenshot_2025-09-24-040308" src="https://github.com/user-attachments/assets/85dc0803-616c-4243-b37f-e98fdef45aab" />
 ---
 
 ### **Other Views**

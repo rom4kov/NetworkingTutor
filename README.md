@@ -1,12 +1,5 @@
 # NetworkingTutor
 
-https://github.com/user-attachments/assets/023925d3-6d94-4b06-a270-c99dc5fd1c68
-
-#### Video Demo (bad audio for now, will make a better one later): 
-[https://youtube.com/2se83kjd7](https://youtu.be/YWNfvbsoCuA)
-
-#### Description:
-
 **NetworkingTutor** is a text-based, IDE-like learning environment designed
 to teach students the fundamentals of network programming in C. It provides
 a guided and interactive platform where users can create an account, enroll
@@ -14,6 +7,11 @@ in courses, complete coding assignments, and receive automated feedback.
 The goal is to make learning network programming approachable while still
 being rigorous, combining educational material with hands-on projects and
 a layer of gamification to keep users motivated.
+
+https://github.com/user-attachments/assets/023925d3-6d94-4b06-a270-c99dc5fd1c68
+
+#### Video Demo (bad audio for now, will make a better one later): 
+[https://youtube.com/2se83kjd7](https://youtu.be/YWNfvbsoCuA)
 
 The first available course, *Build a Simple HTTP Server in C*, introduces
 students to a classic project for solidifying the basics of C while learning 

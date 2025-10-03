@@ -211,6 +211,7 @@ The program has not yet been ported or tested on macOS or Windows.
 
 - Padala, Pradeep and Dickey, Thomas (2024). *NCURSES Programming HOWTO*.
   Available at: [https://invisible-island.net/ncurses/howto/NCURSES-Programming-HOWTO.html](https://invisible-island.net/ncurses/howto/NCURSES-Programming-HOWTO.html)
+
   My main reference and source for learning ncurses. 
 - Hall, Brian “Beej” (2024). *Beej’s Guide to Network Programming*. Available at: [https://beej.us/guide/bgnet/](https://beej.us/guide/bgnet/)  
   This resource was instrumental in writing the material for the course *Build an HTTP Server in C*.

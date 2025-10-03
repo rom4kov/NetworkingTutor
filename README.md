@@ -1,15 +1,4 @@
-```
-             **  _   __       __                          __    _               
-                / | / /___   / /_ _      __ ____   _____ / /__ (_)____   ____ _ 
-               /  |/ // _ \ / __/| | /| / // __ \ / ___// //_// // __ \ / __ `/ 
-              / /|  //  __// /_  | |/ |/ // /_/ // /   / ,<  / // / / // /_/ /  
-             /_/ |_/ \___/ \__/  |__/|__/ \____//_/   /_/|_|/_//_/ /_/ \__, /   
-                             ______        __                        /____/    
-                            /_  __/__  __ / /_ ____   _____                   
-                             / /  / / / // __// __ \ / ___/                    
-                            / /  / /_/ // /_ / /_/ // /                        
-                           /_/   \__,_/ \__/ \____//_/                        **
-```
+# **NetworkingTutor**
 
 **NetworkingTutor** is a text-based, IDE-like learning environment designed
 to teach students the fundamentals of network programming in C. It provides
